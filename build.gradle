@@ -1,0 +1,45 @@
+
+plugins {
+    id 'java-library'
+}
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+
+	compile 'com.sparkjava:spark-core:2.9.3'
+	compile 'com.sparkjava:spark-template-freemarker:2.7.1'
+
+	compile 'org.freemarker:freemarker:2.3.31'
+
+	compile 'com.h2database:h2:1.4.199'
+	compile 'io.vavr:vavr:0.10.0'
+	compile 'p6spy:p6spy:3.8.2'
+	compile 'com.zaxxer:HikariCP:3.3.1'
+	compile 'org.slf4j:slf4j-api:1.7.26'
+	compile 'ch.qos.logback:logback-classic:1.2.3'
+	compile 'commons-cli:commons-cli:1.4'
+	compile 'com.opencsv:opencsv:4.6'
+	compile 'org.apache.commons:commons-lang3:3.9'
+	compile 'org.json:json:20180813'
+	compile 'org.apache.commons:commons-lang3:3.9'
+	compile 'org.apache.poi:poi:4.1.0'
+	compile 'org.apache.poi:poi-ooxml:4.1.0'
+	compile 'com.squareup.tape2:tape:2.0.0-beta1'
+	compile 'org.quartz-scheduler:quartz:2.3.1'
+
+}
+
+task fatJar(type: Jar) {
+	manifest {
+		attributes 'Main-Class': 'gov.epa.bencloud.server.BenCloudServer'
+    }
+	
+	exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA'
+
+	baseName = "BenCloudServer"
+	from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+	with jar
+}
