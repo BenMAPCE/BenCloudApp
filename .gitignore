@@ -80,6 +80,7 @@ gradle-app.setting
 
 .metadata
 bin/
+build/
 tmp/
 *.tmp
 *.bak
@@ -170,3 +171,4 @@ build.paulhosking.properties
 .recommenders/**
 /.recommenders/
 **/.DS_Store
+/build/
