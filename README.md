@@ -1,5 +1,19 @@
 # BenCloudServer
 
+
+## Run the BenCloud Server inside Eclipse
+
+go to the BenCloudServer.java and right click and select "Run as ... Java Application"
+
+## Build the BenCloud Server
+
+To build the .jar file for testing run:
+
+**gradle fatJar**
+
+(this needs to be done before building a Docker image)
+
+
 ## Build docker image for local testing
 
 From the top level source directory
