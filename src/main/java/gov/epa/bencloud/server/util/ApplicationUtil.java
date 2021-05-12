@@ -16,7 +16,31 @@ public class ApplicationUtil {
 
 	public static Properties properties = new Properties();
 
+	public static boolean usingLocalProperties() {
+
+		try {
+			String applicationPath = new File(".").getCanonicalPath();
+					
+			String propertiesPath = applicationPath + File.separator + "bencloud-local.properties";
+			File propertiesFile = new File(propertiesPath);
+
+			if (propertiesFile.exists()) {
+				return true;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return false;
+	}
+	
+	
 	public static void loadProperties(String propertiesFileName) throws IOException {
+		loadProperties(propertiesFileName, false);
+	}
+	
+	public static void loadProperties(
+			String propertiesFileName, boolean optional) throws IOException {
 
 		String applicationPath = new File(".").getCanonicalPath();
 		System.out.println(applicationPath);
@@ -25,19 +49,20 @@ public class ApplicationUtil {
 		File propertiesFile = new File(propertiesPath);
 
 		if (!propertiesFile.exists()) {
-			System.out.println("Sorry, unable to find " + propertiesFileName);
-			return;
-		}
+			if (!optional) {
+				System.out.println("Sorry, unable to find " + propertiesFileName);
+				return;
+			}
+		} else {
+			try (InputStream input = new FileInputStream(propertiesFile)) {
 
-		try (InputStream input = new FileInputStream(propertiesFile)) {
-
-			properties.load(input);
-			
-		} catch (IOException ex) {
-			ex.printStackTrace();
+				properties.load(input);
+				
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
 		}
 	}
-
 
 	public static String getProperty(String property) {
 

@@ -14,15 +14,20 @@ dependencies {
 
 	compile 'org.freemarker:freemarker:2.3.31'
 
+	// database related
+	
+	compile 'org.postgresql:postgresql:42.2.20'
+	
 	compile 'com.h2database:h2:1.4.199'
-	compile 'io.vavr:vavr:0.10.0'
+	compile 'org.jooq:jooq:3.14.9'
 	compile 'p6spy:p6spy:3.8.2'
-	compile 'com.zaxxer:HikariCP:3.3.1'
+	compile 'com.zaxxer:HikariCP:4.0.3'
+
+	compile 'io.vavr:vavr:0.10.0'
 	compile 'org.slf4j:slf4j-api:1.7.26'
 	compile 'ch.qos.logback:logback-classic:1.2.3'
 	compile 'commons-cli:commons-cli:1.4'
 	compile 'com.opencsv:opencsv:4.6'
-	compile 'org.apache.commons:commons-lang3:3.9'
 	compile 'org.json:json:20180813'
 	compile 'org.apache.commons:commons-lang3:3.9'
 	compile 'org.apache.poi:poi:4.1.0'

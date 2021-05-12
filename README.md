@@ -1,5 +1,6 @@
 # BenCloudServer
 
+    Read the DATABASE_CONFIGURATION.md for info on configuring your database.
 
 ## Run the BenCloud Server inside Eclipse
 

@@ -1,7 +1,3 @@
-# Liferay
-configs
-.sass-cache
-.sass_cache_*.css
 
 ### Mac OS X
 
@@ -140,24 +136,14 @@ local.properties
 # Typically, this file would be tracked if it contains build/dependency configurations:
 #.project
 
+bencloud-local.properties
 
-
-node_modules
-
-#From old portal gitignore
-**/.class
-**/.classpath
-**/.project
-**/bin/*
-**/classes/*
-**/.settings/*
-**/.sass-cache/*
-build.paulhosking.properties
 .project
 .classpath
 **/WEB-INF/classes/*
 **/.settings/*
 **/bin/**/*
+**/build/**/*
 **/.sass-cache/*
 *.component
 **/.tern-project/*

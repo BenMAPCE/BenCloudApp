@@ -40,6 +40,7 @@ public class FreeMarkerRenderUtil {
 			Configuration freeMarkerConfiguration, 
 			Map<String, Object> model, 
 			String templatePath) {
+		
 	    return new FreeMarkerEngine(freeMarkerConfiguration)
 	    		.render(new ModelAndView(model, templatePath));
 	}
