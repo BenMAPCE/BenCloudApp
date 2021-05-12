@@ -8,10 +8,12 @@ import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.LoggerContext;
 import freemarker.template.Configuration;
+import gov.epa.bencloud.server.jobs.JobsUtil;
 import gov.epa.bencloud.server.routes.AdminRoutes;
 import gov.epa.bencloud.server.routes.ApiRoutes;
 import gov.epa.bencloud.server.routes.PublicRoutes;
 import gov.epa.bencloud.server.routes.SecuredRoutes;
+import gov.epa.bencloud.server.tasks.TaskUtil;
 import gov.epa.bencloud.server.util.ApplicationUtil;
 import gov.epa.bencloud.server.util.FreeMarkerRenderUtil;
 import spark.Service;
@@ -22,6 +24,8 @@ public class BenCloudServer {
 	
 	private static Logger log = LoggerFactory.getLogger(BenCloudServer.class);
     
+	private static String applicationPath;
+	
 	public static void main(String[] args) {
 
 		String javaVersion = System.getProperty("java.version");
@@ -52,9 +56,7 @@ public class BenCloudServer {
 		ApplicationUtil.configureLogging();
 		LoggerContext loggerContext = (LoggerContext)LoggerFactory.getILoggerFactory();
 		Logger logger = loggerContext.getLogger("gov.epa.bencloud");
-	
-		String applicationPath = "";
-		
+			
 		try {
 			applicationPath = new File(".").getCanonicalPath();
 		} catch (IOException e1) {
@@ -77,8 +79,14 @@ public class BenCloudServer {
 		new ApiRoutes(benCloudService, freeMarkerConfiguration);
 		new SecuredRoutes(benCloudService, freeMarkerConfiguration);
 		
+		JobsUtil.startJobScheduler();
+		
 		System.out.println("\nStarting BenCloud Demo, version " + version);
 
+	}
+
+	public static String getApplicationPath() {
+		return applicationPath;
 	}
 
 }

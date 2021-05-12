@@ -35,6 +35,8 @@ dependencies {
 	compile 'com.squareup.tape2:tape:2.0.0-beta1'
 	compile 'org.quartz-scheduler:quartz:2.3.1'
 
+    compile 'com.github.javafaker:javafaker:1.0.2'
+
 }
 
 task fatJar(type: Jar) {

@@ -158,3 +158,8 @@ bencloud-local.properties
 /.recommenders/
 **/.DS_Store
 /build/
+
+# ignore BenCloud data directories
+/queue
+/output
+

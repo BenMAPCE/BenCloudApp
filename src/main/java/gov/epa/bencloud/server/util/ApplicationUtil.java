@@ -43,7 +43,6 @@ public class ApplicationUtil {
 			String propertiesFileName, boolean optional) throws IOException {
 
 		String applicationPath = new File(".").getCanonicalPath();
-		System.out.println(applicationPath);
 				
 		String propertiesPath = applicationPath + File.separator + propertiesFileName;
 		File propertiesFile = new File(propertiesPath);
