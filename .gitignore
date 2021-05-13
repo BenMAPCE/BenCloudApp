@@ -152,12 +152,12 @@ bencloud-local.properties
 .metadata
 .gradle
 **/build/tmp/**/*
+**/build/libs/**/*
 **/build/resources/**/*
 **/build/portal-common-css/**/*
 .recommenders/**
 /.recommenders/
 **/.DS_Store
-/build/
 
 # ignore BenCloud data directories
 /queue
