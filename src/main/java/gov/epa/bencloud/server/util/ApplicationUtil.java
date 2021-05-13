@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
+import gov.epa.bencloud.server.BenCloudServer;
 
 public class ApplicationUtil {
 
@@ -140,5 +141,29 @@ public class ApplicationUtil {
 		outputString = outputString.replaceAll(" ", "_");
 		outputString = outputString.replaceAll("[^a-zA-Z0-9\\_\\-\\s]", "_");
 		return outputString;
+	}
+	
+	public static String createQueueDirectoryIfNecessary() {
+		
+		String queueDirectory = BenCloudServer.getApplicationPath() + 
+				ApplicationUtil.getProperty("queue.directory");
+
+		if (!new File(queueDirectory).exists()) {
+			new File(queueDirectory).mkdirs();
+		}
+
+		return queueDirectory;
+	}
+
+	public static String createOutputDirectoryIfNecessary() {
+		
+		String outputDirectory = BenCloudServer.getApplicationPath() + 
+				ApplicationUtil.getProperty("output.directory");
+				
+		if (!new File(outputDirectory).exists()) {
+			new File(outputDirectory).mkdirs();
+		}
+		
+		return outputDirectory;
 	}
 }

@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import com.github.javafaker.Faker;
 
 import freemarker.template.Configuration;
+import gov.epa.bencloud.server.BenCloudServer;
 import gov.epa.bencloud.server.tasks.Task;
 import gov.epa.bencloud.server.tasks.TaskUtil;
 import gov.epa.bencloud.server.util.ApplicationUtil;
@@ -83,7 +84,7 @@ public class SecuredRoutes {
 			String fileSetToDelete = req.body();
 			
 			try (Stream<Path> filePathStream = 
-					Files.walk(Paths.get(ApplicationUtil.getProperty("output.directory") + 
+					Files.walk(Paths.get(BenCloudServer.getOutputDirectory() + 
 							File.separator + bcoUserIdentifier))) {
 			    filePathStream.forEach(filePath -> {
 			        if (Files.isRegularFile(filePath)) {

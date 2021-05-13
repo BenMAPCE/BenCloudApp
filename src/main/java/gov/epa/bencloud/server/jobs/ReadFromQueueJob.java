@@ -39,8 +39,7 @@ public class ReadFromQueueJob implements Job {
 
 			try (Stream<Path> filePathStream = 
 					Files.walk(Paths.get(
-							BenCloudServer.getApplicationPath() +  
-							ApplicationUtil.getProperties().get("queue.directory").toString()))) {
+							BenCloudServer.getQueueDirectory()))) {
 			    filePathStream.forEach(filePath -> {
 			        if (Files.isRegularFile(filePath)) {
 			        	if (filePath.toString().endsWith(".task")) {

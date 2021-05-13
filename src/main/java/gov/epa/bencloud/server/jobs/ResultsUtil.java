@@ -9,7 +9,7 @@ import java.io.OutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import gov.epa.bencloud.server.util.ApplicationUtil;
+import gov.epa.bencloud.server.BenCloudServer;
 import spark.Request;
 import spark.Response;
 
@@ -19,7 +19,7 @@ public class ResultsUtil {
 
 	private static Object getFile(Request request, Response responce, String userIdentifier, String fileName) {
 
-		String scenarioFileDirectory = ApplicationUtil.getProperty("output.directory") + 
+		String scenarioFileDirectory = BenCloudServer.getOutputDirectory() + 
 				File.separator + userIdentifier;
 
 		File downloadFile = new File(scenarioFileDirectory + File.separator + fileName);

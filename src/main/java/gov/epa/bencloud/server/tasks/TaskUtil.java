@@ -17,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import gov.epa.bencloud.server.BenCloudServer;
-import gov.epa.bencloud.server.util.ApplicationUtil;
 
 public class TaskUtil {
 
@@ -31,10 +30,7 @@ public class TaskUtil {
 
 		byte[] serializedScenerio = SerializationUtils.serialize(task);
 
-		String queueDirectory = BenCloudServer.getApplicationPath() + 
-				ApplicationUtil.getProperties().get("queue.directory").toString();
-
-		String queueFile = queueDirectory + File.separator + now.format(dateTimeformatter) 
+		String queueFile = BenCloudServer.getQueueDirectory() + File.separator + now.format(dateTimeformatter) 
 			+ "-" + task.getUuid() + ".task";
 
 		Path path = Paths.get(queueFile);
@@ -54,8 +50,7 @@ public class TaskUtil {
 				dateString +
 				".task";
 				
-		String taskFile = BenCloudServer.getApplicationPath() + 
-				ApplicationUtil.getProperty("output.directory") + 
+		String taskFile = BenCloudServer.getOutputDirectory() + 
 				File.separator + 
 				getUserIdentifierPath(task) + File.separator + 
 				taskOutputFileName;
@@ -84,8 +79,7 @@ public class TaskUtil {
 	
 	public static String getUserIdentifierPath(Task task) {
 				
-		String outputDirectory = BenCloudServer.getApplicationPath() + 
-				ApplicationUtil.getProperty("output.directory") + File.separator + task.getUserIdentifier();
+		String outputDirectory = BenCloudServer.getOutputDirectory() + File.separator + task.getUserIdentifier();
 				
 		if (!new File(outputDirectory).exists()) {
 			new File(outputDirectory).mkdirs();
@@ -101,8 +95,7 @@ public class TaskUtil {
 		if (null != userIdentifier) {
 
 			Path userOutputPath = 
-					Paths.get(BenCloudServer.getApplicationPath() +
-							ApplicationUtil.getProperty("output.directory") + 
+					Paths.get(BenCloudServer.getOutputDirectory() + 
 					File.separator + userIdentifier);
 		    
 			if (!userOutputPath.toFile().exists()) {
@@ -116,8 +109,7 @@ public class TaskUtil {
 				try (Stream<Path> filePathStream = 
 						Files.walk(
 								Paths.get(
-										BenCloudServer.getApplicationPath() + 
-										ApplicationUtil.getProperty("output.directory") + 
+										BenCloudServer.getOutputDirectory() + 
 								File.separator + userIdentifier))) {
 					filePathStream.forEach(filePath -> {
 						if (Files.isRegularFile(filePath)) {
