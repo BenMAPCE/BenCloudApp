@@ -1,15 +1,15 @@
 package gov.epa.bencloud.server.jobs;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Stream;
+import static gov.epa.bencloud.server.database.jooq.Tables.TASK_QUEUE;
 
-import org.apache.commons.lang3.SerializationUtils;
+import java.sql.Connection;
+
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Result;
+import org.jooq.SQLDialect;
+import org.jooq.exception.DataAccessException;
+import org.jooq.impl.DSL;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -17,10 +17,8 @@ import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import gov.epa.bencloud.server.BenCloudServer;
-import gov.epa.bencloud.server.tasks.Task;
+import gov.epa.bencloud.server.database.ConnectionManager;
 import gov.epa.bencloud.server.tasks.TaskUtil;
-import gov.epa.bencloud.server.util.ApplicationUtil;
 
 @DisallowConcurrentExecution
 public class ReadFromQueueJob implements Job {
@@ -33,41 +31,48 @@ public class ReadFromQueueJob implements Job {
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 
+		System.out.println("ReadFromQueueJob execute");
+		
+		Connection connection = ConnectionManager.getConnection();
+		DSLContext create = DSL.using(connection, SQLDialect.POSTGRES);
+		
+		String uuid = null;
+		
 		try {
-			
-			List<String> taskFilePaths = new ArrayList<>();
+			Result<Record> result = create.select().from(TASK_QUEUE)
+					.where(TASK_QUEUE.IN_PROCESS.isFalse())
+					.orderBy(TASK_QUEUE.SUBMITTED_DATE.asc())
+					.limit(1)
+					.forUpdate()
+					.fetch();
 
-			try (Stream<Path> filePathStream = 
-					Files.walk(Paths.get(
-							BenCloudServer.getQueueDirectory()))) {
-			    filePathStream.forEach(filePath -> {
-			        if (Files.isRegularFile(filePath)) {
-			        	if (filePath.toString().endsWith(".task")) {
-			        		taskFilePaths.add(filePath.toString());
-			        	}
-			        }
-			    });
-			}
-
-			if (!taskFilePaths.isEmpty()) {
-				Collections.sort(taskFilePaths);
-				byte[] scenarioFileContent = Files.readAllBytes(Paths.get(taskFilePaths.get(0)));
-				Task task = SerializationUtils.deserialize(scenarioFileContent);
-				if (log.isDebugEnabled()) {
-					log.debug("Processing " + task.getName());
-				}
-
-				TaskUtil.processTask(task);
-				
-				Files.delete(Paths.get(taskFilePaths.get(0)));
+			if (result.size() == 0) {
+				System.out.println("no tasks to process");
+			} else if (result.size() > 1) {
+				System.out.println("recieved more than 1 task record");
 			} else {
-				if (log.isDebugEnabled()) {
-					log.debug("No tasks to process");
-				}
+				Record record = result.get(0);
+				
+				System.out.println("get job from queue: " + 
+						record.get(TASK_QUEUE.TASK_NAME));
+				uuid = record.getValue(TASK_QUEUE.TASK_UUID);
+				
+				create.update(TASK_QUEUE)
+				.set(TASK_QUEUE.IN_PROCESS, true)
+				.where(TASK_QUEUE.ID.eq(record.getValue(TASK_QUEUE.ID)))
+				.execute();
 			}
-		} catch (IOException e) {
+		} catch (DataAccessException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			ConnectionManager.releaseConnection(connection);
 		}
+		
+		TaskUtil.processTask(uuid);
 
 	}
 

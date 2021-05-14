@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import freemarker.template.Configuration;
-import gov.epa.bencloud.server.database.ConnectionManager;
+import gov.epa.bencloud.server.database.PooledDataSource;
 import gov.epa.bencloud.server.util.FreeMarkerRenderUtil;
 import spark.Service;
 
@@ -33,7 +33,7 @@ public class AdminRoutes {
 			
 			Map<String, Object> attributes = new HashMap<>();
 			
-			Connection connection = ConnectionManager.getConnection();
+			Connection connection = PooledDataSource.getConnection();
 			
 			if (null != connection) {
 				attributes.put("database_status", "Got a database connection");

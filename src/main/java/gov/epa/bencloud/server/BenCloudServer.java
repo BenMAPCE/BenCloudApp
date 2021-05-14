@@ -24,8 +24,6 @@ public class BenCloudServer {
 	private static Logger log = LoggerFactory.getLogger(BenCloudServer.class);
     
 	private static String applicationPath;
-	private static String queueDirectory;
-	private static String outputDirectory;
 	
 	public static void main(String[] args) {
 
@@ -63,10 +61,6 @@ public class BenCloudServer {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-
-		queueDirectory = ApplicationUtil.createQueueDirectoryIfNecessary();
-		
-		outputDirectory = ApplicationUtil.createOutputDirectoryIfNecessary();
 		
 		Configuration freeMarkerConfiguration = FreeMarkerRenderUtil.configureFreemarker(
 				applicationPath + ApplicationUtil.getProperties().getProperty(
@@ -93,13 +87,4 @@ public class BenCloudServer {
 	public static String getApplicationPath() {
 		return applicationPath;
 	}
-
-	public static String getQueueDirectory() {
-		return queueDirectory;
-	}
-
-	public static String getOutputDirectory() {
-		return outputDirectory;
-	}
-
 }

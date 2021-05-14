@@ -24,7 +24,9 @@
 				<tr>
     				<th>Name</th>
     				<th>Description</th>
-    				<th>Output File Name</th>
+    				<th>UUID</th>
+    				<th>Submitted</th>
+    				<th>Completed</th>
     				<th> </th>
 				</tr>
 			</thead>
@@ -32,7 +34,9 @@
 				<#list tasks as task>
 						<td>${task.name}</td>
 						<td>${task.description}</td>
-						<td>${task.outputFileName}</td>
+						<td>${task.uuid}</td>
+						<td>${task.submittedDate}</td>
+						<td>${task.completedDate}</td>
 						<td>
 							<button type='button' id="DELETE-${fileNamePrefix}" 
 								class='btn btn-outline-secondary btn-sm' 

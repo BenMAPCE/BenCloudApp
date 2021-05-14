@@ -1,138 +1,236 @@
 package gov.epa.bencloud.server.tasks;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Stream;
+import static gov.epa.bencloud.server.database.jooq.Tables.TASK_COMPLETE;
+import static gov.epa.bencloud.server.database.jooq.Tables.TASK_QUEUE;
 
-import org.apache.commons.lang3.SerializationUtils;
+import java.io.File;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Result;
+import org.jooq.SQLDialect;
+import org.jooq.exception.DataAccessException;
+import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import gov.epa.bencloud.server.BenCloudServer;
+import gov.epa.bencloud.server.database.ConnectionManager;
 
 public class TaskUtil {
 
-	private static DateTimeFormatter dateTimeformatter = 
-			DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
 	private static Logger log = LoggerFactory.getLogger(TaskUtil.class);
 
 	public static void writeTaskToQueue(Task task) {
 
-		LocalDateTime now = LocalDateTime.now();
+		System.out.println("writeTaskToQueue: " + task.getUuid());
 
-		byte[] serializedScenerio = SerializationUtils.serialize(task);
+		DSLContext create = DSL.using(ConnectionManager.getConnection(), SQLDialect.POSTGRES);
 
-		String queueFile = BenCloudServer.getQueueDirectory() + File.separator + now.format(dateTimeformatter) 
-			+ "-" + task.getUuid() + ".task";
-
-		Path path = Paths.get(queueFile);
 		try {
-			Files.write(path, serializedScenerio);
-		} catch (IOException e) {
+			create.insertInto(TASK_QUEUE,
+					TASK_QUEUE.USER_IDENTIFIER,
+					TASK_QUEUE.PRIORITY,
+					TASK_QUEUE.TASK_UUID,
+					TASK_QUEUE.TASK_NAME,
+					TASK_QUEUE.TASK_DESCRIPTION,
+					TASK_QUEUE.TASK_DATA,
+					TASK_QUEUE.IN_PROCESS,
+					TASK_QUEUE.SUBMITTED_DATE)
+			.values(
+					task.getUserIdentifier(),
+					Integer.valueOf(10),
+					UUID.randomUUID().toString(),
+					task.getName(),
+					task.getDescription(),
+					"{}",
+					false,
+					LocalDateTime.now())
+			.execute();
+		} catch (DataAccessException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+	}
+
+	public static void addTaskToCompleteAndRemoveTaskFromQueue(String uuid) {
+
+		if (null == uuid) {
+			return;
+		}
+		
+		System.out.println("addTaskToCompleteAndRemoveTaskFromQueue: " + uuid);
+
+		Task task = getTaskFromQueueRecord(uuid);
+
+		DSLContext create = DSL.using(ConnectionManager.getConnection(), SQLDialect.POSTGRES);
+
+		try {
+			create.insertInto(TASK_COMPLETE,
+					TASK_COMPLETE.USER_IDENTIFIER,
+					TASK_COMPLETE.PRIORITY,
+					TASK_COMPLETE.TASK_UUID,
+					TASK_COMPLETE.TASK_NAME,
+					TASK_COMPLETE.TASK_DESCRIPTION,
+					TASK_COMPLETE.TASK_RESULTS,
+					TASK_COMPLETE.SUBMITTED_DATE,
+					TASK_COMPLETE.COMPLETED_DATE)
+			.values(
+					task.getUserIdentifier(),
+					task.getPriority(),
+					task.getUuid(),
+					task.getName(),
+					task.getDescription(),
+					"{}",
+					task.getSubmittedDate(),
+					LocalDateTime.now())
+			.execute();
+
+			create.delete(TASK_QUEUE)
+			.where(TASK_QUEUE.TASK_UUID.eq(task.getUuid()))
+			.execute();
+			
+
+		} catch (DataAccessException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+	}
+
+	public static void processTask(String uuid) {
+
+		System.out.println("processTask: " + uuid);
+
+		DSLContext create = DSL.using(ConnectionManager.getConnection(), SQLDialect.POSTGRES);
+
+		 try {
+			Thread.sleep(10000);
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-	}
-	
-	public static void writeTaskToOutput(Task task, String dateString) {
-		
-
-		String taskOutputFileName = 
-				"TASK" + "_" +
-				task.getName() + "_" +
-				dateString +
-				".task";
-				
-		String taskFile = BenCloudServer.getOutputDirectory() + 
-				File.separator + 
-				getUserIdentifierPath(task) + File.separator + 
-				taskOutputFileName;
-
-		
-		task.setOutputFileName(taskOutputFileName);
-				
-		byte[] serializedTask = SerializationUtils.serialize(task);
-
-		Path path = Paths.get(taskFile);
+		    
 		try {
-			Files.write(path, serializedTask);
-		} catch (IOException e) {
+			create.update(TASK_QUEUE)
+			.set(TASK_QUEUE.TASK_DATA, "{'complete':true}")
+			.where(TASK_QUEUE.TASK_UUID.eq(uuid))
+			.execute();
+		} catch (DataAccessException e) {
 			e.printStackTrace();
 		}
-	}
 
-	public static void processTask(Task task) {
-				
-	    DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
-	    LocalDateTime now = LocalDateTime.now();
-	    String dateString = now.format(dateFormatter);
-
-	    writeTaskToOutput(task, dateString);
-	}
-	
-	public static String getUserIdentifierPath(Task task) {
-				
-		String outputDirectory = BenCloudServer.getOutputDirectory() + File.separator + task.getUserIdentifier();
-				
-		if (!new File(outputDirectory).exists()) {
-			new File(outputDirectory).mkdirs();
-		}
-		
-		return task.getUserIdentifier(); 
+		addTaskToCompleteAndRemoveTaskFromQueue(uuid);
 	}
 
 	public static List<Task> getCompletedTasks(String userIdentifier) {
-		
+
+		System.out.println("getCompletedTasks: " + userIdentifier);
+
 		List<Task> tasks = new ArrayList<Task>();
+		Task task = new Task();
 		
 		if (null != userIdentifier) {
 
-			Path userOutputPath = 
-					Paths.get(BenCloudServer.getOutputDirectory() + 
-					File.separator + userIdentifier);
-		    
-			if (!userOutputPath.toFile().exists()) {
-				userOutputPath.toFile().mkdirs();
-			}
+			DSLContext create = DSL.using(ConnectionManager.getConnection(), SQLDialect.POSTGRES);
 
 			try {
-
-				List<String> taskFilePaths = new ArrayList<>();
-
-				try (Stream<Path> filePathStream = 
-						Files.walk(
-								Paths.get(
-										BenCloudServer.getOutputDirectory() + 
-								File.separator + userIdentifier))) {
-					filePathStream.forEach(filePath -> {
-						if (Files.isRegularFile(filePath)) {
-							if (filePath.toString().endsWith(".task")) {
-								taskFilePaths.add(filePath.toString());
-							}
-						}
-					});
-				}
-
-				Collections.sort(taskFilePaths);
-				for (String taskFilePath : taskFilePaths) {
-					byte[] taskFileContent = Files.readAllBytes(Paths.get(taskFilePath));
-					Task task = SerializationUtils.deserialize(taskFileContent);
+				Result<Record> result = create.select().from(TASK_COMPLETE)
+						.where(TASK_COMPLETE.USER_IDENTIFIER.eq(userIdentifier))
+						.orderBy(TASK_COMPLETE.COMPLETED_DATE.desc())
+						.fetch();
+						
+				for (Record record : result) {
+					
+					task = new Task();
+					task.setName(record.getValue(TASK_COMPLETE.TASK_NAME));
+					task.setDescription(record.getValue(TASK_COMPLETE.TASK_DESCRIPTION));
+					task.setUserIdentifier(record.getValue(TASK_COMPLETE.USER_IDENTIFIER));
+					task.setPriority(record.getValue(TASK_COMPLETE.PRIORITY));
+					task.setUuid(record.getValue(TASK_COMPLETE.TASK_UUID));
+					task.setSubmittedDate(record.getValue(TASK_COMPLETE.SUBMITTED_DATE));
+					task.setCompletedDate(record.getValue(TASK_COMPLETE.COMPLETED_DATE));
+				    
 					tasks.add(task);
 				}
-
-			} catch (IOException e) {
+			} catch (DataAccessException e) {
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
 				e.printStackTrace();
 			}
 		}
 
 		return tasks;
 	} 
+
+	private static Task getTaskFromQueueRecord(String uuid) {
+
+		System.out.println("getTaskFromQueueRecord: " + uuid);
+
+		Task task = new Task();
+		
+		DSLContext create = DSL.using(ConnectionManager.getConnection(), SQLDialect.POSTGRES);
+
+		try {
+			Result<Record> result = create.select().from(TASK_QUEUE)
+			.where(TASK_QUEUE.TASK_UUID.eq(uuid))
+			.fetch();
+		
+			if (result.size() == 0) {
+				System.out.println("no uuid in queue");
+			} else if (result.size() > 1) {
+				System.out.println("recieved more than 1 uuid record");
+			} else {
+				Record record = result.get(0);
+				task.setName(record.getValue(TASK_QUEUE.TASK_NAME));
+				task.setDescription(record.getValue(TASK_QUEUE.TASK_DESCRIPTION));
+				task.setUserIdentifier(record.getValue(TASK_QUEUE.USER_IDENTIFIER));
+				task.setPriority(record.getValue(TASK_QUEUE.PRIORITY));
+				task.setUuid(record.getValue(TASK_QUEUE.TASK_UUID));
+				task.setSubmittedDate(record.getValue(TASK_QUEUE.SUBMITTED_DATE));
+			}
+		} catch (DataAccessException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		return task;
+	}
+
+	private static Task getTaskFromComplete(String uuid) {
+		
+		Task task = new Task();
+		
+		DSLContext create = DSL.using(ConnectionManager.getConnection(), SQLDialect.POSTGRES);
+
+		try {
+			Result<Record> result = create.select().from(TASK_COMPLETE)
+			.where(TASK_COMPLETE.TASK_UUID.eq(uuid))
+			.fetch();
+		
+			if (result.size() == 0) {
+				System.out.println("no uuid in complete");
+			} else if (result.size() > 1) {
+				System.out.println("recieved more than 1 uuid record");
+			} else {
+				Record record = result.get(0);
+				task.setName(record.getValue(TASK_COMPLETE.TASK_NAME));
+				task.setDescription(record.getValue(TASK_COMPLETE.TASK_DESCRIPTION));
+				task.setUserIdentifier(record.getValue(TASK_COMPLETE.USER_IDENTIFIER));
+				task.setPriority(record.getValue(TASK_COMPLETE.PRIORITY));
+				task.setUuid(record.getValue(TASK_COMPLETE.TASK_UUID));
+				task.setSubmittedDate(record.getValue(TASK_COMPLETE.SUBMITTED_DATE));
+				task.setCompletedDate(record.getValue(TASK_COMPLETE.COMPLETED_DATE));
+			}
+		} catch (DataAccessException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		return task;
+	}
 
 }

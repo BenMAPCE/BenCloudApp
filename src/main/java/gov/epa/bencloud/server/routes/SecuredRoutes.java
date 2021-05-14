@@ -83,22 +83,22 @@ public class SecuredRoutes {
 			String bcoUserIdentifier = RoutesUtil.getOrSetOrExtendCookie(req, res);
 			String fileSetToDelete = req.body();
 			
-			try (Stream<Path> filePathStream = 
-					Files.walk(Paths.get(BenCloudServer.getOutputDirectory() + 
-							File.separator + bcoUserIdentifier))) {
-			    filePathStream.forEach(filePath -> {
-			        if (Files.isRegularFile(filePath)) {
-			        	if (filePath.toString().contains(fileSetToDelete)) {
-			        		try {
-								Files.delete(filePath);
-							} catch (IOException e) {
-								log.error(filePath.toString() + " was not deleted");
-							}
-			        	}
-			        }
-			    });
-			}
-						
+//			try (Stream<Path> filePathStream = 
+//					Files.walk(Paths.get(BenCloudServer.getOutputDirectory() + 
+//							File.separator + bcoUserIdentifier))) {
+//			    filePathStream.forEach(filePath -> {
+//			        if (Files.isRegularFile(filePath)) {
+//			        	if (filePath.toString().contains(fileSetToDelete)) {
+//			        		try {
+//								Files.delete(filePath);
+//							} catch (IOException e) {
+//								log.error(filePath.toString() + " was not deleted");
+//							}
+//			        	}
+//			        }
+//			    });
+//			}
+//						
 			return "";
 
 		});

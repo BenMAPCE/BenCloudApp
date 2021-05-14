@@ -1,16 +1,20 @@
 package gov.epa.bencloud.server.tasks;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 public class Task implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private String name;
 	private String uuid;
+	private Integer priority; 
+	private String name;
     private String description;
     private String userIdentifier;
     private String outputFileName;
+    private LocalDateTime submittedDate;
+    private LocalDateTime completedDate;
 
     public Task() {
 	}
@@ -56,6 +60,30 @@ public class Task implements Serializable {
 
 	public void setOutputFileName(String outputFileName) {
 		this.outputFileName = outputFileName;
+	}
+
+	public Integer getPriority() {
+		return priority;
+	}
+
+	public void setPriority(Integer priority) {
+		this.priority = priority;
+	}
+
+	public LocalDateTime getSubmittedDate() {
+		return submittedDate;
+	}
+
+	public void setSubmittedDate(LocalDateTime submittedDate) {
+		this.submittedDate = submittedDate;
+	}
+
+	public LocalDateTime getCompletedDate() {
+		return completedDate;
+	}
+
+	public void setCompletedDate(LocalDateTime completedDate) {
+		this.completedDate = completedDate;
 	}
     
 }
