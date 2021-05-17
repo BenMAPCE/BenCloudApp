@@ -42,7 +42,7 @@
       <packageName>gov.epa.bencloud.server.database.jooq</packageName>
 
       <!-- The destination directory of your generated classes. Using Maven directory layout here -->
-      <directory>/Users/bselack/docker/jooq/classes</directory>
+      <directory>./classes</directory>
     </target>
   </generator>
 </configuration>
