@@ -6,6 +6,9 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.jmx.JmxReporter;
+
 import ch.qos.logback.classic.LoggerContext;
 import freemarker.template.Configuration;
 import gov.epa.bencloud.server.jobs.JobsUtil;
@@ -79,7 +82,7 @@ public class BenCloudServer {
 		new SecuredRoutes(benCloudService, freeMarkerConfiguration);
 		
 		JobsUtil.startJobScheduler();
-		
+				
 		System.out.println("\nStarting BenCloud Demo, version " + version);
 
 	}

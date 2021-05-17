@@ -25,7 +25,7 @@ public class JobsUtil {
 		    Trigger trigger = TriggerBuilder.newTrigger()
 		    	    .withIdentity("readQueueTrigger", "bencloud")
 		    	    .withSchedule(SimpleScheduleBuilder
-		    	    		.simpleSchedule().withIntervalInSeconds(30).repeatForever()
+		    	    		.simpleSchedule().withIntervalInSeconds(10).repeatForever()
 		    	    		.withMisfireHandlingInstructionNextWithRemainingCount())
 		    	    .build();
 		    

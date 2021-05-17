@@ -1,19 +1,16 @@
 package gov.epa.bencloud.server.routes;
 
-import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Result;
-import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import freemarker.template.Configuration;
-import gov.epa.bencloud.server.database.PooledDataSource;
+import gov.epa.bencloud.server.database.JooqUtil;
 import gov.epa.bencloud.server.util.FreeMarkerRenderUtil;
 import spark.Service;
 
@@ -33,21 +30,12 @@ public class AdminRoutes {
 			
 			Map<String, Object> attributes = new HashMap<>();
 			
-			Connection connection = PooledDataSource.getConnection();
-			
-			if (null != connection) {
-				attributes.put("database_status", "Got a database connection");
-				
-				DSLContext dsl = DSL.using(connection, SQLDialect.POSTGRES);
-				
-				String sql = "SELECT CURRENT_DATE";
+			attributes.put("database_status", "Got a database connection");
+							
+			String sql = "SELECT CURRENT_DATE";
 
-				Result<Record> result = dsl.fetch(sql);
-				attributes.put("result", result.get(0).get(0));
-
-			} else {
-				attributes.put("database_status", "Failed getting a database connection");
-			}
+			Result<Record> result = DSL.using(JooqUtil.getJooqConfiguration()).fetch(sql);
+			attributes.put("result", result.get(0).get(0));
 			
 			return FreeMarkerRenderUtil.render(freeMarkerConfiguration, attributes, "db.ftl");
 		});

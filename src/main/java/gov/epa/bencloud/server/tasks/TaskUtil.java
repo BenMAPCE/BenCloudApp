@@ -3,23 +3,19 @@ package gov.epa.bencloud.server.tasks;
 import static gov.epa.bencloud.server.database.jooq.Tables.TASK_COMPLETE;
 import static gov.epa.bencloud.server.database.jooq.Tables.TASK_QUEUE;
 
-import java.io.File;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Result;
-import org.jooq.SQLDialect;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import gov.epa.bencloud.server.BenCloudServer;
-import gov.epa.bencloud.server.database.ConnectionManager;
+import gov.epa.bencloud.server.database.JooqUtil;
 
 public class TaskUtil {
 
@@ -29,10 +25,8 @@ public class TaskUtil {
 
 		System.out.println("writeTaskToQueue: " + task.getUuid());
 
-		DSLContext create = DSL.using(ConnectionManager.getConnection(), SQLDialect.POSTGRES);
-
 		try {
-			create.insertInto(TASK_QUEUE,
+				DSL.using(JooqUtil.getJooqConfiguration()).insertInto(TASK_QUEUE,
 					TASK_QUEUE.USER_IDENTIFIER,
 					TASK_QUEUE.PRIORITY,
 					TASK_QUEUE.TASK_UUID,
@@ -51,6 +45,7 @@ public class TaskUtil {
 					false,
 					LocalDateTime.now())
 			.execute();
+			
 		} catch (DataAccessException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -66,11 +61,12 @@ public class TaskUtil {
 		System.out.println("addTaskToCompleteAndRemoveTaskFromQueue: " + uuid);
 
 		Task task = getTaskFromQueueRecord(uuid);
-
-		DSLContext create = DSL.using(ConnectionManager.getConnection(), SQLDialect.POSTGRES);
-
+		
 		try {
-			create.insertInto(TASK_COMPLETE,
+
+			DSL.using(JooqUtil.getJooqConfiguration()).transaction(ctx -> {
+
+				DSL.using(ctx).insertInto(TASK_COMPLETE,
 					TASK_COMPLETE.USER_IDENTIFIER,
 					TASK_COMPLETE.PRIORITY,
 					TASK_COMPLETE.TASK_UUID,
@@ -90,10 +86,11 @@ public class TaskUtil {
 					LocalDateTime.now())
 			.execute();
 
-			create.delete(TASK_QUEUE)
+				DSL.using(ctx).delete(TASK_QUEUE)
 			.where(TASK_QUEUE.TASK_UUID.eq(task.getUuid()))
 			.execute();
 			
+			});
 
 		} catch (DataAccessException e1) {
 			// TODO Auto-generated catch block
@@ -106,19 +103,18 @@ public class TaskUtil {
 
 		System.out.println("processTask: " + uuid);
 
-		DSLContext create = DSL.using(ConnectionManager.getConnection(), SQLDialect.POSTGRES);
-
-		 try {
-			Thread.sleep(10000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+//		 try {
+//			Thread.sleep(10000);
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
 		    
 		try {
-			create.update(TASK_QUEUE)
+			DSL.using(JooqUtil.getJooqConfiguration()).update(TASK_QUEUE)
 			.set(TASK_QUEUE.TASK_DATA, "{'complete':true}")
 			.where(TASK_QUEUE.TASK_UUID.eq(uuid))
 			.execute();
+			
 		} catch (DataAccessException e) {
 			e.printStackTrace();
 		}
@@ -132,13 +128,12 @@ public class TaskUtil {
 
 		List<Task> tasks = new ArrayList<Task>();
 		Task task = new Task();
-		
+	
 		if (null != userIdentifier) {
-
-			DSLContext create = DSL.using(ConnectionManager.getConnection(), SQLDialect.POSTGRES);
-
+			
 			try {
-				Result<Record> result = create.select().from(TASK_COMPLETE)
+
+				Result<Record> result = DSL.using(JooqUtil.getJooqConfiguration()).select().from(TASK_COMPLETE)
 						.where(TASK_COMPLETE.USER_IDENTIFIER.eq(userIdentifier))
 						.orderBy(TASK_COMPLETE.COMPLETED_DATE.desc())
 						.fetch();
@@ -172,10 +167,8 @@ public class TaskUtil {
 
 		Task task = new Task();
 		
-		DSLContext create = DSL.using(ConnectionManager.getConnection(), SQLDialect.POSTGRES);
-
 		try {
-			Result<Record> result = create.select().from(TASK_QUEUE)
+			Result<Record> result = DSL.using(JooqUtil.getJooqConfiguration()).select().from(TASK_QUEUE)
 			.where(TASK_QUEUE.TASK_UUID.eq(uuid))
 			.fetch();
 		
@@ -204,10 +197,8 @@ public class TaskUtil {
 		
 		Task task = new Task();
 		
-		DSLContext create = DSL.using(ConnectionManager.getConnection(), SQLDialect.POSTGRES);
-
 		try {
-			Result<Record> result = create.select().from(TASK_COMPLETE)
+			Result<Record> result = DSL.using(JooqUtil.getJooqConfiguration()).select().from(TASK_COMPLETE)
 			.where(TASK_COMPLETE.TASK_UUID.eq(uuid))
 			.fetch();
 		

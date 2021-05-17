@@ -4,9 +4,15 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
 
+import org.jooq.DSLContext;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.health.HealthCheckRegistry;
+import com.codahale.metrics.jmx.JmxReporter;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -89,10 +95,25 @@ public class PooledDataSource {
 			
 			config.setMaximumPoolSize(25);
 			config.setMinimumIdle(10);
-			config.setAutoCommit(true);
 			config.setRegisterMbeans(true);
 
-			config.setConnectionTimeout(150000);
+			config.setPoolName("benmap");
+			config.setAutoCommit(true);
+			
+
+			MetricRegistry metricRegistry = new MetricRegistry();
+			HealthCheckRegistry healthCheckRegistry = new HealthCheckRegistry();
+			
+			final JmxReporter reporter = JmxReporter.forRegistry(metricRegistry).build();
+			reporter.start();
+			
+			config.setMetricRegistry(metricRegistry);
+			config.setHealthCheckRegistry(healthCheckRegistry);
+			
+			config.addHealthCheckProperty("connectivityCheckTimeoutMs", "1000");
+			config.addHealthCheckProperty("expected99thPercentileMs", "10");
+
+			config.setConnectionTimeout(10000);
 			
 			try {
 				dataSource = new HikariDataSource( config );
@@ -102,12 +123,14 @@ public class PooledDataSource {
 		}
 	}
 
-	private PooledDataSource() {}
-
-	public static Connection getConnection() throws SQLException {
-		return dataSource.getConnection();
+	public static HikariDataSource getDataSource() {
+		return dataSource;
 	}
-
+	
+	public static DSLContext getDSLContext() {
+		return DSL.using(dataSource, SQLDialect.POSTGRES);
+	}
+	
 	public static void shutdownDataSource() {
 
 		try {
