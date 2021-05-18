@@ -5,7 +5,11 @@ package gov.epa.bencloud.server.database.jooq.tables;
 
 
 import gov.epa.bencloud.server.database.jooq.Data;
+import gov.epa.bencloud.server.database.jooq.Keys;
 import gov.epa.bencloud.server.database.jooq.tables.records.PopConfigEthnicityRecord;
+
+import java.util.Arrays;
+import java.util.List;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
@@ -88,6 +92,28 @@ public class PopConfigEthnicity extends TableImpl<PopConfigEthnicityRecord> {
     @Override
     public Schema getSchema() {
         return Data.DATA;
+    }
+
+    @Override
+    public List<ForeignKey<PopConfigEthnicityRecord, ?>> getReferences() {
+        return Arrays.<ForeignKey<PopConfigEthnicityRecord, ?>>asList(Keys.POP_CONFIG_ETHNICITY__POP_CONFIG_ETHNICITY_POP_CONFIG_ID_FKEY, Keys.POP_CONFIG_ETHNICITY__POP_CONFIG_ETHNICITY_ETHNICITY_ID_FKEY);
+    }
+
+    private transient PopConfig _popConfig;
+    private transient Ethnicity _ethnicity;
+
+    public PopConfig popConfig() {
+        if (_popConfig == null)
+            _popConfig = new PopConfig(this, Keys.POP_CONFIG_ETHNICITY__POP_CONFIG_ETHNICITY_POP_CONFIG_ID_FKEY);
+
+        return _popConfig;
+    }
+
+    public Ethnicity ethnicity() {
+        if (_ethnicity == null)
+            _ethnicity = new Ethnicity(this, Keys.POP_CONFIG_ETHNICITY__POP_CONFIG_ETHNICITY_ETHNICITY_ID_FKEY);
+
+        return _ethnicity;
     }
 
     @Override

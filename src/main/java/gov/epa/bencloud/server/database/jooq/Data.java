@@ -5,6 +5,8 @@ package gov.epa.bencloud.server.database.jooq;
 
 
 import gov.epa.bencloud.server.database.jooq.tables.AgeRange;
+import gov.epa.bencloud.server.database.jooq.tables.AirQualityCell;
+import gov.epa.bencloud.server.database.jooq.tables.AirQualityLayer;
 import gov.epa.bencloud.server.database.jooq.tables.Endpoint;
 import gov.epa.bencloud.server.database.jooq.tables.EndpointGroup;
 import gov.epa.bencloud.server.database.jooq.tables.Ethnicity;
@@ -55,6 +57,16 @@ public class Data extends SchemaImpl {
      * The table <code>data.age_range</code>.
      */
     public final AgeRange AGE_RANGE = AgeRange.AGE_RANGE;
+
+    /**
+     * The table <code>data.air_quality_cell</code>.
+     */
+    public final AirQualityCell AIR_QUALITY_CELL = AirQualityCell.AIR_QUALITY_CELL;
+
+    /**
+     * The table <code>data.air_quality_layer</code>.
+     */
+    public final AirQualityLayer AIR_QUALITY_LAYER = AirQualityLayer.AIR_QUALITY_LAYER;
 
     /**
      * The table <code>data.endpoint</code>.
@@ -188,6 +200,7 @@ public class Data extends SchemaImpl {
     public final List<Sequence<?>> getSequences() {
         return Arrays.<Sequence<?>>asList(
             Sequences.AGE_RANGE_ID_SEQ,
+            Sequences.AIR_QUALITY_LAYER_ID_SEQ,
             Sequences.ENDPOINT_GROUP_ID_SEQ,
             Sequences.ENDPOINT_ID_SEQ,
             Sequences.ETHNICITY_ID_SEQ,
@@ -212,6 +225,8 @@ public class Data extends SchemaImpl {
     public final List<Table<?>> getTables() {
         return Arrays.<Table<?>>asList(
             AgeRange.AGE_RANGE,
+            AirQualityCell.AIR_QUALITY_CELL,
+            AirQualityLayer.AIR_QUALITY_LAYER,
             Endpoint.ENDPOINT,
             EndpointGroup.ENDPOINT_GROUP,
             Ethnicity.ETHNICITY,

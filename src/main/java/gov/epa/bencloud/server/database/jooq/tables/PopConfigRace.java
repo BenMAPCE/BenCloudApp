@@ -5,7 +5,11 @@ package gov.epa.bencloud.server.database.jooq.tables;
 
 
 import gov.epa.bencloud.server.database.jooq.Data;
+import gov.epa.bencloud.server.database.jooq.Keys;
 import gov.epa.bencloud.server.database.jooq.tables.records.PopConfigRaceRecord;
+
+import java.util.Arrays;
+import java.util.List;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
@@ -88,6 +92,28 @@ public class PopConfigRace extends TableImpl<PopConfigRaceRecord> {
     @Override
     public Schema getSchema() {
         return Data.DATA;
+    }
+
+    @Override
+    public List<ForeignKey<PopConfigRaceRecord, ?>> getReferences() {
+        return Arrays.<ForeignKey<PopConfigRaceRecord, ?>>asList(Keys.POP_CONFIG_RACE__POP_CONFIG_RACE_POP_CONFIG_ID_FKEY, Keys.POP_CONFIG_RACE__POP_CONFIG_RACE_RACE_ID_FKEY);
+    }
+
+    private transient PopConfig _popConfig;
+    private transient Race _race;
+
+    public PopConfig popConfig() {
+        if (_popConfig == null)
+            _popConfig = new PopConfig(this, Keys.POP_CONFIG_RACE__POP_CONFIG_RACE_POP_CONFIG_ID_FKEY);
+
+        return _popConfig;
+    }
+
+    public Race race() {
+        if (_race == null)
+            _race = new Race(this, Keys.POP_CONFIG_RACE__POP_CONFIG_RACE_RACE_ID_FKEY);
+
+        return _race;
     }
 
     @Override

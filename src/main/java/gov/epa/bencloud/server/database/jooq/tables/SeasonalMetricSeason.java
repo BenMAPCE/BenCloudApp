@@ -132,6 +132,20 @@ public class SeasonalMetricSeason extends TableImpl<SeasonalMetricSeasonRecord> 
     }
 
     @Override
+    public List<ForeignKey<SeasonalMetricSeasonRecord, ?>> getReferences() {
+        return Arrays.<ForeignKey<SeasonalMetricSeasonRecord, ?>>asList(Keys.SEASONAL_METRIC_SEASON__SEASONAL_METRIC_SEASON_SEASONAL_METRIC_ID_FKEY);
+    }
+
+    private transient SeasonalMetric _seasonalMetric;
+
+    public SeasonalMetric seasonalMetric() {
+        if (_seasonalMetric == null)
+            _seasonalMetric = new SeasonalMetric(this, Keys.SEASONAL_METRIC_SEASON__SEASONAL_METRIC_SEASON_SEASONAL_METRIC_ID_FKEY);
+
+        return _seasonalMetric;
+    }
+
+    @Override
     public SeasonalMetricSeason as(String alias) {
         return new SeasonalMetricSeason(DSL.name(alias), this);
     }

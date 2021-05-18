@@ -5,7 +5,11 @@ package gov.epa.bencloud.server.database.jooq.tables;
 
 
 import gov.epa.bencloud.server.database.jooq.Data;
+import gov.epa.bencloud.server.database.jooq.Keys;
 import gov.epa.bencloud.server.database.jooq.tables.records.IncidenceEntryRecord;
+
+import java.util.Arrays;
+import java.util.List;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
@@ -17,6 +21,7 @@ import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
+import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
@@ -139,6 +144,30 @@ public class IncidenceEntry extends TableImpl<IncidenceEntryRecord> {
     @Override
     public Identity<IncidenceEntryRecord, Integer> getIdentity() {
         return (Identity<IncidenceEntryRecord, Integer>) super.getIdentity();
+    }
+
+    @Override
+    public UniqueKey<IncidenceEntryRecord> getPrimaryKey() {
+        return Keys.INCIDENCE_ENTRY_PKEY;
+    }
+
+    @Override
+    public List<UniqueKey<IncidenceEntryRecord>> getKeys() {
+        return Arrays.<UniqueKey<IncidenceEntryRecord>>asList(Keys.INCIDENCE_ENTRY_PKEY);
+    }
+
+    @Override
+    public List<ForeignKey<IncidenceEntryRecord, ?>> getReferences() {
+        return Arrays.<ForeignKey<IncidenceEntryRecord, ?>>asList(Keys.INCIDENCE_ENTRY__INCIDENCE_ENTRY_INCIDENCE_DATASET_ID_FKEY);
+    }
+
+    private transient IncidenceDataset _incidenceDataset;
+
+    public IncidenceDataset incidenceDataset() {
+        if (_incidenceDataset == null)
+            _incidenceDataset = new IncidenceDataset(this, Keys.INCIDENCE_ENTRY__INCIDENCE_ENTRY_INCIDENCE_DATASET_ID_FKEY);
+
+        return _incidenceDataset;
     }
 
     @Override

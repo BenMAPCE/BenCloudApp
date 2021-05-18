@@ -5,7 +5,11 @@ package gov.epa.bencloud.server.database.jooq.tables;
 
 
 import gov.epa.bencloud.server.database.jooq.Data;
+import gov.epa.bencloud.server.database.jooq.Keys;
 import gov.epa.bencloud.server.database.jooq.tables.records.GenderRecord;
+
+import java.util.Arrays;
+import java.util.List;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
@@ -17,6 +21,7 @@ import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
+import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
@@ -94,6 +99,16 @@ public class Gender extends TableImpl<GenderRecord> {
     @Override
     public Identity<GenderRecord, Integer> getIdentity() {
         return (Identity<GenderRecord, Integer>) super.getIdentity();
+    }
+
+    @Override
+    public UniqueKey<GenderRecord> getPrimaryKey() {
+        return Keys.GENDER_PKEY;
+    }
+
+    @Override
+    public List<UniqueKey<GenderRecord>> getKeys() {
+        return Arrays.<UniqueKey<GenderRecord>>asList(Keys.GENDER_PKEY);
     }
 
     @Override

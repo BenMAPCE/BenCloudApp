@@ -5,7 +5,11 @@ package gov.epa.bencloud.server.database.jooq.tables;
 
 
 import gov.epa.bencloud.server.database.jooq.Data;
+import gov.epa.bencloud.server.database.jooq.Keys;
 import gov.epa.bencloud.server.database.jooq.tables.records.PopConfigGenderRecord;
+
+import java.util.Arrays;
+import java.util.List;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
@@ -88,6 +92,28 @@ public class PopConfigGender extends TableImpl<PopConfigGenderRecord> {
     @Override
     public Schema getSchema() {
         return Data.DATA;
+    }
+
+    @Override
+    public List<ForeignKey<PopConfigGenderRecord, ?>> getReferences() {
+        return Arrays.<ForeignKey<PopConfigGenderRecord, ?>>asList(Keys.POP_CONFIG_GENDER__POP_CONFIG_GENDER_POP_CONFIG_ID_FKEY, Keys.POP_CONFIG_GENDER__POP_CONFIG_GENDER_GENDER_ID_FKEY);
+    }
+
+    private transient PopConfig _popConfig;
+    private transient Gender _gender;
+
+    public PopConfig popConfig() {
+        if (_popConfig == null)
+            _popConfig = new PopConfig(this, Keys.POP_CONFIG_GENDER__POP_CONFIG_GENDER_POP_CONFIG_ID_FKEY);
+
+        return _popConfig;
+    }
+
+    public Gender gender() {
+        if (_gender == null)
+            _gender = new Gender(this, Keys.POP_CONFIG_GENDER__POP_CONFIG_GENDER_GENDER_ID_FKEY);
+
+        return _gender;
     }
 
     @Override

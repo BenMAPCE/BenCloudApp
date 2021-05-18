@@ -5,7 +5,11 @@ package gov.epa.bencloud.server.database.jooq.tables;
 
 
 import gov.epa.bencloud.server.database.jooq.Data;
+import gov.epa.bencloud.server.database.jooq.Keys;
 import gov.epa.bencloud.server.database.jooq.tables.records.AgeRangeRecord;
+
+import java.util.Arrays;
+import java.util.List;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
@@ -17,6 +21,7 @@ import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
+import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
@@ -109,6 +114,30 @@ public class AgeRange extends TableImpl<AgeRangeRecord> {
     @Override
     public Identity<AgeRangeRecord, Integer> getIdentity() {
         return (Identity<AgeRangeRecord, Integer>) super.getIdentity();
+    }
+
+    @Override
+    public UniqueKey<AgeRangeRecord> getPrimaryKey() {
+        return Keys.AGE_RANGE_PKEY;
+    }
+
+    @Override
+    public List<UniqueKey<AgeRangeRecord>> getKeys() {
+        return Arrays.<UniqueKey<AgeRangeRecord>>asList(Keys.AGE_RANGE_PKEY);
+    }
+
+    @Override
+    public List<ForeignKey<AgeRangeRecord, ?>> getReferences() {
+        return Arrays.<ForeignKey<AgeRangeRecord, ?>>asList(Keys.AGE_RANGE__AGE_RANGE_POP_CONFIG_ID_FKEY);
+    }
+
+    private transient PopConfig _popConfig;
+
+    public PopConfig popConfig() {
+        if (_popConfig == null)
+            _popConfig = new PopConfig(this, Keys.AGE_RANGE__AGE_RANGE_POP_CONFIG_ID_FKEY);
+
+        return _popConfig;
     }
 
     @Override

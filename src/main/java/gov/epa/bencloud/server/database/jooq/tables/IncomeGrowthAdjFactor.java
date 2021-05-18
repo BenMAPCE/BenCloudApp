@@ -128,6 +128,28 @@ public class IncomeGrowthAdjFactor extends TableImpl<IncomeGrowthAdjFactorRecord
     }
 
     @Override
+    public List<ForeignKey<IncomeGrowthAdjFactorRecord, ?>> getReferences() {
+        return Arrays.<ForeignKey<IncomeGrowthAdjFactorRecord, ?>>asList(Keys.INCOME_GROWTH_ADJ_FACTOR__INCOME_GROWTH_ADJ_FACTOR_INCOME_GROWTH_ADJ_DATASET_ID_FKEY, Keys.INCOME_GROWTH_ADJ_FACTOR__INCOME_GROWTH_ADJ_FACTOR_ENDPOINT_GROUP_ID_FKEY);
+    }
+
+    private transient IncomeGrowthAdjDataset _incomeGrowthAdjDataset;
+    private transient EndpointGroup _endpointGroup;
+
+    public IncomeGrowthAdjDataset incomeGrowthAdjDataset() {
+        if (_incomeGrowthAdjDataset == null)
+            _incomeGrowthAdjDataset = new IncomeGrowthAdjDataset(this, Keys.INCOME_GROWTH_ADJ_FACTOR__INCOME_GROWTH_ADJ_FACTOR_INCOME_GROWTH_ADJ_DATASET_ID_FKEY);
+
+        return _incomeGrowthAdjDataset;
+    }
+
+    public EndpointGroup endpointGroup() {
+        if (_endpointGroup == null)
+            _endpointGroup = new EndpointGroup(this, Keys.INCOME_GROWTH_ADJ_FACTOR__INCOME_GROWTH_ADJ_FACTOR_ENDPOINT_GROUP_ID_FKEY);
+
+        return _endpointGroup;
+    }
+
+    @Override
     public IncomeGrowthAdjFactor as(String alias) {
         return new IncomeGrowthAdjFactor(DSL.name(alias), this);
     }

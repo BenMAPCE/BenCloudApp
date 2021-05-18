@@ -23,16 +23,16 @@ public class IncidenceValueRecord extends TableRecordImpl<IncidenceValueRecord> 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>data.incidence_value.incidence_rate_id</code>.
+     * Setter for <code>data.incidence_value.incidence_entry_id</code>.
      */
-    public void setIncidenceRateId(Integer value) {
+    public void setIncidenceEntryId(Integer value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>data.incidence_value.incidence_rate_id</code>.
+     * Getter for <code>data.incidence_value.incidence_entry_id</code>.
      */
-    public Integer getIncidenceRateId() {
+    public Integer getIncidenceEntryId() {
         return (Integer) get(0);
     }
 
@@ -94,7 +94,7 @@ public class IncidenceValueRecord extends TableRecordImpl<IncidenceValueRecord> 
 
     @Override
     public Field<Integer> field1() {
-        return IncidenceValue.INCIDENCE_VALUE.INCIDENCE_RATE_ID;
+        return IncidenceValue.INCIDENCE_VALUE.INCIDENCE_ENTRY_ID;
     }
 
     @Override
@@ -114,7 +114,7 @@ public class IncidenceValueRecord extends TableRecordImpl<IncidenceValueRecord> 
 
     @Override
     public Integer component1() {
-        return getIncidenceRateId();
+        return getIncidenceEntryId();
     }
 
     @Override
@@ -134,7 +134,7 @@ public class IncidenceValueRecord extends TableRecordImpl<IncidenceValueRecord> 
 
     @Override
     public Integer value1() {
-        return getIncidenceRateId();
+        return getIncidenceEntryId();
     }
 
     @Override
@@ -154,7 +154,7 @@ public class IncidenceValueRecord extends TableRecordImpl<IncidenceValueRecord> 
 
     @Override
     public IncidenceValueRecord value1(Integer value) {
-        setIncidenceRateId(value);
+        setIncidenceEntryId(value);
         return this;
     }
 
@@ -199,10 +199,10 @@ public class IncidenceValueRecord extends TableRecordImpl<IncidenceValueRecord> 
     /**
      * Create a detached, initialised IncidenceValueRecord
      */
-    public IncidenceValueRecord(Integer incidenceRateId, Integer gridCol, Integer gridRow, BigDecimal value) {
+    public IncidenceValueRecord(Integer incidenceEntryId, Integer gridCol, Integer gridRow, BigDecimal value) {
         super(IncidenceValue.INCIDENCE_VALUE);
 
-        setIncidenceRateId(incidenceRateId);
+        setIncidenceEntryId(incidenceEntryId);
         setGridCol(gridCol);
         setGridRow(gridRow);
         setValue(value);

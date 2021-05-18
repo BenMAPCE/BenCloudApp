@@ -127,6 +127,20 @@ public class PopulationDataset extends TableImpl<PopulationDatasetRecord> {
     }
 
     @Override
+    public List<ForeignKey<PopulationDatasetRecord, ?>> getReferences() {
+        return Arrays.<ForeignKey<PopulationDatasetRecord, ?>>asList(Keys.POPULATION_DATASET__POPULATION_DATASET_POP_CONFIG_ID_FKEY);
+    }
+
+    private transient PopConfig _popConfig;
+
+    public PopConfig popConfig() {
+        if (_popConfig == null)
+            _popConfig = new PopConfig(this, Keys.POPULATION_DATASET__POPULATION_DATASET_POP_CONFIG_ID_FKEY);
+
+        return _popConfig;
+    }
+
+    @Override
     public PopulationDataset as(String alias) {
         return new PopulationDataset(DSL.name(alias), this);
     }

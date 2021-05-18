@@ -5,7 +5,11 @@ package gov.epa.bencloud.server.database.jooq.tables;
 
 
 import gov.epa.bencloud.server.database.jooq.Data;
+import gov.epa.bencloud.server.database.jooq.Keys;
 import gov.epa.bencloud.server.database.jooq.tables.records.GridDefinitionRecord;
+
+import java.util.Arrays;
+import java.util.List;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
@@ -17,6 +21,7 @@ import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
+import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
@@ -124,6 +129,16 @@ public class GridDefinition extends TableImpl<GridDefinitionRecord> {
     @Override
     public Identity<GridDefinitionRecord, Integer> getIdentity() {
         return (Identity<GridDefinitionRecord, Integer>) super.getIdentity();
+    }
+
+    @Override
+    public UniqueKey<GridDefinitionRecord> getPrimaryKey() {
+        return Keys.GRID_DEFINITION_PKEY;
+    }
+
+    @Override
+    public List<UniqueKey<GridDefinitionRecord>> getKeys() {
+        return Arrays.<UniqueKey<GridDefinitionRecord>>asList(Keys.GRID_DEFINITION_PKEY);
     }
 
     @Override

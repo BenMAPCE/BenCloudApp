@@ -147,6 +147,20 @@ public class PollutantMetric extends TableImpl<PollutantMetricRecord> {
     }
 
     @Override
+    public List<ForeignKey<PollutantMetricRecord, ?>> getReferences() {
+        return Arrays.<ForeignKey<PollutantMetricRecord, ?>>asList(Keys.POLLUTANT_METRIC__POLLUTANT_METRIC_POLLUTANT_ID_FKEY);
+    }
+
+    private transient Pollutant _pollutant;
+
+    public Pollutant pollutant() {
+        if (_pollutant == null)
+            _pollutant = new Pollutant(this, Keys.POLLUTANT_METRIC__POLLUTANT_METRIC_POLLUTANT_ID_FKEY);
+
+        return _pollutant;
+    }
+
+    @Override
     public PollutantMetric as(String alias) {
         return new PollutantMetric(DSL.name(alias), this);
     }

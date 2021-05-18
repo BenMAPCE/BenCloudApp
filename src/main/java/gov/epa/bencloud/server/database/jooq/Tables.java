@@ -5,6 +5,8 @@ package gov.epa.bencloud.server.database.jooq;
 
 
 import gov.epa.bencloud.server.database.jooq.tables.AgeRange;
+import gov.epa.bencloud.server.database.jooq.tables.AirQualityCell;
+import gov.epa.bencloud.server.database.jooq.tables.AirQualityLayer;
 import gov.epa.bencloud.server.database.jooq.tables.Endpoint;
 import gov.epa.bencloud.server.database.jooq.tables.EndpointGroup;
 import gov.epa.bencloud.server.database.jooq.tables.Ethnicity;
@@ -40,6 +42,16 @@ public class Tables {
      * The table <code>data.age_range</code>.
      */
     public static final AgeRange AGE_RANGE = AgeRange.AGE_RANGE;
+
+    /**
+     * The table <code>data.air_quality_cell</code>.
+     */
+    public static final AirQualityCell AIR_QUALITY_CELL = AirQualityCell.AIR_QUALITY_CELL;
+
+    /**
+     * The table <code>data.air_quality_layer</code>.
+     */
+    public static final AirQualityLayer AIR_QUALITY_LAYER = AirQualityLayer.AIR_QUALITY_LAYER;
 
     /**
      * The table <code>data.endpoint</code>.

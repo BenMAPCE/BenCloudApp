@@ -5,7 +5,11 @@ package gov.epa.bencloud.server.database.jooq.tables;
 
 
 import gov.epa.bencloud.server.database.jooq.Data;
+import gov.epa.bencloud.server.database.jooq.Keys;
 import gov.epa.bencloud.server.database.jooq.tables.records.EndpointRecord;
+
+import java.util.Arrays;
+import java.util.List;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
@@ -17,6 +21,7 @@ import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
+import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
@@ -99,6 +104,30 @@ public class Endpoint extends TableImpl<EndpointRecord> {
     @Override
     public Identity<EndpointRecord, Integer> getIdentity() {
         return (Identity<EndpointRecord, Integer>) super.getIdentity();
+    }
+
+    @Override
+    public UniqueKey<EndpointRecord> getPrimaryKey() {
+        return Keys.ENDPOINT_PKEY;
+    }
+
+    @Override
+    public List<UniqueKey<EndpointRecord>> getKeys() {
+        return Arrays.<UniqueKey<EndpointRecord>>asList(Keys.ENDPOINT_PKEY);
+    }
+
+    @Override
+    public List<ForeignKey<EndpointRecord, ?>> getReferences() {
+        return Arrays.<ForeignKey<EndpointRecord, ?>>asList(Keys.ENDPOINT__ENDPOINT_ENDPOINT_GROUP_ID_FKEY);
+    }
+
+    private transient EndpointGroup _endpointGroup;
+
+    public EndpointGroup endpointGroup() {
+        if (_endpointGroup == null)
+            _endpointGroup = new EndpointGroup(this, Keys.ENDPOINT__ENDPOINT_ENDPOINT_GROUP_ID_FKEY);
+
+        return _endpointGroup;
     }
 
     @Override

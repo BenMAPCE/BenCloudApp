@@ -31,12 +31,12 @@ public class BenCloudServer {
 	public static void main(String[] args) {
 
 		String javaVersion = System.getProperty("java.version");
-
+/*
 		if (!javaVersion.startsWith("1.8")) {
 			System.out.println("Java 8 is required to run the BenCloud Demo");
 			System.exit(0);
 		}
-
+*/
 		try {
 			ApplicationUtil.loadProperties("bencloud-server.properties");
 			ApplicationUtil.loadProperties("bencloud-local.properties", true);

@@ -21,6 +21,11 @@ public class Sequences {
     public static final Sequence<Integer> AGE_RANGE_ID_SEQ = Internal.createSequence("age_range_id_seq", Data.DATA, SQLDataType.INTEGER.nullable(false), null, null, null, null, false, null);
 
     /**
+     * The sequence <code>data.air_quality_layer_id_seq</code>
+     */
+    public static final Sequence<Integer> AIR_QUALITY_LAYER_ID_SEQ = Internal.createSequence("air_quality_layer_id_seq", Data.DATA, SQLDataType.INTEGER.nullable(false), null, null, null, null, false, null);
+
+    /**
      * The sequence <code>data.endpoint_group_id_seq</code>
      */
     public static final Sequence<Integer> ENDPOINT_GROUP_ID_SEQ = Internal.createSequence("endpoint_group_id_seq", Data.DATA, SQLDataType.INTEGER.nullable(false), null, null, null, null, false, null);

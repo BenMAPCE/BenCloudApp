@@ -5,9 +5,12 @@ package gov.epa.bencloud.server.database.jooq.tables;
 
 
 import gov.epa.bencloud.server.database.jooq.Data;
+import gov.epa.bencloud.server.database.jooq.Keys;
 import gov.epa.bencloud.server.database.jooq.tables.records.IncidenceValueRecord;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
@@ -45,9 +48,9 @@ public class IncidenceValue extends TableImpl<IncidenceValueRecord> {
     }
 
     /**
-     * The column <code>data.incidence_value.incidence_rate_id</code>.
+     * The column <code>data.incidence_value.incidence_entry_id</code>.
      */
-    public final TableField<IncidenceValueRecord, Integer> INCIDENCE_RATE_ID = createField(DSL.name("incidence_rate_id"), SQLDataType.INTEGER, this, "");
+    public final TableField<IncidenceValueRecord, Integer> INCIDENCE_ENTRY_ID = createField(DSL.name("incidence_entry_id"), SQLDataType.INTEGER, this, "");
 
     /**
      * The column <code>data.incidence_value.grid_col</code>.
@@ -100,6 +103,20 @@ public class IncidenceValue extends TableImpl<IncidenceValueRecord> {
     @Override
     public Schema getSchema() {
         return Data.DATA;
+    }
+
+    @Override
+    public List<ForeignKey<IncidenceValueRecord, ?>> getReferences() {
+        return Arrays.<ForeignKey<IncidenceValueRecord, ?>>asList(Keys.INCIDENCE_VALUE__INCIDENCE_VALUE_INCIDENCE_ENTRY_ID_FKEY);
+    }
+
+    private transient IncidenceEntry _incidenceEntry;
+
+    public IncidenceEntry incidenceEntry() {
+        if (_incidenceEntry == null)
+            _incidenceEntry = new IncidenceEntry(this, Keys.INCIDENCE_VALUE__INCIDENCE_VALUE_INCIDENCE_ENTRY_ID_FKEY);
+
+        return _incidenceEntry;
     }
 
     @Override

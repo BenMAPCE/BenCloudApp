@@ -5,9 +5,12 @@ package gov.epa.bencloud.server.database.jooq.tables;
 
 
 import gov.epa.bencloud.server.database.jooq.Data;
+import gov.epa.bencloud.server.database.jooq.Keys;
 import gov.epa.bencloud.server.database.jooq.tables.records.PopulationEntryRecord;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
@@ -125,6 +128,20 @@ public class PopulationEntry extends TableImpl<PopulationEntryRecord> {
     @Override
     public Schema getSchema() {
         return Data.DATA;
+    }
+
+    @Override
+    public List<ForeignKey<PopulationEntryRecord, ?>> getReferences() {
+        return Arrays.<ForeignKey<PopulationEntryRecord, ?>>asList(Keys.POPULATION_ENTRY__POPULATION_ENTRY_POP_DATASET_ID_FKEY);
+    }
+
+    private transient PopulationDataset _populationDataset;
+
+    public PopulationDataset populationDataset() {
+        if (_populationDataset == null)
+            _populationDataset = new PopulationDataset(this, Keys.POPULATION_ENTRY__POPULATION_ENTRY_POP_DATASET_ID_FKEY);
+
+        return _populationDataset;
     }
 
     @Override

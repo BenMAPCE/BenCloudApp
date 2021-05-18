@@ -5,7 +5,11 @@ package gov.epa.bencloud.server.database.jooq.tables;
 
 
 import gov.epa.bencloud.server.database.jooq.Data;
+import gov.epa.bencloud.server.database.jooq.Keys;
 import gov.epa.bencloud.server.database.jooq.tables.records.IncidenceDatasetRecord;
+
+import java.util.Arrays;
+import java.util.List;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
@@ -17,6 +21,7 @@ import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
+import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
@@ -99,6 +104,30 @@ public class IncidenceDataset extends TableImpl<IncidenceDatasetRecord> {
     @Override
     public Identity<IncidenceDatasetRecord, Integer> getIdentity() {
         return (Identity<IncidenceDatasetRecord, Integer>) super.getIdentity();
+    }
+
+    @Override
+    public UniqueKey<IncidenceDatasetRecord> getPrimaryKey() {
+        return Keys.INCIDENCE_DATASET_PKEY;
+    }
+
+    @Override
+    public List<UniqueKey<IncidenceDatasetRecord>> getKeys() {
+        return Arrays.<UniqueKey<IncidenceDatasetRecord>>asList(Keys.INCIDENCE_DATASET_PKEY);
+    }
+
+    @Override
+    public List<ForeignKey<IncidenceDatasetRecord, ?>> getReferences() {
+        return Arrays.<ForeignKey<IncidenceDatasetRecord, ?>>asList(Keys.INCIDENCE_DATASET__INCIDENCE_DATASET_GRID_DEFINITION_ID_FKEY);
+    }
+
+    private transient GridDefinition _gridDefinition;
+
+    public GridDefinition gridDefinition() {
+        if (_gridDefinition == null)
+            _gridDefinition = new GridDefinition(this, Keys.INCIDENCE_DATASET__INCIDENCE_DATASET_GRID_DEFINITION_ID_FKEY);
+
+        return _gridDefinition;
     }
 
     @Override
