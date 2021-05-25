@@ -41,6 +41,8 @@ dependencies {
 	compile 'org.quartz-scheduler:quartz:2.3.1'
 
     compile 'com.github.javafaker:javafaker:1.0.2'
+    compile 'org.mariuszgromada.math:MathParser.org-mXparser:4.4.2'
+    
 
 }
 
