@@ -108,10 +108,15 @@ public class Sequences {
     /**
      * The sequence <code>data.task_complete_id_seq</code>
      */
-    public static final Sequence<Integer> TASK_COMPLETE_ID_SEQ = Internal.createSequence("task_complete_id_seq", Data.DATA, SQLDataType.INTEGER.nullable(false), null, null, null, null, false, null);
+    public static final Sequence<Long> TASK_COMPLETE_ID_SEQ = Internal.createSequence("task_complete_id_seq", Data.DATA, SQLDataType.BIGINT.nullable(false), null, null, null, null, false, null);
 
     /**
      * The sequence <code>data.task_queue_id_seq</code>
      */
-    public static final Sequence<Integer> TASK_QUEUE_ID_SEQ = Internal.createSequence("task_queue_id_seq", Data.DATA, SQLDataType.INTEGER.nullable(false), null, null, null, null, false, null);
+    public static final Sequence<Long> TASK_QUEUE_ID_SEQ = Internal.createSequence("task_queue_id_seq", Data.DATA, SQLDataType.BIGINT.nullable(false), null, null, null, null, false, null);
+
+    /**
+     * The sequence <code>data.task_worker_id_seq</code>
+     */
+    public static final Sequence<Long> TASK_WORKER_ID_SEQ = Internal.createSequence("task_worker_id_seq", Data.DATA, SQLDataType.BIGINT.nullable(false), null, null, null, null, false, null);
 }

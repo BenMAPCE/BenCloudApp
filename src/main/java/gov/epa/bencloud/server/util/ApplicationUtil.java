@@ -79,8 +79,24 @@ public class ApplicationUtil {
 
 		boolean propertiesOK = true;
 
-		if (!checkPropertyDirectory("config.directory")) {
+//		if (!checkPropertyDirectory("config.directory")) {
+//			propertiesOK = false;
+//		}
+
+		if (null == getProperty("max.task.workers")) {
+			System.out.println("max.task.workers property not defined");
 			propertiesOK = false;
+		} else {
+			int maxTaskWorkers = 0;
+			
+			try {
+				maxTaskWorkers = Integer.parseInt(getProperty("max.task.workers"));
+				if (maxTaskWorkers <= 0) {
+					System.out.println("max.task.workers must be > 0");
+				}
+			} catch (NumberFormatException e) {
+				System.out.println("max.task.workers property is not numeric");
+			}
 		}
 
 		return propertiesOK;
@@ -109,8 +125,8 @@ public class ApplicationUtil {
 		}
 
 		return propertyOK;
-	}
-
+	}	
+	
 	public static void configureLogging() {
 
 		LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();

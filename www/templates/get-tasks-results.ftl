@@ -26,17 +26,23 @@
     				<th>Description</th>
     				<th>UUID</th>
     				<th>Submitted</th>
+    				<th>Started</th>
     				<th>Completed</th>
+    				<th>Wait Time</th>
+    				<th>Task Time</th>
     				<th> </th>
 				</tr>
 			</thead>
 			<tbody>
 				<#list tasks as task>
-						<td>${task.name}</td>
-						<td>${task.description}</td>
-						<td>${task.uuid}</td>
-						<td>${task.submittedDate}</td>
-						<td>${task.completedDate}</td>
+						<td>${task[0]}</td>
+						<td>${task[1]}</td>
+						<td>${task[2]}</td>
+						<td>${task[3]}</td>
+						<td>${task[4]}</td>
+						<td>${task[5]}</td>
+						<td>${task[6]}</td>
+						<td>${task[7]}</td>
 						<td>
 							<button type='button' id="DELETE-${fileNamePrefix}" 
 								class='btn btn-outline-secondary btn-sm' 

@@ -6,6 +6,7 @@ package gov.epa.bencloud.server.database.jooq.tables;
 
 import gov.epa.bencloud.server.database.jooq.Data;
 import gov.epa.bencloud.server.database.jooq.Indexes;
+import gov.epa.bencloud.server.database.jooq.Keys;
 import gov.epa.bencloud.server.database.jooq.tables.records.TaskCompleteRecord;
 
 import java.time.LocalDateTime;
@@ -18,11 +19,12 @@ import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row9;
+import org.jooq.Row11;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
+import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
@@ -52,7 +54,7 @@ public class TaskComplete extends TableImpl<TaskCompleteRecord> {
     /**
      * The column <code>data.task_complete.id</code>.
      */
-    public final TableField<TaskCompleteRecord, Integer> ID = createField(DSL.name("id"), SQLDataType.INTEGER.nullable(false).identity(true), this, "");
+    public final TableField<TaskCompleteRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
 
     /**
      * The column <code>data.task_complete.task_uuid</code>.
@@ -80,6 +82,11 @@ public class TaskComplete extends TableImpl<TaskCompleteRecord> {
     public final TableField<TaskCompleteRecord, String> TASK_DESCRIPTION = createField(DSL.name("task_description"), SQLDataType.CLOB, this, "");
 
     /**
+     * The column <code>data.task_complete.task_data</code>.
+     */
+    public final TableField<TaskCompleteRecord, String> TASK_DATA = createField(DSL.name("task_data"), SQLDataType.CLOB, this, "");
+
+    /**
      * The column <code>data.task_complete.task_results</code>.
      */
     public final TableField<TaskCompleteRecord, String> TASK_RESULTS = createField(DSL.name("task_results"), SQLDataType.CLOB, this, "");
@@ -88,6 +95,11 @@ public class TaskComplete extends TableImpl<TaskCompleteRecord> {
      * The column <code>data.task_complete.submitted_date</code>.
      */
     public final TableField<TaskCompleteRecord, LocalDateTime> SUBMITTED_DATE = createField(DSL.name("submitted_date"), SQLDataType.LOCALDATETIME(6), this, "");
+
+    /**
+     * The column <code>data.task_complete.started_date</code>.
+     */
+    public final TableField<TaskCompleteRecord, LocalDateTime> STARTED_DATE = createField(DSL.name("started_date"), SQLDataType.LOCALDATETIME(6), this, "");
 
     /**
      * The column <code>data.task_complete.completed_date</code>.
@@ -134,12 +146,22 @@ public class TaskComplete extends TableImpl<TaskCompleteRecord> {
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.TASK_COMPLETE_BY_DATE, Indexes.TASK_COMPLETE_BY_UUID);
+        return Arrays.<Index>asList(Indexes.TASK_COMPLETE_ON_DATE, Indexes.TASK_COMPLETE_ON_UUID);
     }
 
     @Override
-    public Identity<TaskCompleteRecord, Integer> getIdentity() {
-        return (Identity<TaskCompleteRecord, Integer>) super.getIdentity();
+    public Identity<TaskCompleteRecord, Long> getIdentity() {
+        return (Identity<TaskCompleteRecord, Long>) super.getIdentity();
+    }
+
+    @Override
+    public UniqueKey<TaskCompleteRecord> getPrimaryKey() {
+        return Keys.TASK_COMPLETE_PKEY;
+    }
+
+    @Override
+    public List<UniqueKey<TaskCompleteRecord>> getKeys() {
+        return Arrays.<UniqueKey<TaskCompleteRecord>>asList(Keys.TASK_COMPLETE_PKEY);
     }
 
     @Override
@@ -169,11 +191,11 @@ public class TaskComplete extends TableImpl<TaskCompleteRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row9 type methods
+    // Row11 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row9<Integer, String, String, Integer, String, String, String, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row9) super.fieldsRow();
+    public Row11<Long, String, String, Integer, String, String, String, String, LocalDateTime, LocalDateTime, LocalDateTime> fieldsRow() {
+        return (Row11) super.fieldsRow();
     }
 }

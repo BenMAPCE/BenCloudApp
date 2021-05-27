@@ -1,4 +1,4 @@
-package gov.epa.bencloud.server.tasks;
+package gov.epa.bencloud.server.tasks.model;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -14,6 +14,7 @@ public class Task implements Serializable {
     private String userIdentifier;
     private String outputFileName;
     private LocalDateTime submittedDate;
+    private LocalDateTime startedDate;
     private LocalDateTime completedDate;
 
     public Task() {
@@ -84,6 +85,14 @@ public class Task implements Serializable {
 
 	public void setCompletedDate(LocalDateTime completedDate) {
 		this.completedDate = completedDate;
+	}
+
+	public LocalDateTime getStartedDate() {
+		return startedDate;
+	}
+
+	public void setStartedDate(LocalDateTime startedDate) {
+		this.startedDate = startedDate;
 	}
     
 }

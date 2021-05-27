@@ -6,6 +6,7 @@ package gov.epa.bencloud.server.database.jooq.tables;
 
 import gov.epa.bencloud.server.database.jooq.Data;
 import gov.epa.bencloud.server.database.jooq.Indexes;
+import gov.epa.bencloud.server.database.jooq.Keys;
 import gov.epa.bencloud.server.database.jooq.tables.records.TaskQueueRecord;
 
 import java.time.LocalDateTime;
@@ -18,11 +19,12 @@ import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row9;
+import org.jooq.Row11;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
+import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
@@ -52,7 +54,7 @@ public class TaskQueue extends TableImpl<TaskQueueRecord> {
     /**
      * The column <code>data.task_queue.id</code>.
      */
-    public final TableField<TaskQueueRecord, Integer> ID = createField(DSL.name("id"), SQLDataType.INTEGER.nullable(false).identity(true), this, "");
+    public final TableField<TaskQueueRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
 
     /**
      * The column <code>data.task_queue.user_identifier</code>.
@@ -85,6 +87,11 @@ public class TaskQueue extends TableImpl<TaskQueueRecord> {
     public final TableField<TaskQueueRecord, String> TASK_DATA = createField(DSL.name("task_data"), SQLDataType.CLOB, this, "");
 
     /**
+     * The column <code>data.task_queue.task_percentage</code>.
+     */
+    public final TableField<TaskQueueRecord, Integer> TASK_PERCENTAGE = createField(DSL.name("task_percentage"), SQLDataType.INTEGER, this, "");
+
+    /**
      * The column <code>data.task_queue.in_process</code>.
      */
     public final TableField<TaskQueueRecord, Boolean> IN_PROCESS = createField(DSL.name("in_process"), SQLDataType.BOOLEAN.defaultValue(DSL.field("false", SQLDataType.BOOLEAN)), this, "");
@@ -93,6 +100,11 @@ public class TaskQueue extends TableImpl<TaskQueueRecord> {
      * The column <code>data.task_queue.submitted_date</code>.
      */
     public final TableField<TaskQueueRecord, LocalDateTime> SUBMITTED_DATE = createField(DSL.name("submitted_date"), SQLDataType.LOCALDATETIME(6), this, "");
+
+    /**
+     * The column <code>data.task_queue.started_date</code>.
+     */
+    public final TableField<TaskQueueRecord, LocalDateTime> STARTED_DATE = createField(DSL.name("started_date"), SQLDataType.LOCALDATETIME(6), this, "");
 
     private TaskQueue(Name alias, Table<TaskQueueRecord> aliased) {
         this(alias, aliased, null);
@@ -134,12 +146,22 @@ public class TaskQueue extends TableImpl<TaskQueueRecord> {
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.TASK_QUEUE_BY_DATE, Indexes.TASK_QUEUE_BY_PRIORITY_DATE, Indexes.TASK_QUEUE_BY_UUID);
+        return Arrays.<Index>asList(Indexes.TASK_QUEUE_ON_DATE, Indexes.TASK_QUEUE_ON_PRIORITY_SUBMITTED_DATE, Indexes.TASK_QUEUE_ON_UUID);
     }
 
     @Override
-    public Identity<TaskQueueRecord, Integer> getIdentity() {
-        return (Identity<TaskQueueRecord, Integer>) super.getIdentity();
+    public Identity<TaskQueueRecord, Long> getIdentity() {
+        return (Identity<TaskQueueRecord, Long>) super.getIdentity();
+    }
+
+    @Override
+    public UniqueKey<TaskQueueRecord> getPrimaryKey() {
+        return Keys.TASK_QUEUE_PKEY;
+    }
+
+    @Override
+    public List<UniqueKey<TaskQueueRecord>> getKeys() {
+        return Arrays.<UniqueKey<TaskQueueRecord>>asList(Keys.TASK_QUEUE_PKEY);
     }
 
     @Override
@@ -169,11 +191,11 @@ public class TaskQueue extends TableImpl<TaskQueueRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row9 type methods
+    // Row11 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row9<Integer, String, Integer, String, String, String, String, Boolean, LocalDateTime> fieldsRow() {
-        return (Row9) super.fieldsRow();
+    public Row11<Long, String, Integer, String, String, String, String, Integer, Boolean, LocalDateTime, LocalDateTime> fieldsRow() {
+        return (Row11) super.fieldsRow();
     }
 }

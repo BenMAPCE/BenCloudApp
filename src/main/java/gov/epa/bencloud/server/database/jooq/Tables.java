@@ -30,6 +30,7 @@ import gov.epa.bencloud.server.database.jooq.tables.SeasonalMetric;
 import gov.epa.bencloud.server.database.jooq.tables.SeasonalMetricSeason;
 import gov.epa.bencloud.server.database.jooq.tables.TaskComplete;
 import gov.epa.bencloud.server.database.jooq.tables.TaskQueue;
+import gov.epa.bencloud.server.database.jooq.tables.TaskWorker;
 
 
 /**
@@ -167,4 +168,9 @@ public class Tables {
      * The table <code>data.task_queue</code>.
      */
     public static final TaskQueue TASK_QUEUE = TaskQueue.TASK_QUEUE;
+
+    /**
+     * The table <code>data.task_worker</code>.
+     */
+    public static final TaskWorker TASK_WORKER = TaskWorker.TASK_WORKER;
 }

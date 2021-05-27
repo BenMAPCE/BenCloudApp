@@ -6,9 +6,6 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.jmx.JmxReporter;
-
 import ch.qos.logback.classic.LoggerContext;
 import freemarker.template.Configuration;
 import gov.epa.bencloud.server.jobs.JobsUtil;
@@ -16,6 +13,7 @@ import gov.epa.bencloud.server.routes.AdminRoutes;
 import gov.epa.bencloud.server.routes.ApiRoutes;
 import gov.epa.bencloud.server.routes.PublicRoutes;
 import gov.epa.bencloud.server.routes.SecuredRoutes;
+import gov.epa.bencloud.server.tasks.TaskWorker;
 import gov.epa.bencloud.server.util.ApplicationUtil;
 import gov.epa.bencloud.server.util.FreeMarkerRenderUtil;
 import spark.Service;
@@ -45,16 +43,18 @@ public class BenCloudServer {
 			System.exit(-1);
 		}
 
-//		try {
-//			if (!ApplicationUtil.validateProperties()) {
-//				System.out.println("properties are not all valid, application exiting");
-//				System.exit(-1);
-//			}
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//			System.exit(-1);
-//		}
+		try {
+			if (!ApplicationUtil.validateProperties()) {
+				System.out.println("properties are not all valid, application exiting");
+				System.exit(-1);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
 
+		System.out.println("max Task Workers: " + TaskWorker.getMaxTaskWorkers());
+		
 		ApplicationUtil.configureLogging();
 		LoggerContext loggerContext = (LoggerContext)LoggerFactory.getILoggerFactory();
 		Logger logger = loggerContext.getLogger("gov.epa.bencloud");
@@ -82,7 +82,10 @@ public class BenCloudServer {
 		new SecuredRoutes(benCloudService, freeMarkerConfiguration);
 		
 		JobsUtil.startJobScheduler();
-				
+		
+//		QueueTest.startTaskCreateThreads(1000);
+//		QueueTest.startQueueReadThreads(10000);
+        
 		System.out.println("\nStarting BenCloud Demo, version " + version);
 
 	}

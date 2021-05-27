@@ -30,6 +30,7 @@ import gov.epa.bencloud.server.database.jooq.tables.SeasonalMetric;
 import gov.epa.bencloud.server.database.jooq.tables.SeasonalMetricSeason;
 import gov.epa.bencloud.server.database.jooq.tables.TaskComplete;
 import gov.epa.bencloud.server.database.jooq.tables.TaskQueue;
+import gov.epa.bencloud.server.database.jooq.tables.TaskWorker;
 
 import java.util.Arrays;
 import java.util.List;
@@ -184,6 +185,11 @@ public class Data extends SchemaImpl {
     public final TaskQueue TASK_QUEUE = TaskQueue.TASK_QUEUE;
 
     /**
+     * The table <code>data.task_worker</code>.
+     */
+    public final TaskWorker TASK_WORKER = TaskWorker.TASK_WORKER;
+
+    /**
      * No further instances allowed
      */
     private Data() {
@@ -218,7 +224,8 @@ public class Data extends SchemaImpl {
             Sequences.SEASONAL_METRIC_ID_SEQ,
             Sequences.SEASONAL_METRIC_SEASON_ID_SEQ,
             Sequences.TASK_COMPLETE_ID_SEQ,
-            Sequences.TASK_QUEUE_ID_SEQ);
+            Sequences.TASK_QUEUE_ID_SEQ,
+            Sequences.TASK_WORKER_ID_SEQ);
     }
 
     @Override
@@ -249,6 +256,7 @@ public class Data extends SchemaImpl {
             SeasonalMetric.SEASONAL_METRIC,
             SeasonalMetricSeason.SEASONAL_METRIC_SEASON,
             TaskComplete.TASK_COMPLETE,
-            TaskQueue.TASK_QUEUE);
+            TaskQueue.TASK_QUEUE,
+            TaskWorker.TASK_WORKER);
     }
 }

@@ -1,15 +1,9 @@
 package gov.epa.bencloud.server.routes;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,10 +11,9 @@ import org.slf4j.LoggerFactory;
 import com.github.javafaker.Faker;
 
 import freemarker.template.Configuration;
-import gov.epa.bencloud.server.BenCloudServer;
-import gov.epa.bencloud.server.tasks.Task;
-import gov.epa.bencloud.server.tasks.TaskUtil;
-import gov.epa.bencloud.server.util.ApplicationUtil;
+import gov.epa.bencloud.server.tasks.TaskComplete;
+import gov.epa.bencloud.server.tasks.TaskQueue;
+import gov.epa.bencloud.server.tasks.model.Task;
 import gov.epa.bencloud.server.util.FreeMarkerRenderUtil;
 import spark.Service;
 
@@ -48,7 +41,7 @@ public class SecuredRoutes {
 			task.setUuid(UUID.randomUUID().toString());
 			task.setUserIdentifier(bcoUserIdentifier);
 			
-			TaskUtil.writeTaskToQueue(task);
+			TaskQueue.writeTaskToQueue(task);
 
 			Map<String, Object> attributes = new HashMap<>();
 
@@ -69,7 +62,7 @@ public class SecuredRoutes {
 
 			String bcoUserIdentifier = RoutesUtil.getOrSetOrExtendCookie(req, res);
 			
-			List<Task> tasks = TaskUtil.getCompletedTasks(bcoUserIdentifier);
+			List<List> tasks = TaskComplete.getCompletedTasks(bcoUserIdentifier);
 
 			Map<String, Object> attributes = new HashMap<>();
 			attributes.put("tasks", tasks);

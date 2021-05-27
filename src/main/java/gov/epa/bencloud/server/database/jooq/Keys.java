@@ -28,6 +28,9 @@ import gov.epa.bencloud.server.database.jooq.tables.PopulationEntry;
 import gov.epa.bencloud.server.database.jooq.tables.Race;
 import gov.epa.bencloud.server.database.jooq.tables.SeasonalMetric;
 import gov.epa.bencloud.server.database.jooq.tables.SeasonalMetricSeason;
+import gov.epa.bencloud.server.database.jooq.tables.TaskComplete;
+import gov.epa.bencloud.server.database.jooq.tables.TaskQueue;
+import gov.epa.bencloud.server.database.jooq.tables.TaskWorker;
 import gov.epa.bencloud.server.database.jooq.tables.records.AgeRangeRecord;
 import gov.epa.bencloud.server.database.jooq.tables.records.AirQualityCellRecord;
 import gov.epa.bencloud.server.database.jooq.tables.records.AirQualityLayerRecord;
@@ -52,6 +55,9 @@ import gov.epa.bencloud.server.database.jooq.tables.records.PopulationEntryRecor
 import gov.epa.bencloud.server.database.jooq.tables.records.RaceRecord;
 import gov.epa.bencloud.server.database.jooq.tables.records.SeasonalMetricRecord;
 import gov.epa.bencloud.server.database.jooq.tables.records.SeasonalMetricSeasonRecord;
+import gov.epa.bencloud.server.database.jooq.tables.records.TaskCompleteRecord;
+import gov.epa.bencloud.server.database.jooq.tables.records.TaskQueueRecord;
+import gov.epa.bencloud.server.database.jooq.tables.records.TaskWorkerRecord;
 
 import org.jooq.ForeignKey;
 import org.jooq.TableField;
@@ -89,6 +95,9 @@ public class Keys {
     public static final UniqueKey<RaceRecord> RACE_PKEY = Internal.createUniqueKey(Race.RACE, DSL.name("race_pkey"), new TableField[] { Race.RACE.ID }, true);
     public static final UniqueKey<SeasonalMetricRecord> SEASONAL_METRIC_PKEY = Internal.createUniqueKey(SeasonalMetric.SEASONAL_METRIC, DSL.name("seasonal_metric_pkey"), new TableField[] { SeasonalMetric.SEASONAL_METRIC.ID }, true);
     public static final UniqueKey<SeasonalMetricSeasonRecord> SEASONAL_METRIC_SEASON_PKEY = Internal.createUniqueKey(SeasonalMetricSeason.SEASONAL_METRIC_SEASON, DSL.name("seasonal_metric_season_pkey"), new TableField[] { SeasonalMetricSeason.SEASONAL_METRIC_SEASON.ID }, true);
+    public static final UniqueKey<TaskCompleteRecord> TASK_COMPLETE_PKEY = Internal.createUniqueKey(TaskComplete.TASK_COMPLETE, DSL.name("task_complete_pkey"), new TableField[] { TaskComplete.TASK_COMPLETE.ID }, true);
+    public static final UniqueKey<TaskQueueRecord> TASK_QUEUE_PKEY = Internal.createUniqueKey(TaskQueue.TASK_QUEUE, DSL.name("task_queue_pkey"), new TableField[] { TaskQueue.TASK_QUEUE.ID }, true);
+    public static final UniqueKey<TaskWorkerRecord> TASK_WORKER_PKEY = Internal.createUniqueKey(TaskWorker.TASK_WORKER, DSL.name("task_worker_pkey"), new TableField[] { TaskWorker.TASK_WORKER.ID }, true);
 
     // -------------------------------------------------------------------------
     // FOREIGN KEY definitions
