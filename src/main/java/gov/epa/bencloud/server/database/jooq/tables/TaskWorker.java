@@ -52,9 +52,9 @@ public class TaskWorker extends TableImpl<TaskWorkerRecord> {
     }
 
     /**
-     * The column <code>data.task_worker.id</code>.
+     * The column <code>data.task_worker.task_id</code>.
      */
-    public final TableField<TaskWorkerRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+    public final TableField<TaskWorkerRecord, Long> TASK_ID = createField(DSL.name("task_id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
 
     /**
      * The column <code>data.task_worker.task_worker_uuid</code>.

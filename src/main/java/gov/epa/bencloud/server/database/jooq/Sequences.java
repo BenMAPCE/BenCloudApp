@@ -106,17 +106,17 @@ public class Sequences {
     public static final Sequence<Integer> SEASONAL_METRIC_SEASON_ID_SEQ = Internal.createSequence("seasonal_metric_season_id_seq", Data.DATA, SQLDataType.INTEGER.nullable(false), null, null, null, null, false, null);
 
     /**
-     * The sequence <code>data.task_complete_id_seq</code>
+     * The sequence <code>data.task_complete_task_id_seq</code>
      */
-    public static final Sequence<Long> TASK_COMPLETE_ID_SEQ = Internal.createSequence("task_complete_id_seq", Data.DATA, SQLDataType.BIGINT.nullable(false), null, null, null, null, false, null);
+    public static final Sequence<Long> TASK_COMPLETE_TASK_ID_SEQ = Internal.createSequence("task_complete_task_id_seq", Data.DATA, SQLDataType.BIGINT.nullable(false), null, null, null, null, false, null);
 
     /**
-     * The sequence <code>data.task_queue_id_seq</code>
+     * The sequence <code>data.task_queue_task_id_seq</code>
      */
-    public static final Sequence<Long> TASK_QUEUE_ID_SEQ = Internal.createSequence("task_queue_id_seq", Data.DATA, SQLDataType.BIGINT.nullable(false), null, null, null, null, false, null);
+    public static final Sequence<Long> TASK_QUEUE_TASK_ID_SEQ = Internal.createSequence("task_queue_task_id_seq", Data.DATA, SQLDataType.BIGINT.nullable(false), null, null, null, null, false, null);
 
     /**
-     * The sequence <code>data.task_worker_id_seq</code>
+     * The sequence <code>data.task_worker_task_id_seq</code>
      */
-    public static final Sequence<Long> TASK_WORKER_ID_SEQ = Internal.createSequence("task_worker_id_seq", Data.DATA, SQLDataType.BIGINT.nullable(false), null, null, null, null, false, null);
+    public static final Sequence<Long> TASK_WORKER_TASK_ID_SEQ = Internal.createSequence("task_worker_task_id_seq", Data.DATA, SQLDataType.BIGINT.nullable(false), null, null, null, null, false, null);
 }

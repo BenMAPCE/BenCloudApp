@@ -1,5 +1,7 @@
 package gov.epa.bencloud.server.tasks.local;
 
+import java.time.LocalDateTime;
+
 import gov.epa.bencloud.server.tasks.TaskComplete;
 import gov.epa.bencloud.server.tasks.TaskQueue;
 import gov.epa.bencloud.server.tasks.TaskWorker;
@@ -18,12 +20,29 @@ public class TaskWorkerRunable implements Runnable {
 	private int minRandomNumber = 1;
 	private int maxRandomNumber = 30;
 
+	private boolean taskSuccessful = true;
+	private String taskCompleteMessage = "Task Complete";
+	
 	public void run() {
 
 		Task task = TaskQueue.getTaskFromQueueRecord(taskUuid);
 
 		int loopTimes = (int) Math.floor(
 				Math.random() * (maxRandomNumber - minRandomNumber + 1) + minRandomNumber);
+
+		// Fake an unresponsive Task Worker
+		if (loopTimes % 5 == 0) {
+			System.out.println("--- faking unresponsive Task Worker");
+			LocalDateTime localDateTime = LocalDateTime.now().minusMinutes(30); 
+			TaskWorker.updateTaskWorkerHeartbeat(taskWorkerUuid, localDateTime);
+			return;
+		}
+		
+		// Fake a failed Task
+		if (loopTimes % 3 == 0) {
+			taskSuccessful = false;
+			taskCompleteMessage = "Failed because " + loopTimes + " is evenly divisible by 3";
+		}
 
 		try {
 
@@ -35,7 +54,8 @@ public class TaskWorkerRunable implements Runnable {
 
 			}
 
-			TaskComplete.addTaskToCompleteAndRemoveTaskFromQueue(taskUuid, taskWorkerUuid);
+			TaskComplete.addTaskToCompleteAndRemoveTaskFromQueue(
+					taskUuid, taskWorkerUuid, taskSuccessful, taskCompleteMessage);
 
 		} catch (InterruptedException e) {
 		}

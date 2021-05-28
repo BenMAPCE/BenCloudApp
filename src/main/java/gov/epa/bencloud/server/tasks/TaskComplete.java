@@ -24,7 +24,9 @@ public class TaskComplete {
 
 	private static Logger log = LoggerFactory.getLogger(TaskComplete.class);
 
-	public static void addTaskToCompleteAndRemoveTaskFromQueue(String taskUuid, String taskWorkerUuid) {
+	public static void addTaskToCompleteAndRemoveTaskFromQueue(
+			String taskUuid, String taskWorkerUuid, 
+			boolean taskSuccessful, String taskCompleteMessage) {
 
 		if (null == taskUuid) {
 			return;
@@ -43,15 +45,17 @@ public class TaskComplete {
 				.execute();
 
 				DSL.using(ctx).insertInto(TASK_COMPLETE,
-						TASK_COMPLETE.USER_IDENTIFIER,
-						TASK_COMPLETE.PRIORITY,
+						TASK_COMPLETE.TASK_USER_IDENTIFIER,
+						TASK_COMPLETE.TASK_PRIORITY,
 						TASK_COMPLETE.TASK_UUID,
 						TASK_COMPLETE.TASK_NAME,
 						TASK_COMPLETE.TASK_DESCRIPTION,
 						TASK_COMPLETE.TASK_RESULTS,
-						TASK_COMPLETE.SUBMITTED_DATE,
-						TASK_COMPLETE.STARTED_DATE,
-						TASK_COMPLETE.COMPLETED_DATE)
+						TASK_COMPLETE.TASK_SUCCESSFUL,
+						TASK_COMPLETE.TASK_COMPLETE_MESSAGE,
+						TASK_COMPLETE.TASK_SUBMITTED_DATE,
+						TASK_COMPLETE.TASK_STARTED_DATE,
+						TASK_COMPLETE.TASK_COMPLETED_DATE)
 				.values(
 						task.getUserIdentifier(),
 						task.getPriority(),
@@ -59,6 +63,8 @@ public class TaskComplete {
 						task.getName(),
 						task.getDescription(),
 						"{}",
+						taskSuccessful,
+						taskCompleteMessage,
 						task.getSubmittedDate(),
 						task.getStartedDate(),
 						LocalDateTime.now())
@@ -79,13 +85,10 @@ public class TaskComplete {
 
 	public static List<List> getCompletedTasks(String userIdentifier) {
 
-		System.out.println("getCompletedTasks: " + userIdentifier);
+		//System.out.println("getCompletedTasks: " + userIdentifier);
 
 		List<List> tasks = new ArrayList<List>();
 		List<Object> task = new ArrayList<Object>();
-
-		//List<Task> tasks = new ArrayList<Task>();
-		//Task task = new Task();
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -94,37 +97,29 @@ public class TaskComplete {
 			try {
 
 				Result<Record> result = DSL.using(JooqUtil.getJooqConfiguration()).select().from(TASK_COMPLETE)
-						.where(TASK_COMPLETE.USER_IDENTIFIER.eq(userIdentifier))
-						.orderBy(TASK_COMPLETE.COMPLETED_DATE.asc())
+						.where(TASK_COMPLETE.TASK_USER_IDENTIFIER.eq(userIdentifier))
+						.orderBy(TASK_COMPLETE.TASK_COMPLETED_DATE.asc())
 						.fetch();
 
 				for (Record record : result) {
-
-//					task = new Task();
-//					task.setName(record.getValue(TASK_COMPLETE.TASK_NAME));
-//					task.setDescription(record.getValue(TASK_COMPLETE.TASK_DESCRIPTION));
-//					task.setUserIdentifier(record.getValue(TASK_COMPLETE.USER_IDENTIFIER));
-//					task.setPriority(record.getValue(TASK_COMPLETE.PRIORITY));
-//					task.setUuid(record.getValue(TASK_COMPLETE.TASK_UUID));
-//					task.setSubmittedDate(record.getValue(TASK_COMPLETE.SUBMITTED_DATE));
-//					task.setStartedDate(record.getValue(TASK_COMPLETE.STARTED_DATE));
-//					task.setCompletedDate(record.getValue(TASK_COMPLETE.COMPLETED_DATE));
 
 					task = new ArrayList<Object>();
 
 					task.add(record.getValue(TASK_COMPLETE.TASK_NAME));
 					task.add(record.getValue(TASK_COMPLETE.TASK_DESCRIPTION));
 					task.add(record.getValue(TASK_COMPLETE.TASK_UUID));
-					task.add(record.getValue(TASK_COMPLETE.SUBMITTED_DATE).format(formatter));
-					task.add(record.getValue(TASK_COMPLETE.STARTED_DATE).format(formatter));
-					task.add(record.getValue(TASK_COMPLETE.COMPLETED_DATE).format(formatter));
+					task.add(record.getValue(TASK_COMPLETE.TASK_SUBMITTED_DATE).format(formatter));
+					task.add(record.getValue(TASK_COMPLETE.TASK_STARTED_DATE).format(formatter));
+					task.add(record.getValue(TASK_COMPLETE.TASK_COMPLETED_DATE).format(formatter));
 					task.add(getHumanReadableTime(
-							record.getValue(TASK_COMPLETE.SUBMITTED_DATE), 
-							record.getValue(TASK_COMPLETE.STARTED_DATE)));
+							record.getValue(TASK_COMPLETE.TASK_SUBMITTED_DATE), 
+							record.getValue(TASK_COMPLETE.TASK_STARTED_DATE)));
 
 					task.add(getHumanReadableTime(
-							record.getValue(TASK_COMPLETE.STARTED_DATE), 
-							record.getValue(TASK_COMPLETE.COMPLETED_DATE)));
+							record.getValue(TASK_COMPLETE.TASK_STARTED_DATE), 
+							record.getValue(TASK_COMPLETE.TASK_COMPLETED_DATE)));
+					task.add(record.getValue(TASK_COMPLETE.TASK_SUCCESSFUL) ? "Y" : "N");
+					task.add(record.getValue(TASK_COMPLETE.TASK_COMPLETE_MESSAGE));
 				    
 					tasks.add(task);
 				}
@@ -155,12 +150,12 @@ public class TaskComplete {
 				Record record = result.get(0);
 				task.setName(record.getValue(TASK_COMPLETE.TASK_NAME));
 				task.setDescription(record.getValue(TASK_COMPLETE.TASK_DESCRIPTION));
-				task.setUserIdentifier(record.getValue(TASK_COMPLETE.USER_IDENTIFIER));
-				task.setPriority(record.getValue(TASK_COMPLETE.PRIORITY));
+				task.setUserIdentifier(record.getValue(TASK_COMPLETE.TASK_USER_IDENTIFIER));
+				task.setPriority(record.getValue(TASK_COMPLETE.TASK_PRIORITY));
 				task.setUuid(record.getValue(TASK_COMPLETE.TASK_UUID));
-				task.setSubmittedDate(record.getValue(TASK_COMPLETE.SUBMITTED_DATE));
-				task.setStartedDate(record.getValue(TASK_COMPLETE.STARTED_DATE));
-				task.setCompletedDate(record.getValue(TASK_COMPLETE.COMPLETED_DATE));
+				task.setSubmittedDate(record.getValue(TASK_COMPLETE.TASK_SUBMITTED_DATE));
+				task.setStartedDate(record.getValue(TASK_COMPLETE.TASK_STARTED_DATE));
+				task.setCompletedDate(record.getValue(TASK_COMPLETE.TASK_COMPLETED_DATE));
 			}
 		} catch (DataAccessException e1) {
 			// TODO Auto-generated catch block

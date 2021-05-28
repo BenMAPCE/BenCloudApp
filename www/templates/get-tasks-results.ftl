@@ -30,6 +30,8 @@
     				<th>Completed</th>
     				<th>Wait Time</th>
     				<th>Task Time</th>
+    				<th>Successful</th>
+    				<th>Message</th>
     				<th> </th>
 				</tr>
 			</thead>
@@ -43,6 +45,8 @@
 						<td>${task[5]}</td>
 						<td>${task[6]}</td>
 						<td>${task[7]}</td>
+						<td>${task[8]}</td>
+						<td>${task[9]}</td>
 						<td>
 							<button type='button' id="DELETE-${fileNamePrefix}" 
 								class='btn btn-outline-secondary btn-sm' 

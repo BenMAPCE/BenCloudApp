@@ -24,44 +24,44 @@ public class TaskQueueRecord extends UpdatableRecordImpl<TaskQueueRecord> implem
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>data.task_queue.id</code>.
+     * Setter for <code>data.task_queue.task_id</code>.
      */
-    public void setId(Long value) {
+    public void setTaskId(Long value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>data.task_queue.id</code>.
+     * Getter for <code>data.task_queue.task_id</code>.
      */
-    public Long getId() {
+    public Long getTaskId() {
         return (Long) get(0);
     }
 
     /**
-     * Setter for <code>data.task_queue.user_identifier</code>.
+     * Setter for <code>data.task_queue.task_user_identifier</code>.
      */
-    public void setUserIdentifier(String value) {
+    public void setTaskUserIdentifier(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>data.task_queue.user_identifier</code>.
+     * Getter for <code>data.task_queue.task_user_identifier</code>.
      */
-    public String getUserIdentifier() {
+    public String getTaskUserIdentifier() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>data.task_queue.priority</code>.
+     * Setter for <code>data.task_queue.task_priority</code>.
      */
-    public void setPriority(Integer value) {
+    public void setTaskPriority(Integer value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>data.task_queue.priority</code>.
+     * Getter for <code>data.task_queue.task_priority</code>.
      */
-    public Integer getPriority() {
+    public Integer getTaskPriority() {
         return (Integer) get(2);
     }
 
@@ -136,44 +136,44 @@ public class TaskQueueRecord extends UpdatableRecordImpl<TaskQueueRecord> implem
     }
 
     /**
-     * Setter for <code>data.task_queue.in_process</code>.
+     * Setter for <code>data.task_queue.task_in_process</code>.
      */
-    public void setInProcess(Boolean value) {
+    public void setTaskInProcess(Boolean value) {
         set(8, value);
     }
 
     /**
-     * Getter for <code>data.task_queue.in_process</code>.
+     * Getter for <code>data.task_queue.task_in_process</code>.
      */
-    public Boolean getInProcess() {
+    public Boolean getTaskInProcess() {
         return (Boolean) get(8);
     }
 
     /**
-     * Setter for <code>data.task_queue.submitted_date</code>.
+     * Setter for <code>data.task_queue.task_submitted_date</code>.
      */
-    public void setSubmittedDate(LocalDateTime value) {
+    public void setTaskSubmittedDate(LocalDateTime value) {
         set(9, value);
     }
 
     /**
-     * Getter for <code>data.task_queue.submitted_date</code>.
+     * Getter for <code>data.task_queue.task_submitted_date</code>.
      */
-    public LocalDateTime getSubmittedDate() {
+    public LocalDateTime getTaskSubmittedDate() {
         return (LocalDateTime) get(9);
     }
 
     /**
-     * Setter for <code>data.task_queue.started_date</code>.
+     * Setter for <code>data.task_queue.task_started_date</code>.
      */
-    public void setStartedDate(LocalDateTime value) {
+    public void setTaskStartedDate(LocalDateTime value) {
         set(10, value);
     }
 
     /**
-     * Getter for <code>data.task_queue.started_date</code>.
+     * Getter for <code>data.task_queue.task_started_date</code>.
      */
-    public LocalDateTime getStartedDate() {
+    public LocalDateTime getTaskStartedDate() {
         return (LocalDateTime) get(10);
     }
 
@@ -202,17 +202,17 @@ public class TaskQueueRecord extends UpdatableRecordImpl<TaskQueueRecord> implem
 
     @Override
     public Field<Long> field1() {
-        return TaskQueue.TASK_QUEUE.ID;
+        return TaskQueue.TASK_QUEUE.TASK_ID;
     }
 
     @Override
     public Field<String> field2() {
-        return TaskQueue.TASK_QUEUE.USER_IDENTIFIER;
+        return TaskQueue.TASK_QUEUE.TASK_USER_IDENTIFIER;
     }
 
     @Override
     public Field<Integer> field3() {
-        return TaskQueue.TASK_QUEUE.PRIORITY;
+        return TaskQueue.TASK_QUEUE.TASK_PRIORITY;
     }
 
     @Override
@@ -242,32 +242,32 @@ public class TaskQueueRecord extends UpdatableRecordImpl<TaskQueueRecord> implem
 
     @Override
     public Field<Boolean> field9() {
-        return TaskQueue.TASK_QUEUE.IN_PROCESS;
+        return TaskQueue.TASK_QUEUE.TASK_IN_PROCESS;
     }
 
     @Override
     public Field<LocalDateTime> field10() {
-        return TaskQueue.TASK_QUEUE.SUBMITTED_DATE;
+        return TaskQueue.TASK_QUEUE.TASK_SUBMITTED_DATE;
     }
 
     @Override
     public Field<LocalDateTime> field11() {
-        return TaskQueue.TASK_QUEUE.STARTED_DATE;
+        return TaskQueue.TASK_QUEUE.TASK_STARTED_DATE;
     }
 
     @Override
     public Long component1() {
-        return getId();
+        return getTaskId();
     }
 
     @Override
     public String component2() {
-        return getUserIdentifier();
+        return getTaskUserIdentifier();
     }
 
     @Override
     public Integer component3() {
-        return getPriority();
+        return getTaskPriority();
     }
 
     @Override
@@ -297,32 +297,32 @@ public class TaskQueueRecord extends UpdatableRecordImpl<TaskQueueRecord> implem
 
     @Override
     public Boolean component9() {
-        return getInProcess();
+        return getTaskInProcess();
     }
 
     @Override
     public LocalDateTime component10() {
-        return getSubmittedDate();
+        return getTaskSubmittedDate();
     }
 
     @Override
     public LocalDateTime component11() {
-        return getStartedDate();
+        return getTaskStartedDate();
     }
 
     @Override
     public Long value1() {
-        return getId();
+        return getTaskId();
     }
 
     @Override
     public String value2() {
-        return getUserIdentifier();
+        return getTaskUserIdentifier();
     }
 
     @Override
     public Integer value3() {
-        return getPriority();
+        return getTaskPriority();
     }
 
     @Override
@@ -352,34 +352,34 @@ public class TaskQueueRecord extends UpdatableRecordImpl<TaskQueueRecord> implem
 
     @Override
     public Boolean value9() {
-        return getInProcess();
+        return getTaskInProcess();
     }
 
     @Override
     public LocalDateTime value10() {
-        return getSubmittedDate();
+        return getTaskSubmittedDate();
     }
 
     @Override
     public LocalDateTime value11() {
-        return getStartedDate();
+        return getTaskStartedDate();
     }
 
     @Override
     public TaskQueueRecord value1(Long value) {
-        setId(value);
+        setTaskId(value);
         return this;
     }
 
     @Override
     public TaskQueueRecord value2(String value) {
-        setUserIdentifier(value);
+        setTaskUserIdentifier(value);
         return this;
     }
 
     @Override
     public TaskQueueRecord value3(Integer value) {
-        setPriority(value);
+        setTaskPriority(value);
         return this;
     }
 
@@ -415,19 +415,19 @@ public class TaskQueueRecord extends UpdatableRecordImpl<TaskQueueRecord> implem
 
     @Override
     public TaskQueueRecord value9(Boolean value) {
-        setInProcess(value);
+        setTaskInProcess(value);
         return this;
     }
 
     @Override
     public TaskQueueRecord value10(LocalDateTime value) {
-        setSubmittedDate(value);
+        setTaskSubmittedDate(value);
         return this;
     }
 
     @Override
     public TaskQueueRecord value11(LocalDateTime value) {
-        setStartedDate(value);
+        setTaskStartedDate(value);
         return this;
     }
 
@@ -461,19 +461,19 @@ public class TaskQueueRecord extends UpdatableRecordImpl<TaskQueueRecord> implem
     /**
      * Create a detached, initialised TaskQueueRecord
      */
-    public TaskQueueRecord(Long id, String userIdentifier, Integer priority, String taskUuid, String taskName, String taskDescription, String taskData, Integer taskPercentage, Boolean inProcess, LocalDateTime submittedDate, LocalDateTime startedDate) {
+    public TaskQueueRecord(Long taskId, String taskUserIdentifier, Integer taskPriority, String taskUuid, String taskName, String taskDescription, String taskData, Integer taskPercentage, Boolean taskInProcess, LocalDateTime taskSubmittedDate, LocalDateTime taskStartedDate) {
         super(TaskQueue.TASK_QUEUE);
 
-        setId(id);
-        setUserIdentifier(userIdentifier);
-        setPriority(priority);
+        setTaskId(taskId);
+        setTaskUserIdentifier(taskUserIdentifier);
+        setTaskPriority(taskPriority);
         setTaskUuid(taskUuid);
         setTaskName(taskName);
         setTaskDescription(taskDescription);
         setTaskData(taskData);
         setTaskPercentage(taskPercentage);
-        setInProcess(inProcess);
-        setSubmittedDate(submittedDate);
-        setStartedDate(startedDate);
+        setTaskInProcess(taskInProcess);
+        setTaskSubmittedDate(taskSubmittedDate);
+        setTaskStartedDate(taskStartedDate);
     }
 }

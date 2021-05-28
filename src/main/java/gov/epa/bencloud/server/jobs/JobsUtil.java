@@ -18,22 +18,36 @@ public class JobsUtil {
 			Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
 			scheduler.start();
 
-		    JobDetail job = newJob(ReadFromQueueJob.class)
+		    JobDetail readFromQueueJob = newJob(ReadFromQueueJob.class)
 		    		.withIdentity("readQueueJob", "bencloud")
 		    		.build();
 
-		    Trigger trigger = TriggerBuilder.newTrigger()
+		    Trigger readFromQueueJobTrigger = TriggerBuilder.newTrigger()
 		    	    .withIdentity("readQueueTrigger", "bencloud")
 		    	    .withSchedule(SimpleScheduleBuilder
 		    	    		.simpleSchedule().withIntervalInSeconds(10).repeatForever()
 		    	    		.withMisfireHandlingInstructionNextWithRemainingCount())
 		    	    .build();
 		    
-		    scheduler.scheduleJob(job, trigger);
-			  
+		    scheduler.scheduleJob(readFromQueueJob, readFromQueueJobTrigger);
+
+		    JobDetail checkForUnresponsiveWorkersJob = newJob(CheckForUnresponsiveWorkersJob.class)
+		    		.withIdentity("checkForUnresponsiveWorkersJob", "bencloud")
+		    		.build();
+
+		    Trigger checkForUnresponsiveWorkersJobTrigger = TriggerBuilder.newTrigger()
+		    	    .withIdentity("checkForUnresponsiveWorkersJobTrigger", "bencloud")
+		    	    .withSchedule(SimpleScheduleBuilder
+		    	    		.simpleSchedule().withIntervalInSeconds(30).repeatForever()
+		    	    		.withMisfireHandlingInstructionNextWithRemainingCount())
+		    	    .build();
+		    
+		    scheduler.scheduleJob(checkForUnresponsiveWorkersJob, checkForUnresponsiveWorkersJobTrigger);
+
 		} catch (SchedulerException e1) {
 			e1.printStackTrace();
 		}
 
 	}
+	
 }

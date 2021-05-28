@@ -223,9 +223,9 @@ public class Data extends SchemaImpl {
             Sequences.RACE_ID_SEQ,
             Sequences.SEASONAL_METRIC_ID_SEQ,
             Sequences.SEASONAL_METRIC_SEASON_ID_SEQ,
-            Sequences.TASK_COMPLETE_ID_SEQ,
-            Sequences.TASK_QUEUE_ID_SEQ,
-            Sequences.TASK_WORKER_ID_SEQ);
+            Sequences.TASK_COMPLETE_TASK_ID_SEQ,
+            Sequences.TASK_QUEUE_TASK_ID_SEQ,
+            Sequences.TASK_WORKER_TASK_ID_SEQ);
     }
 
     @Override

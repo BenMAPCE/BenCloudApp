@@ -95,9 +95,9 @@ public class Keys {
     public static final UniqueKey<RaceRecord> RACE_PKEY = Internal.createUniqueKey(Race.RACE, DSL.name("race_pkey"), new TableField[] { Race.RACE.ID }, true);
     public static final UniqueKey<SeasonalMetricRecord> SEASONAL_METRIC_PKEY = Internal.createUniqueKey(SeasonalMetric.SEASONAL_METRIC, DSL.name("seasonal_metric_pkey"), new TableField[] { SeasonalMetric.SEASONAL_METRIC.ID }, true);
     public static final UniqueKey<SeasonalMetricSeasonRecord> SEASONAL_METRIC_SEASON_PKEY = Internal.createUniqueKey(SeasonalMetricSeason.SEASONAL_METRIC_SEASON, DSL.name("seasonal_metric_season_pkey"), new TableField[] { SeasonalMetricSeason.SEASONAL_METRIC_SEASON.ID }, true);
-    public static final UniqueKey<TaskCompleteRecord> TASK_COMPLETE_PKEY = Internal.createUniqueKey(TaskComplete.TASK_COMPLETE, DSL.name("task_complete_pkey"), new TableField[] { TaskComplete.TASK_COMPLETE.ID }, true);
-    public static final UniqueKey<TaskQueueRecord> TASK_QUEUE_PKEY = Internal.createUniqueKey(TaskQueue.TASK_QUEUE, DSL.name("task_queue_pkey"), new TableField[] { TaskQueue.TASK_QUEUE.ID }, true);
-    public static final UniqueKey<TaskWorkerRecord> TASK_WORKER_PKEY = Internal.createUniqueKey(TaskWorker.TASK_WORKER, DSL.name("task_worker_pkey"), new TableField[] { TaskWorker.TASK_WORKER.ID }, true);
+    public static final UniqueKey<TaskCompleteRecord> TASK_COMPLETE_PKEY = Internal.createUniqueKey(TaskComplete.TASK_COMPLETE, DSL.name("task_complete_pkey"), new TableField[] { TaskComplete.TASK_COMPLETE.TASK_ID }, true);
+    public static final UniqueKey<TaskQueueRecord> TASK_QUEUE_PKEY = Internal.createUniqueKey(TaskQueue.TASK_QUEUE, DSL.name("task_queue_pkey"), new TableField[] { TaskQueue.TASK_QUEUE.TASK_ID }, true);
+    public static final UniqueKey<TaskWorkerRecord> TASK_WORKER_PKEY = Internal.createUniqueKey(TaskWorker.TASK_WORKER, DSL.name("task_worker_pkey"), new TableField[] { TaskWorker.TASK_WORKER.TASK_ID }, true);
 
     // -------------------------------------------------------------------------
     // FOREIGN KEY definitions

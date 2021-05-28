@@ -63,7 +63,7 @@ public class SecuredRoutes {
 			String bcoUserIdentifier = RoutesUtil.getOrSetOrExtendCookie(req, res);
 			
 			List<List> tasks = TaskComplete.getCompletedTasks(bcoUserIdentifier);
-
+			
 			Map<String, Object> attributes = new HashMap<>();
 			attributes.put("tasks", tasks);
 

@@ -31,25 +31,25 @@ public class TaskQueue {
 				    String taskUuid = null;
 				    
 					Result<Record> result = DSL.using(ctx).select().from(TASK_QUEUE)
-							.where(TASK_QUEUE.IN_PROCESS.isFalse())
-							.orderBy(TASK_QUEUE.SUBMITTED_DATE.asc())
+							.where(TASK_QUEUE.TASK_IN_PROCESS.isFalse())
+							.orderBy(TASK_QUEUE.TASK_SUBMITTED_DATE.asc())
 							.limit(1)
 							.forUpdate()
 							.fetch();
 					
 					if (result.size() == 0) {
-						System.out.println("no tasks to process");
+						// System.out.println("no tasks to process");
 					} else if (result.size() > 1) {
 						System.out.println("recieved more than 1 task record");
 					} else {
 						Record record = result.get(0);
 
-						System.out.println("get job from queue: " + 
-								record.get(TASK_QUEUE.TASK_NAME));
+//						System.out.println("get job from queue: " + 
+//								record.get(TASK_QUEUE.TASK_NAME));
 
 						DSL.using(ctx).update(TASK_QUEUE)
-						.set(TASK_QUEUE.IN_PROCESS, true)
-						.where(TASK_QUEUE.ID.eq(record.getValue(TASK_QUEUE.ID)))
+						.set(TASK_QUEUE.TASK_IN_PROCESS, true)
+						.where(TASK_QUEUE.TASK_ID.eq(record.getValue(TASK_QUEUE.TASK_ID)))
 						.execute();
 
 						taskUuid = record.getValue(TASK_QUEUE.TASK_UUID);
@@ -75,8 +75,8 @@ public class TaskQueue {
 			DSL.using(JooqUtil.getJooqConfiguration())
 			   .transaction(ctx -> {
 					Result<Record> result = DSL.using(ctx).select().from(TASK_QUEUE)
-							.where(TASK_QUEUE.IN_PROCESS.isTrue().and(TASK_QUEUE.TASK_UUID.eq(uuid)))
-							.orderBy(TASK_QUEUE.SUBMITTED_DATE.asc())
+							.where(TASK_QUEUE.TASK_IN_PROCESS.isTrue().and(TASK_QUEUE.TASK_UUID.eq(uuid)))
+							.orderBy(TASK_QUEUE.TASK_SUBMITTED_DATE.asc())
 							.forUpdate()
 							.fetch();
 
@@ -91,7 +91,7 @@ public class TaskQueue {
 								record.get(TASK_QUEUE.TASK_NAME));
 
 						DSL.using(ctx).update(TASK_QUEUE)
-						.set(TASK_QUEUE.IN_PROCESS, false)
+						.set(TASK_QUEUE.TASK_IN_PROCESS, false)
 						.where(TASK_QUEUE.TASK_UUID.eq(record.getValue(TASK_QUEUE.TASK_UUID)))
 						.execute();
 					}
@@ -110,14 +110,14 @@ public class TaskQueue {
 
 		try {
 				DSL.using(JooqUtil.getJooqConfiguration()).insertInto(TASK_QUEUE,
-					TASK_QUEUE.USER_IDENTIFIER,
-					TASK_QUEUE.PRIORITY,
+					TASK_QUEUE.TASK_USER_IDENTIFIER,
+					TASK_QUEUE.TASK_PRIORITY,
 					TASK_QUEUE.TASK_UUID,
 					TASK_QUEUE.TASK_NAME,
 					TASK_QUEUE.TASK_DESCRIPTION,
 					TASK_QUEUE.TASK_DATA,
-					TASK_QUEUE.IN_PROCESS,
-					TASK_QUEUE.SUBMITTED_DATE)
+					TASK_QUEUE.TASK_IN_PROCESS,
+					TASK_QUEUE.TASK_SUBMITTED_DATE)
 			.values(
 					task.getUserIdentifier(),
 					Integer.valueOf(10),
@@ -137,7 +137,7 @@ public class TaskQueue {
 
 	public static Task getTaskFromQueueRecord(String uuid) {
 
-		System.out.println("getTaskFromQueueRecord: " + uuid);
+		// System.out.println("getTaskFromQueueRecord: " + uuid);
 
 		Task task = new Task();
 		
@@ -154,11 +154,11 @@ public class TaskQueue {
 				Record record = result.get(0);
 				task.setName(record.getValue(TASK_QUEUE.TASK_NAME));
 				task.setDescription(record.getValue(TASK_QUEUE.TASK_DESCRIPTION));
-				task.setUserIdentifier(record.getValue(TASK_QUEUE.USER_IDENTIFIER));
-				task.setPriority(record.getValue(TASK_QUEUE.PRIORITY));
+				task.setUserIdentifier(record.getValue(TASK_QUEUE.TASK_USER_IDENTIFIER));
+				task.setPriority(record.getValue(TASK_QUEUE.TASK_PRIORITY));
 				task.setUuid(record.getValue(TASK_QUEUE.TASK_UUID));
-				task.setSubmittedDate(record.getValue(TASK_QUEUE.SUBMITTED_DATE));
-				task.setStartedDate(record.getValue(TASK_QUEUE.STARTED_DATE));
+				task.setSubmittedDate(record.getValue(TASK_QUEUE.TASK_SUBMITTED_DATE));
+				task.setStartedDate(record.getValue(TASK_QUEUE.TASK_STARTED_DATE));
 			}
 		} catch (DataAccessException e1) {
 			// TODO Auto-generated catch block

@@ -19,7 +19,7 @@ import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row11;
+import org.jooq.Row13;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -52,9 +52,9 @@ public class TaskComplete extends TableImpl<TaskCompleteRecord> {
     }
 
     /**
-     * The column <code>data.task_complete.id</code>.
+     * The column <code>data.task_complete.task_id</code>.
      */
-    public final TableField<TaskCompleteRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+    public final TableField<TaskCompleteRecord, Long> TASK_ID = createField(DSL.name("task_id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
 
     /**
      * The column <code>data.task_complete.task_uuid</code>.
@@ -62,14 +62,14 @@ public class TaskComplete extends TableImpl<TaskCompleteRecord> {
     public final TableField<TaskCompleteRecord, String> TASK_UUID = createField(DSL.name("task_uuid"), SQLDataType.CLOB, this, "");
 
     /**
-     * The column <code>data.task_complete.user_identifier</code>.
+     * The column <code>data.task_complete.task_user_identifier</code>.
      */
-    public final TableField<TaskCompleteRecord, String> USER_IDENTIFIER = createField(DSL.name("user_identifier"), SQLDataType.CLOB, this, "");
+    public final TableField<TaskCompleteRecord, String> TASK_USER_IDENTIFIER = createField(DSL.name("task_user_identifier"), SQLDataType.CLOB, this, "");
 
     /**
-     * The column <code>data.task_complete.priority</code>.
+     * The column <code>data.task_complete.task_priority</code>.
      */
-    public final TableField<TaskCompleteRecord, Integer> PRIORITY = createField(DSL.name("priority"), SQLDataType.INTEGER, this, "");
+    public final TableField<TaskCompleteRecord, Integer> TASK_PRIORITY = createField(DSL.name("task_priority"), SQLDataType.INTEGER, this, "");
 
     /**
      * The column <code>data.task_complete.task_name</code>.
@@ -92,19 +92,29 @@ public class TaskComplete extends TableImpl<TaskCompleteRecord> {
     public final TableField<TaskCompleteRecord, String> TASK_RESULTS = createField(DSL.name("task_results"), SQLDataType.CLOB, this, "");
 
     /**
-     * The column <code>data.task_complete.submitted_date</code>.
+     * The column <code>data.task_complete.task_successful</code>.
      */
-    public final TableField<TaskCompleteRecord, LocalDateTime> SUBMITTED_DATE = createField(DSL.name("submitted_date"), SQLDataType.LOCALDATETIME(6), this, "");
+    public final TableField<TaskCompleteRecord, Boolean> TASK_SUCCESSFUL = createField(DSL.name("task_successful"), SQLDataType.BOOLEAN, this, "");
 
     /**
-     * The column <code>data.task_complete.started_date</code>.
+     * The column <code>data.task_complete.task_complete_message</code>.
      */
-    public final TableField<TaskCompleteRecord, LocalDateTime> STARTED_DATE = createField(DSL.name("started_date"), SQLDataType.LOCALDATETIME(6), this, "");
+    public final TableField<TaskCompleteRecord, String> TASK_COMPLETE_MESSAGE = createField(DSL.name("task_complete_message"), SQLDataType.CLOB, this, "");
 
     /**
-     * The column <code>data.task_complete.completed_date</code>.
+     * The column <code>data.task_complete.task_submitted_date</code>.
      */
-    public final TableField<TaskCompleteRecord, LocalDateTime> COMPLETED_DATE = createField(DSL.name("completed_date"), SQLDataType.LOCALDATETIME(6), this, "");
+    public final TableField<TaskCompleteRecord, LocalDateTime> TASK_SUBMITTED_DATE = createField(DSL.name("task_submitted_date"), SQLDataType.LOCALDATETIME(6), this, "");
+
+    /**
+     * The column <code>data.task_complete.task_started_date</code>.
+     */
+    public final TableField<TaskCompleteRecord, LocalDateTime> TASK_STARTED_DATE = createField(DSL.name("task_started_date"), SQLDataType.LOCALDATETIME(6), this, "");
+
+    /**
+     * The column <code>data.task_complete.task_completed_date</code>.
+     */
+    public final TableField<TaskCompleteRecord, LocalDateTime> TASK_COMPLETED_DATE = createField(DSL.name("task_completed_date"), SQLDataType.LOCALDATETIME(6), this, "");
 
     private TaskComplete(Name alias, Table<TaskCompleteRecord> aliased) {
         this(alias, aliased, null);
@@ -191,11 +201,11 @@ public class TaskComplete extends TableImpl<TaskCompleteRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row11 type methods
+    // Row13 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row11<Long, String, String, Integer, String, String, String, String, LocalDateTime, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row11) super.fieldsRow();
+    public Row13<Long, String, String, Integer, String, String, String, String, Boolean, String, LocalDateTime, LocalDateTime, LocalDateTime> fieldsRow() {
+        return (Row13) super.fieldsRow();
     }
 }

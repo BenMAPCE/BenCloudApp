@@ -24,16 +24,16 @@ public class TaskWorkerRecord extends UpdatableRecordImpl<TaskWorkerRecord> impl
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>data.task_worker.id</code>.
+     * Setter for <code>data.task_worker.task_id</code>.
      */
-    public void setId(Long value) {
+    public void setTaskId(Long value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>data.task_worker.id</code>.
+     * Getter for <code>data.task_worker.task_id</code>.
      */
-    public Long getId() {
+    public Long getTaskId() {
         return (Long) get(0);
     }
 
@@ -104,7 +104,7 @@ public class TaskWorkerRecord extends UpdatableRecordImpl<TaskWorkerRecord> impl
 
     @Override
     public Field<Long> field1() {
-        return TaskWorker.TASK_WORKER.ID;
+        return TaskWorker.TASK_WORKER.TASK_ID;
     }
 
     @Override
@@ -124,7 +124,7 @@ public class TaskWorkerRecord extends UpdatableRecordImpl<TaskWorkerRecord> impl
 
     @Override
     public Long component1() {
-        return getId();
+        return getTaskId();
     }
 
     @Override
@@ -144,7 +144,7 @@ public class TaskWorkerRecord extends UpdatableRecordImpl<TaskWorkerRecord> impl
 
     @Override
     public Long value1() {
-        return getId();
+        return getTaskId();
     }
 
     @Override
@@ -164,7 +164,7 @@ public class TaskWorkerRecord extends UpdatableRecordImpl<TaskWorkerRecord> impl
 
     @Override
     public TaskWorkerRecord value1(Long value) {
-        setId(value);
+        setTaskId(value);
         return this;
     }
 
@@ -209,10 +209,10 @@ public class TaskWorkerRecord extends UpdatableRecordImpl<TaskWorkerRecord> impl
     /**
      * Create a detached, initialised TaskWorkerRecord
      */
-    public TaskWorkerRecord(Long id, String taskWorkerUuid, String taskUuid, LocalDateTime lastHeartbeatDate) {
+    public TaskWorkerRecord(Long taskId, String taskWorkerUuid, String taskUuid, LocalDateTime lastHeartbeatDate) {
         super(TaskWorker.TASK_WORKER);
 
-        setId(id);
+        setTaskId(taskId);
         setTaskWorkerUuid(taskWorkerUuid);
         setTaskUuid(taskUuid);
         setLastHeartbeatDate(lastHeartbeatDate);

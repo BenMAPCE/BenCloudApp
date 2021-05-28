@@ -52,19 +52,19 @@ public class TaskQueue extends TableImpl<TaskQueueRecord> {
     }
 
     /**
-     * The column <code>data.task_queue.id</code>.
+     * The column <code>data.task_queue.task_id</code>.
      */
-    public final TableField<TaskQueueRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+    public final TableField<TaskQueueRecord, Long> TASK_ID = createField(DSL.name("task_id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
 
     /**
-     * The column <code>data.task_queue.user_identifier</code>.
+     * The column <code>data.task_queue.task_user_identifier</code>.
      */
-    public final TableField<TaskQueueRecord, String> USER_IDENTIFIER = createField(DSL.name("user_identifier"), SQLDataType.CLOB, this, "");
+    public final TableField<TaskQueueRecord, String> TASK_USER_IDENTIFIER = createField(DSL.name("task_user_identifier"), SQLDataType.CLOB, this, "");
 
     /**
-     * The column <code>data.task_queue.priority</code>.
+     * The column <code>data.task_queue.task_priority</code>.
      */
-    public final TableField<TaskQueueRecord, Integer> PRIORITY = createField(DSL.name("priority"), SQLDataType.INTEGER, this, "");
+    public final TableField<TaskQueueRecord, Integer> TASK_PRIORITY = createField(DSL.name("task_priority"), SQLDataType.INTEGER, this, "");
 
     /**
      * The column <code>data.task_queue.task_uuid</code>.
@@ -92,19 +92,19 @@ public class TaskQueue extends TableImpl<TaskQueueRecord> {
     public final TableField<TaskQueueRecord, Integer> TASK_PERCENTAGE = createField(DSL.name("task_percentage"), SQLDataType.INTEGER, this, "");
 
     /**
-     * The column <code>data.task_queue.in_process</code>.
+     * The column <code>data.task_queue.task_in_process</code>.
      */
-    public final TableField<TaskQueueRecord, Boolean> IN_PROCESS = createField(DSL.name("in_process"), SQLDataType.BOOLEAN.defaultValue(DSL.field("false", SQLDataType.BOOLEAN)), this, "");
+    public final TableField<TaskQueueRecord, Boolean> TASK_IN_PROCESS = createField(DSL.name("task_in_process"), SQLDataType.BOOLEAN.defaultValue(DSL.field("false", SQLDataType.BOOLEAN)), this, "");
 
     /**
-     * The column <code>data.task_queue.submitted_date</code>.
+     * The column <code>data.task_queue.task_submitted_date</code>.
      */
-    public final TableField<TaskQueueRecord, LocalDateTime> SUBMITTED_DATE = createField(DSL.name("submitted_date"), SQLDataType.LOCALDATETIME(6), this, "");
+    public final TableField<TaskQueueRecord, LocalDateTime> TASK_SUBMITTED_DATE = createField(DSL.name("task_submitted_date"), SQLDataType.LOCALDATETIME(6), this, "");
 
     /**
-     * The column <code>data.task_queue.started_date</code>.
+     * The column <code>data.task_queue.task_started_date</code>.
      */
-    public final TableField<TaskQueueRecord, LocalDateTime> STARTED_DATE = createField(DSL.name("started_date"), SQLDataType.LOCALDATETIME(6), this, "");
+    public final TableField<TaskQueueRecord, LocalDateTime> TASK_STARTED_DATE = createField(DSL.name("task_started_date"), SQLDataType.LOCALDATETIME(6), this, "");
 
     private TaskQueue(Name alias, Table<TaskQueueRecord> aliased) {
         this(alias, aliased, null);
