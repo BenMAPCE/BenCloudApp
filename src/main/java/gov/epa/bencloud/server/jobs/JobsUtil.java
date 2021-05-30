@@ -31,6 +31,7 @@ public class JobsUtil {
 		    
 		    scheduler.scheduleJob(readFromQueueJob, readFromQueueJobTrigger);
 
+		    
 		    JobDetail checkForUnresponsiveWorkersJob = newJob(CheckForUnresponsiveWorkersJob.class)
 		    		.withIdentity("checkForUnresponsiveWorkersJob", "bencloud")
 		    		.build();
@@ -41,13 +42,11 @@ public class JobsUtil {
 		    	    		.simpleSchedule().withIntervalInSeconds(30).repeatForever()
 		    	    		.withMisfireHandlingInstructionNextWithRemainingCount())
 		    	    .build();
-		    
+
 		    scheduler.scheduleJob(checkForUnresponsiveWorkersJob, checkForUnresponsiveWorkersJobTrigger);
 
 		} catch (SchedulerException e1) {
 			e1.printStackTrace();
 		}
-
 	}
-	
 }

@@ -7,8 +7,7 @@ import static gov.epa.bencloud.server.database.jooq.Tables.TASK_WORKER;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
 import org.jooq.Record;
 import org.jooq.Result;
@@ -17,8 +16,13 @@ import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import gov.epa.bencloud.server.database.JooqUtil;
 import gov.epa.bencloud.server.tasks.model.Task;
+import gov.epa.bencloud.server.util.DataUtil;
 
 public class TaskComplete {
 
@@ -31,8 +35,6 @@ public class TaskComplete {
 		if (null == taskUuid) {
 			return;
 		}
-
-		System.out.println("addTaskToCompleteAndRemoveTaskFromQueue: " + taskUuid);
 
 		Task task = TaskQueue.getTaskFromQueueRecord(taskUuid);
 
@@ -83,15 +85,28 @@ public class TaskComplete {
 
 	}
 
-	public static List<List> getCompletedTasks(String userIdentifier) {
+	public static ObjectNode getCompletedTasks(String userIdentifier, Map<String, String[]> postParameters) {
 
-		//System.out.println("getCompletedTasks: " + userIdentifier);
-
-		List<List> tasks = new ArrayList<List>();
-		List<Object> task = new ArrayList<Object>();
+//		System.out.println("getCompletedTasks");
+//		System.out.println("userIdentifier: " + userIdentifier);
+		
+//		System.out.println("length: " + postParameters.get("length")[0]);
+//		System.out.println("start: " + postParameters.get("start")[0]);
+//		System.out.println("searchValue: " + postParameters.get("searchValue")[0]);
+//		System.out.println("sortColumn: " + postParameters.get("sortColumn")[0]);
+//		System.out.println("sortDirection: " + postParameters.get("sortDirection")[0]);
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode data = mapper.createObjectNode();
+        
+        ArrayNode tasks = mapper.createArrayNode();
+        ObjectNode task = mapper.createObjectNode();
+        ObjectNode wrappedObject = mapper.createObjectNode();
+
+        int records = 0;
+        
 		if (null != userIdentifier) {
 
 			try {
@@ -103,34 +118,62 @@ public class TaskComplete {
 
 				for (Record record : result) {
 
-					task = new ArrayList<Object>();
+					task = mapper.createObjectNode();
 
-					task.add(record.getValue(TASK_COMPLETE.TASK_NAME));
-					task.add(record.getValue(TASK_COMPLETE.TASK_DESCRIPTION));
-					task.add(record.getValue(TASK_COMPLETE.TASK_UUID));
-					task.add(record.getValue(TASK_COMPLETE.TASK_SUBMITTED_DATE).format(formatter));
-					task.add(record.getValue(TASK_COMPLETE.TASK_STARTED_DATE).format(formatter));
-					task.add(record.getValue(TASK_COMPLETE.TASK_COMPLETED_DATE).format(formatter));
-					task.add(getHumanReadableTime(
+					task.put("task_name", record.getValue(TASK_COMPLETE.TASK_NAME));
+					task.put("task_description", record.getValue(TASK_COMPLETE.TASK_DESCRIPTION));
+					task.put("task_uuid", record.getValue(TASK_COMPLETE.TASK_UUID));
+					task.put("task_submitted_date", record.getValue(TASK_COMPLETE.TASK_SUBMITTED_DATE).format(formatter));
+					task.put("task_started_date", record.getValue(TASK_COMPLETE.TASK_STARTED_DATE).format(formatter));
+					task.put("task_completed_date", record.getValue(TASK_COMPLETE.TASK_COMPLETED_DATE).format(formatter));
+					
+					wrappedObject = mapper.createObjectNode();
+					wrappedObject.put("task_wait_time_display", DataUtil.getHumanReadableTime(
 							record.getValue(TASK_COMPLETE.TASK_SUBMITTED_DATE), 
 							record.getValue(TASK_COMPLETE.TASK_STARTED_DATE)));
+					wrappedObject.put("task_wait_time_seconds", 
+							ChronoUnit.SECONDS.between(record.getValue(TASK_COMPLETE.TASK_SUBMITTED_DATE),
+									record.getValue(TASK_COMPLETE.TASK_STARTED_DATE)));
+					task.set("task_wait_time", wrappedObject);
 
-					task.add(getHumanReadableTime(
+					wrappedObject = mapper.createObjectNode();
+					wrappedObject.put("task_execution_time_display", DataUtil.getHumanReadableTime(
 							record.getValue(TASK_COMPLETE.TASK_STARTED_DATE), 
 							record.getValue(TASK_COMPLETE.TASK_COMPLETED_DATE)));
-					task.add(record.getValue(TASK_COMPLETE.TASK_SUCCESSFUL) ? "Y" : "N");
-					task.add(record.getValue(TASK_COMPLETE.TASK_COMPLETE_MESSAGE));
-				    
+					wrappedObject.put("task_execution_time_seconds", 
+							ChronoUnit.SECONDS.between(record.getValue(TASK_COMPLETE.TASK_STARTED_DATE),
+									record.getValue(TASK_COMPLETE.TASK_COMPLETED_DATE)));
+					task.set("task_execution_time", wrappedObject);
+					
+					task.put("task_successful", record.getValue(TASK_COMPLETE.TASK_SUCCESSFUL));
+					task.put("task_message", record.getValue(TASK_COMPLETE.TASK_COMPLETE_MESSAGE));
+				    					
 					tasks.add(task);
+					records++;
+					
 				}
+				
+				data.set("data", tasks);
+				data.put("success", true);
+				data.put("recordsFiltered", records);
+				data.put("recordsTotal", records);
+
 			} catch (DataAccessException e) {
+				data.put("success", false);
+				data.put("error_message", e.getMessage());
 				e.printStackTrace();
 			} catch (IllegalArgumentException e) {
+				data.put("success", false);
+				data.put("error_message", e.getMessage());
 				e.printStackTrace();
 			}
 		}
 
-		return tasks;
+//		System.out.println("--------------------------------------------------");
+//		System.out.println(data.toPrettyString());
+//		System.out.println("--------------------------------------------------");
+		
+		return data;
 	} 
 
 	private static Task getTaskFromCompleteRecord(String uuid) {
@@ -164,47 +207,4 @@ public class TaskComplete {
 
 		return task;
 	}
-
-	private static String getHumanReadableTime(LocalDateTime start, LocalDateTime end) {
-		
-		long totalSeconds = ChronoUnit.SECONDS.between(start, end);
-
-		StringBuilder humanReadableTime = new StringBuilder();
-
-		getHumanReadableTime(totalSeconds, humanReadableTime);
-		return humanReadableTime.toString();
-		
-	}
-	
-	private static void getHumanReadableTime(long totalSeconds, StringBuilder humanReadableTime) {
-	
-		long hours = ((totalSeconds/60) / 60);
-		long minutes = ((totalSeconds / 60) % 60);
-		long seconds = (totalSeconds % 60);
-
-		if (hours > 0) {
-			if (hours < 2) {
-				humanReadableTime.append(hours).append(" hour").append(" ");
-			} else {
-				humanReadableTime.append(hours).append(" hours").append(" ");
-			}
-		}
-		
-		if (minutes > 0) {
-			if (minutes < 2) {
-				humanReadableTime.append(minutes).append(" minute").append(" ");
-			} else {
-				humanReadableTime.append(minutes).append(" minutes").append(" ");
-			}
-		}
-		
-		if (seconds > 0) {
-			if (seconds < 2) {
-				humanReadableTime.append(seconds).append(" second").append(" ");
-			} else {
-				humanReadableTime.append(seconds).append(" seconds").append(" ");
-			}
-		}
-	}
-
 }

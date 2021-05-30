@@ -28,12 +28,14 @@ dependencies {
 	compile 'io.dropwizard.metrics:metrics-healthchecks:4.2.0'
 	compile 'io.dropwizard.metrics:metrics-jmx:4.2.0'
 
+	compile 'com.fasterxml.jackson.core:jackson-core:2.12.3'
+	compile 'com.fasterxml.jackson.core:jackson-databind:2.12.3'
+
 	compile 'io.vavr:vavr:0.10.0'
 	compile 'org.slf4j:slf4j-api:1.7.26'
 	compile 'ch.qos.logback:logback-classic:1.2.3'
 	compile 'commons-cli:commons-cli:1.4'
 	compile 'com.opencsv:opencsv:4.6'
-	compile 'org.json:json:20180813'
 	compile 'org.apache.commons:commons-lang3:3.9'
 	compile 'org.apache.poi:poi:4.1.0'
 	compile 'org.apache.poi:poi-ooxml:4.1.0'

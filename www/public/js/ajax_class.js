@@ -46,7 +46,7 @@ class AjaxObject {
 			if ( ! data.success) {
 
 			} else {
-
+				console.log(data.error_message);
 			}
 		})
 		.fail(function(data) {

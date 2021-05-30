@@ -66,7 +66,7 @@ public class PublicRoutes extends RoutesBase {
 //			   System.out.println("Filename: " + part.getSubmittedFileName());
 //			}
 			
-			System.out.println(getPostParameterValue(req, "name"));
+//			System.out.println(getPostParameterValue(req, "name"));
 
 			Map<String, Object> attributes = new HashMap<>();
 

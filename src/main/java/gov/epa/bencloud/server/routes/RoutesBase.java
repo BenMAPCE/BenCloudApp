@@ -37,4 +37,8 @@ public class RoutesBase {
 		return value;
 	}
 
+	protected Map<String, String[]> getPostParameterAsMap(Request req) {
+
+		return req.raw().getParameterMap();
+	}
 }

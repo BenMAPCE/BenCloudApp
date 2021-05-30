@@ -30,9 +30,9 @@ public class TaskWorkerRunable implements Runnable {
 		int loopTimes = (int) Math.floor(
 				Math.random() * (maxRandomNumber - minRandomNumber + 1) + minRandomNumber);
 
+		
 		// Fake an unresponsive Task Worker
 		if (loopTimes % 5 == 0) {
-			System.out.println("--- faking unresponsive Task Worker");
 			LocalDateTime localDateTime = LocalDateTime.now().minusMinutes(30); 
 			TaskWorker.updateTaskWorkerHeartbeat(taskWorkerUuid, localDateTime);
 			return;
@@ -49,6 +49,9 @@ public class TaskWorkerRunable implements Runnable {
 			for (int i = 0; i < loopTimes; i++) {
 
 				TaskWorker.updateTaskWorkerHeartbeat(taskWorkerUuid);
+				
+				// Fake updating task percentage
+				TaskQueue.updateTaskPercentage(taskUuid, ((100 / loopTimes) * (i + 1)));
 
 				Thread.sleep( (long) (Math.random() * 5000) );
 

@@ -1,13 +1,13 @@
 package gov.epa.bencloud.server.routes;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.javafaker.Faker;
 
 import freemarker.template.Configuration;
@@ -17,7 +17,7 @@ import gov.epa.bencloud.server.tasks.model.Task;
 import gov.epa.bencloud.server.util.FreeMarkerRenderUtil;
 import spark.Service;
 
-public class SecuredRoutes {
+public class SecuredRoutes extends RoutesBase {
 
 	private static final Logger log = LoggerFactory.getLogger(SecuredRoutes.class);
 	private Service service = null;
@@ -57,17 +57,54 @@ public class SecuredRoutes {
 
 			return FreeMarkerRenderUtil.render(freeMarkerConfiguration, attributes, "logged-in.ftl");
 		});
-		
-		service.get("/get-tasks-results", (req, res) -> {
+
+		service.post("/pending-tasks/data", (req, res) -> {
+			
+			String bcoUserIdentifier = RoutesUtil.getOrSetOrExtendCookie(req, res);
+			
+			ObjectNode data = TaskQueue.getPendingTasks(bcoUserIdentifier, getPostParameterAsMap(req));
+			
+			return data;
+
+		});
+
+		service.get("/pending-tasks", (req, res) -> {
 
 			String bcoUserIdentifier = RoutesUtil.getOrSetOrExtendCookie(req, res);
 			
-			List<List> tasks = TaskComplete.getCompletedTasks(bcoUserIdentifier);
+//			String data = TaskComplete.getCompletedTasks(bcoUserIdentifier);
+			
+//			return data;
 			
 			Map<String, Object> attributes = new HashMap<>();
-			attributes.put("tasks", tasks);
+			//attributes.put("tasks", tasks);
 
-			return FreeMarkerRenderUtil.render(freeMarkerConfiguration, attributes, "get-tasks-results.ftl");
+			return FreeMarkerRenderUtil.render(freeMarkerConfiguration, attributes, "pending-tasks.ftl");
+
+		});
+
+		service.post("/completed-tasks/data", (req, res) -> {
+			
+			String bcoUserIdentifier = RoutesUtil.getOrSetOrExtendCookie(req, res);
+			
+			ObjectNode data = TaskComplete.getCompletedTasks(bcoUserIdentifier, getPostParameterAsMap(req));
+			
+			return data;
+
+		});
+
+		service.get("/completed-tasks", (req, res) -> {
+
+			String bcoUserIdentifier = RoutesUtil.getOrSetOrExtendCookie(req, res);
+			
+//			String data = TaskComplete.getCompletedTasks(bcoUserIdentifier);
+			
+//			return data;
+			
+			Map<String, Object> attributes = new HashMap<>();
+			//attributes.put("tasks", tasks);
+
+			return FreeMarkerRenderUtil.render(freeMarkerConfiguration, attributes, "completed-tasks.ftl");
 
 		});
 
