@@ -2,6 +2,11 @@ package gov.epa.bencloud.server.routes;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import freemarker.template.Configuration;
 import gov.epa.bencloud.api.AirQualityApi;
 import spark.Service;
@@ -40,12 +45,27 @@ public class ApiRoutes extends RoutesBase {
 			return AirQualityApi.postAirQualityLayer(request, layerName, pollutantId, gridId, layerType, response);
 		});
 
+		service.get("/api/load-states", (request, response) -> {
+			
+			ObjectMapper mapper = new ObjectMapper();
+
+			ArrayNode states = mapper.createArrayNode();
+			ObjectNode state = mapper.createObjectNode();
+
+			state = mapper.createObjectNode();
+			state.put("state_abbr", "OR");
+			state.put("state_name", "Oregon");
+			states.add(state);
+			
+			state = mapper.createObjectNode();
+			state.put("state_abbr", "PA");
+			state.put("state_name", "Pensylvania");
+			states.add(state);
+			
+			
+			return states;
+		});
+
 	}
-
-
-
-
-
-
 
 }

@@ -52,6 +52,8 @@ public class TaskComplete {
 						TASK_COMPLETE.TASK_UUID,
 						TASK_COMPLETE.TASK_NAME,
 						TASK_COMPLETE.TASK_DESCRIPTION,
+						TASK_COMPLETE.TASK_TYPE,
+						TASK_COMPLETE.TASK_PARAMETERS,
 						TASK_COMPLETE.TASK_RESULTS,
 						TASK_COMPLETE.TASK_SUCCESSFUL,
 						TASK_COMPLETE.TASK_COMPLETE_MESSAGE,
@@ -64,6 +66,8 @@ public class TaskComplete {
 						task.getUuid(),
 						task.getName(),
 						task.getDescription(),
+						task.getType(),
+						task.getParameters(),
 						"{}",
 						taskSuccessful,
 						taskCompleteMessage,
@@ -121,6 +125,7 @@ public class TaskComplete {
 					task = mapper.createObjectNode();
 
 					task.put("task_name", record.getValue(TASK_COMPLETE.TASK_NAME));
+					task.put("task_type", record.getValue(TASK_COMPLETE.TASK_TYPE));
 					task.put("task_description", record.getValue(TASK_COMPLETE.TASK_DESCRIPTION));
 					task.put("task_uuid", record.getValue(TASK_COMPLETE.TASK_UUID));
 					task.put("task_submitted_date", record.getValue(TASK_COMPLETE.TASK_SUBMITTED_DATE).format(formatter));
@@ -196,6 +201,8 @@ public class TaskComplete {
 				task.setUserIdentifier(record.getValue(TASK_COMPLETE.TASK_USER_IDENTIFIER));
 				task.setPriority(record.getValue(TASK_COMPLETE.TASK_PRIORITY));
 				task.setUuid(record.getValue(TASK_COMPLETE.TASK_UUID));
+				task.setParameters(record.getValue(TASK_COMPLETE.TASK_PARAMETERS));
+				task.setType(record.getValue(TASK_COMPLETE.TASK_TYPE));
 				task.setSubmittedDate(record.getValue(TASK_COMPLETE.TASK_SUBMITTED_DATE));
 				task.setStartedDate(record.getValue(TASK_COMPLETE.TASK_STARTED_DATE));
 				task.setCompletedDate(record.getValue(TASK_COMPLETE.TASK_COMPLETED_DATE));

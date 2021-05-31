@@ -19,7 +19,7 @@ import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row13;
+import org.jooq.Row14;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -82,9 +82,14 @@ public class TaskComplete extends TableImpl<TaskCompleteRecord> {
     public final TableField<TaskCompleteRecord, String> TASK_DESCRIPTION = createField(DSL.name("task_description"), SQLDataType.CLOB, this, "");
 
     /**
-     * The column <code>data.task_complete.task_data</code>.
+     * The column <code>data.task_complete.task_type</code>.
      */
-    public final TableField<TaskCompleteRecord, String> TASK_DATA = createField(DSL.name("task_data"), SQLDataType.CLOB, this, "");
+    public final TableField<TaskCompleteRecord, String> TASK_TYPE = createField(DSL.name("task_type"), SQLDataType.CLOB, this, "");
+
+    /**
+     * The column <code>data.task_complete.task_parameters</code>.
+     */
+    public final TableField<TaskCompleteRecord, String> TASK_PARAMETERS = createField(DSL.name("task_parameters"), SQLDataType.CLOB, this, "");
 
     /**
      * The column <code>data.task_complete.task_results</code>.
@@ -201,11 +206,11 @@ public class TaskComplete extends TableImpl<TaskCompleteRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row13 type methods
+    // Row14 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row13<Long, String, String, Integer, String, String, String, String, Boolean, String, LocalDateTime, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row13) super.fieldsRow();
+    public Row14<Long, String, String, Integer, String, String, String, String, String, Boolean, String, LocalDateTime, LocalDateTime, LocalDateTime> fieldsRow() {
+        return (Row14) super.fieldsRow();
     }
 }

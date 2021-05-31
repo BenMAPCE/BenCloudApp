@@ -19,7 +19,7 @@ import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row11;
+import org.jooq.Row12;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -82,9 +82,14 @@ public class TaskQueue extends TableImpl<TaskQueueRecord> {
     public final TableField<TaskQueueRecord, String> TASK_DESCRIPTION = createField(DSL.name("task_description"), SQLDataType.CLOB, this, "");
 
     /**
-     * The column <code>data.task_queue.task_data</code>.
+     * The column <code>data.task_queue.task_type</code>.
      */
-    public final TableField<TaskQueueRecord, String> TASK_DATA = createField(DSL.name("task_data"), SQLDataType.CLOB, this, "");
+    public final TableField<TaskQueueRecord, String> TASK_TYPE = createField(DSL.name("task_type"), SQLDataType.CLOB, this, "");
+
+    /**
+     * The column <code>data.task_queue.task_parameters</code>.
+     */
+    public final TableField<TaskQueueRecord, String> TASK_PARAMETERS = createField(DSL.name("task_parameters"), SQLDataType.CLOB, this, "");
 
     /**
      * The column <code>data.task_queue.task_percentage</code>.
@@ -191,11 +196,11 @@ public class TaskQueue extends TableImpl<TaskQueueRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row11 type methods
+    // Row12 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row11<Long, String, Integer, String, String, String, String, Integer, Boolean, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row11) super.fieldsRow();
+    public Row12<Long, String, Integer, String, String, String, String, String, Integer, Boolean, LocalDateTime, LocalDateTime> fieldsRow() {
+        return (Row12) super.fieldsRow();
     }
 }

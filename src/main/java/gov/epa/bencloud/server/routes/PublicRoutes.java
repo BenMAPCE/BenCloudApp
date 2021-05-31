@@ -34,6 +34,12 @@ public class PublicRoutes extends RoutesBase {
 			return FreeMarkerRenderUtil.render(freeMarkerConfiguration, attributes, "about.ftl");
 		});
 
+		service.get("/demo", (req, res) -> {
+						
+			Map<String, Object> attributes = new HashMap<>();
+			return FreeMarkerRenderUtil.render(freeMarkerConfiguration, attributes, "/demo/demo.ftl");
+		});
+
 		service.notFound((request, response) -> {
 			Map<String, Object> attributes = new HashMap<>();
 			attributes.put("page", request.pathInfo());

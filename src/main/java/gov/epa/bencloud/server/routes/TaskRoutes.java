@@ -40,6 +40,16 @@ public class TaskRoutes extends RoutesBase {
 			task.setDescription(faker.funnyName().name());
 			task.setUuid(UUID.randomUUID().toString());
 			task.setUserIdentifier(bcoUserIdentifier);
+			task.setType("");
+
+			// Fake Task Type
+			
+			int randomNumber = (int) Math.floor(
+					Math.random() * (2 - 1 + 1) + 1);
+
+			if (randomNumber == 1) {
+				task.setType("HIF");
+			}
 			
 			TaskQueue.writeTaskToQueue(task);
 

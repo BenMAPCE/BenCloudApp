@@ -160,7 +160,8 @@ public class TaskQueue {
 					TASK_QUEUE.TASK_UUID,
 					TASK_QUEUE.TASK_NAME,
 					TASK_QUEUE.TASK_DESCRIPTION,
-					TASK_QUEUE.TASK_DATA,
+					TASK_QUEUE.TASK_PARAMETERS,
+					TASK_QUEUE.TASK_TYPE,
 					TASK_QUEUE.TASK_IN_PROCESS,
 					TASK_QUEUE.TASK_SUBMITTED_DATE)
 			.values(
@@ -169,7 +170,8 @@ public class TaskQueue {
 					UUID.randomUUID().toString(),
 					task.getName(),
 					task.getDescription(),
-					"{}",
+					task.getParameters(),
+					task.getType(),
 					false,
 					LocalDateTime.now())
 			.execute();
@@ -214,6 +216,7 @@ public class TaskQueue {
 					task.put("task_description", record.getValue(TASK_COMPLETE.TASK_DESCRIPTION));
 					task.put("task_uuid", record.getValue(TASK_COMPLETE.TASK_UUID));
 					task.put("task_submitted_date", record.getValue(TASK_COMPLETE.TASK_SUBMITTED_DATE).format(formatter));
+					task.put("task_type", record.getValue(TASK_COMPLETE.TASK_TYPE));
 
 					wrappedObject = mapper.createObjectNode();
 
@@ -305,6 +308,8 @@ public class TaskQueue {
 				task.setUserIdentifier(record.getValue(TASK_QUEUE.TASK_USER_IDENTIFIER));
 				task.setPriority(record.getValue(TASK_QUEUE.TASK_PRIORITY));
 				task.setUuid(record.getValue(TASK_QUEUE.TASK_UUID));
+				task.setParameters(record.getValue(TASK_QUEUE.TASK_PARAMETERS));
+				task.setType(record.getValue(TASK_QUEUE.TASK_TYPE));
 				task.setSubmittedDate(record.getValue(TASK_QUEUE.TASK_SUBMITTED_DATE));
 				task.setStartedDate(record.getValue(TASK_QUEUE.TASK_STARTED_DATE));
 			}

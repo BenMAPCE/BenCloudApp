@@ -12,10 +12,12 @@ class AjaxObject {
 		this.cache = false;
 		this.processData = false;
 		this.contentType = false;
-		this.preventDefault = true;
+		this.preventDefault = false;
 	
 		this.successCallback = "";
 		this.alwaysCallback = "";
+		
+		this.data = "";
 		
 		this.secret = "SECRET";
 	}
@@ -40,11 +42,13 @@ class AjaxObject {
 		.done(function(data) {
 			
 			console.log("done...");
+			console.log(data);
+			self.data = data;
 			
 			self.successFunction(self);
 			
 			if ( ! data.success) {
-
+				
 			} else {
 				console.log(data.error_message);
 			}
@@ -52,6 +56,7 @@ class AjaxObject {
 		.fail(function(data) {
 		
 			console.log("fail...");
+			console.log(data);
 
 			self.failFunction(self);
 		

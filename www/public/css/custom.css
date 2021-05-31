@@ -28,3 +28,12 @@ div#navigation li a {
 div#navigation li a:hover {
   background-color: #111;
 }
+
+
+#results-datatable tfoot {
+	display: table-row-group;
+}
+
+#pending-datatable tfoot {
+	display: table-row-group;
+}

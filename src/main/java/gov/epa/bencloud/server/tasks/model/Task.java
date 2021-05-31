@@ -12,6 +12,8 @@ public class Task implements Serializable {
 	private String name;
     private String description;
     private String userIdentifier;
+    private String type;
+    private String parameters;
     private String outputFileName;
     private LocalDateTime submittedDate;
     private LocalDateTime startedDate;
@@ -93,6 +95,22 @@ public class Task implements Serializable {
 
 	public void setStartedDate(LocalDateTime startedDate) {
 		this.startedDate = startedDate;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public String getParameters() {
+		return parameters;
+	}
+
+	public void setParameters(String parameters) {
+		this.parameters = parameters;
 	}
     
 }

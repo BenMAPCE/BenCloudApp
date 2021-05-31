@@ -16,6 +16,7 @@
 			<thead>
 				<tr>
     				<th>Name</th>
+    				<th>Type</th>
     				<th>Description</th>
     				<th>UUID</th>
     				<th>Submitted</th>
@@ -28,6 +29,22 @@
     				<th> </th>
 				</tr>
 			</thead>
+			<tfoot>
+				<tr>
+    				<th></th>
+    				<th></th>
+    				<th></th>
+    				<th></th>
+    				<th></th>
+    				<th></th>
+    				<th></th>
+    				<th></th>
+    				<th></th>
+    				<th></th>
+    				<th></th>
+    				<th> </th>
+				</tr>			
+			</tfoot>
 		</table>
 	</div>
 
@@ -41,6 +58,9 @@
 	[
 	    { "data": "task_name",
 	    	className : "results-task-name-column"
+	    },
+	    { "data": "task_type",
+	    	className : "results-task-type-column"
 	    },
 	    { "data": "task_description",
 	    	className : "results-task-description-column"
@@ -118,6 +138,20 @@
 						console.log(error);
 					},
 				},
+				initComplete: function () {
+					// Apply the search
+					this.api().columns().every( function () {
+						var that = this;
+ 
+						$( 'input', this.footer() ).on( 'keyup change clear', function () {
+ 							if ( that.search() !== this.value ) {
+								that
+									.search( this.value )
+                            		.draw();
+                    		}
+						} );
+            		} );
+        		},
 				"paging": true,
 				"info": true,
 				"columns": resultsDatatableColumns,
@@ -132,6 +166,13 @@
 		} else {
 			$('#results-datatable').DataTable().ajax.reload();
 		}
+		
+		$('#results-datatable tfoot th').each( function () {
+	        if ($(this).index() < 4) {
+		        $(this).html( '<input type="text" placeholder="Filter" />' );
+	        }
+	    } );
+
 	});
 
 	function createResultsEllipsis(row){

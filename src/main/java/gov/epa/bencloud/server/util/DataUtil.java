@@ -8,8 +8,6 @@ public class DataUtil {
 	public static String getHumanReadableTime(LocalDateTime start, LocalDateTime end) {
 		
 		long totalSeconds = ChronoUnit.SECONDS.between(start, end);
-
-		System.out.println(totalSeconds);
 		
 		StringBuilder humanReadableTime = new StringBuilder();
 
