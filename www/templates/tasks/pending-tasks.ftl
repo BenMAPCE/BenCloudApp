@@ -1,30 +1,28 @@
-<#assign page_title = "Conpleted Tasks">
+<#assign page_title = "Pending Tasks">
 
 <html>
 <head>
-    <#include 'head.ftl'>
+    <#include '/head.ftl'>
 	
 </head>
 <body>
 
-	<#include 'navigation.ftl'>
+	<#include '/navigation.ftl'>
 
 <div style="padding: 25px;">
 
 	<div class="datatable-wrapper">
-		<table id="results-datatable" class="table table-striped" style="width:100%">
+		<table id="pending-datatable" class="table table-striped" style="width:100%">
 			<thead>
 				<tr>
     				<th>Name</th>
     				<th>Description</th>
     				<th>UUID</th>
     				<th>Submitted</th>
-    				<th>Started</th>
-    				<th>Completed</th>
     				<th data-type="@data-sort">Wait Time</th>
-    				<th data-type="@data-sort">Task Time</th>
-    				<th data-type="@data-sort">Successful</th>
-    				<th>Message</th>
+    				<th>Status</th>
+    				<th data-type="@data-sort">Active Time</th>
+    				<th>Percentage</th>
     				<th> </th>
 				</tr>
 			</thead>
@@ -35,69 +33,63 @@
 
 <script>
 
-	var getResultsUrl = "/completed-tasks/data";
+	var getResultsUrl = "/tasks/pending-tasks/data";
 		
 	var resultsDatatableColumns = 
 	[
 	    { "data": "task_name",
-	    	className : "results-task-name-column"
+	    	className : "pending-task-name-column"
 	    },
 	    { "data": "task_description",
-	    	className : "results-task-description-column"
+	    	className : "pending-task-description-column"
 	    },
 	    { "data": "task_uuid",
-	    	className : "results-task-uuid-column"
+	    	className : "pending-task-uuid-column"
 	    },
 	    { "data": "task_submitted_date",
-	    	className : "results-task-submitted-date-column"
-	    },
-	    { "data": "task_started_date",
-	    	className : "results-task-started-date-column"
-	    },
-	    { "data": "task_completed_date",
-	    	className : "results-task-completed-date-column"
+	    	className : "pending-task-submitted-date-column"
 	    },
 	    { "data":
 	    	{
 				_:    "task_wait_time.task_wait_time_display",
 				sort: "task_wait_time.task_wait_time_seconds"
 			},
-	    	className : "results-task-wait-time-column"
+	    	className : "pending-task-wait-time-column"
 	    },
-	    { "data":
-	    	{
-				_:    "task_execution_time.task_execution_time_display",
-				sort: "task_execution_time.task_execution_time_seconds"
-			},
-	    	className : "results-task-execution-time-column"
-	    },
-	    { "data": "task_successful",
-	    	className : "results-task-successful-column",
-         	render: function ( data, type, row ) {
+	    { "data": "task_status",
+	    	className : "pending-task-status-column",
+        	render: function ( data, type, row ) {
          		if (!data) {
-         			return "<i class='fas fa-exclamation-circle'></i>"
+         			return "Waiting"
          		} else {
-         			return "<i class='fas fa-check-circle'></i>"
+         			return "Active"
          		}
          	}
 	    },
-	    { "data": "task_message",
-	    	className : "results-task-message-column"
+	    { "data":
+	    	{
+				_:    "task_active_time.task_active_time_display",
+				sort: "task_active_time.task_active_time_seconds"
+			},
+	    	className : "pending-task-active-time-column"
+	    },
+	    { "data": "task_percentage",
+	    	className : "pending-task-percentage-column"
 	    },
 	   	{
-			className : "results-column-ellipsis",
+			className : "pending-column-ellipsis",
 			"bSortable": false,
 			"mRender": function(data, type, row){
-				return createResultsEllipsis(row);
+				return createPendingEllipsis(row);
 			},
 		}
 	];
 
 	$( document ).ready(function() {
 	
-		if (!$.fn.DataTable.isDataTable('#results-datatable')) {
+		if (!$.fn.DataTable.isDataTable('#pending-datatable')) {
 	
-			resultsDatatable = $('#results-datatable').DataTable({
+			resultsDatatable = $('#pending-datatable').DataTable({
 				"processing": true,
 				"serverSide": false,
 				"sServerMethod": "POST",
@@ -130,11 +122,11 @@
 			});
 
 		} else {
-			$('#results-datatable').DataTable().ajax.reload();
+			$('#pending-datatable').DataTable().ajax.reload();
 		}
 	});
 
-	function createResultsEllipsis(row){
+	function createPendingEllipsis(row){
 		
 		var str = '';
 /*

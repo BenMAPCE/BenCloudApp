@@ -2,11 +2,11 @@
 
 <html>
 <head>
-    <#include 'head.ftl'>
+    <#include '/head.ftl'>
 </head>
 <body>
 
-	<#include 'navigation.ftl'>
+	<#include '/navigation.ftl'>
 
 	<div>
 		Your task was submitted.

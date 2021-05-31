@@ -14,7 +14,7 @@ import gov.epa.bencloud.server.database.JooqUtil;
 import gov.epa.bencloud.server.util.FreeMarkerRenderUtil;
 import spark.Service;
 
-public class AdminRoutes {
+public class AdminRoutes extends RoutesBase {
 
 	private static final Logger log = LoggerFactory.getLogger(AdminRoutes.class);
 	private Service service = null;

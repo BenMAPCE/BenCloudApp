@@ -2,11 +2,11 @@
 
 <html>
 <head>
-    <#include 'head.ftl'>
+    <#include '/head.ftl'>
 </head>
 <body>
 
-	<#include 'navigation.ftl'>
+	<#include '/navigation.ftl'>
 
 	<div>
 		404 - Not Found (what were you looking for?)

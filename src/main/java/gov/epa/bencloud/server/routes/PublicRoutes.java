@@ -37,13 +37,13 @@ public class PublicRoutes extends RoutesBase {
 		service.notFound((request, response) -> {
 			Map<String, Object> attributes = new HashMap<>();
 			attributes.put("page", request.pathInfo());
-			return FreeMarkerRenderUtil.render(freeMarkerConfiguration, attributes, "/404.ftl");
+			return FreeMarkerRenderUtil.render(freeMarkerConfiguration, attributes, "/error/404.ftl");
 		});
 
 		service.internalServerError((request, response) -> {
 			Map<String, Object> attributes = new HashMap<>();
 
-			return FreeMarkerRenderUtil.render(freeMarkerConfiguration, attributes, "/500.ftl");
+			return FreeMarkerRenderUtil.render(freeMarkerConfiguration, attributes, "/error/500.ftl");
 		});
 
 		service.post("/test-ajax", (req, res) -> {
