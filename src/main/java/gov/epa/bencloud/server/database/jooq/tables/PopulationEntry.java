@@ -16,7 +16,7 @@ import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row9;
+import org.jooq.Row10;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -81,6 +81,11 @@ public class PopulationEntry extends TableImpl<PopulationEntryRecord> {
      * The column <code>data.population_entry.grid_row</code>.
      */
     public final TableField<PopulationEntryRecord, Integer> GRID_ROW = createField(DSL.name("grid_row"), SQLDataType.INTEGER, this, "");
+
+    /**
+     * The column <code>data.population_entry.grid_cell_id</code>.
+     */
+    public final TableField<PopulationEntryRecord, Long> GRID_CELL_ID = createField(DSL.name("grid_cell_id"), SQLDataType.BIGINT, this, "");
 
     /**
      * The column <code>data.population_entry.pop_year</code>.
@@ -171,11 +176,11 @@ public class PopulationEntry extends TableImpl<PopulationEntryRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row9 type methods
+    // Row10 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row9<Integer, Integer, Integer, Integer, Integer, Integer, Integer, Short, BigDecimal> fieldsRow() {
-        return (Row9) super.fieldsRow();
+    public Row10<Integer, Integer, Integer, Integer, Integer, Integer, Integer, Long, Short, BigDecimal> fieldsRow() {
+        return (Row10) super.fieldsRow();
     }
 }

@@ -16,7 +16,7 @@ import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row4;
+import org.jooq.Row5;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -51,6 +51,11 @@ public class IncidenceValue extends TableImpl<IncidenceValueRecord> {
      * The column <code>data.incidence_value.incidence_entry_id</code>.
      */
     public final TableField<IncidenceValueRecord, Integer> INCIDENCE_ENTRY_ID = createField(DSL.name("incidence_entry_id"), SQLDataType.INTEGER, this, "");
+
+    /**
+     * The column <code>data.incidence_value.grid_cell_id</code>.
+     */
+    public final TableField<IncidenceValueRecord, Long> GRID_CELL_ID = createField(DSL.name("grid_cell_id"), SQLDataType.BIGINT, this, "");
 
     /**
      * The column <code>data.incidence_value.grid_col</code>.
@@ -146,11 +151,11 @@ public class IncidenceValue extends TableImpl<IncidenceValueRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row4 type methods
+    // Row5 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row4<Integer, Integer, Integer, BigDecimal> fieldsRow() {
-        return (Row4) super.fieldsRow();
+    public Row5<Integer, Long, Integer, Integer, BigDecimal> fieldsRow() {
+        return (Row5) super.fieldsRow();
     }
 }

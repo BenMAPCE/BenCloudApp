@@ -16,7 +16,7 @@ import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row6;
+import org.jooq.Row7;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -61,6 +61,11 @@ public class AirQualityCell extends TableImpl<AirQualityCellRecord> {
      * The column <code>data.air_quality_cell.grid_row</code>.
      */
     public final TableField<AirQualityCellRecord, Integer> GRID_ROW = createField(DSL.name("grid_row"), SQLDataType.INTEGER, this, "");
+
+    /**
+     * The column <code>data.air_quality_cell.grid_cell_id</code>.
+     */
+    public final TableField<AirQualityCellRecord, Long> GRID_CELL_ID = createField(DSL.name("grid_cell_id"), SQLDataType.BIGINT, this, "");
 
     /**
      * The column <code>data.air_quality_cell.metric_id</code>.
@@ -122,7 +127,7 @@ public class AirQualityCell extends TableImpl<AirQualityCellRecord> {
 
     private transient AirQualityLayer _airQualityLayer;
     private transient PollutantMetric _pollutantMetric;
-    private transient SeasonalMetricSeason _seasonalMetricSeason;
+    private transient SeasonalMetric _seasonalMetric;
 
     public AirQualityLayer airQualityLayer() {
         if (_airQualityLayer == null)
@@ -138,11 +143,11 @@ public class AirQualityCell extends TableImpl<AirQualityCellRecord> {
         return _pollutantMetric;
     }
 
-    public SeasonalMetricSeason seasonalMetricSeason() {
-        if (_seasonalMetricSeason == null)
-            _seasonalMetricSeason = new SeasonalMetricSeason(this, Keys.AIR_QUALITY_CELL__AIR_QUALITY_CELL_SEASONAL_METRIC_ID_FKEY);
+    public SeasonalMetric seasonalMetric() {
+        if (_seasonalMetric == null)
+            _seasonalMetric = new SeasonalMetric(this, Keys.AIR_QUALITY_CELL__AIR_QUALITY_CELL_SEASONAL_METRIC_ID_FKEY);
 
-        return _seasonalMetricSeason;
+        return _seasonalMetric;
     }
 
     @Override
@@ -172,11 +177,11 @@ public class AirQualityCell extends TableImpl<AirQualityCellRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row6 type methods
+    // Row7 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row6<Integer, Integer, Integer, Integer, Integer, BigDecimal> fieldsRow() {
-        return (Row6) super.fieldsRow();
+    public Row7<Integer, Integer, Integer, Long, Integer, Integer, BigDecimal> fieldsRow() {
+        return (Row7) super.fieldsRow();
     }
 }
