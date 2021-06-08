@@ -12,7 +12,7 @@ This will navigate to a form with the following fields:
 - scenario air quality (select using /air-quality-data API call)
 - population dataset (select using /population API call. Needs to be implemented. Can hardcode to 40 for now.)
 - population year
-- functions (multi select list. Use /health-impact-functions API call as data source. Show endpoint, author, start age, end age for now)
+- functions (multi select list. Use /health-impact-functions API call as data source. Show endpoint, author, start age, end age for now). For example: "Acute Myocardial Infarction, Nonfatal | Peters et al. | 18-24"
 
 ## Example JSON created by the above form that is posted to /tasks
 
