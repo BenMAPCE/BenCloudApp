@@ -12,6 +12,10 @@ import gov.epa.bencloud.server.database.jooq.tables.EndpointGroup;
 import gov.epa.bencloud.server.database.jooq.tables.Ethnicity;
 import gov.epa.bencloud.server.database.jooq.tables.Gender;
 import gov.epa.bencloud.server.database.jooq.tables.GridDefinition;
+import gov.epa.bencloud.server.database.jooq.tables.HealthImpactFunction;
+import gov.epa.bencloud.server.database.jooq.tables.HealthImpactFunctionDataset;
+import gov.epa.bencloud.server.database.jooq.tables.HifResultDatasets;
+import gov.epa.bencloud.server.database.jooq.tables.HifResults;
 import gov.epa.bencloud.server.database.jooq.tables.IncidenceDataset;
 import gov.epa.bencloud.server.database.jooq.tables.IncidenceEntry;
 import gov.epa.bencloud.server.database.jooq.tables.IncidenceValue;
@@ -78,6 +82,26 @@ public class Tables {
      * The table <code>data.grid_definition</code>.
      */
     public static final GridDefinition GRID_DEFINITION = GridDefinition.GRID_DEFINITION;
+
+    /**
+     * The table <code>data.health_impact_function</code>.
+     */
+    public static final HealthImpactFunction HEALTH_IMPACT_FUNCTION = HealthImpactFunction.HEALTH_IMPACT_FUNCTION;
+
+    /**
+     * The table <code>data.health_impact_function_dataset</code>.
+     */
+    public static final HealthImpactFunctionDataset HEALTH_IMPACT_FUNCTION_DATASET = HealthImpactFunctionDataset.HEALTH_IMPACT_FUNCTION_DATASET;
+
+    /**
+     * The table <code>data.hif_result_datasets</code>.
+     */
+    public static final HifResultDatasets HIF_RESULT_DATASETS = HifResultDatasets.HIF_RESULT_DATASETS;
+
+    /**
+     * The table <code>data.hif_results</code>.
+     */
+    public static final HifResults HIF_RESULTS = HifResults.HIF_RESULTS;
 
     /**
      * The table <code>data.incidence_dataset</code>.

@@ -51,6 +51,21 @@ public class Sequences {
     public static final Sequence<Integer> GRID_DEFINITION_ID_SEQ = Internal.createSequence("grid_definition_id_seq", Data.DATA, SQLDataType.INTEGER.nullable(false), null, null, null, null, false, null);
 
     /**
+     * The sequence <code>data.health_impact_function_dataset_id_seq</code>
+     */
+    public static final Sequence<Integer> HEALTH_IMPACT_FUNCTION_DATASET_ID_SEQ = Internal.createSequence("health_impact_function_dataset_id_seq", Data.DATA, SQLDataType.INTEGER.nullable(false), null, null, null, null, false, null);
+
+    /**
+     * The sequence <code>data.health_impact_function_id_seq</code>
+     */
+    public static final Sequence<Integer> HEALTH_IMPACT_FUNCTION_ID_SEQ = Internal.createSequence("health_impact_function_id_seq", Data.DATA, SQLDataType.INTEGER.nullable(false), null, null, null, null, false, null);
+
+    /**
+     * The sequence <code>data.hif_result_datasets_id_seq</code>
+     */
+    public static final Sequence<Integer> HIF_RESULT_DATASETS_ID_SEQ = Internal.createSequence("hif_result_datasets_id_seq", Data.DATA, SQLDataType.INTEGER.nullable(false), null, null, null, null, false, null);
+
+    /**
      * The sequence <code>data.incidence_dataset_id_seq</code>
      */
     public static final Sequence<Integer> INCIDENCE_DATASET_ID_SEQ = Internal.createSequence("incidence_dataset_id_seq", Data.DATA, SQLDataType.INTEGER.nullable(false), null, null, null, null, false, null);

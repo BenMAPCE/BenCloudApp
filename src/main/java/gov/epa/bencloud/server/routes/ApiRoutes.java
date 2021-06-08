@@ -1,5 +1,7 @@
 package gov.epa.bencloud.server.routes;
 
+import javax.servlet.MultipartConfigElement;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,6 +11,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import freemarker.template.Configuration;
 import gov.epa.bencloud.api.AirQualityApi;
+import gov.epa.bencloud.api.HIFApi;
 import spark.Service;
 
 public class ApiRoutes extends RoutesBase {
@@ -29,15 +32,20 @@ public class ApiRoutes extends RoutesBase {
 		});
 
 		service.get("/api/v1/air-quality-data/:id/definition", (request, response) -> {
-			return AirQualityApi.getAirQualityLayerDefintion(request, response);
+			return AirQualityApi.getAirQualityLayerDefinition(request, response);
 		});
 
 		service.get("/api/v1/air-quality-data/:id/details", (request, response) -> {
 			return AirQualityApi.getAirQualityLayerDetails(request, response);
 		});
+
+		service.get("/api/v1/health-impact-functions", (request, response) -> {
+			return HIFApi.getAllHealthImpactFunctions(request, response);
+		});
 		
 		// POST
 		service.post("/api/v1/air-quality-data", (request, response) -> {
+			request.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp"));
 			String layerName = getPostParameterValue(request, "name");
 			Integer pollutantId = Integer.valueOf(getPostParameterValue(request, "pollutantId"));
 			Integer gridId = Integer.valueOf(getPostParameterValue(request, "gridId"));
@@ -45,6 +53,9 @@ public class ApiRoutes extends RoutesBase {
 			return AirQualityApi.postAirQualityLayer(request, layerName, pollutantId, gridId, layerType, response);
 		});
 
+
+		
+		
 		service.get("/api/load-states", (request, response) -> {
 			
 			ObjectMapper mapper = new ObjectMapper();

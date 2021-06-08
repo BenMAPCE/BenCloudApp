@@ -167,7 +167,7 @@ public class TaskQueue {
 			.values(
 					task.getUserIdentifier(),
 					Integer.valueOf(10),
-					UUID.randomUUID().toString(),
+					task.getUuid(),
 					task.getName(),
 					task.getDescription(),
 					task.getParameters(),

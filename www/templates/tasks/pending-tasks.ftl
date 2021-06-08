@@ -48,7 +48,7 @@
 
 <script>
 
-	var getResultsUrl = "/tasks/pending-tasks/data";
+	var getResultsUrl = "/api/v1/tasks/pending";
 		
 	var resultsDatatableColumns = 
 	[
@@ -110,7 +110,7 @@
 			resultsDatatable = $('#pending-datatable').DataTable({
 				"processing": true,
 				"serverSide": false,
-				"sServerMethod": "POST",
+				"sServerMethod": "GET",
 				"pageLength": 25,
 				"ajax": {
 					"url": getResultsUrl,

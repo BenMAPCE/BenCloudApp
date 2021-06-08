@@ -7,12 +7,12 @@ import gov.epa.bencloud.server.tasks.TaskQueue;
 import gov.epa.bencloud.server.tasks.TaskWorker;
 import gov.epa.bencloud.server.tasks.model.Task;
 
-public class TaskWorkerRunable implements Runnable {
+public class TaskWorkerRunnable implements Runnable {
 
 	private String taskUuid;
 	private String taskWorkerUuid;
 
-	public TaskWorkerRunable(String taskUuid, String taskWorkerUuid) {
+	public TaskWorkerRunnable(String taskUuid, String taskWorkerUuid) {
 		this.taskUuid = taskUuid;
 		this.taskWorkerUuid = taskWorkerUuid;
 	}

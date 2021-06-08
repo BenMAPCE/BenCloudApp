@@ -52,7 +52,7 @@
 
 <script>
 
-	var getResultsUrl = "/tasks/completed-tasks/data";
+	var getResultsUrl = "/api/v1/tasks/completed";
 		
 	var resultsDatatableColumns = 
 	[
@@ -120,7 +120,7 @@
 			resultsDatatable = $('#results-datatable').DataTable({
 				"processing": true,
 				"serverSide": false,
-				"sServerMethod": "POST",
+				"sServerMethod": "GET",
 				"pageLength": 25,
 				"ajax": {
 					"url": getResultsUrl,

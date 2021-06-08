@@ -4,13 +4,19 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.javafaker.Faker;
 
 import freemarker.template.Configuration;
+import gov.epa.bencloud.api.HIFApi;
+import gov.epa.bencloud.api.util.HIFUtil;
 import gov.epa.bencloud.server.tasks.TaskComplete;
 import gov.epa.bencloud.server.tasks.TaskQueue;
 import gov.epa.bencloud.server.tasks.model.Task;
@@ -29,42 +35,37 @@ public class TaskRoutes extends RoutesBase {
 
 	private void addRoutes(Configuration freeMarkerConfiguration) {
 
-		service.get("/tasks/submit-task", (req, res) -> {
+		// Submit a new task
+		service.post("/api/v1/tasks", (req, res) -> {
 
 			String bcoUserIdentifier = getOrSetOrExtendCookie(req, res);
+			String body = req.body();
+			ObjectMapper mapper = new ObjectMapper();
+			JsonNode params = mapper.readTree(body);
 			
-			Faker faker = new Faker();
 			
 			Task task = new Task();
-			task.setName(faker.pokemon().name());
-			task.setDescription(faker.funnyName().name());
+			task.setName(params.get("name").asText());
+			//task.setDescription(faker.funnyName().name());
+			task.setParameters(body);
 			task.setUuid(UUID.randomUUID().toString());
 			task.setUserIdentifier(bcoUserIdentifier);
-			task.setType("");
-
-			// Fake Task Type
-			
-			int randomNumber = (int) Math.floor(
-					Math.random() * (2 - 1 + 1) + 1);
-
-			if (randomNumber == 1) {
-				task.setType("HIF");
-			}
-			
+			task.setType(params.get("type").asText());		
 			TaskQueue.writeTaskToQueue(task);
 
-			Map<String, Object> attributes = new HashMap<>();
-
-			return FreeMarkerRenderUtil.render(freeMarkerConfiguration, attributes, "/tasks/task-submitted.ftl");
+			ObjectNode ret = mapper.createObjectNode();
+			ret.put("task_uuid", task.getUuid());
+			res.type("application/json");
+			return ret;
 
 		});
 
-		service.post("/tasks/pending-tasks/data", (req, res) -> {
+		service.get("/api/v1/tasks/pending", (req, res) -> {
 			
 			String bcoUserIdentifier = getOrSetOrExtendCookie(req, res);
 			
 			ObjectNode data = TaskQueue.getPendingTasks(bcoUserIdentifier, getPostParametersAsMap(req));
-			
+			res.type("application/json");
 			return data;
 
 		});
@@ -78,13 +79,13 @@ public class TaskRoutes extends RoutesBase {
 			return FreeMarkerRenderUtil.render(freeMarkerConfiguration, attributes, "/tasks/pending-tasks.ftl");
 
 		});
-
-		service.post("/tasks/completed-tasks/data", (req, res) -> {
+		
+		service.get("/api/v1/tasks/completed", (req, res) -> {
 			
 			String bcoUserIdentifier = getOrSetOrExtendCookie(req, res);
 			
 			ObjectNode data = TaskComplete.getCompletedTasks(bcoUserIdentifier, getPostParametersAsMap(req));
-			
+			res.type("application/json");
 			return data;
 
 		});
@@ -99,5 +100,12 @@ public class TaskRoutes extends RoutesBase {
 
 		});
 
+		service.get("/api/v1/tasks/:uuid/results", (req, res) -> {
+			
+			String bcoUserIdentifier = getOrSetOrExtendCookie(req, res);
+			
+			return HIFApi.getHifResultDetails(req, res);
+
+		});
 	}
 }
