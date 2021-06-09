@@ -11,7 +11,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import freemarker.template.Configuration;
 import gov.epa.bencloud.api.AirQualityApi;
+import gov.epa.bencloud.api.GridDefinitionApi;
 import gov.epa.bencloud.api.HIFApi;
+import gov.epa.bencloud.api.PollutantApi;
 import spark.Service;
 
 public class ApiRoutes extends RoutesBase {
@@ -27,6 +29,14 @@ public class ApiRoutes extends RoutesBase {
 	private void addRoutes(Configuration freeMarkerConfiguration) {
 
 		// GET	
+		service.get("/api/v1/grid-definitions", (request, response) -> {
+			return GridDefinitionApi.getAllGridDefinitions(response);
+		});
+		
+		service.get("/api/v1/pollutants", (request, response) -> {
+			return PollutantApi.getAllPollutantDefinitions(response);
+		});
+		
 		service.get("/api/v1/air-quality-data", (request, response) -> {
 			return AirQualityApi.getAllAirQualityLayerDefinitions(response);
 		});

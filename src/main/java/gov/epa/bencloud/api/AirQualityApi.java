@@ -1,23 +1,18 @@
 package gov.epa.bencloud.api;
 
-import static gov.epa.bencloud.server.database.jooq.Tables.AIR_QUALITY_CELL;
-import static gov.epa.bencloud.server.database.jooq.Tables.AIR_QUALITY_LAYER;
+import static gov.epa.bencloud.server.database.jooq.Tables.*;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.util.Map;
 
-import javax.servlet.MultipartConfigElement;
-
-import org.jooq.Field;
-import org.jooq.InsertValuesStep6;
 import org.jooq.InsertValuesStep7;
 import org.jooq.JSONFormat;
 import org.jooq.Result;
 import org.jooq.JSONFormat.RecordFormat;
 import org.jooq.Record;
-import org.jooq.Record1;
+import org.jooq.Record6;
 import org.jooq.impl.DSL;
 import org.jooq.tools.csv.CSVReader;
 
@@ -32,8 +27,17 @@ import spark.Response;
 public class AirQualityApi {
 
 	public static Object getAllAirQualityLayerDefinitions(Response response) {
-		Result<AirQualityLayerRecord> aqRecords = DSL.using(JooqUtil.getJooqConfiguration())
-				.selectFrom(AIR_QUALITY_LAYER)
+		Result<Record6<Integer, String, Integer, Integer, String, String>> aqRecords = DSL.using(JooqUtil.getJooqConfiguration())
+				.select(
+						AIR_QUALITY_LAYER.ID, 
+						AIR_QUALITY_LAYER.NAME,
+						AIR_QUALITY_LAYER.GRID_DEFINITION_ID,
+						AIR_QUALITY_LAYER.POLLUTANT_ID,
+						POLLUTANT.NAME.as("pollutant_name"), 
+						GRID_DEFINITION.NAME.as("grid_definition_name"))
+				.from(AIR_QUALITY_LAYER)
+				.join(POLLUTANT).on(POLLUTANT.ID.eq(AIR_QUALITY_LAYER.POLLUTANT_ID))				
+				.join(GRID_DEFINITION).on(GRID_DEFINITION.ID.eq(AIR_QUALITY_LAYER.GRID_DEFINITION_ID))
 				.orderBy(AIR_QUALITY_LAYER.NAME)
 				.fetch();
 		
@@ -42,10 +46,18 @@ public class AirQualityApi {
 	}
 	
 	public static Object getAirQualityLayerDefinition(Request request, Response response) {
-		AirQualityLayerRecord aqRecord = DSL.using(JooqUtil.getJooqConfiguration())
-				.selectFrom(AIR_QUALITY_LAYER)
+		Record6<Integer, String, Integer, Integer, String, String> aqRecord = DSL.using(JooqUtil.getJooqConfiguration())
+				.select(
+						AIR_QUALITY_LAYER.ID, 
+						AIR_QUALITY_LAYER.NAME,
+						AIR_QUALITY_LAYER.GRID_DEFINITION_ID,
+						AIR_QUALITY_LAYER.POLLUTANT_ID,
+						POLLUTANT.NAME.as("pollutant_name"), 
+						GRID_DEFINITION.NAME.as("grid_definition_name"))
+				.from(AIR_QUALITY_LAYER)
+				.join(POLLUTANT).on(POLLUTANT.ID.eq(AIR_QUALITY_LAYER.POLLUTANT_ID))				
+				.join(GRID_DEFINITION).on(GRID_DEFINITION.ID.eq(AIR_QUALITY_LAYER.GRID_DEFINITION_ID))
 				.where(AIR_QUALITY_LAYER.ID.eq(Integer.valueOf(request.params("id"))))
-				.orderBy(AIR_QUALITY_LAYER.NAME)
 				.fetchOne();
 		response.type("application/json");
 		return aqRecord.formatJSON(new JSONFormat().header(false).recordFormat(RecordFormat.OBJECT));

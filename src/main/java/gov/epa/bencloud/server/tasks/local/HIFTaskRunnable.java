@@ -87,6 +87,7 @@ public class HIFTaskRunnable implements Runnable {
 			Map<Long, AirQualityCellRecord> scenario = AirQualityApi.getAirQualityLayerMap(hifTaskConfig.aqScenarioId);
 
 			// Load the population dataset
+			//TODO Add back in the breakdown and iterate over relevant entries for each cell
 			Map<Long, Result<Record2<Long, BigDecimal>>> population = PopulationApi.getPopulationEntryGroups(hifTaskConfig.popId);
 			
 			// Load data for the selected HIFs

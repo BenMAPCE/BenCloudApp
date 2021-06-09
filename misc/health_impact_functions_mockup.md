@@ -2,8 +2,7 @@
 
 ## Updates to the Task Queue
 
-Add a link to the header to "Estimate Health Impacts"
-
+Add a link to the header to "Estimate Health Impacts"  
 This will navigate to a form with the following fields:
 
 - name (text)
@@ -13,6 +12,9 @@ This will navigate to a form with the following fields:
 - population dataset (select using /population API call. Needs to be implemented. Can hardcode to 40 for now.)
 - population year
 - functions (multi select list. Use /health-impact-functions API call as data source. Show endpoint, author, start age, end age for now). For example: "Acute Myocardial Infarction, Nonfatal | Peters et al. | 18-24"
+
+**Note that the list of functions should be filtered to the pollutant assigned to the selected air quality surfaces**
+
 
 ## Example JSON created by the above form that is posted to /tasks
 
