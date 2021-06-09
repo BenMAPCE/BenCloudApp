@@ -45,6 +45,19 @@ public class HIFUtil {
 		return e;
 	}
 
+	public static HealthImpactFunctionRecord getFunctionDefinition(Integer id) {
+
+		// Load the function by id
+		DSLContext create = DSL.using(JooqUtil.getJooqConfiguration());
+
+		HealthImpactFunctionRecord record = create
+				.selectFrom(HEALTH_IMPACT_FUNCTION)
+				.where(HEALTH_IMPACT_FUNCTION.ID.eq(id))
+				.fetchOne();
+				
+		return record;
+	}
+	
 	public static void storeResults(Task task, ArrayList<HifResultsRecord> hifResults) {
 		DSLContext create = DSL.using(JooqUtil.getJooqConfiguration());
 		

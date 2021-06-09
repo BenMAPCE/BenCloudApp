@@ -13,7 +13,7 @@ Note that the /api/v1/air-quality-data api endpoint only includes pollutant and 
 ## Add Air Quality Surface
 Present form to collection name, pollutant id, and grid definition id from the user.
 
-TODO: Need to add GET /pollutants and /grid-definitions to the API to support these selections
+Will use GET /pollutants and /grid-definitions API calls to support these selections
 
 Will POST to /air-quality-data as multipart/form-data
 
