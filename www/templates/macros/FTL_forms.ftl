@@ -31,6 +31,52 @@
 
 </#macro>
 
+<#macro smartforms_multi_select_json
+ 	id
+ 	name = id
+ 	label=""
+ 	class = id
+ 	validation=""
+ 	tooltip=""
+ 	tooltip_direction="tip-right"
+ 	required=false
+>
+
+   <div class="section">
+		<label for="${id}" class="field-label">${label} <#if required><span class="required">*</span></#if></label> 
+        <label class="field">
+			<select class="${id} smart-select2 <#if validation!="">${validation}</#if>" multiple="multiple">
+			</select>
+  			<#if tooltip != ""><b class="tooltip ${tooltip_direction}"><em> ${tooltip}</em></b></#if>                 
+       </label>
+    </div>
+
+</#macro>
+
+<#macro smartforms_single_select_json
+ 	id
+ 	name = id
+ 	label=""
+ 	class = id
+ 	value=""
+ 	validation=""
+	defaultValueText="Select a value"
+ 	tooltip=""
+ 	tooltip_direction="tip-right"
+ 	required=false
+>
+
+   <div class="section">
+		<label for="${id}" class="field-label">${label} <#if required><span class="required">*</span></#if></label> 
+        <label class="field">
+			<select class="${id} smart-select2 <#if validation!="">${validation}</#if>">
+            <option value="">${defaultValueText}</option>
+			</select>
+  			<#if tooltip != ""><b class="tooltip ${tooltip_direction}"><em> ${tooltip}</em></b></#if>                 
+       </label>
+    </div>
+
+</#macro>
 
 <#macro smartforms_single_select
  	id
@@ -59,7 +105,7 @@
 
 </#macro>
 
-<#macro smartforms_single_select_json
+<#macro smartforms_single_select_jsonX
  	id
  	name = id
  	label=""
@@ -135,6 +181,17 @@
         <#if tooltip != ""><b class="tooltip ${tooltip_direction}"><em> ${tooltip}</em></b></#if>                 
     	<#if icon != ""><span class="field-icon"><i class="fa ${icon}"></i></span></#if>
    </label>
+        
+</#macro>  
+
+ <#macro smartforms_hidden_text_field
+ 	id
+ 	name = id
+ 	value=""
+	>
+    	<input type="hidden" name="${name}" id="${id}" class="gui-input" 
+    		<#if value != "">value="${value}"</#if>
+    	>
         
 </#macro>  
 
@@ -322,5 +379,28 @@
 	</div>
 </#macro>
 
-                    
+<#macro smartforms_header
+	space_above=10
+	space_below=10
+	text="" 
+	>
+	<div class="spacer-t${space_above} spacer-b${space_below}">
+		<div class="header">
+			<span>${text}</span>
+		</div>
+	</div>
+</#macro>
+
+ <#macro smartforms_messages
+	space_above=10
+	space_below=10
+	text="" 
+	>
+	<div class="messages-wrapper spacer-t${space_above} spacer-b${space_below}">
+		<div class="messages">
+			<span>${text} </span>
+		</div>
+	</div>
+</#macro>
+          
                     

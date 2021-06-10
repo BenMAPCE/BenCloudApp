@@ -5,22 +5,30 @@ import static gov.epa.bencloud.server.database.jooq.Tables.*;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Map;
 
 import org.jooq.InsertValuesStep7;
 import org.jooq.JSONFormat;
 import org.jooq.Result;
 import org.jooq.JSONFormat.RecordFormat;
+import org.jooq.exception.DataAccessException;
 import org.jooq.Record;
 import org.jooq.Record6;
 import org.jooq.impl.DSL;
 import org.jooq.tools.csv.CSVReader;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import gov.epa.bencloud.api.util.AirQualityUtil;
 import gov.epa.bencloud.api.util.ApiUtil;
 import gov.epa.bencloud.server.database.JooqUtil;
 import gov.epa.bencloud.server.database.jooq.tables.records.AirQualityCellRecord;
 import gov.epa.bencloud.server.database.jooq.tables.records.AirQualityLayerRecord;
+import gov.epa.bencloud.server.util.DataUtil;
 import spark.Request;
 import spark.Response;
 
@@ -65,7 +73,7 @@ public class AirQualityApi {
 	
 	public static Object getAirQualityLayerDetails(Request request, Response response) {
 		Integer id = Integer.valueOf(request.params("id"));
-		
+				
 		Result<AirQualityCellRecord> aqRecords = DSL.using(JooqUtil.getJooqConfiguration())
 				.selectFrom(AIR_QUALITY_CELL)
 				.where(AIR_QUALITY_CELL.AIR_QUALITY_LAYER_ID.eq(id))
@@ -181,4 +189,75 @@ public class AirQualityApi {
 		response.type("application/json");
 		return aqRecord.formatJSON(new JSONFormat().header(false).recordFormat(RecordFormat.OBJECT));
 	}
+	
+	public static ObjectNode getAirQualityLayers(String userIdentifier) {
+
+//		System.out.println("getCompletedTasks");
+//		System.out.println("userIdentifier: " + userIdentifier);
+		
+//		System.out.println("length: " + postParameters.get("length")[0]);
+//		System.out.println("start: " + postParameters.get("start")[0]);
+//		System.out.println("searchValue: " + postParameters.get("searchValue")[0]);
+//		System.out.println("sortColumn: " + postParameters.get("sortColumn")[0]);
+//		System.out.println("sortDirection: " + postParameters.get("sortDirection")[0]);
+
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode data = mapper.createObjectNode();
+        
+        ArrayNode airQualityLayers = mapper.createArrayNode();
+        ObjectNode airQualityLayer = mapper.createObjectNode();
+
+        int records = 0;
+        
+		if (null != userIdentifier) {
+
+			try {
+
+				Result<Record6<Integer, String, Integer, Integer, String, String>> aqRecords = DSL.using(JooqUtil.getJooqConfiguration())
+						.select(
+								AIR_QUALITY_LAYER.ID, 
+								AIR_QUALITY_LAYER.NAME,
+								AIR_QUALITY_LAYER.GRID_DEFINITION_ID,
+								AIR_QUALITY_LAYER.POLLUTANT_ID,
+								POLLUTANT.NAME, 
+								GRID_DEFINITION.NAME)
+						.from(AIR_QUALITY_LAYER)
+						.join(POLLUTANT).on(POLLUTANT.ID.eq(AIR_QUALITY_LAYER.POLLUTANT_ID))				
+						.join(GRID_DEFINITION).on(GRID_DEFINITION.ID.eq(AIR_QUALITY_LAYER.GRID_DEFINITION_ID))
+						.orderBy(AIR_QUALITY_LAYER.NAME)
+						.fetch();
+
+				for (Record record : aqRecords) {
+
+					airQualityLayer = mapper.createObjectNode();
+
+					airQualityLayer.put("id", record.getValue(AIR_QUALITY_LAYER.ID));
+					airQualityLayer.put("name", record.getValue(AIR_QUALITY_LAYER.NAME));
+					airQualityLayer.put("pollutant_name", record.getValue(POLLUTANT.NAME));
+					airQualityLayer.put("grid_definition_name", record.getValue(GRID_DEFINITION.NAME));
+					
+					airQualityLayers.add(airQualityLayer);
+					records++;
+					
+				}
+				
+				data.set("data", airQualityLayers);
+				data.put("success", true);
+				data.put("recordsFiltered", records);
+				data.put("recordsTotal", records);
+				
+			} catch (DataAccessException e) {
+				data.put("success", false);
+				data.put("error_message", e.getMessage());
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				data.put("success", false);
+				data.put("error_message", e.getMessage());
+				e.printStackTrace();
+			}
+		}
+
+		return data;
+	} 
+
 }

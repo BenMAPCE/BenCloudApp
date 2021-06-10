@@ -40,17 +40,20 @@ public class TaskRoutes extends RoutesBase {
 
 			String bcoUserIdentifier = getOrSetOrExtendCookie(req, res);
 			String body = req.body();
+			
 			ObjectMapper mapper = new ObjectMapper();
 			JsonNode params = mapper.readTree(body);
 			
 			
 			Task task = new Task();
 			task.setName(params.get("name").asText());
+			
 			//task.setDescription(faker.funnyName().name());
 			task.setParameters(body);
 			task.setUuid(UUID.randomUUID().toString());
 			task.setUserIdentifier(bcoUserIdentifier);
-			task.setType(params.get("type").asText());		
+			task.setType(params.get("type").asText());
+			
 			TaskQueue.writeTaskToQueue(task);
 
 			ObjectNode ret = mapper.createObjectNode();

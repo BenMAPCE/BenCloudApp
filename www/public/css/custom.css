@@ -37,3 +37,84 @@ div#navigation li a:hover {
 #pending-datatable tfoot {
 	display: table-row-group;
 }
+
+#aqs-datatable tfoot {
+	display: table-row-group;
+}
+
+.hif-form-body .header {
+	font-size: 18px;
+}
+
+.hif-form-body .messages-wrapper {
+	display: none;
+}
+
+
+/* General Styles for Menu  */
+.dropDownMenu, .dropDownMenu ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.dropDownMenu li {
+  position: relative;
+}
+
+.dropDownMenu a {
+  padding: 3px;
+  display: block;
+  text-decoration: none;
+}
+
+/* Level 1 Drop Down */
+.dropDownMenu > li {
+  display: inline-block;
+  vertical-align: top;
+  margin-left: -4px;
+  /* solve the 4 pixels spacing between list-items */
+}
+
+.dropDownMenu > li:first-child {
+  margin-left: 0;
+}
+
+/* Level 2 */
+.dropDownMenu ul {
+  box-shadow: 2px 2px 15px 0 rgba(0, 0, 0, 0.5);
+  background: white;
+}
+
+.dropDownMenu > li > ul {
+  text-align: left;
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: -160px;
+  width: 180px;
+  z-index: 1;
+}
+
+.dropDownMenu > li > ul li:hover {
+  background: #d9e9ef;
+}
+
+/* Level 3 */
+.dropDownMenu > li > ul > li > ul {
+  text-align: left;
+  display: none;
+  position: absolute;
+  left: 100%;
+  top: 0;
+  z-index: 1;
+}
+
+.dropDownMenu .ellipsis {
+	margin-top: 0px !important;
+}
+
+.btn-link.file-menu {
+	border: none;
+	background-color: transparent;
+}

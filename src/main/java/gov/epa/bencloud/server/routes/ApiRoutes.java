@@ -1,7 +1,21 @@
 package gov.epa.bencloud.server.routes;
 
+import static gov.epa.bencloud.server.database.jooq.Tables.AIR_QUALITY_LAYER;
+import static gov.epa.bencloud.server.database.jooq.Tables.ENDPOINT;
+import static gov.epa.bencloud.server.database.jooq.Tables.ETHNICITY;
+import static gov.epa.bencloud.server.database.jooq.Tables.GENDER;
+import static gov.epa.bencloud.server.database.jooq.Tables.HEALTH_IMPACT_FUNCTION;
+import static gov.epa.bencloud.server.database.jooq.Tables.RACE;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import javax.servlet.MultipartConfigElement;
 
+import org.jooq.Record;
+import org.jooq.Result;
+import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,6 +28,8 @@ import gov.epa.bencloud.api.AirQualityApi;
 import gov.epa.bencloud.api.GridDefinitionApi;
 import gov.epa.bencloud.api.HIFApi;
 import gov.epa.bencloud.api.PollutantApi;
+import gov.epa.bencloud.server.database.JooqUtil;
+import gov.epa.bencloud.server.util.FreeMarkerRenderUtil;
 import spark.Service;
 
 public class ApiRoutes extends RoutesBase {
@@ -63,7 +79,30 @@ public class ApiRoutes extends RoutesBase {
 			return AirQualityApi.postAirQualityLayer(request, layerName, pollutantId, gridId, layerType, response);
 		});
 
+		service.get("/api/load-air-quality-options", (request, response) -> {
+			
+			ObjectMapper mapper = new ObjectMapper();
 
+			ArrayNode options = mapper.createArrayNode();
+			ObjectNode option = mapper.createObjectNode();
+
+			Result<Record> result = DSL.using(JooqUtil.getJooqConfiguration())
+					.select(AIR_QUALITY_LAYER.asterisk())
+					.from(AIR_QUALITY_LAYER)
+					.orderBy(AIR_QUALITY_LAYER.NAME)
+					.fetch();
+			for (Record r : result) {
+				option = mapper.createObjectNode();
+				option.put("id", r.getValue(AIR_QUALITY_LAYER.ID));
+				option.put("text", 
+						r.getValue(AIR_QUALITY_LAYER.NAME)
+					);
+
+				options.add(option);
+			}
+						
+			return options;
+		});
 		
 		
 		service.get("/api/load-states", (request, response) -> {
@@ -85,6 +124,58 @@ public class ApiRoutes extends RoutesBase {
 			
 			
 			return states;
+		});
+
+		service.get("/api/load-functions", (request, response) -> {
+			
+			ObjectMapper mapper = new ObjectMapper();
+
+			ArrayNode options = mapper.createArrayNode();
+			ObjectNode option = mapper.createObjectNode();
+
+			Result<Record> result = DSL.using(JooqUtil.getJooqConfiguration())
+					.select(HEALTH_IMPACT_FUNCTION.asterisk(), ENDPOINT.NAME, RACE.NAME, GENDER.NAME, ETHNICITY.NAME)
+					.from(HEALTH_IMPACT_FUNCTION)
+					.join(ENDPOINT).on(HEALTH_IMPACT_FUNCTION.ENDPOINT_ID.eq(ENDPOINT.ID))
+					.join(RACE).on(HEALTH_IMPACT_FUNCTION.RACE_ID.eq(RACE.ID))
+					.join(GENDER).on(HEALTH_IMPACT_FUNCTION.GENDER_ID.eq(GENDER.ID))
+					.join(ETHNICITY).on(HEALTH_IMPACT_FUNCTION.ETHNICITY_ID.eq(ETHNICITY.ID))
+					.orderBy(ENDPOINT.NAME, HEALTH_IMPACT_FUNCTION.AUTHOR, 
+							HEALTH_IMPACT_FUNCTION.START_AGE, HEALTH_IMPACT_FUNCTION.END_AGE)
+					.fetch();
+			for (Record r : result) {
+				option = mapper.createObjectNode();
+				option.put("id", r.getValue(HEALTH_IMPACT_FUNCTION.ID));
+				option.put("text", 
+						r.getValue(ENDPOINT.NAME) + " | " + 
+						r.getValue(HEALTH_IMPACT_FUNCTION.AUTHOR) + " | " + 
+						r.getValue(HEALTH_IMPACT_FUNCTION.START_AGE) + "-" + 
+						r.getValue(HEALTH_IMPACT_FUNCTION.END_AGE) + " | " + 
+						r.getValue(RACE.NAME) + " | " + 
+						r.getValue(GENDER.NAME) + " | " + 
+						r.getValue(ETHNICITY.NAME)
+					);
+
+				options.add(option);
+			}
+						
+			return options;
+		});
+
+		service.post("/api/submit-hif", (request, response) -> {
+			
+			
+			List<String> parameterNames = getPostParametersNames(request);
+			
+			for (String parameterName : parameterNames) {
+				
+				//System.out.println(parameterName);
+				
+			}
+			
+			
+			Map<String, Object> attributes = new HashMap<>();
+			return FreeMarkerRenderUtil.render(freeMarkerConfiguration, attributes, "/demo/demo.ftl");
 		});
 
 	}

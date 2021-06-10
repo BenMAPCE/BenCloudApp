@@ -206,14 +206,14 @@ public class HIFTaskRunnable implements Runnable {
 		for (JsonNode function : functions) {
 			HIFConfig hifConfig = new HIFConfig();
 			hifConfig.hifId = function.get("id").asInt();
-			hifConfig.startAge = function.get("startAge").asInt();
-			hifConfig.endAge = function.get("endAge").asInt();
-			hifConfig.race = function.get("race").asInt();
-			hifConfig.ethnicity = function.get("ethnicity").asInt();
-			hifConfig.gender = function.get("gender").asInt();
-			hifConfig.incidence = function.get("incidence").asInt();
-			hifConfig.prevalence = function.get("prevalence").asInt();
-			hifConfig.variable = function.get("variable").asInt();
+//			hifConfig.startAge = function.get("startAge").asInt();
+//			hifConfig.endAge = function.get("endAge").asInt();
+//			hifConfig.race = function.get("race").asInt();
+//			hifConfig.ethnicity = function.get("ethnicity").asInt();
+//			hifConfig.gender = function.get("gender").asInt();
+//			hifConfig.incidence = function.get("incidence").asInt();
+//			hifConfig.prevalence = function.get("prevalence").asInt();
+//			hifConfig.variable = function.get("variable").asInt();
 			hifTaskConfig.hifs.add(hifConfig);
 		}
 	}
