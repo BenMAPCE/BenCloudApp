@@ -1,4 +1,34 @@
 
+<#macro smartforms_file_upload
+
+	id
+	name = id
+	class = id
+ 	label=""
+	upload_name_id = ""
+	button_title = "Chose File"
+	file_formats = ""
+	placeholder = ""
+	file_upload_label_class="file-upload-label"
+	icon_class = "file-upload-icon"
+ 	required = false
+>
+
+	<div class="section">
+		<div class="${file_upload_label_class}">${label} <#if required><span class="required">*</span></#if></div>
+		<label class="field prepend-icon file">
+			<span class="button btn-primary"> ${button_title} </span>
+			<input type="file" class="gui-file" name="${name}" id="${id}" onchange="document.getElementById('${upload_name_id}').value = this.value;">
+			<input type="text" class="gui-input" id="${upload_name_id}" placeholder="${placeholder}" readonly="">
+			<span class="field-icon"><i class="fa fa-upload ${icon_class}"></i></span>
+		 </label>
+		<#if file_formats != "">
+			<span class="small-text block spacer-t10 fine-grey"> ${file_formats} </span>
+		</#if>
+	</div>
+             
+</#macro>
+                          
 
 <#macro smartforms_multi_select
  	id
@@ -42,14 +72,12 @@
  	required=false
 >
 
-   <div class="section">
 		<label for="${id}" class="field-label">${label} <#if required><span class="required">*</span></#if></label> 
         <label class="field">
 			<select class="${id} smart-select2 <#if validation!="">${validation}</#if>" multiple="multiple">
 			</select>
   			<#if tooltip != ""><b class="tooltip ${tooltip_direction}"><em> ${tooltip}</em></b></#if>                 
        </label>
-    </div>
 
 </#macro>
 
@@ -66,7 +94,6 @@
  	required=false
 >
 
-   <div class="section">
 		<label for="${id}" class="field-label">${label} <#if required><span class="required">*</span></#if></label> 
         <label class="field">
 			<select class="${id} smart-select2 <#if validation!="">${validation}</#if>">
@@ -74,7 +101,6 @@
 			</select>
   			<#if tooltip != ""><b class="tooltip ${tooltip_direction}"><em> ${tooltip}</em></b></#if>                 
        </label>
-    </div>
 
 </#macro>
 
@@ -176,7 +202,8 @@
     	<input type="text" name="${name}" id="${id}" class="gui-input  <#if required>required</#if> <#if disabled> disabled </#if>" 
     		<#if placeholder != "">placeholder="${placeholder}"</#if> 
     		<#if value != "">value="${value}"</#if>
-    		<#if disabled> disabled </#if>
+    		<#if disabled> disabled </#if> 
+    		<#if required> required </#if>
     	>
         <#if tooltip != ""><b class="tooltip ${tooltip_direction}"><em> ${tooltip}</em></b></#if>                 
     	<#if icon != ""><span class="field-icon"><i class="fa ${icon}"></i></span></#if>
@@ -287,8 +314,9 @@
 
 
 
-<#macro start_smartforms_row>
-	<div class="frm-row">
+<#macro start_smartforms_row
+	class="">
+	<div class="frm-row ${class}">
 </#macro>
 
 <#macro end_smartforms_row>
@@ -329,8 +357,9 @@
 	method="post"
 	action="/"
 	id=""
+	multipart=false
 	>
-    <form method="${method}" action="${action}" id="${id}">
+    <form method="${method}" action="${action}" id="${id}" <#if multipart>enctype="multipart/form-data"</#if>>
 </#macro>
 
 <#macro end_smartforms_form>

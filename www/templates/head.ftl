@@ -11,21 +11,27 @@
     
 	<link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
 	<link rel="stylesheet" href="/css/datatables/dataTables.bootstrap4.min.css">
+	<link rel="stylesheet" href="/css/datatables/buttons.dataTables.min.css">
     
-    <link rel="stylesheet" href="/css/smartforms/smart-forms.css">
     <link rel="stylesheet" href="/css/smartforms/smart-addons.css">
     
     
     <link rel="stylesheet" href="/css/custom.css">
+    <link rel="stylesheet" href="/css/smartforms/smart-forms.css">
     
 	<script src="/js/jquery/jquery-3.6.0.min.js"></script>
+	<script src="/js/jquery/jquery.form.min.js"></script>
+	<script src="/js/jquery/jquery.validate.min.js"></script>
+	<script src="/js/jquery/additional-methods.min.js"></script>
 	<script src="/js/jquery/jquery-ui.min.js"></script>
+	
 	<script src="/js/jquery/select2.full.min.js"></script>
 
 	<script src="/js/bootstrap/bootstrap.min.js"></script>
 	
 	<script src="/js/datatables/jquery.dataTables.min.js"></script>
 	<script src="/js/datatables/dataTables.bootstrap4.min.js"></script>
+	<script src="/js/datatables/dataTables.buttons.min.js"></script>
 
 	<script src="/js/smartforms/smartforms-modal.min.js"></script>
 		

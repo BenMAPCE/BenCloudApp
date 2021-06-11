@@ -6,6 +6,8 @@ import static gov.epa.bencloud.server.database.jooq.Tables.ETHNICITY;
 import static gov.epa.bencloud.server.database.jooq.Tables.GENDER;
 import static gov.epa.bencloud.server.database.jooq.Tables.HEALTH_IMPACT_FUNCTION;
 import static gov.epa.bencloud.server.database.jooq.Tables.RACE;
+import static gov.epa.bencloud.server.database.jooq.Tables.GRID_DEFINITION;
+import static gov.epa.bencloud.server.database.jooq.Tables.POLLUTANT;
 
 import java.util.HashMap;
 import java.util.List;
@@ -71,11 +73,13 @@ public class ApiRoutes extends RoutesBase {
 		
 		// POST
 		service.post("/api/v1/air-quality-data", (request, response) -> {
+			
 			request.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp"));
 			String layerName = getPostParameterValue(request, "name");
 			Integer pollutantId = Integer.valueOf(getPostParameterValue(request, "pollutantId"));
 			Integer gridId = Integer.valueOf(getPostParameterValue(request, "gridId"));
 			String layerType = getPostParameterValue(request, "type");
+			
 			return AirQualityApi.postAirQualityLayer(request, layerName, pollutantId, gridId, layerType, response);
 		});
 
@@ -102,6 +106,59 @@ public class ApiRoutes extends RoutesBase {
 			}
 						
 			return options;
+		});
+		
+
+		service.get("/api/load-pollutant-options", (request, response) -> {
+			
+			ObjectMapper mapper = new ObjectMapper();
+
+			ArrayNode options = mapper.createArrayNode();
+			ObjectNode option = mapper.createObjectNode();
+
+			Result<Record> result = DSL.using(JooqUtil.getJooqConfiguration())
+					.select(POLLUTANT.asterisk())
+					.from(POLLUTANT)
+					.orderBy(POLLUTANT.NAME)
+					.fetch();
+			for (Record r : result) {
+				option = mapper.createObjectNode();
+				option.put("id", r.getValue(POLLUTANT.ID));
+				option.put("text", 
+						r.getValue(POLLUTANT.NAME)
+					);
+
+				options.add(option);
+			}
+						
+			return options;
+			
+		});
+		
+		service.get("/api/load-grid-options", (request, response) -> {
+			
+			ObjectMapper mapper = new ObjectMapper();
+
+			ArrayNode options = mapper.createArrayNode();
+			ObjectNode option = mapper.createObjectNode();
+
+			Result<Record> result = DSL.using(JooqUtil.getJooqConfiguration())
+					.select(GRID_DEFINITION.asterisk())
+					.from(GRID_DEFINITION)
+					.orderBy(GRID_DEFINITION.NAME)
+					.fetch();
+			for (Record r : result) {
+				option = mapper.createObjectNode();
+				option.put("id", r.getValue(GRID_DEFINITION.ID));
+				option.put("text", 
+						r.getValue(GRID_DEFINITION.NAME)
+					);
+
+				options.add(option);
+			}
+						
+			return options;
+			
 		});
 		
 		

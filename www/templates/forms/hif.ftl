@@ -108,12 +108,13 @@
 		 
 		<@forms.end_smartforms_section />
 
-   	       <@forms.end_smartforms_body />  
-            
    	       <@forms.start_smartforms_footer class="demo-form-footer"/>  
             	<button type="submit" class="button btn-primary submit">Submit</button>
    	       <@forms.end_smartforms_footer />  
+
+   	       <@forms.end_smartforms_body />  
             
+             
 		<@forms.end_smartforms_form />
         
    <@forms.end_smartforms_container />

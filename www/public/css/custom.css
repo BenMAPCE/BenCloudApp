@@ -1,7 +1,6 @@
 
 /* Navigation */
 
-
 div#navigation ul {
   list-style-type: none;
   margin: 0;
@@ -92,7 +91,7 @@ div#navigation li a:hover {
   position: absolute;
   top: 100%;
   left: -160px;
-  width: 180px;
+  width: 200px;
   z-index: 1;
 }
 
@@ -117,4 +116,35 @@ div#navigation li a:hover {
 .btn-link.file-menu {
 	border: none;
 	background-color: transparent;
+}
+
+ul.dropDownMenu .btn-link {
+    font-size: 14px;
+    color: black;
+    text-decoration: none;
+}
+
+.file-upload-icon {
+	margin-top: 13px;
+}
+
+.file-upload-label {
+	margin-bottom: 10px;
+}
+
+.smartforms-modal-footer {
+    padding-bottom: 15px;
+}
+
+.dataTables_length {
+	float: left;
+}
+
+.dataTables_filter {
+	float: left;
+	margin-left: 20px;
+}
+
+div.dt-buttons {
+	float: right;
 }

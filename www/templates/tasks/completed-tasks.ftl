@@ -66,7 +66,8 @@
 	    	className : "results-task-description-column"
 	    },
 	    { "data": "task_uuid",
-	    	className : "results-task-uuid-column"
+	    	className : "results-task-uuid-column",
+	    	visible: true
 	    },
 	    { "data": "task_submitted_date",
 	    	className : "results-task-submitted-date-column"
@@ -115,6 +116,10 @@
 
 	$( document ).ready(function() {
 	
+		$(document).mouseup(function (e) {
+			hideResultsEllipsisMenu(e);
+		});
+
 		if (!$.fn.DataTable.isDataTable('#results-datatable')) {
 	
 			resultsDatatable = $('#results-datatable').DataTable({
@@ -140,7 +145,11 @@
 				},
 				initComplete: function () {
 					// Apply the search
-					this.api().columns().every( function () {
+					var api = this.api();
+					api.column(4).visible( false );
+
+
+					api.columns().every( function () {
 						var that = this;
  
 						$( 'input', this.footer() ).on( 'keyup change clear', function () {
@@ -178,17 +187,66 @@
 	function createResultsEllipsis(row){
 		
 		var str = '';
-/*
+		
 		str += '<div class="fileMenu"><ul class="dropDownMenu"><li class="has-children">';
 		str += '<button class="btn-link file-menu">';
 		str += '<i class="fas fa-ellipsis-v"></i>'
 		str += '</button>';
 		str += '<ul>';
-		str += '<li><button style="width:100%; text-align:left;" class="btn-link" onclick="javascript: showViewModal(' + row.resolution_id + ');  hideResolutionsEllipsisMenu(); return false;">View</button></li>';		
-
-		str += '</ul></li></ul></div>';
-*/
+		str += '<li><button style="width:100%; text-align:left;" class="btn-link" onclick="javascript: downloadAsCSV(\'' + row.task_uuid + '\', \'' + row.task_name + '\');  hideResultsEllipsisMenu(); return false;">Download Results As CSV</button></li>';		
+		
 		return str;
+	}
+
+	$('#results-datatable').on('click', '.fileMenu ul li.has-children > button', function(e){
+		console.log("clicked...");
+		e.preventDefault();
+		if ($(this).next('ul').css("display") === 'none') {
+			$(this).next('ul').stop(true, false, true).fadeIn(300);
+		} else {
+			$(this).parent().find('ul').fadeOut(300);
+		}
+		return false;
+	});
+	
+	function hideResultsEllipsisMenu(e) {
+	    var container = $(".fileMenu ul li.has-children > ul");
+	    if (e == undefined || !container.is(e.target) 
+	        && container.has(e.target).length === 0) {
+	        container.hide();
+	    }
+	}
+
+	function downloadAsCSV(uuid, name) {
+		
+		$.ajax({
+			type 		: "GET", 
+			url 		: "/api/v1/tasks/" + uuid + "/results", 
+			data 		: {},
+            dataType	: "text",
+			cache		: false,
+			processData	: false,
+		    contentType	: false,
+		    headers		: { 'Accept': 'text/csv', 'Content-Type': 'text/csv' },
+		})
+
+		.done(function(data) {
+			
+			var hiddenElement = document.createElement('a');
+			hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(data);
+	    	hiddenElement.target = '_blank';
+	    	hiddenElement.download = name;
+	    	hiddenElement.click();
+    
+		})
+		.fail(function(data) {
+		
+			console.log("fail...");
+			console.log(data);
+	
+		})
+		.always(function() {
+		});
 	}
 
 </script>
