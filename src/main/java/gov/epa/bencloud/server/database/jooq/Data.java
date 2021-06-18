@@ -14,13 +14,16 @@ import gov.epa.bencloud.server.database.jooq.tables.Gender;
 import gov.epa.bencloud.server.database.jooq.tables.GridDefinition;
 import gov.epa.bencloud.server.database.jooq.tables.HealthImpactFunction;
 import gov.epa.bencloud.server.database.jooq.tables.HealthImpactFunctionDataset;
-import gov.epa.bencloud.server.database.jooq.tables.HifResultDatasets;
-import gov.epa.bencloud.server.database.jooq.tables.HifResults;
+import gov.epa.bencloud.server.database.jooq.tables.HifResult;
+import gov.epa.bencloud.server.database.jooq.tables.HifResultDataset;
+import gov.epa.bencloud.server.database.jooq.tables.HifResultFunctionConfig;
 import gov.epa.bencloud.server.database.jooq.tables.IncidenceDataset;
 import gov.epa.bencloud.server.database.jooq.tables.IncidenceEntry;
 import gov.epa.bencloud.server.database.jooq.tables.IncidenceValue;
 import gov.epa.bencloud.server.database.jooq.tables.IncomeGrowthAdjDataset;
 import gov.epa.bencloud.server.database.jooq.tables.IncomeGrowthAdjFactor;
+import gov.epa.bencloud.server.database.jooq.tables.InflationDataset;
+import gov.epa.bencloud.server.database.jooq.tables.InflationEntry;
 import gov.epa.bencloud.server.database.jooq.tables.Pollutant;
 import gov.epa.bencloud.server.database.jooq.tables.PollutantMetric;
 import gov.epa.bencloud.server.database.jooq.tables.PopConfig;
@@ -35,6 +38,14 @@ import gov.epa.bencloud.server.database.jooq.tables.SeasonalMetricSeason;
 import gov.epa.bencloud.server.database.jooq.tables.TaskComplete;
 import gov.epa.bencloud.server.database.jooq.tables.TaskQueue;
 import gov.epa.bencloud.server.database.jooq.tables.TaskWorker;
+import gov.epa.bencloud.server.database.jooq.tables.ValuationFunction;
+import gov.epa.bencloud.server.database.jooq.tables.ValuationFunctionDataset;
+import gov.epa.bencloud.server.database.jooq.tables.ValuationResult;
+import gov.epa.bencloud.server.database.jooq.tables.ValuationResultDataset;
+import gov.epa.bencloud.server.database.jooq.tables.ValuationResultFunctionConfig;
+import gov.epa.bencloud.server.database.jooq.tables.VariableDataset;
+import gov.epa.bencloud.server.database.jooq.tables.VariableEntry;
+import gov.epa.bencloud.server.database.jooq.tables.VariableValue;
 
 import java.util.Arrays;
 import java.util.List;
@@ -109,14 +120,19 @@ public class Data extends SchemaImpl {
     public final HealthImpactFunctionDataset HEALTH_IMPACT_FUNCTION_DATASET = HealthImpactFunctionDataset.HEALTH_IMPACT_FUNCTION_DATASET;
 
     /**
-     * The table <code>data.hif_result_datasets</code>.
+     * The table <code>data.hif_result</code>.
      */
-    public final HifResultDatasets HIF_RESULT_DATASETS = HifResultDatasets.HIF_RESULT_DATASETS;
+    public final HifResult HIF_RESULT = HifResult.HIF_RESULT;
 
     /**
-     * The table <code>data.hif_results</code>.
+     * The table <code>data.hif_result_dataset</code>.
      */
-    public final HifResults HIF_RESULTS = HifResults.HIF_RESULTS;
+    public final HifResultDataset HIF_RESULT_DATASET = HifResultDataset.HIF_RESULT_DATASET;
+
+    /**
+     * The table <code>data.hif_result_function_config</code>.
+     */
+    public final HifResultFunctionConfig HIF_RESULT_FUNCTION_CONFIG = HifResultFunctionConfig.HIF_RESULT_FUNCTION_CONFIG;
 
     /**
      * The table <code>data.incidence_dataset</code>.
@@ -142,6 +158,16 @@ public class Data extends SchemaImpl {
      * The table <code>data.income_growth_adj_factor</code>.
      */
     public final IncomeGrowthAdjFactor INCOME_GROWTH_ADJ_FACTOR = IncomeGrowthAdjFactor.INCOME_GROWTH_ADJ_FACTOR;
+
+    /**
+     * The table <code>data.inflation_dataset</code>.
+     */
+    public final InflationDataset INFLATION_DATASET = InflationDataset.INFLATION_DATASET;
+
+    /**
+     * The table <code>data.inflation_entry</code>.
+     */
+    public final InflationEntry INFLATION_ENTRY = InflationEntry.INFLATION_ENTRY;
 
     /**
      * The table <code>data.pollutant</code>.
@@ -214,6 +240,46 @@ public class Data extends SchemaImpl {
     public final TaskWorker TASK_WORKER = TaskWorker.TASK_WORKER;
 
     /**
+     * The table <code>data.valuation_function</code>.
+     */
+    public final ValuationFunction VALUATION_FUNCTION = ValuationFunction.VALUATION_FUNCTION;
+
+    /**
+     * The table <code>data.valuation_function_dataset</code>.
+     */
+    public final ValuationFunctionDataset VALUATION_FUNCTION_DATASET = ValuationFunctionDataset.VALUATION_FUNCTION_DATASET;
+
+    /**
+     * The table <code>data.valuation_result</code>.
+     */
+    public final ValuationResult VALUATION_RESULT = ValuationResult.VALUATION_RESULT;
+
+    /**
+     * The table <code>data.valuation_result_dataset</code>.
+     */
+    public final ValuationResultDataset VALUATION_RESULT_DATASET = ValuationResultDataset.VALUATION_RESULT_DATASET;
+
+    /**
+     * The table <code>data.valuation_result_function_config</code>.
+     */
+    public final ValuationResultFunctionConfig VALUATION_RESULT_FUNCTION_CONFIG = ValuationResultFunctionConfig.VALUATION_RESULT_FUNCTION_CONFIG;
+
+    /**
+     * The table <code>data.variable_dataset</code>.
+     */
+    public final VariableDataset VARIABLE_DATASET = VariableDataset.VARIABLE_DATASET;
+
+    /**
+     * The table <code>data.variable_entry</code>.
+     */
+    public final VariableEntry VARIABLE_ENTRY = VariableEntry.VARIABLE_ENTRY;
+
+    /**
+     * The table <code>data.variable_value</code>.
+     */
+    public final VariableValue VARIABLE_VALUE = VariableValue.VARIABLE_VALUE;
+
+    /**
      * No further instances allowed
      */
     private Data() {
@@ -238,11 +304,12 @@ public class Data extends SchemaImpl {
             Sequences.GRID_DEFINITION_ID_SEQ,
             Sequences.HEALTH_IMPACT_FUNCTION_DATASET_ID_SEQ,
             Sequences.HEALTH_IMPACT_FUNCTION_ID_SEQ,
-            Sequences.HIF_RESULT_DATASETS_ID_SEQ,
+            Sequences.HIF_RESULT_DATASET_ID_SEQ,
             Sequences.INCIDENCE_DATASET_ID_SEQ,
             Sequences.INCIDENCE_ENTRY_ID_SEQ,
             Sequences.INCOME_GROWTH_ADJ_DATASET_ID_SEQ,
             Sequences.INCOME_GROWTH_ADJ_FACTOR_ID_SEQ,
+            Sequences.INFLATION_DATASET_ID_SEQ,
             Sequences.POLLUTANT_ID_SEQ,
             Sequences.POLLUTANT_METRIC_ID_SEQ,
             Sequences.POP_CONFIG_ID_SEQ,
@@ -252,7 +319,12 @@ public class Data extends SchemaImpl {
             Sequences.SEASONAL_METRIC_SEASON_ID_SEQ,
             Sequences.TASK_COMPLETE_TASK_ID_SEQ,
             Sequences.TASK_QUEUE_TASK_ID_SEQ,
-            Sequences.TASK_WORKER_TASK_ID_SEQ);
+            Sequences.TASK_WORKER_TASK_ID_SEQ,
+            Sequences.VALUATION_FUNCTION_DATASET_ID_SEQ,
+            Sequences.VALUATION_FUNCTION_ID_SEQ,
+            Sequences.VALUATION_RESULT_DATASET_ID_SEQ,
+            Sequences.VARIABLE_DATASET_ID_SEQ,
+            Sequences.VARIABLE_ENTRY_ID_SEQ);
     }
 
     @Override
@@ -268,13 +340,16 @@ public class Data extends SchemaImpl {
             GridDefinition.GRID_DEFINITION,
             HealthImpactFunction.HEALTH_IMPACT_FUNCTION,
             HealthImpactFunctionDataset.HEALTH_IMPACT_FUNCTION_DATASET,
-            HifResultDatasets.HIF_RESULT_DATASETS,
-            HifResults.HIF_RESULTS,
+            HifResult.HIF_RESULT,
+            HifResultDataset.HIF_RESULT_DATASET,
+            HifResultFunctionConfig.HIF_RESULT_FUNCTION_CONFIG,
             IncidenceDataset.INCIDENCE_DATASET,
             IncidenceEntry.INCIDENCE_ENTRY,
             IncidenceValue.INCIDENCE_VALUE,
             IncomeGrowthAdjDataset.INCOME_GROWTH_ADJ_DATASET,
             IncomeGrowthAdjFactor.INCOME_GROWTH_ADJ_FACTOR,
+            InflationDataset.INFLATION_DATASET,
+            InflationEntry.INFLATION_ENTRY,
             Pollutant.POLLUTANT,
             PollutantMetric.POLLUTANT_METRIC,
             PopConfig.POP_CONFIG,
@@ -288,6 +363,14 @@ public class Data extends SchemaImpl {
             SeasonalMetricSeason.SEASONAL_METRIC_SEASON,
             TaskComplete.TASK_COMPLETE,
             TaskQueue.TASK_QUEUE,
-            TaskWorker.TASK_WORKER);
+            TaskWorker.TASK_WORKER,
+            ValuationFunction.VALUATION_FUNCTION,
+            ValuationFunctionDataset.VALUATION_FUNCTION_DATASET,
+            ValuationResult.VALUATION_RESULT,
+            ValuationResultDataset.VALUATION_RESULT_DATASET,
+            ValuationResultFunctionConfig.VALUATION_RESULT_FUNCTION_CONFIG,
+            VariableDataset.VARIABLE_DATASET,
+            VariableEntry.VARIABLE_ENTRY,
+            VariableValue.VARIABLE_VALUE);
     }
 }

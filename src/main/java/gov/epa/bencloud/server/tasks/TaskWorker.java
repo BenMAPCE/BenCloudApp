@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import gov.epa.bencloud.server.database.JooqUtil;
 import gov.epa.bencloud.server.tasks.local.HIFTaskRunnable;
 import gov.epa.bencloud.server.tasks.local.TaskWorkerRunnable;
+import gov.epa.bencloud.server.tasks.local.ValuationTaskRunnable;
 import gov.epa.bencloud.server.tasks.model.Task;
 import gov.epa.bencloud.server.util.ApplicationUtil;
 
@@ -106,6 +107,11 @@ public class TaskWorker {
 			switch (task.getType()) {
 			case "HIF":
 				 t = new Thread(new HIFTaskRunnable(task.getUuid(), taskWorkerUuid));
+				 t.start();
+				break;
+				
+			case "Valuation":
+				 t = new Thread(new ValuationTaskRunnable(task.getUuid(), taskWorkerUuid));
 				 t.start();
 				break;
 

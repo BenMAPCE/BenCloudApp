@@ -181,7 +181,7 @@ public class TaskComplete {
 		return data;
 	} 
 
-	private static Task getTaskFromCompleteRecord(String uuid) {
+	public static Task getTaskFromCompleteRecord(String uuid) {
 
 		Task task = new Task();
 

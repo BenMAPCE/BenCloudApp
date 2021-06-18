@@ -14,13 +14,16 @@ import gov.epa.bencloud.server.database.jooq.tables.Gender;
 import gov.epa.bencloud.server.database.jooq.tables.GridDefinition;
 import gov.epa.bencloud.server.database.jooq.tables.HealthImpactFunction;
 import gov.epa.bencloud.server.database.jooq.tables.HealthImpactFunctionDataset;
-import gov.epa.bencloud.server.database.jooq.tables.HifResultDatasets;
-import gov.epa.bencloud.server.database.jooq.tables.HifResults;
+import gov.epa.bencloud.server.database.jooq.tables.HifResult;
+import gov.epa.bencloud.server.database.jooq.tables.HifResultDataset;
+import gov.epa.bencloud.server.database.jooq.tables.HifResultFunctionConfig;
 import gov.epa.bencloud.server.database.jooq.tables.IncidenceDataset;
 import gov.epa.bencloud.server.database.jooq.tables.IncidenceEntry;
 import gov.epa.bencloud.server.database.jooq.tables.IncidenceValue;
 import gov.epa.bencloud.server.database.jooq.tables.IncomeGrowthAdjDataset;
 import gov.epa.bencloud.server.database.jooq.tables.IncomeGrowthAdjFactor;
+import gov.epa.bencloud.server.database.jooq.tables.InflationDataset;
+import gov.epa.bencloud.server.database.jooq.tables.InflationEntry;
 import gov.epa.bencloud.server.database.jooq.tables.Pollutant;
 import gov.epa.bencloud.server.database.jooq.tables.PollutantMetric;
 import gov.epa.bencloud.server.database.jooq.tables.PopConfig;
@@ -35,6 +38,14 @@ import gov.epa.bencloud.server.database.jooq.tables.SeasonalMetricSeason;
 import gov.epa.bencloud.server.database.jooq.tables.TaskComplete;
 import gov.epa.bencloud.server.database.jooq.tables.TaskQueue;
 import gov.epa.bencloud.server.database.jooq.tables.TaskWorker;
+import gov.epa.bencloud.server.database.jooq.tables.ValuationFunction;
+import gov.epa.bencloud.server.database.jooq.tables.ValuationFunctionDataset;
+import gov.epa.bencloud.server.database.jooq.tables.ValuationResult;
+import gov.epa.bencloud.server.database.jooq.tables.ValuationResultDataset;
+import gov.epa.bencloud.server.database.jooq.tables.ValuationResultFunctionConfig;
+import gov.epa.bencloud.server.database.jooq.tables.VariableDataset;
+import gov.epa.bencloud.server.database.jooq.tables.VariableEntry;
+import gov.epa.bencloud.server.database.jooq.tables.VariableValue;
 
 
 /**
@@ -94,14 +105,19 @@ public class Tables {
     public static final HealthImpactFunctionDataset HEALTH_IMPACT_FUNCTION_DATASET = HealthImpactFunctionDataset.HEALTH_IMPACT_FUNCTION_DATASET;
 
     /**
-     * The table <code>data.hif_result_datasets</code>.
+     * The table <code>data.hif_result</code>.
      */
-    public static final HifResultDatasets HIF_RESULT_DATASETS = HifResultDatasets.HIF_RESULT_DATASETS;
+    public static final HifResult HIF_RESULT = HifResult.HIF_RESULT;
 
     /**
-     * The table <code>data.hif_results</code>.
+     * The table <code>data.hif_result_dataset</code>.
      */
-    public static final HifResults HIF_RESULTS = HifResults.HIF_RESULTS;
+    public static final HifResultDataset HIF_RESULT_DATASET = HifResultDataset.HIF_RESULT_DATASET;
+
+    /**
+     * The table <code>data.hif_result_function_config</code>.
+     */
+    public static final HifResultFunctionConfig HIF_RESULT_FUNCTION_CONFIG = HifResultFunctionConfig.HIF_RESULT_FUNCTION_CONFIG;
 
     /**
      * The table <code>data.incidence_dataset</code>.
@@ -127,6 +143,16 @@ public class Tables {
      * The table <code>data.income_growth_adj_factor</code>.
      */
     public static final IncomeGrowthAdjFactor INCOME_GROWTH_ADJ_FACTOR = IncomeGrowthAdjFactor.INCOME_GROWTH_ADJ_FACTOR;
+
+    /**
+     * The table <code>data.inflation_dataset</code>.
+     */
+    public static final InflationDataset INFLATION_DATASET = InflationDataset.INFLATION_DATASET;
+
+    /**
+     * The table <code>data.inflation_entry</code>.
+     */
+    public static final InflationEntry INFLATION_ENTRY = InflationEntry.INFLATION_ENTRY;
 
     /**
      * The table <code>data.pollutant</code>.
@@ -197,4 +223,44 @@ public class Tables {
      * The table <code>data.task_worker</code>.
      */
     public static final TaskWorker TASK_WORKER = TaskWorker.TASK_WORKER;
+
+    /**
+     * The table <code>data.valuation_function</code>.
+     */
+    public static final ValuationFunction VALUATION_FUNCTION = ValuationFunction.VALUATION_FUNCTION;
+
+    /**
+     * The table <code>data.valuation_function_dataset</code>.
+     */
+    public static final ValuationFunctionDataset VALUATION_FUNCTION_DATASET = ValuationFunctionDataset.VALUATION_FUNCTION_DATASET;
+
+    /**
+     * The table <code>data.valuation_result</code>.
+     */
+    public static final ValuationResult VALUATION_RESULT = ValuationResult.VALUATION_RESULT;
+
+    /**
+     * The table <code>data.valuation_result_dataset</code>.
+     */
+    public static final ValuationResultDataset VALUATION_RESULT_DATASET = ValuationResultDataset.VALUATION_RESULT_DATASET;
+
+    /**
+     * The table <code>data.valuation_result_function_config</code>.
+     */
+    public static final ValuationResultFunctionConfig VALUATION_RESULT_FUNCTION_CONFIG = ValuationResultFunctionConfig.VALUATION_RESULT_FUNCTION_CONFIG;
+
+    /**
+     * The table <code>data.variable_dataset</code>.
+     */
+    public static final VariableDataset VARIABLE_DATASET = VariableDataset.VARIABLE_DATASET;
+
+    /**
+     * The table <code>data.variable_entry</code>.
+     */
+    public static final VariableEntry VARIABLE_ENTRY = VariableEntry.VARIABLE_ENTRY;
+
+    /**
+     * The table <code>data.variable_value</code>.
+     */
+    public static final VariableValue VARIABLE_VALUE = VariableValue.VARIABLE_VALUE;
 }

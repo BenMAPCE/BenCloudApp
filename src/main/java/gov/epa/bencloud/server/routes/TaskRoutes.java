@@ -4,19 +4,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.github.javafaker.Faker;
-
 import freemarker.template.Configuration;
-import gov.epa.bencloud.api.HIFApi;
-import gov.epa.bencloud.api.util.HIFUtil;
+import gov.epa.bencloud.api.util.ApiUtil;
 import gov.epa.bencloud.server.tasks.TaskComplete;
 import gov.epa.bencloud.server.tasks.TaskQueue;
 import gov.epa.bencloud.server.tasks.model.Task;
@@ -107,7 +102,7 @@ public class TaskRoutes extends RoutesBase {
 			
 			String bcoUserIdentifier = getOrSetOrExtendCookie(req, res);
 			
-			return HIFApi.getHifResultDetails(req, res);
+			return ApiUtil.getTaskResultDetails(req, res);
 
 		});
 	}

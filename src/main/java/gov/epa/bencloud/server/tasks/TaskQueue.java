@@ -7,8 +7,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
-import java.util.UUID;
-
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.exception.DataAccessException;

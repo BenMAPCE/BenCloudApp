@@ -5,8 +5,6 @@ import static gov.epa.bencloud.server.database.jooq.Tables.*;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.Map;
 
 import org.jooq.InsertValuesStep7;
@@ -28,7 +26,6 @@ import gov.epa.bencloud.api.util.ApiUtil;
 import gov.epa.bencloud.server.database.JooqUtil;
 import gov.epa.bencloud.server.database.jooq.tables.records.AirQualityCellRecord;
 import gov.epa.bencloud.server.database.jooq.tables.records.AirQualityLayerRecord;
-import gov.epa.bencloud.server.util.DataUtil;
 import spark.Request;
 import spark.Response;
 

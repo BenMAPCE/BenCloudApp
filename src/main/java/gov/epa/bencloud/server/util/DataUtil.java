@@ -45,6 +45,10 @@ public class DataUtil {
 				humanReadableTime.append(seconds).append(" seconds").append(" ");
 			}
 		}
+		
+		if(hours==0 && minutes==0 && seconds==0) {
+			humanReadableTime.append("0 seconds");
+		}
 	}
 
 }

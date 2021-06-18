@@ -81,6 +81,19 @@
 	            <@forms.end_smartforms_column />
             <@forms.end_smartforms_row />
 
+           <@forms.start_smartforms_row />
+	            <@forms.start_smartforms_column width=4 />
+            		<@forms.start_smartforms_section />
+		               	<@forms.smartforms_single_select_json 
+		                		id="population"
+		 						label="Population"
+								defaultValueText="Select Population Dataset"
+		 						value=""
+		 						required=true
+		 						/>
+	            	<@forms.end_smartforms_section />
+	            <@forms.end_smartforms_column />
+            <@forms.end_smartforms_row />
 
           <@forms.start_smartforms_row />
 	            <@forms.start_smartforms_column width=4 />
@@ -96,15 +109,6 @@
 		  <@forms.end_smartforms_row />
 
 
-		<@forms.smartforms_hidden_text_field 
-			id="population"
-			value="40"
-		/>
-
-		<@forms.smartforms_hidden_text_field 
-			id="fucntion_type"
-			value="HIF"
-		/>
 		 
 		<@forms.end_smartforms_section />
 
@@ -159,6 +163,36 @@
 		});
 	}
 	
+		function loadPopulationOptions() {
+	
+		formData = new FormData();
+	
+		$.ajax({
+			type 		: "GET", 
+			url 		: "/api/load-population-options", 
+			data 		: formData,
+			dataType 	: "json",
+			cache		: false,
+			processData	: false,
+		    contentType	: false
+		})
+		.done(function(data) {
+			
+			$(".population").select2({
+				data: data
+			})
+	
+		})
+		.fail(function(data) {
+		
+			console.log("fail...");
+			console.log(data);
+	
+		})
+		.always(function() {
+		});
+	}
+	
 	
 	function loadFunctions() {
 	
@@ -194,8 +228,9 @@
 	
 		$('.hif-form-body .messages-wrapper').hide();
 
-		loadAirQualityOptions()
-		loadFunctions()
+		loadAirQualityOptions();
+		loadPopulationOptions();
+		loadFunctions();
 		
 	    $(' .submit').on('click', function(event){
 	  
@@ -261,8 +296,9 @@
 		hifJSON.airQualityData.push(airQualityScenario)
 		
 		population = {};
-		population.id = 40
-		population.year = 2020
+		population.id = $('.population').select2('data')[0].id;
+		//Right now, we only have 2010 and 2024 pop datasets. Hardcoding this for the moment.
+		population.year = population.id=='41' ? 2024 : 2010;
 		
 		hifJSON.population = population;
 		

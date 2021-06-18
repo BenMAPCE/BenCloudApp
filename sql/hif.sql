@@ -30,5 +30,6 @@ CREATE TABLE data.hif_results (
 	grid_cell_id int8 NULL,
 	population numeric,
 	delta numeric,
-    result numeric
+    result numeric,
+	baseline numeric
 );

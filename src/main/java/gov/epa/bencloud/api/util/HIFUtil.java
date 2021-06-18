@@ -5,20 +5,22 @@ import static gov.epa.bencloud.server.database.jooq.Tables.*;
 import java.util.ArrayList;
 
 import org.jooq.DSLContext;
-import org.jooq.InsertResultStep;
 import org.jooq.impl.DSL;
 import org.mariuszgromada.math.mxparser.*;
 
+import gov.epa.bencloud.api.model.HIFConfig;
+import gov.epa.bencloud.api.model.HIFTaskConfig;
 import gov.epa.bencloud.server.database.JooqUtil;
-import gov.epa.bencloud.server.database.jooq.tables.records.HifResultsRecord;
 import gov.epa.bencloud.server.database.jooq.tables.records.HealthImpactFunctionRecord;
-import gov.epa.bencloud.server.database.jooq.tables.records.HifResultDatasetsRecord;
+import gov.epa.bencloud.server.database.jooq.tables.records.HifResultDatasetRecord;
+import gov.epa.bencloud.server.database.jooq.tables.records.HifResultRecord;
 import gov.epa.bencloud.server.tasks.model.Task;
 
 public class HIFUtil {
 
-	public static Expression getFunctionExpression(Integer id) {
+	public static Expression[] getFunctionAndBaselineExpression(Integer id) {
 
+		Expression[] functionAndBaselineExpressions = new Expression[2];
 		// Load the function by id
 		DSLContext create = DSL.using(JooqUtil.getJooqConfiguration());
 
@@ -41,8 +43,10 @@ public class HIFUtil {
 		Argument population = new Argument("POPULATION", 0.0);
 		
 		// return the expression
-		Expression e = new Expression(record.getFunctionText(), a, b, c, beta, deltaQ, q1, q2, incidence, prevalence, population);		
-		return e;
+		functionAndBaselineExpressions[0] = new Expression(record.getFunctionText(), a, b, c, beta, deltaQ, q1, q2, incidence, prevalence, population);		
+		functionAndBaselineExpressions[1] = new Expression(record.getBaselineFunctionText(), a, b, c, beta, deltaQ, q1, q2, incidence, prevalence, population);		
+
+		return functionAndBaselineExpressions;
 	}
 
 	public static HealthImpactFunctionRecord getFunctionDefinition(Integer id) {
@@ -58,16 +62,59 @@ public class HIFUtil {
 		return record;
 	}
 	
-	public static void storeResults(Task task, ArrayList<HifResultsRecord> hifResults) {
+	public static void storeResults(Task task, HIFTaskConfig hifTaskConfig, ArrayList<HifResultRecord> hifResults) {
 		DSLContext create = DSL.using(JooqUtil.getJooqConfiguration());
 		
-		HifResultDatasetsRecord record = create.insertInto(HIF_RESULT_DATASETS, HIF_RESULT_DATASETS.TASK_UUID)
-		.values(task.getUuid())
-		.returning(HIF_RESULT_DATASETS.ID)
+		// HIF result dataset record links the result dataset id to the task uuid
+		HifResultDatasetRecord hifResultDatasetRecord = create.insertInto(
+				HIF_RESULT_DATASET
+				, HIF_RESULT_DATASET.TASK_UUID
+				, HIF_RESULT_DATASET.NAME
+				, HIF_RESULT_DATASET.POPULATION_DATASET_ID
+				, HIF_RESULT_DATASET.POPULATION_YEAR
+				, HIF_RESULT_DATASET.BASELINE_AQ_LAYER_ID
+				, HIF_RESULT_DATASET.SCENARIO_AQ_LAYER_ID
+				)
+		.values(
+				task.getUuid()
+				, hifTaskConfig.name
+				, hifTaskConfig.popId
+				, hifTaskConfig.popYear
+				, hifTaskConfig.aqBaselineId
+				, hifTaskConfig.aqScenarioId)
+		.returning(HIF_RESULT_DATASET.ID)
 		.fetchOne();
 		
-		for(HifResultsRecord hifResult : hifResults) {
-			hifResult.setHifResultDatasetId(record.getId());
+		// Each HIF result function config contains the details of how the function was configured
+		for(HIFConfig hif : hifTaskConfig.hifs) {
+			create.insertInto(HIF_RESULT_FUNCTION_CONFIG
+					, HIF_RESULT_FUNCTION_CONFIG.HIF_RESULT_DATASET_ID
+					, HIF_RESULT_FUNCTION_CONFIG.HIF_ID
+					, HIF_RESULT_FUNCTION_CONFIG.START_AGE
+					, HIF_RESULT_FUNCTION_CONFIG.END_AGE
+					, HIF_RESULT_FUNCTION_CONFIG.RACE_ID
+					, HIF_RESULT_FUNCTION_CONFIG.GENDER_ID
+					, HIF_RESULT_FUNCTION_CONFIG.ETHNICITY_ID
+					, HIF_RESULT_FUNCTION_CONFIG.INCIDENCE_DATASET_ID
+					, HIF_RESULT_FUNCTION_CONFIG.PREVALENCE_DATASET_ID
+					, HIF_RESULT_FUNCTION_CONFIG.VARIABLE_DATASET_ID)
+			.values(hifResultDatasetRecord.getId()
+					, hif.hifId
+					, hif.startAge
+					, hif.endAge
+					, hif.race
+					, hif.gender
+					, hif.ethnicity
+					, hif.incidence
+					, hif.prevalence
+					, hif.variable)
+			.execute();
+			
+		}
+
+		// Finally, store the actual estimates
+		for(HifResultRecord hifResult : hifResults) {
+			hifResult.setHifResultDatasetId(hifResultDatasetRecord.getId());
 		}
 		
 		create
@@ -75,23 +122,5 @@ public class HIFUtil {
 		.execute();	
 	}
 	
-	public static void main(String[] args) {
-		Argument a = new Argument("A", 0.98148);
-		Argument b = new Argument("B", 0.0);
-		Argument c = new Argument("C", 0.0);
-		Argument beta = new Argument("BETA", 0.024121307);
-		Argument deltaQ = new Argument("DELTAQ", 0.5);
-		Argument q1 = new Argument("Q0", 1.0);
-		Argument q2 = new Argument("Q1", 0.5);
-		Argument incidence = new Argument("INCIDENCE", 0.5);
-		Argument prevalence = new Argument("PREVALENCE", 0.0);
-		Argument population = new Argument("POPULATION", 500.0);
-		
-		// return the expression
-		mXparser.setToOverrideBuiltinTokens();
-		Expression e = new Expression("(1-(1/((1-INCIDENCE)*exp(BETA*DELTAQ)+INCIDENCE)))*INCIDENCE*POPULATION*A", a, b, c, beta, deltaQ, q1, q2, incidence, prevalence, population);					
-		Double d = e.calculate();
-		System.out.println(d);
-
-	}
+	
 }

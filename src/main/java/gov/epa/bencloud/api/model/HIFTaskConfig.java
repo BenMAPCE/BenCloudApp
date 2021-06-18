@@ -1,4 +1,4 @@
-package gov.epa.bencloud.api.util;
+package gov.epa.bencloud.api.model;
 
 import java.util.ArrayList;
 import java.util.List;

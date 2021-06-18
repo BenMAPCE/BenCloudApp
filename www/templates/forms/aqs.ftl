@@ -196,7 +196,7 @@
 			var hiddenElement = document.createElement('a');
 			hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(data);
 	    	hiddenElement.target = '_blank';
-	    	hiddenElement.download = name;
+	    	hiddenElement.download = name + ".csv";
 	    	hiddenElement.click();
     
 		})

@@ -4,6 +4,7 @@
 package gov.epa.bencloud.server.database.jooq;
 
 
+import gov.epa.bencloud.server.database.jooq.tables.PopulationEntry;
 import gov.epa.bencloud.server.database.jooq.tables.TaskComplete;
 import gov.epa.bencloud.server.database.jooq.tables.TaskQueue;
 import gov.epa.bencloud.server.database.jooq.tables.TaskWorker;
@@ -24,6 +25,9 @@ public class Indexes {
     // INDEX definitions
     // -------------------------------------------------------------------------
 
+    public static final Index POPULATION_ENTRY_GRID_CELL_ID_IDX = Internal.createIndex(DSL.name("population_entry_grid_cell_id_idx"), PopulationEntry.POPULATION_ENTRY, new OrderField[] { PopulationEntry.POPULATION_ENTRY.GRID_CELL_ID }, false);
+    public static final Index POPULATION_ENTRY_GRID_COL_IDX = Internal.createIndex(DSL.name("population_entry_grid_col_idx"), PopulationEntry.POPULATION_ENTRY, new OrderField[] { PopulationEntry.POPULATION_ENTRY.GRID_COL }, false);
+    public static final Index POPULATION_ENTRY_GRID_ROW_IDX = Internal.createIndex(DSL.name("population_entry_grid_row_idx"), PopulationEntry.POPULATION_ENTRY, new OrderField[] { PopulationEntry.POPULATION_ENTRY.GRID_ROW }, false);
     public static final Index TASK_COMPLETE_ON_DATE = Internal.createIndex(DSL.name("task_complete_on_date"), TaskComplete.TASK_COMPLETE, new OrderField[] { TaskComplete.TASK_COMPLETE.TASK_COMPLETED_DATE }, false);
     public static final Index TASK_COMPLETE_ON_UUID = Internal.createIndex(DSL.name("task_complete_on_uuid"), TaskComplete.TASK_COMPLETE, new OrderField[] { TaskComplete.TASK_COMPLETE.TASK_UUID }, false);
     public static final Index TASK_QUEUE_ON_DATE = Internal.createIndex(DSL.name("task_queue_on_date"), TaskQueue.TASK_QUEUE, new OrderField[] { TaskQueue.TASK_QUEUE.TASK_SUBMITTED_DATE }, false);

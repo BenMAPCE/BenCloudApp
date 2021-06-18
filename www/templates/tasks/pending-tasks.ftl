@@ -108,7 +108,7 @@
 		if (!$.fn.DataTable.isDataTable('#pending-datatable')) {
 	
 			resultsDatatable = $('#pending-datatable').DataTable({
-				"processing": true,
+				"processing": false,
 				"serverSide": false,
 				"sServerMethod": "GET",
 				"pageLength": 25,
@@ -157,6 +157,8 @@
 			$('#pending-datatable').DataTable().ajax.reload();
 		}
 		
+		autoRefresh();
+		
 		$('#pending-datatable tfoot th').each( function () {
 	        if ($(this).index() < 4) {
 		        $(this).html( '<input type="text" placeholder="Filter" />' );
@@ -164,6 +166,11 @@
 	    } );
 
 	});
+
+	function autoRefresh() {
+		$('#pending-datatable').DataTable().ajax.reload();
+		setTimeout(() => { autoRefresh(); }, 1000);
+	}
 
 	function createPendingEllipsis(row){
 		

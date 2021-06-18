@@ -21,8 +21,8 @@ public class SQLPrinter extends DefaultExecuteListener {
         // ... and the flag for pretty-printing
         new Settings().withRenderFormatted(true));
 
-        // If we're executing a query
-        if (ctx.query() != null) {
+        // If we're executing a query (skip the polling of the task_worker table to reduce noise)
+        if (ctx.query() != null && !ctx.query().getSQL().contains("task_worker") && !ctx.query().getSQL().contains("task_queue") && !ctx.query().getSQL().contains("task_complete")) {
             System.out.println(create.renderInlined(ctx.query()));
         }
         

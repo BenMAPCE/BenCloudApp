@@ -1,13 +1,6 @@
 package gov.epa.bencloud.server.routes;
 
-import static gov.epa.bencloud.server.database.jooq.Tables.AIR_QUALITY_LAYER;
-import static gov.epa.bencloud.server.database.jooq.Tables.ENDPOINT;
-import static gov.epa.bencloud.server.database.jooq.Tables.ETHNICITY;
-import static gov.epa.bencloud.server.database.jooq.Tables.GENDER;
-import static gov.epa.bencloud.server.database.jooq.Tables.HEALTH_IMPACT_FUNCTION;
-import static gov.epa.bencloud.server.database.jooq.Tables.RACE;
-import static gov.epa.bencloud.server.database.jooq.Tables.GRID_DEFINITION;
-import static gov.epa.bencloud.server.database.jooq.Tables.POLLUTANT;
+import static gov.epa.bencloud.server.database.jooq.Tables.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -161,26 +154,30 @@ public class ApiRoutes extends RoutesBase {
 			
 		});
 		
-		
-		service.get("/api/load-states", (request, response) -> {
+		service.get("/api/load-population-options", (request, response) -> {
 			
 			ObjectMapper mapper = new ObjectMapper();
 
-			ArrayNode states = mapper.createArrayNode();
-			ObjectNode state = mapper.createObjectNode();
+			ArrayNode options = mapper.createArrayNode();
+			ObjectNode option = mapper.createObjectNode();
 
-			state = mapper.createObjectNode();
-			state.put("state_abbr", "OR");
-			state.put("state_name", "Oregon");
-			states.add(state);
+			Result<Record> result = DSL.using(JooqUtil.getJooqConfiguration())
+					.select(POPULATION_DATASET.asterisk())
+					.from(POPULATION_DATASET)
+					.orderBy(POPULATION_DATASET.NAME)
+					.fetch();
+			for (Record r : result) {
+				option = mapper.createObjectNode();
+				option.put("id", r.getValue(POPULATION_DATASET.ID));
+				option.put("text", 
+						r.getValue(POPULATION_DATASET.NAME)
+					);
+
+				options.add(option);
+			}
+						
+			return options;
 			
-			state = mapper.createObjectNode();
-			state.put("state_abbr", "PA");
-			state.put("state_name", "Pensylvania");
-			states.add(state);
-			
-			
-			return states;
 		});
 
 		service.get("/api/load-functions", (request, response) -> {
@@ -217,22 +214,6 @@ public class ApiRoutes extends RoutesBase {
 			}
 						
 			return options;
-		});
-
-		service.post("/api/submit-hif", (request, response) -> {
-			
-			
-			List<String> parameterNames = getPostParametersNames(request);
-			
-			for (String parameterName : parameterNames) {
-				
-				//System.out.println(parameterName);
-				
-			}
-			
-			
-			Map<String, Object> attributes = new HashMap<>();
-			return FreeMarkerRenderUtil.render(freeMarkerConfiguration, attributes, "/demo/demo.ftl");
 		});
 
 	}

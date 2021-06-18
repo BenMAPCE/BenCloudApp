@@ -61,9 +61,9 @@ public class Sequences {
     public static final Sequence<Integer> HEALTH_IMPACT_FUNCTION_ID_SEQ = Internal.createSequence("health_impact_function_id_seq", Data.DATA, SQLDataType.INTEGER.nullable(false), null, null, null, null, false, null);
 
     /**
-     * The sequence <code>data.hif_result_datasets_id_seq</code>
+     * The sequence <code>data.hif_result_dataset_id_seq</code>
      */
-    public static final Sequence<Integer> HIF_RESULT_DATASETS_ID_SEQ = Internal.createSequence("hif_result_datasets_id_seq", Data.DATA, SQLDataType.INTEGER.nullable(false), null, null, null, null, false, null);
+    public static final Sequence<Integer> HIF_RESULT_DATASET_ID_SEQ = Internal.createSequence("hif_result_dataset_id_seq", Data.DATA, SQLDataType.INTEGER.nullable(false), null, null, null, null, false, null);
 
     /**
      * The sequence <code>data.incidence_dataset_id_seq</code>
@@ -84,6 +84,11 @@ public class Sequences {
      * The sequence <code>data.income_growth_adj_factor_id_seq</code>
      */
     public static final Sequence<Integer> INCOME_GROWTH_ADJ_FACTOR_ID_SEQ = Internal.createSequence("income_growth_adj_factor_id_seq", Data.DATA, SQLDataType.INTEGER.nullable(false), null, null, null, null, false, null);
+
+    /**
+     * The sequence <code>data.inflation_dataset_id_seq</code>
+     */
+    public static final Sequence<Integer> INFLATION_DATASET_ID_SEQ = Internal.createSequence("inflation_dataset_id_seq", Data.DATA, SQLDataType.INTEGER.nullable(false), null, null, null, null, false, null);
 
     /**
      * The sequence <code>data.pollutant_id_seq</code>
@@ -134,4 +139,29 @@ public class Sequences {
      * The sequence <code>data.task_worker_task_id_seq</code>
      */
     public static final Sequence<Long> TASK_WORKER_TASK_ID_SEQ = Internal.createSequence("task_worker_task_id_seq", Data.DATA, SQLDataType.BIGINT.nullable(false), null, null, null, null, false, null);
+
+    /**
+     * The sequence <code>data.valuation_function_dataset_id_seq</code>
+     */
+    public static final Sequence<Integer> VALUATION_FUNCTION_DATASET_ID_SEQ = Internal.createSequence("valuation_function_dataset_id_seq", Data.DATA, SQLDataType.INTEGER.nullable(false), null, null, null, null, false, null);
+
+    /**
+     * The sequence <code>data.valuation_function_id_seq</code>
+     */
+    public static final Sequence<Integer> VALUATION_FUNCTION_ID_SEQ = Internal.createSequence("valuation_function_id_seq", Data.DATA, SQLDataType.INTEGER.nullable(false), null, null, null, null, false, null);
+
+    /**
+     * The sequence <code>data.valuation_result_dataset_id_seq</code>
+     */
+    public static final Sequence<Integer> VALUATION_RESULT_DATASET_ID_SEQ = Internal.createSequence("valuation_result_dataset_id_seq", Data.DATA, SQLDataType.INTEGER.nullable(false), null, null, null, null, false, null);
+
+    /**
+     * The sequence <code>data.variable_dataset_id_seq</code>
+     */
+    public static final Sequence<Integer> VARIABLE_DATASET_ID_SEQ = Internal.createSequence("variable_dataset_id_seq", Data.DATA, SQLDataType.INTEGER.nullable(false), null, null, null, null, false, null);
+
+    /**
+     * The sequence <code>data.variable_entry_id_seq</code>
+     */
+    public static final Sequence<Integer> VARIABLE_ENTRY_ID_SEQ = Internal.createSequence("variable_entry_id_seq", Data.DATA, SQLDataType.INTEGER.nullable(false), null, null, null, null, false, null);
 }
