@@ -17,6 +17,7 @@ Here's the tricky bit. Once the hif_result_dataset is selected, we need to prese
 
 The /api/load-valuation-functions endpoint needs to be implemented.
 
+For the valuation function selection field, show a concatenation of "Endpoint | Start Age - End Age | Function Text | Qualifier"
 
 ## Example JSON created by the above form that is posted to /tasks
 
