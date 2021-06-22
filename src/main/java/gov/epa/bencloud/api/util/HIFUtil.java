@@ -35,6 +35,8 @@ public class HIFUtil {
 		Argument b = new Argument("B", record.getValB().doubleValue());
 		Argument c = new Argument("C", record.getValC().doubleValue());
 		Argument beta = new Argument("BETA", record.getBeta().doubleValue());
+		
+		//The following will be set while iterating cells
 		Argument deltaQ = new Argument("DELTAQ", 0.0);
 		Argument q1 = new Argument("Q0", 0.0);
 		Argument q2 = new Argument("Q1", 0.0);

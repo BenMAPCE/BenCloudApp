@@ -57,6 +57,20 @@
 	            <@forms.start_smartforms_column width=4 />
             		<@forms.start_smartforms_section />
 		               	<@forms.smartforms_single_select_json 
+		                		id="pollutant"
+		 						label="Pollutant"
+								defaultValueText="Select Pollutant"
+		 						value=""
+		 						required=true
+		 						/>
+	            	<@forms.end_smartforms_section />
+	            <@forms.end_smartforms_column />
+            <@forms.end_smartforms_row />
+            
+           <@forms.start_smartforms_row />
+	            <@forms.start_smartforms_column width=4 />
+            		<@forms.start_smartforms_section />
+		               	<@forms.smartforms_single_select_json 
 		                		id="air_quality_baseline"
 		 						label="Air Quality (Baseline)"
 								defaultValueText="Select Baseline Air Quality"
@@ -136,6 +150,40 @@
 		$.ajax({
 			type 		: "GET", 
 			url 		: "/api/load-air-quality-options", 
+			data 		: "pollutant="+$('.pollutant').select2('data')[0].id,
+			dataType 	: "json",
+			cache		: false,
+			processData	: false,
+		    contentType	: false
+		})
+		.done(function(data) {
+			$(".air_quality_baseline").empty();
+			$(".air_quality_baseline").select2({
+				data: data
+			})
+			$(".air_quality_scenario").empty();
+			$(".air_quality_scenario").select2({
+				data: data
+			})
+	
+		})
+		.fail(function(data) {
+		
+			console.log("fail...");
+			console.log(data);
+	
+		})
+		.always(function() {
+		});
+	}
+	
+	function loadPollutantOptions() {
+	
+		formData = new FormData();
+	
+		$.ajax({
+			type 		: "GET", 
+			url 		: "/api/load-pollutant-options", 
 			data 		: formData,
 			dataType 	: "json",
 			cache		: false,
@@ -144,11 +192,7 @@
 		})
 		.done(function(data) {
 			
-			$(".air_quality_baseline").select2({
-				data: data
-			})
-
-			$(".air_quality_scenario").select2({
+			$(".pollutant").select2({
 				data: data
 			})
 	
@@ -197,18 +241,18 @@
 	function loadFunctions() {
 	
 		formData = new FormData();
-	
+
 		$.ajax({
 			type 		: "GET", 
 			url 		: "/api/load-functions", 
-			data 		: formData,
+			data 		: "pollutant="+$('.pollutant').select2('data')[0].id,
 			dataType 	: "json",
 			cache		: false,
 			processData	: false,
 		    contentType	: false
 		})
 		.done(function(data) {
-			
+			$(".hif_functions").empty();
 			$(".hif_functions").select2({
 				data: data
 			})
@@ -228,9 +272,9 @@
 	
 		$('.hif-form-body .messages-wrapper').hide();
 
-		loadAirQualityOptions();
+		loadPollutantOptions();
 		loadPopulationOptions();
-		loadFunctions();
+
 		
 	    $(' .submit').on('click', function(event){
 	  
@@ -239,6 +283,13 @@
 			submitForm(parameters);
 				
 	 		event.preventDefault();
+	    });
+	    
+	   	$('.pollutant').on('change', function(event){
+	   		if($('.pollutant').select2('data')[0].id != "") { 
+	   			loadAirQualityOptions();
+				loadFunctions();
+			}
 	    });
 	
 	});

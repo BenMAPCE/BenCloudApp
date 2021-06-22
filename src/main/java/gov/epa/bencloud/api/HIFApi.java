@@ -24,7 +24,8 @@ public class HIFApi {
 	
 	public static Object getHifResultDetails(Request request, Response response) {
 		String uuid = request.params("uuid");
-
+		BigDecimal tmpZero = new BigDecimal(0);
+		
 		DSLContext create = DSL.using(JooqUtil.getJooqConfiguration());
 
 		Record1<Integer> id = create.select(HIF_RESULT_DATASET.ID).from(HIF_RESULT_DATASET)
@@ -42,7 +43,7 @@ Result<Record11<Integer, Integer, String, String, Integer, Integer, BigDecimal, 
 				HIF_RESULT.DELTA,
 // add mean?
 				HIF_RESULT.BASELINE,
-				HIF_RESULT.RESULT.div(HIF_RESULT.BASELINE).as("percent_of_baseline")
+				DSL.when(HIF_RESULT.BASELINE.eq(tmpZero), tmpZero).otherwise(HIF_RESULT.RESULT.div(HIF_RESULT.BASELINE)).as("percent_of_baseline")
 				)
 				.from(HIF_RESULT)
 				.join(HIF_RESULT_FUNCTION_CONFIG).on(HIF_RESULT_FUNCTION_CONFIG.HIF_RESULT_DATASET_ID.eq(HIF_RESULT.HIF_RESULT_DATASET_ID).and(HIF_RESULT_FUNCTION_CONFIG.HIF_ID.eq(HIF_RESULT.HIF_ID)))

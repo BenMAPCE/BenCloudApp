@@ -83,9 +83,16 @@ public class ApiRoutes extends RoutesBase {
 			ArrayNode options = mapper.createArrayNode();
 			ObjectNode option = mapper.createObjectNode();
 
+			String pollutantParam = request.raw().getParameter("pollutant");
+			Integer pollutant= -999;
+			if(pollutantParam != null) {
+				pollutant = Integer.valueOf(pollutantParam);
+			}
+			
 			Result<Record> result = DSL.using(JooqUtil.getJooqConfiguration())
 					.select(AIR_QUALITY_LAYER.asterisk())
 					.from(AIR_QUALITY_LAYER)
+					.where(pollutant==-999 ? DSL.noCondition() : AIR_QUALITY_LAYER.POLLUTANT_ID.eq(pollutant))
 					.orderBy(AIR_QUALITY_LAYER.NAME)
 					.fetch();
 			for (Record r : result) {
@@ -187,6 +194,12 @@ public class ApiRoutes extends RoutesBase {
 			ArrayNode options = mapper.createArrayNode();
 			ObjectNode option = mapper.createObjectNode();
 
+			String pollutantParam = request.raw().getParameter("pollutant");
+			Integer pollutant= -999;
+			if(pollutantParam != null) {
+				pollutant = Integer.valueOf(pollutantParam);
+			}
+			
 			Result<Record> result = DSL.using(JooqUtil.getJooqConfiguration())
 					.select(HEALTH_IMPACT_FUNCTION.asterisk(), ENDPOINT.NAME, RACE.NAME, GENDER.NAME, ETHNICITY.NAME)
 					.from(HEALTH_IMPACT_FUNCTION)
@@ -194,6 +207,7 @@ public class ApiRoutes extends RoutesBase {
 					.join(RACE).on(HEALTH_IMPACT_FUNCTION.RACE_ID.eq(RACE.ID))
 					.join(GENDER).on(HEALTH_IMPACT_FUNCTION.GENDER_ID.eq(GENDER.ID))
 					.join(ETHNICITY).on(HEALTH_IMPACT_FUNCTION.ETHNICITY_ID.eq(ETHNICITY.ID))
+					.where(pollutant==-999 ? DSL.noCondition() : HEALTH_IMPACT_FUNCTION.POLLUTANT_ID.eq(pollutant))
 					.orderBy(ENDPOINT.NAME, HEALTH_IMPACT_FUNCTION.AUTHOR, 
 							HEALTH_IMPACT_FUNCTION.START_AGE, HEALTH_IMPACT_FUNCTION.END_AGE)
 					.fetch();
@@ -207,7 +221,8 @@ public class ApiRoutes extends RoutesBase {
 						r.getValue(HEALTH_IMPACT_FUNCTION.END_AGE) + " | " + 
 						r.getValue(RACE.NAME) + " | " + 
 						r.getValue(GENDER.NAME) + " | " + 
-						r.getValue(ETHNICITY.NAME)
+						r.getValue(ETHNICITY.NAME) + 
+						  " | " + r.getValue(HEALTH_IMPACT_FUNCTION.QUALIFIER)
 					);
 
 				options.add(option);
