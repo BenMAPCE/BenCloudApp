@@ -13,7 +13,7 @@ import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row9;
+import org.jooq.Row14;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -89,6 +89,31 @@ public class HifResult extends TableImpl<HifResultRecord> {
      */
     public final TableField<HifResultRecord, BigDecimal> BASELINE = createField(DSL.name("baseline"), SQLDataType.NUMERIC, this, "");
 
+    /**
+     * The column <code>data.hif_result.result_mean</code>.
+     */
+    public final TableField<HifResultRecord, BigDecimal> RESULT_MEAN = createField(DSL.name("result_mean"), SQLDataType.NUMERIC, this, "");
+
+    /**
+     * The column <code>data.hif_result.standard_dev</code>.
+     */
+    public final TableField<HifResultRecord, BigDecimal> STANDARD_DEV = createField(DSL.name("standard_dev"), SQLDataType.NUMERIC, this, "");
+
+    /**
+     * The column <code>data.hif_result.result_variance</code>.
+     */
+    public final TableField<HifResultRecord, BigDecimal> RESULT_VARIANCE = createField(DSL.name("result_variance"), SQLDataType.NUMERIC, this, "");
+
+    /**
+     * The column <code>data.hif_result.pct2_5</code>.
+     */
+    public final TableField<HifResultRecord, BigDecimal> PCT2_5 = createField(DSL.name("pct2_5"), SQLDataType.NUMERIC, this, "");
+
+    /**
+     * The column <code>data.hif_result.pct97_5</code>.
+     */
+    public final TableField<HifResultRecord, BigDecimal> PCT97_5 = createField(DSL.name("pct97_5"), SQLDataType.NUMERIC, this, "");
+
     private HifResult(Name alias, Table<HifResultRecord> aliased) {
         this(alias, aliased, null);
     }
@@ -154,11 +179,11 @@ public class HifResult extends TableImpl<HifResultRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row9 type methods
+    // Row14 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row9<Integer, Integer, Integer, Integer, Long, BigDecimal, BigDecimal, BigDecimal, BigDecimal> fieldsRow() {
-        return (Row9) super.fieldsRow();
+    public Row14<Integer, Integer, Integer, Integer, Long, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal> fieldsRow() {
+        return (Row14) super.fieldsRow();
     }
 }

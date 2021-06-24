@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.util.Map;
 
 import org.jooq.InsertValuesStep7;
+import org.jooq.InsertValuesStep8;
 import org.jooq.JSONFormat;
 import org.jooq.Result;
 import org.jooq.JSONFormat.RecordFormat;
@@ -110,7 +111,7 @@ public class AirQualityApi {
 			int rowIdx=-999;
 			int metricIdx=-999;
 			int seasonalMetricIdx=-999;
-			int statisticIdx=-999;
+			int annualMetricIdx=-999;
 			int valuesIdx=-999;
 
 			String[] record;
@@ -130,19 +131,25 @@ public class AirQualityApi {
 				case "seasonalmetric":
 					seasonalMetricIdx=i;
 					break;
-				case "statistic":
-					statisticIdx=i;
+				case "annualmetric":
+					annualMetricIdx=i;
 					break;
 				case "values":
 					valuesIdx=i;
 					break;
 				}
 			}
-			String tmp = AirQualityUtil.validateModelColumnHeadings(columnIdx, rowIdx, metricIdx, seasonalMetricIdx, statisticIdx, valuesIdx);
+			String tmp = AirQualityUtil.validateModelColumnHeadings(columnIdx, rowIdx, metricIdx, seasonalMetricIdx, annualMetricIdx, valuesIdx);
 			if(tmp.length() > 0) {
 				response.status(400);
 				return "The following columns are missing: " + tmp;
 			}
+			
+			//TODO: Finish creating lookups for these metrics so we can fill them in properly in the insert below
+			//HashMap<String, Integer> pollutantMetricIdLookup = AirQualityUtil.getPollutantMetricIdLookup(pollutantId);
+			//HashMap<String, Integer> seasonalMetricIdLookup = AirQualityUtil.getSeasonalMetricIdLookup(pollutantId);
+			
+			
 			//TODO: Validate each record and abort before the batch.execute() if there's a problem.
 			//We might also need to clean up the header. Or, maybe we should make this a transaction?
 			
@@ -154,7 +161,7 @@ public class AirQualityApi {
 			.fetchOne();
 			
 			// Read the data rows and write to the db	
-			InsertValuesStep7<AirQualityCellRecord, Integer, Integer, Integer, Long, Integer, Integer, BigDecimal> batch = DSL.using(JooqUtil.getJooqConfiguration())
+			InsertValuesStep8<AirQualityCellRecord, Integer, Integer, Integer, Long, Integer, Integer, String, BigDecimal> batch = DSL.using(JooqUtil.getJooqConfiguration())
 					.insertInto(
 							AIR_QUALITY_CELL, 
 							AIR_QUALITY_CELL.AIR_QUALITY_LAYER_ID,
@@ -163,6 +170,7 @@ public class AirQualityApi {
 							AIR_QUALITY_CELL.GRID_CELL_ID,
 							AIR_QUALITY_CELL.METRIC_ID,
 							AIR_QUALITY_CELL.SEASONAL_METRIC_ID,
+							AIR_QUALITY_CELL.ANNUAL_METRIC,
 							AIR_QUALITY_CELL.VALUE
 							);
 			
@@ -172,8 +180,9 @@ public class AirQualityApi {
 						Integer.valueOf(record[columnIdx]), 
 						Integer.valueOf(record[rowIdx]),
 						Long.valueOf(ApiUtil.getCellId(Integer.valueOf(record[columnIdx]), Integer.valueOf(record[rowIdx]))),
-						Integer.valueOf(11),
-						Integer.valueOf(3), 
+						Integer.valueOf(11), //TODO
+						Integer.valueOf(3), //TODO
+						record[annualMetricIdx],
 						BigDecimal.valueOf(Double.valueOf(record[valuesIdx]))
 					);
 			}

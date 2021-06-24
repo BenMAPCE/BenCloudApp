@@ -5,7 +5,6 @@ package gov.epa.bencloud.server.database.jooq;
 
 
 import gov.epa.bencloud.server.database.jooq.tables.AgeRange;
-import gov.epa.bencloud.server.database.jooq.tables.AirQualityCell;
 import gov.epa.bencloud.server.database.jooq.tables.AirQualityLayer;
 import gov.epa.bencloud.server.database.jooq.tables.Endpoint;
 import gov.epa.bencloud.server.database.jooq.tables.EndpointGroup;
@@ -41,7 +40,6 @@ import gov.epa.bencloud.server.database.jooq.tables.ValuationResultDataset;
 import gov.epa.bencloud.server.database.jooq.tables.VariableDataset;
 import gov.epa.bencloud.server.database.jooq.tables.VariableEntry;
 import gov.epa.bencloud.server.database.jooq.tables.records.AgeRangeRecord;
-import gov.epa.bencloud.server.database.jooq.tables.records.AirQualityCellRecord;
 import gov.epa.bencloud.server.database.jooq.tables.records.AirQualityLayerRecord;
 import gov.epa.bencloud.server.database.jooq.tables.records.EndpointGroupRecord;
 import gov.epa.bencloud.server.database.jooq.tables.records.EndpointRecord;
@@ -131,9 +129,6 @@ public class Keys {
     // -------------------------------------------------------------------------
 
     public static final ForeignKey<AgeRangeRecord, PopConfigRecord> AGE_RANGE__AGE_RANGE_POP_CONFIG_ID_FKEY = Internal.createForeignKey(AgeRange.AGE_RANGE, DSL.name("age_range_pop_config_id_fkey"), new TableField[] { AgeRange.AGE_RANGE.POP_CONFIG_ID }, Keys.POP_CONFIG_PKEY, new TableField[] { PopConfig.POP_CONFIG.ID }, true);
-    public static final ForeignKey<AirQualityCellRecord, AirQualityLayerRecord> AIR_QUALITY_CELL__AIR_QUALITY_CELL_AIR_QUALITY_LAYER_ID_FKEY = Internal.createForeignKey(AirQualityCell.AIR_QUALITY_CELL, DSL.name("air_quality_cell_air_quality_layer_id_fkey"), new TableField[] { AirQualityCell.AIR_QUALITY_CELL.AIR_QUALITY_LAYER_ID }, Keys.AIR_QUALITY_LAYER_PKEY, new TableField[] { AirQualityLayer.AIR_QUALITY_LAYER.ID }, true);
-    public static final ForeignKey<AirQualityCellRecord, PollutantMetricRecord> AIR_QUALITY_CELL__AIR_QUALITY_CELL_METRIC_ID_FKEY = Internal.createForeignKey(AirQualityCell.AIR_QUALITY_CELL, DSL.name("air_quality_cell_metric_id_fkey"), new TableField[] { AirQualityCell.AIR_QUALITY_CELL.METRIC_ID }, Keys.POLLUTANT_METRIC_PKEY, new TableField[] { PollutantMetric.POLLUTANT_METRIC.ID }, true);
-    public static final ForeignKey<AirQualityCellRecord, SeasonalMetricRecord> AIR_QUALITY_CELL__AIR_QUALITY_CELL_SEASONAL_METRIC_ID_FKEY = Internal.createForeignKey(AirQualityCell.AIR_QUALITY_CELL, DSL.name("air_quality_cell_seasonal_metric_id_fkey"), new TableField[] { AirQualityCell.AIR_QUALITY_CELL.SEASONAL_METRIC_ID }, Keys.SEASONAL_METRIC_PKEY, new TableField[] { SeasonalMetric.SEASONAL_METRIC.ID }, true);
     public static final ForeignKey<AirQualityLayerRecord, GridDefinitionRecord> AIR_QUALITY_LAYER__AIR_QUALITY_LAYER_GRID_DEFINITION_ID_FKEY = Internal.createForeignKey(AirQualityLayer.AIR_QUALITY_LAYER, DSL.name("air_quality_layer_grid_definition_id_fkey"), new TableField[] { AirQualityLayer.AIR_QUALITY_LAYER.GRID_DEFINITION_ID }, Keys.GRID_DEFINITION_PKEY, new TableField[] { GridDefinition.GRID_DEFINITION.ID }, true);
     public static final ForeignKey<AirQualityLayerRecord, PollutantRecord> AIR_QUALITY_LAYER__AIR_QUALITY_LAYER_POLLUTANT_ID_FKEY = Internal.createForeignKey(AirQualityLayer.AIR_QUALITY_LAYER, DSL.name("air_quality_layer_pollutant_id_fkey"), new TableField[] { AirQualityLayer.AIR_QUALITY_LAYER.POLLUTANT_ID }, Keys.POLLUTANT_PKEY, new TableField[] { Pollutant.POLLUTANT.ID }, true);
     public static final ForeignKey<EndpointRecord, EndpointGroupRecord> ENDPOINT__ENDPOINT_ENDPOINT_GROUP_ID_FKEY = Internal.createForeignKey(Endpoint.ENDPOINT, DSL.name("endpoint_endpoint_group_id_fkey"), new TableField[] { Endpoint.ENDPOINT.ENDPOINT_GROUP_ID }, Keys.ENDPOINT_GROUP_PKEY, new TableField[] { EndpointGroup.ENDPOINT_GROUP.ID }, true);

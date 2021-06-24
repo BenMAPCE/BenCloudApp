@@ -13,7 +13,7 @@ import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row8;
+import org.jooq.Row13;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -84,6 +84,31 @@ public class ValuationResult extends TableImpl<ValuationResultRecord> {
      */
     public final TableField<ValuationResultRecord, BigDecimal> RESULT = createField(DSL.name("result"), SQLDataType.NUMERIC, this, "");
 
+    /**
+     * The column <code>data.valuation_result.result_mean</code>.
+     */
+    public final TableField<ValuationResultRecord, BigDecimal> RESULT_MEAN = createField(DSL.name("result_mean"), SQLDataType.NUMERIC, this, "");
+
+    /**
+     * The column <code>data.valuation_result.standard_dev</code>.
+     */
+    public final TableField<ValuationResultRecord, BigDecimal> STANDARD_DEV = createField(DSL.name("standard_dev"), SQLDataType.NUMERIC, this, "");
+
+    /**
+     * The column <code>data.valuation_result.result_variance</code>.
+     */
+    public final TableField<ValuationResultRecord, BigDecimal> RESULT_VARIANCE = createField(DSL.name("result_variance"), SQLDataType.NUMERIC, this, "");
+
+    /**
+     * The column <code>data.valuation_result.pct2_5</code>.
+     */
+    public final TableField<ValuationResultRecord, BigDecimal> PCT2_5 = createField(DSL.name("pct2_5"), SQLDataType.NUMERIC, this, "");
+
+    /**
+     * The column <code>data.valuation_result.pct97_5</code>.
+     */
+    public final TableField<ValuationResultRecord, BigDecimal> PCT97_5 = createField(DSL.name("pct97_5"), SQLDataType.NUMERIC, this, "");
+
     private ValuationResult(Name alias, Table<ValuationResultRecord> aliased) {
         this(alias, aliased, null);
     }
@@ -149,11 +174,11 @@ public class ValuationResult extends TableImpl<ValuationResultRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row8 type methods
+    // Row13 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row8<Integer, Integer, Integer, Integer, Integer, Long, BigDecimal, BigDecimal> fieldsRow() {
-        return (Row8) super.fieldsRow();
+    public Row13<Integer, Integer, Integer, Integer, Integer, Long, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal> fieldsRow() {
+        return (Row13) super.fieldsRow();
     }
 }

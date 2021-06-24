@@ -2,10 +2,13 @@ package gov.epa.bencloud.server.tasks.local;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.math3.distribution.NormalDistribution;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jooq.Record3;
 import org.jooq.Record6;
 import org.jooq.Result;
@@ -54,10 +57,11 @@ public class HIFTaskRunnable implements Runnable {
 			ArrayList<Expression> hifBaselineExpressionList = new ArrayList<Expression>();
 			ArrayList<HealthImpactFunctionRecord> hifDefinitionList = new ArrayList<HealthImpactFunctionRecord>();
 			ArrayList<Map<Long, Map<Integer, Double>>> incidenceLists = new ArrayList<Map<Long, Map<Integer, Double>>>();
-			
+			ArrayList<DescriptiveStatistics> hifDistributionStats = new ArrayList<DescriptiveStatistics>();
 			
 			TaskQueue.updateTaskPercentage(taskUuid, 1);
 			TaskWorker.updateTaskWorkerHeartbeat(taskWorkerUuid);
+			
 			
 			// Inspect each selected HIF and create parallel lists of math expressions and
 			// HIF config records
@@ -74,6 +78,14 @@ public class HIFTaskRunnable implements Runnable {
 				
 				Map<Long, Map<Integer, Double>> incidenceMap = IncidenceApi.getIncidenceEntryGroups(hifTaskConfig, hif, h);
 				incidenceLists.add(incidenceMap);
+				
+				NormalDistribution normalDistribution = new NormalDistribution(h.getBeta().doubleValue(), h.getP1Beta().doubleValue());
+				double[] samples = normalDistribution.sample(10000);
+				DescriptiveStatistics stats = new DescriptiveStatistics();
+				for( int i = 0; i < samples.length; i++) {
+			        stats.addValue(samples[i]);
+				}
+				hifDistributionStats.add(stats);
 			}
 
 			TaskQueue.updateTaskPercentage(taskUuid, 2);
@@ -102,7 +114,7 @@ public class HIFTaskRunnable implements Runnable {
 			int totalCells = baseline.size();
 			int currentCell = 0;
 			int prevPct = -999;
-
+			
 			ArrayList<HifResultRecord> hifResults = new ArrayList<HifResultRecord>();
 			mXparser.setToOverrideBuiltinTokens();
 
@@ -144,7 +156,14 @@ public class HIFTaskRunnable implements Runnable {
 					Expression hifBaselineExpression = hifBaselineExpressionList.get(hifIdx);
 					HIFConfig hifConfig = hifTaskConfig.hifs.get(hifIdx);
 					HealthImpactFunctionRecord hifDefinition = hifDefinitionList.get(hifIdx);
-
+					DescriptiveStatistics stats = hifDistributionStats.get(hifIdx);
+					
+					// If we have variable values, grab them for use in the standard deviation calc below. 
+					// Else, set to 1 so they won't have any effect.
+					Double varA = hifDefinition.getValA().doubleValue() != 0 ? hifDefinition.getValA().doubleValue() : 1.0;
+					Double varB = hifDefinition.getValB().doubleValue() != 0 ? hifDefinition.getValB().doubleValue() : 1.0;
+					Double varC = hifDefinition.getValC().doubleValue() != 0 ? hifDefinition.getValC().doubleValue() : 1.0;
+					
 					hifFunctionExpression.setArgumentValue("DELTAQ",baselineCell.getValue().subtract(scenarioCell.getValue()).doubleValue());
 					hifFunctionExpression.setArgumentValue("Q0", baselineCell.getValue().doubleValue());
 					hifFunctionExpression.setArgumentValue("Q1", scenarioCell.getValue().doubleValue());
@@ -161,28 +180,58 @@ public class HIFTaskRunnable implements Runnable {
 					/*
 					 * ACCUMULATE THE ESTIMATE FOR EACH AGE CATEGORY IN THIS CELL
 					 */
-
+					Double beta = hifDefinition.getBeta().doubleValue();
+					Double p1Beta = hifDefinition.getP1Beta().doubleValue();
+					Double deltaQ = baselineCell.getValue().subtract(scenarioCell.getValue()).doubleValue();
+					
 					Double totalPop = 0.0;
 					Double hifFunctionEstimate = 0.0;
 					Double hifBaselineEstimate = 0.0;
+					Double hifStandardDev = 0.0;
+					Double hifPct25 = 0.0;
+					Double hifPct975 = 0.0;
+					
 					for (Record6<Long, Integer, Integer, Integer, Integer, BigDecimal> popCategory : populationCell) {
 						// <gridCellId, race, gender, ethnicity, agerange, pop>
 						Integer popAgeRange = popCategory.value5();
 						
 						if (popAgeRangeHifMap.containsKey(popAgeRange)) {
 							Double rangePop = popCategory.value6().doubleValue() * popAgeRangeHifMap.get(popAgeRange);
+							Double incidence = incidenceCell.getOrDefault(popAgeRange, 0.0);
 							totalPop += rangePop;
 
-							hifFunctionExpression.setArgumentValue("INCIDENCE", incidenceCell.getOrDefault(popAgeRange, 0.0));
+							hifFunctionExpression.setArgumentValue("BETA", beta);
+							hifFunctionExpression.setArgumentValue("INCIDENCE", incidence);
 							hifFunctionExpression.setArgumentValue("POPULATION", rangePop);
 							hifFunctionEstimate += hifFunctionExpression.calculate();
+							
+							//SEPE = SEβ * DELTAQ / eβ*DELTAQ * Incidence*POP*A
+							//SEPE = SEβ * DELTAQ /((1 - Incidence)*eβ*DELTAQ + Incidence) * Incidence*A*POP
+							//TODO: Handle second form
+							//TODO: Handle variables, if they're present
+							//hifStandardDev += (p1Beta * deltaQ) / Math.exp(p1Beta * deltaQ) * incidence * rangePop * varA * varB * varC;
+							hifFunctionExpression.setArgumentValue("BETA", stats.getPercentile(2.5));
+							hifPct25 += hifFunctionExpression.calculate();
 
-							hifBaselineExpression.setArgumentValue("INCIDENCE", incidenceCell.getOrDefault(popAgeRange, 0.0));
+							hifFunctionExpression.setArgumentValue("BETA", stats.getPercentile(97.5));
+							hifPct975 += hifFunctionExpression.calculate();
+							
+							hifBaselineExpression.setArgumentValue("INCIDENCE", incidence);
 							hifBaselineExpression.setArgumentValue("POPULATION", rangePop);
 							hifBaselineEstimate += hifBaselineExpression.calculate();
 						}
 					}
 
+/*
+					System.out.println(stats.getMean());
+					System.out.println(stats.getStandardDeviation());
+					System.out.println(stats.getVariance());
+					System.out.println(stats.getPercentile(2.5));
+					System.out.println(stats.getPercentile(97.5));
+*/
+					
+					
+					
 					HifResultRecord rec = new HifResultRecord();
 					rec.setGridCellId(baselineEntry.getKey());
 					rec.setGridCol(baselineCell.getGridCol());
@@ -191,6 +240,14 @@ public class HIFTaskRunnable implements Runnable {
 					rec.setPopulation(new BigDecimal(totalPop));
 					rec.setDelta(baselineCell.getValue().subtract(scenarioCell.getValue()));
 					rec.setResult(BigDecimal.valueOf(hifFunctionEstimate));
+					rec.setStandardDev(new BigDecimal(hifStandardDev));
+					
+					//rec.setPct2_5(new BigDecimal(hifFunctionEstimate - (1.96 * hifStandardDev)));
+					//rec.setPct97_5(new BigDecimal(hifFunctionEstimate + (1.96 * hifStandardDev)));
+					rec.setPct2_5(new BigDecimal(hifPct25));
+					rec.setPct97_5(new BigDecimal(hifPct975));
+					
+					
 					rec.setBaseline(BigDecimal.valueOf(hifBaselineEstimate));
 					hifResults.add(rec);
 				}

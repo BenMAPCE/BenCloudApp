@@ -348,8 +348,8 @@
 		
 		population = {};
 		population.id = $('.population').select2('data')[0].id;
-		//Right now, we only have 2010 and 2024 pop datasets. Hardcoding this for the moment.
-		population.year = population.id=='41' ? 2024 : 2010;
+		//Right now, we only have 2010 and 2020 pop datasets. Hardcoding this for the moment.
+		population.year = population.id=='41' ? 2020 : 2010;
 		
 		hifJSON.population = population;
 		

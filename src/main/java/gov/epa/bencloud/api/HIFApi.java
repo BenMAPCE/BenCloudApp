@@ -12,6 +12,7 @@ import org.jooq.Record;
 import org.jooq.Record1;
 import org.jooq.Record10;
 import org.jooq.Record11;
+import org.jooq.Record14;
 import org.jooq.impl.DSL;
 
 import gov.epa.bencloud.api.model.HIFTaskConfig;
@@ -31,7 +32,7 @@ public class HIFApi {
 		Record1<Integer> id = create.select(HIF_RESULT_DATASET.ID).from(HIF_RESULT_DATASET)
 				.where(HIF_RESULT_DATASET.TASK_UUID.eq(uuid)).fetchOne();
 
-Result<Record11<Integer, Integer, String, String, Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> hifRecords = create.select(
+		Result<Record14<Integer, Integer, String, String, Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> hifRecords = create.select(
 				HIF_RESULT.GRID_COL.as("column"),
 				HIF_RESULT.GRID_ROW.as("row"),
 				ENDPOINT.NAME.as("endpoint"),
@@ -39,11 +40,13 @@ Result<Record11<Integer, Integer, String, String, Integer, Integer, BigDecimal, 
 				HIF_RESULT_FUNCTION_CONFIG.START_AGE,
 				HIF_RESULT_FUNCTION_CONFIG.END_AGE,
 				HIF_RESULT.RESULT.as("point_estimate"),
-				HIF_RESULT.POPULATION,
 				HIF_RESULT.DELTA,
-// add mean?
+				HIF_RESULT.STANDARD_DEV.as("standard_deviation"),
+				HIF_RESULT.POPULATION,
 				HIF_RESULT.BASELINE,
-				DSL.when(HIF_RESULT.BASELINE.eq(tmpZero), tmpZero).otherwise(HIF_RESULT.RESULT.div(HIF_RESULT.BASELINE)).as("percent_of_baseline")
+				DSL.when(HIF_RESULT.BASELINE.eq(tmpZero), tmpZero).otherwise(HIF_RESULT.RESULT.div(HIF_RESULT.BASELINE)).as("percent_of_baseline"),
+				HIF_RESULT.PCT2_5,
+				HIF_RESULT.PCT97_5
 				)
 				.from(HIF_RESULT)
 				.join(HIF_RESULT_FUNCTION_CONFIG).on(HIF_RESULT_FUNCTION_CONFIG.HIF_RESULT_DATASET_ID.eq(HIF_RESULT.HIF_RESULT_DATASET_ID).and(HIF_RESULT_FUNCTION_CONFIG.HIF_ID.eq(HIF_RESULT.HIF_ID)))

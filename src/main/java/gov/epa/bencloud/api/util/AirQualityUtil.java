@@ -17,7 +17,7 @@ public class AirQualityUtil {
 			b.append((b.length()==0 ? "" : ", ") + "Seasonal Metric");
 		}
 		if(statisticIdx == -999) {
-			b.append((b.length()==0 ? "" : ", ") + "Statistic");
+			b.append((b.length()==0 ? "" : ", ") + "Annual Metric");
 		}
 		if(valuesIdx == -999) {
 			b.append((b.length()==0 ? "" : ", ") + "Values");

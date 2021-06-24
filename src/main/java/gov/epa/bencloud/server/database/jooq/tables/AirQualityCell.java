@@ -5,18 +5,15 @@ package gov.epa.bencloud.server.database.jooq.tables;
 
 
 import gov.epa.bencloud.server.database.jooq.Data;
-import gov.epa.bencloud.server.database.jooq.Keys;
 import gov.epa.bencloud.server.database.jooq.tables.records.AirQualityCellRecord;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.List;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row7;
+import org.jooq.Row8;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -78,6 +75,11 @@ public class AirQualityCell extends TableImpl<AirQualityCellRecord> {
     public final TableField<AirQualityCellRecord, Integer> SEASONAL_METRIC_ID = createField(DSL.name("seasonal_metric_id"), SQLDataType.INTEGER, this, "");
 
     /**
+     * The column <code>data.air_quality_cell.annual_metric</code>.
+     */
+    public final TableField<AirQualityCellRecord, String> ANNUAL_METRIC = createField(DSL.name("annual_metric"), SQLDataType.CLOB, this, "");
+
+    /**
      * The column <code>data.air_quality_cell.value</code>.
      */
     public final TableField<AirQualityCellRecord, BigDecimal> VALUE = createField(DSL.name("value"), SQLDataType.NUMERIC, this, "");
@@ -121,36 +123,6 @@ public class AirQualityCell extends TableImpl<AirQualityCellRecord> {
     }
 
     @Override
-    public List<ForeignKey<AirQualityCellRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<AirQualityCellRecord, ?>>asList(Keys.AIR_QUALITY_CELL__AIR_QUALITY_CELL_AIR_QUALITY_LAYER_ID_FKEY, Keys.AIR_QUALITY_CELL__AIR_QUALITY_CELL_METRIC_ID_FKEY, Keys.AIR_QUALITY_CELL__AIR_QUALITY_CELL_SEASONAL_METRIC_ID_FKEY);
-    }
-
-    private transient AirQualityLayer _airQualityLayer;
-    private transient PollutantMetric _pollutantMetric;
-    private transient SeasonalMetric _seasonalMetric;
-
-    public AirQualityLayer airQualityLayer() {
-        if (_airQualityLayer == null)
-            _airQualityLayer = new AirQualityLayer(this, Keys.AIR_QUALITY_CELL__AIR_QUALITY_CELL_AIR_QUALITY_LAYER_ID_FKEY);
-
-        return _airQualityLayer;
-    }
-
-    public PollutantMetric pollutantMetric() {
-        if (_pollutantMetric == null)
-            _pollutantMetric = new PollutantMetric(this, Keys.AIR_QUALITY_CELL__AIR_QUALITY_CELL_METRIC_ID_FKEY);
-
-        return _pollutantMetric;
-    }
-
-    public SeasonalMetric seasonalMetric() {
-        if (_seasonalMetric == null)
-            _seasonalMetric = new SeasonalMetric(this, Keys.AIR_QUALITY_CELL__AIR_QUALITY_CELL_SEASONAL_METRIC_ID_FKEY);
-
-        return _seasonalMetric;
-    }
-
-    @Override
     public AirQualityCell as(String alias) {
         return new AirQualityCell(DSL.name(alias), this);
     }
@@ -177,11 +149,11 @@ public class AirQualityCell extends TableImpl<AirQualityCellRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row7 type methods
+    // Row8 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row7<Integer, Integer, Integer, Long, Integer, Integer, BigDecimal> fieldsRow() {
-        return (Row7) super.fieldsRow();
+    public Row8<Integer, Integer, Integer, Long, Integer, Integer, String, BigDecimal> fieldsRow() {
+        return (Row8) super.fieldsRow();
     }
 }
