@@ -148,3 +148,15 @@ ul.dropDownMenu .btn-link {
 div.dt-buttons {
 	float: right;
 }
+
+div#hif-results.cloneya-wrap .delete.button {
+	display: none;
+}
+
+div#hif-results.cloneya-wrap .clone.button {
+	display: none;
+}
+
+div.hif-result-row { 
+	display: none;
+}

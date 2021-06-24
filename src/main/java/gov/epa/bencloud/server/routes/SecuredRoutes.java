@@ -44,6 +44,12 @@ public class SecuredRoutes extends RoutesBase {
 			return FreeMarkerRenderUtil.render(freeMarkerConfiguration, attributes, "/forms/hif.ftl");
 		});
 
+		service.get("/vhif", (req, res) -> {
+			
+			Map<String, Object> attributes = new HashMap<>();
+			return FreeMarkerRenderUtil.render(freeMarkerConfiguration, attributes, "/forms/vhif.ftl");
+		});
+
 		service.get("/air-quality-layers", (req, res) -> {
 			String bcoUserIdentifier = getOrSetOrExtendCookie(req, res);
 			return AirQualityApi.getAirQualityLayers(bcoUserIdentifier);

@@ -24,8 +24,10 @@
 	<script src="/js/jquery/jquery.validate.min.js"></script>
 	<script src="/js/jquery/additional-methods.min.js"></script>
 	<script src="/js/jquery/jquery-ui.min.js"></script>
+	<script src="/js/jquery/jquery-cloneya.min.js"></script>
 	
 	<script src="/js/jquery/select2.full.min.js"></script>
+
 
 	<script src="/js/bootstrap/bootstrap.min.js"></script>
 	

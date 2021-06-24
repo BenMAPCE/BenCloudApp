@@ -46,7 +46,7 @@
    <div class="section">
 		<label for="${id}" class="field-label">${label} <#if required><span class="required">*</span></#if></label> 
         <label class="field">
-            <select class="${id} smart-select2 <#if validation!="">${validation}</#if>" multiple="multiple">
+            <select class="${class} smart-select2 <#if validation!="">${validation}</#if>" multiple="multiple">
  				<#list options as option>
  					<#if values?seq_contains(option[0])>
  		                <option value="${option[0]}" selected="selected">${option[1]}</option>
@@ -74,7 +74,7 @@
 
 		<label for="${id}" class="field-label">${label} <#if required><span class="required">*</span></#if></label> 
         <label class="field">
-			<select class="${id} smart-select2 <#if validation!="">${validation}</#if>" multiple="multiple">
+			<select name="${name}" class="${class} smart-select2 <#if validation!="">${validation}</#if>" multiple="multiple">
 			</select>
   			<#if tooltip != ""><b class="tooltip ${tooltip_direction}"><em> ${tooltip}</em></b></#if>                 
        </label>
@@ -96,7 +96,7 @@
 
 		<label for="${id}" class="field-label">${label} <#if required><span class="required">*</span></#if></label> 
         <label class="field">
-			<select class="${id} smart-select2 <#if validation!="">${validation}</#if>">
+			<select class="${class} smart-select2 <#if validation!="">${validation}</#if>">
             <option value="">${defaultValueText}</option>
 			</select>
   			<#if tooltip != ""><b class="tooltip ${tooltip_direction}"><em> ${tooltip}</em></b></#if>                 
@@ -296,14 +296,12 @@
 
 	<div id="${id}" class="cloneya-wrap">
 		<div class="toclone clone-widget cloneya">
-			<div class="frm-row">
     
 </#macro>
 
 <#macro smartforms_clone_end
 >
 
-			</div>
 			<a href="#" class="clone button btn-primary"><i class="fa fa-plus"></i></a> 
 			<a href="#" class="delete button"><i class="fa fa-minus"></i></a>		
 		</div>
@@ -312,6 +310,15 @@
 </#macro>
 
 
+<#macro start_smartforms_label
+	class=""
+	name="">
+	<label class="${class}" name="${name}">
+</#macro>
+
+<#macro end_smartforms_label>
+	</label>
+</#macro>
 
 
 <#macro start_smartforms_row
@@ -325,16 +332,18 @@
 
 <#macro start_smartforms_column
 	width = 12
+	class=""
 	>
-	<div class="colm colm${width}">
+	<div class="colm colm${width} ${class}">
 </#macro>
 
 <#macro end_smartforms_column>
 	</div>
 </#macro>
 
-<#macro start_smartforms_section>
-	<div class="section">
+<#macro start_smartforms_section
+	class="">
+	<div class="section ${class}">
 </#macro>
 
 <#macro end_smartforms_section>

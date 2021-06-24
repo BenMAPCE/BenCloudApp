@@ -1,14 +1,23 @@
 package gov.epa.bencloud.server.routes;
 
-import static gov.epa.bencloud.server.database.jooq.Tables.*;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import static gov.epa.bencloud.server.database.jooq.Tables.AIR_QUALITY_LAYER;
+import static gov.epa.bencloud.server.database.jooq.Tables.ENDPOINT;
+import static gov.epa.bencloud.server.database.jooq.Tables.ETHNICITY;
+import static gov.epa.bencloud.server.database.jooq.Tables.GENDER;
+import static gov.epa.bencloud.server.database.jooq.Tables.GRID_DEFINITION;
+import static gov.epa.bencloud.server.database.jooq.Tables.HEALTH_IMPACT_FUNCTION;
+import static gov.epa.bencloud.server.database.jooq.Tables.HIF_RESULT_DATASET;
+import static gov.epa.bencloud.server.database.jooq.Tables.HIF_RESULT_FUNCTION_CONFIG;
+import static gov.epa.bencloud.server.database.jooq.Tables.POLLUTANT;
+import static gov.epa.bencloud.server.database.jooq.Tables.POPULATION_DATASET;
+import static gov.epa.bencloud.server.database.jooq.Tables.RACE;
+import static gov.epa.bencloud.server.database.jooq.Tables.VALUATION_FUNCTION;
 
 import javax.servlet.MultipartConfigElement;
 
 import org.jooq.Record;
+import org.jooq.Record13;
+import org.jooq.Record6;
 import org.jooq.Result;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -24,7 +33,6 @@ import gov.epa.bencloud.api.GridDefinitionApi;
 import gov.epa.bencloud.api.HIFApi;
 import gov.epa.bencloud.api.PollutantApi;
 import gov.epa.bencloud.server.database.JooqUtil;
-import gov.epa.bencloud.server.util.FreeMarkerRenderUtil;
 import spark.Service;
 
 public class ApiRoutes extends RoutesBase {
@@ -187,6 +195,161 @@ public class ApiRoutes extends RoutesBase {
 			
 		});
 
+		service.get("/api/load-hif-result-dataset-options", (request, response) -> {
+			
+			ObjectMapper mapper = new ObjectMapper();
+
+			ArrayNode options = mapper.createArrayNode();
+			ObjectNode option = mapper.createObjectNode();
+
+			option = mapper.createObjectNode();
+			option.put("id", "0");
+			option.put("text", "Select HIF Result Dataset");
+			options.add(option);
+			
+			Result<Record> result = DSL.using(JooqUtil.getJooqConfiguration())
+					.select(HIF_RESULT_DATASET.asterisk())
+					.from(HIF_RESULT_DATASET)
+					.orderBy(HIF_RESULT_DATASET.NAME)
+					.fetch();
+			for (Record r : result) {
+				option = mapper.createObjectNode();
+				option.put("id", r.getValue(HIF_RESULT_DATASET.ID));
+				option.put("text", 
+						r.getValue(HIF_RESULT_DATASET.NAME)
+					);
+
+				options.add(option);
+			}
+						
+			return options;
+			
+		});	
+
+		service.get("/api/load-hif-result-functions", (request, response) -> {
+			
+			String resultsetIdParameter = request.raw().getParameter("resultsetId");
+
+			ObjectMapper mapper = new ObjectMapper();
+
+			ArrayNode options = mapper.createArrayNode();
+			ObjectNode option = mapper.createObjectNode();
+
+			Integer resultsetId;
+			try {
+				resultsetId = Integer.parseInt(resultsetIdParameter);
+
+				Result<Record13<Integer, Integer, Integer, Integer, String, String, String, Integer, Integer, String, String, String, String>> result = DSL.using(JooqUtil.getJooqConfiguration())
+						.select(HIF_RESULT_FUNCTION_CONFIG.HIF_RESULT_DATASET_ID, 
+								HIF_RESULT_FUNCTION_CONFIG.HIF_ID,
+								HEALTH_IMPACT_FUNCTION.ENDPOINT_ID,
+								HEALTH_IMPACT_FUNCTION.ID,
+								HIF_RESULT_DATASET.NAME,
+								ENDPOINT.NAME,
+								HEALTH_IMPACT_FUNCTION.AUTHOR,
+								HEALTH_IMPACT_FUNCTION.START_AGE,
+								HEALTH_IMPACT_FUNCTION.END_AGE,
+								RACE.NAME,
+								GENDER.NAME,
+								ETHNICITY.NAME,
+								HEALTH_IMPACT_FUNCTION.QUALIFIER
+								)
+						.from(HIF_RESULT_FUNCTION_CONFIG)
+						.join(HIF_RESULT_DATASET).on(HIF_RESULT_DATASET.ID.eq(HIF_RESULT_FUNCTION_CONFIG.HIF_RESULT_DATASET_ID))
+						.join(HEALTH_IMPACT_FUNCTION).on(HEALTH_IMPACT_FUNCTION.ID.eq(HIF_RESULT_FUNCTION_CONFIG.HIF_ID))
+						.join(ENDPOINT).on(HEALTH_IMPACT_FUNCTION.ENDPOINT_ID.eq(ENDPOINT.ID))
+						.join(RACE).on(HEALTH_IMPACT_FUNCTION.RACE_ID.eq(RACE.ID))
+						.join(GENDER).on(HEALTH_IMPACT_FUNCTION.GENDER_ID.eq(GENDER.ID))
+						.join(ETHNICITY).on(HEALTH_IMPACT_FUNCTION.ETHNICITY_ID.eq(ETHNICITY.ID))
+						.where(HIF_RESULT_FUNCTION_CONFIG.HIF_RESULT_DATASET_ID.eq(resultsetId))
+						.fetch();
+				
+				for (Record r : result) {
+					option = mapper.createObjectNode();
+					option.put("hif_result_dataset_id", r.getValue(HIF_RESULT_FUNCTION_CONFIG.HIF_RESULT_DATASET_ID));
+					option.put("hif_result_dataset_name", r.getValue(HIF_RESULT_DATASET.NAME));
+					option.put("hif_id", r.getValue(HEALTH_IMPACT_FUNCTION.ID));
+					option.put("hif_endpoint_id", r.getValue(HEALTH_IMPACT_FUNCTION.ENDPOINT_ID));
+					String hif_options = 
+						r.getValue(ENDPOINT.NAME) + " | " + 
+						r.getValue(HEALTH_IMPACT_FUNCTION.AUTHOR) + " | " + 
+						r.getValue(HEALTH_IMPACT_FUNCTION.START_AGE) + "-" + 
+						r.getValue(HEALTH_IMPACT_FUNCTION.END_AGE) + " | " + 
+						r.getValue(RACE.NAME) + " | " + 
+						r.getValue(GENDER.NAME) + " | " + 
+						r.getValue(ETHNICITY.NAME) + 
+						  " | " + r.getValue(HEALTH_IMPACT_FUNCTION.QUALIFIER);
+					option.put("hif_options", hif_options);
+
+					options.add(option);
+				}
+			
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+						
+			return options;
+			
+		});	
+
+		service.get("/api/load-valuation-functions", (request, response) -> {
+
+			String endpointIdParamater = request.raw().getParameter("endpointId");
+
+			ObjectMapper mapper = new ObjectMapper();
+
+			ArrayNode options = mapper.createArrayNode();
+			ObjectNode option = mapper.createObjectNode();
+
+			Integer endpointId;
+
+			try {
+				endpointId = Integer.parseInt(endpointIdParamater);
+
+				Result<Record6<Integer, Integer, Integer, String, String, String>> result = DSL.using(JooqUtil.getJooqConfiguration())
+						.select(VALUATION_FUNCTION.ID, 
+								VALUATION_FUNCTION.START_AGE, 
+								VALUATION_FUNCTION.END_AGE, 
+								VALUATION_FUNCTION.FUNCTION_TEXT, 
+								VALUATION_FUNCTION.QUALIFIER,  
+								ENDPOINT.NAME)
+						.from(VALUATION_FUNCTION)
+						.join(ENDPOINT).on(VALUATION_FUNCTION.ENDPOINT_ID.eq(ENDPOINT.ID))
+						.where(VALUATION_FUNCTION.ENDPOINT_ID.eq(endpointId))
+						.orderBy(ENDPOINT.NAME, 
+								VALUATION_FUNCTION.START_AGE,
+								VALUATION_FUNCTION.END_AGE,
+								VALUATION_FUNCTION.FUNCTION_TEXT,
+								VALUATION_FUNCTION.QUALIFIER)
+						.fetch();
+				
+				for (Record r : result) {
+					option = mapper.createObjectNode();
+					option.put("id", r.getValue(VALUATION_FUNCTION.ID));
+					
+					
+					String vf_options = 
+							r.getValue(ENDPOINT.NAME) + " | " + 
+							r.getValue(VALUATION_FUNCTION.START_AGE) + "-" + 
+							r.getValue(VALUATION_FUNCTION.END_AGE) + " | " + 
+							r.getValue(VALUATION_FUNCTION.FUNCTION_TEXT) + " | " + 
+							r.getValue(VALUATION_FUNCTION.QUALIFIER);
+					
+					option.put("text", vf_options);
+
+					options.add(option);
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+						
+			return options;
+			
+		});	
+		
 		service.get("/api/load-functions", (request, response) -> {
 			
 			ObjectMapper mapper = new ObjectMapper();
