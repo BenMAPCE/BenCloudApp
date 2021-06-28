@@ -385,7 +385,9 @@ public class ApiRoutes extends RoutesBase {
 						r.getValue(RACE.NAME) + " | " + 
 						r.getValue(GENDER.NAME) + " | " + 
 						r.getValue(ETHNICITY.NAME) + 
-						  " | " + r.getValue(HEALTH_IMPACT_FUNCTION.QUALIFIER)
+				
+						(null == r.getValue(HEALTH_IMPACT_FUNCTION.QUALIFIER) 
+							? "" : " | " + r.getValue(HEALTH_IMPACT_FUNCTION.QUALIFIER))
 					);
 
 				options.add(option);

@@ -47,8 +47,17 @@ div#navigation li a:hover {
 
 .hif-form-body .messages-wrapper {
 	display: none;
+	color: #228B22;
 }
 
+.vhif-form-body .header {
+	font-size: 18px;
+}
+
+.vhif-form-body .messages-wrapper {
+	display: none;
+	color: #228B22;
+}
 
 /* General Styles for Menu  */
 .dropDownMenu, .dropDownMenu ul {
@@ -159,4 +168,10 @@ div#hif-results.cloneya-wrap .clone.button {
 
 div.hif-result-row { 
 	display: none;
+}
+
+div.completed-tasks-header,  div.pending-tasks-header, div.air-quality-surfaces-header {
+	font-size: 1.25em;
+	font-weight: 600;
+	margin-bottom: 20px;
 }

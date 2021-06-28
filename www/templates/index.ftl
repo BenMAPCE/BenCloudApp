@@ -14,7 +14,7 @@
 
          <div class="row section-title">
 			<div class="col-12">
-				Home
+				BenCloud Online Home
 			</div>
 		</div>
 

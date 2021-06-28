@@ -172,6 +172,17 @@
 		});
 	}
 	
+/*	
+	function loadValuationFunctionsOptions(endpoint_id, valuations_select_name) {
+		$.getJSON( "/api/load-valuation-functions", {endpointId:endpoint_id}, function(respond) {
+                $("select[name='" + valuations_select_name + "']").select2({
+                    multiple: true,
+                    data: respond
+                });
+             });
+  	}           
+*/
+             
 	function loadValuationFunctionsOptions(endpoint_id, valuations_select_name) {
 			
 		formData = new FormData();
@@ -187,27 +198,44 @@
 		})
 		.done(function(data) {
 		
-		
+/*		
 			if ($("select[name='" + valuations_select_name + "']").hasClass("select2-hidden-accessible")) {
 //				console.log("!!! " + valuations_select_name + " already initialized");
 //				console.log("!!! need to do some cleanup");
 
-				$("select[name='" + valuations_select_name + "']").val(null).trigger('change');
-				$("select[name='" + valuations_select_name + "']").empty();
+///				$("select[name='" + valuations_select_name + "']").val(null).trigger('change');
+///				$("select[name='" + valuations_select_name + "']").empty();
 			} else {
 //				console.log("!!! need initialize");
-				$("select[name='" + valuations_select_name + "']").select2();
+///				$("select[name='" + valuations_select_name + "']").select2();
 			}
 			
-		
-		
-		
-		
-			$("select[name='" + valuations_select_name + "']").empty();
-			$("select[name='" + valuations_select_name + "']").select2({
-					data: data
-			})
+*/		
+			console.log(data);
 			
+			console.log("filling " + valuations_select_name);
+			
+			console.log($("select[name='" + valuations_select_name + "']").attr('class'))
+			console.log($("select[name='" + valuations_select_name + "']").hasClass('select2-hidden-accessible'));
+		
+//			if ($("select[name='" + valuations_select_name + "']").hasClass("select2-hidden-accessible")) {
+//    			console.log(valuations_select_name + " had been initialized");
+//    			$("select[name='" + valuations_select_name + "']").select2('destroy');
+//			}
+
+
+//			$("select[name='" + valuations_select_name + "']").val(null).trigger('change');
+
+			//$("select[name='" + valuations_select_name + "']").select2('destroy');
+			$("select[name='" + valuations_select_name + "']").empty();			
+			$("select[name='" + valuations_select_name + "']").select2({
+				data: data
+			});
+			console.log($("select[name='" + valuations_select_name + "']").hasClass('select2-hidden-accessible'));
+
+		
+
+		
 		})
 		.fail(function(data) {
 		
@@ -216,12 +244,22 @@
 	
 		})
 		.always(function() {
+			console.log("... always ...");
 		});
 	}
 	
 	
 	function loadHIFResultFunctions() {
 	
+		var resultRows = $('div.hif-result-row').length;
+		
+		console.log("resultRows: " + resultRows)
+		
+		for (var i = resultRows-1; i > 0; i--) {
+			console.log("removing: " + i);
+			$('div.hif-result-row')[i].remove();
+		}
+
 		formData = new FormData();
 
 		$.ajax({
@@ -234,85 +272,26 @@
 		    contentType	: false
 		})
 		.done(function(data) {
-			//$(".hif_functions").empty();
-			//$(".hif_functions").select2({
-			//	data: data
-			//})
 
 			$('div.hif-result-row').show();
 
 			cloneyaWrapper = $('div.hif-result-row').closest('div.toclone.clone-widget.cloneya').parent();
-			
-			$('div.hif-result-row').each(function( index ) {
-								
-				if (index > 0) {
-				
-/*				
-					if ($("select[name='valuations[" + index + "]']").hasClass("select2-hidden-accessible")) {
-	    				console.log("valuations [" + index + "] has been initialized");
-	    				
-						$("select[name='valuations[" + index + "]']").val(null).trigger('change');
-						$("select[name='valuations[" + index + "]']").empty();
-					} else {
-	    				console.log("initialize valuations [" + index + "]");
-						$("select[name='valuations[" + index + "]']").select2();
-					}
 
-//					$("select[name='valuations[" + index + "]']").val(null).trigger('change');
-//					$("select[name='valuations[" + index + "]']").select2('destroy');
-//					$("select[name='valuations[" + index + "]']").select2();
-//					$("select[name='valuations[" + index + "]']").empty();
-*/
-					$( this ).remove();
-				}
-			});
-
-
-
-
-/*
-			$('.smart-select2').each(function( index ) {
-				
-				if ($( this ).hasClass("select2-hidden-accessible")) {
-					console.log("destroying select2: " + index);
-					$( this ).select2('destroy');
-					$( this ).select2();
-				}
-			
-			});
-*/			
-			//$('div.hif-result-row').not(':first').remove();
-			
 //			console.log(data);
-			
+
+			$("select[name='valuations[0]'").val(null).trigger('change');
+						
 			for(var i = 0; i < data.length; i++) {
     			var obj = data[i];
 				
 				if (i > 0) {				
-					cloneyaWrapper = $('div.hif-result-row').closest('div.toclone.clone-widget.cloneya').parent();
 					cloneyaWrapper.triggerHandler('clone.cloneya',[cloneyaWrapper.children().first()]);
 				}
-
-			$('div#hif-results .select2-container').each(function( index ) {
-				//console.log(this);
-				if ($( this ).hasClass('select2-container--below')) {
-					$( this ).remove()
-				}
-			});
+	
+//			$('div.hif-result-row .select2-container').not(':first').remove();
 			
+//			$("div.hif-result-row .select2-container select.select2-hidden-accessible").select2('destroy');
 
-
-/*
-				if ($("select[name='valuations[" + i + "]']").hasClass("select2-hidden-accessible")) {
-    				console.log("valuations [" + i + "] has been initialized");
-    				
-					$("select[name='valuations[" + i + "]']").val(null).trigger('change');
-					$("select[name='valuations[" + i + "]']").empty();
-				} else {
-    				console.log("initialize valuations [" + i + "]");
-					$("select[name='valuations[" + i + "]']").select2();
-				}
-*/
 			}
 
 			for(var i = 0; i < data.length; i++) {
@@ -320,7 +299,31 @@
 				$('label[name*="hif-label[' + i + ']"]').text(obj.hif_options);
 				$('input[name*="hif-id[' + i + ']"]').val(obj.hif_id);
 				
+//				$("select[name='valuations[" + i + "]'").val(null).trigger('change');
+
+//				loadValuationFunctionsOptions(data[i].hif_endpoint_id, "valuations[" + i + "]");
 				
+				// ????
+				// remove extra entries persisting
+								
+				$('div.hif-result-row .select2.select2-container').not(':first').remove();
+				
+				$('div.hif-result-row').find('.smart-select2').each(function( index ) {
+					console.log("-----");
+					console.log( this );
+					console.log("-----");
+				});
+	
+				
+				
+			}
+
+			for(var i = 0; i < data.length; i++) {
+			
+//				$("select[name='valuations[" + i + "]'").val(null).trigger('change');
+			}
+			
+			for(var i = 0; i < data.length; i++) {
 				loadValuationFunctionsOptions(data[i].hif_endpoint_id, "valuations[" + i + "]");
 			}
 			
@@ -349,13 +352,20 @@
 				serializeIndex: true
 			})
 			.on('after_append.cloneya', function (event, toclone, newclone) {
-				//console.log("newclone");
+				console.log("append newclone");
 				//console.log(newclone);
+				console.log(newclone);
+				
+				var select2item = $(newclone).find('.valuations-select')
+				console.log(newclone);
+				
+				console.log(newclone.attr('name'));
+				
 				//$(newclone).slideToggle();
 				//console.log('finished cloning ' + toclone.attr('name') + ' to ' + newclone.attr('name'));
 			})
 			.on('after_clone.cloneya', function ( event, toClone, newClone) {
-				//console.log("just cloned...");
+				console.log("just cloned...");
 				//console.log(event);
 				//console.log(event.target);
 				
@@ -445,6 +455,21 @@
 		return JSON.stringify(vhifJSON);
 	
 	}
+
+
+(function ($) {
+    $.fn.refreshDataSelect2 = function (data) {
+        this.select2('data', data);
+
+        // Update options
+        var $select = $(this[0]);
+        var options = data.map(function(item) {
+            return '<option value="' + item.id + '">' + item.text + '</option>';
+        });
+        $select.html(options.join('')).change();
+    };
+})(jQuery);
+
 
 </script>
 </body>

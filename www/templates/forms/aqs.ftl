@@ -13,6 +13,8 @@
 
 <div style="padding: 25px;">
 
+	<div class="air-quality-surfaces-header">Air Quality Surfaces</div>
+
 	<div class="datatable-wrapper">
 		<table id="aqs-datatable" class="table table-striped" style="width:100%">
 			<thead>
