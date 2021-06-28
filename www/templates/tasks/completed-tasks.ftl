@@ -19,14 +19,8 @@
 				<tr>
     				<th>Name</th>
     				<th>Type</th>
-    				<th>Description</th>
-    				<th>UUID</th>
-    				<th>Submitted</th>
-    				<th>Started</th>
     				<th>Completed</th>
-    				<th data-type="@data-sort">Wait Time</th>
-    				<th data-type="@data-sort">Task Time</th>
-    				<th data-type="@data-sort">Successful</th>
+    				<th data-type="@data-sort">Elapsed Time</th>
     				<th>Message</th>
     				<th> </th>
 				</tr>
@@ -38,18 +32,16 @@
     				<th></th>
     				<th></th>
     				<th></th>
-    				<th></th>
-    				<th></th>
-    				<th></th>
-    				<th></th>
-    				<th></th>
-    				<th></th>
     				<th> </th>
 				</tr>			
 			</tfoot>
 		</table>
 	</div>
 
+</div>
+
+<div id="delete-results-confirm" title="Delete Results?">
+  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span><span class="delete-task-name">These</span> results will be deleted, and cannot be undone. Are you sure?</p>
 </div>
 
 <script>
@@ -64,28 +56,8 @@
 	    { "data": "task_type",
 	    	className : "results-task-type-column"
 	    },
-	    { "data": "task_description",
-	    	className : "results-task-description-column"
-	    },
-	    { "data": "task_uuid",
-	    	className : "results-task-uuid-column",
-	    	visible: true
-	    },
-	    { "data": "task_submitted_date",
-	    	className : "results-task-submitted-date-column"
-	    },
-	    { "data": "task_started_date",
-	    	className : "results-task-started-date-column"
-	    },
 	    { "data": "task_completed_date",
 	    	className : "results-task-completed-date-column"
-	    },
-	    { "data":
-	    	{
-				_:    "task_wait_time.task_wait_time_display",
-				sort: "task_wait_time.task_wait_time_seconds"
-			},
-	    	className : "results-task-wait-time-column"
 	    },
 	    { "data":
 	    	{
@@ -93,16 +65,6 @@
 				sort: "task_execution_time.task_execution_time_seconds"
 			},
 	    	className : "results-task-execution-time-column"
-	    },
-	    { "data": "task_successful",
-	    	className : "results-task-successful-column",
-         	render: function ( data, type, row ) {
-         		if (!data) {
-         			return "<i class='fas fa-exclamation-circle'></i>"
-         		} else {
-         			return "<i class='fas fa-check-circle'></i>"
-         		}
-         	}
 	    },
 	    { "data": "task_message",
 	    	className : "results-task-message-column"
@@ -196,6 +158,7 @@
 		str += '</button>';
 		str += '<ul>';
 		str += '<li><button style="width:100%; text-align:left;" class="btn-link" onclick="javascript: downloadAsCSV(\'' + row.task_uuid + '\', \'' + row.task_name + '\');  hideResultsEllipsisMenu(); return false;">Download Results As CSV</button></li>';		
+		str += '<li><button style="width:100%; text-align:left;" class="btn-link" onclick="javascript: showDeleteResultsConfirm(\'' + row.task_uuid + '\', \'' + row.task_name + '\');  hideResultsEllipsisMenu(); return false;">Delete Results</button></li>';		
 		
 		return str;
 	}
@@ -251,6 +214,64 @@
 		});
 	}
 
+	function deleteResults(uuid, name) {
+		
+		$.ajax({
+			type 		: "GET", 
+			url 		: "/api/v1/tasks/" + uuid + "/results/delete", 
+			data 		: {},
+            dataType	: "text",
+			cache		: false,
+			processData	: false,
+		    contentType	: false,
+		    headers		: { 'Accept': 'text/csv', 'Content-Type': 'text/csv' },
+		})
+
+		.done(function(data) {
+			
+			var hiddenElement = document.createElement('a');
+			hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(data);
+	    	hiddenElement.target = '_blank';
+	    	hiddenElement.download = name + ".csv";
+	    	hiddenElement.click();
+    
+		})
+		.fail(function(data) {
+		
+			console.log("fail...");
+			console.log(data);
+	
+		})
+		.always(function() {
+			$('#results-datatable').DataTable().ajax.reload();
+		});
+	}
+
+
+function showDeleteResultsConfirm(uuid, name) {
+	
+	$('#delete-results-confirm .delete-task-name').text(name);
+	
+	$( "#delete-results-confirm" ).dialog({
+		open: function(event, ui) {
+    	    $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+    	},
+	      resizable: false,
+	      height: "auto",
+	      width: 400,
+	      modal: true,
+	      buttons: {
+	        "Delete Results": function() {
+	          	$( this ).dialog( "close" );
+	          	deleteResults(uuid, name);
+        		return true;
+	        },
+	        Cancel: function() {
+	          $( this ).dialog( "close" );
+	        }
+	      }
+	});    
+}
 </script>
 
 </body>

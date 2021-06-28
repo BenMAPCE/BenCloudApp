@@ -19,19 +19,17 @@
 				<tr>
     				<th>Name</th>
     				<th>Type</th>
-    				<th>Description</th>
-    				<th>UUID</th>
     				<th>Submitted</th>
     				<th data-type="@data-sort">Wait Time</th>
     				<th>Status</th>
-    				<th data-type="@data-sort">Active Time</th>
-    				<th>Percentage</th>
+    				<th data-type="@data-sort">Elapsed Time</th>
+    				<th>Percentage Complete</th>
+    				<th>Message</th>
     				<th> </th>
 				</tr>
 			</thead>
 			<tfoot>
 				<tr>
-    				<th></th>
     				<th></th>
     				<th></th>
     				<th></th>
@@ -59,12 +57,6 @@
 	    },
 	    { "data": "task_type",
 	    	className : "pending-task-type-column"
-	    },
-	    { "data": "task_description",
-	    	className : "pending-task-description-column"
-	    },
-	    { "data": "task_uuid",
-	    	className : "pending-task-uuid-column"
 	    },
 	    { "data": "task_submitted_date",
 	    	className : "pending-task-submitted-date-column"
@@ -95,6 +87,9 @@
 	    },
 	    { "data": "task_percentage",
 	    	className : "pending-task-percentage-column"
+	    },
+	    { "data": "task_message",
+	    	className : "pending-task-message-column"
 	    },
 	   	{
 			className : "pending-column-ellipsis",

@@ -254,6 +254,7 @@ public class TaskQueue {
 
 					task.put("task_status", record.getValue(TASK_QUEUE.TASK_IN_PROCESS));
 					task.put("task_percentage", record.getValue(TASK_QUEUE.TASK_PERCENTAGE));
+					task.put("task_message", record.getValue(TASK_QUEUE.TASK_MESSAGE));
 
 					tasks.add(task);
 					records++;

@@ -105,5 +105,14 @@ public class TaskRoutes extends RoutesBase {
 			return ApiUtil.getTaskResultDetails(req, res);
 
 		});
+
+		service.get("/api/v1/tasks/:uuid/results/delete", (req, res) -> {
+			
+			String bcoUserIdentifier = getOrSetOrExtendCookie(req, res);
+			
+			return ApiUtil.deleteTaskResults(req, res);
+
+		});
+
 	}
 }

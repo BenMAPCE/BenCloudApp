@@ -175,3 +175,7 @@ div.completed-tasks-header,  div.pending-tasks-header, div.air-quality-surfaces-
 	font-weight: 600;
 	margin-bottom: 20px;
 }
+
+#delete-results-confirm {
+	display: none;
+}

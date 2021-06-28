@@ -387,7 +387,12 @@ public class ApiRoutes extends RoutesBase {
 						r.getValue(ETHNICITY.NAME) + 
 				
 						(null == r.getValue(HEALTH_IMPACT_FUNCTION.QUALIFIER) 
-							? "" : " | " + r.getValue(HEALTH_IMPACT_FUNCTION.QUALIFIER))
+							? "" : " | " + r.getValue(HEALTH_IMPACT_FUNCTION.QUALIFIER)
+							) + 
+						
+						(null == r.getValue(HEALTH_IMPACT_FUNCTION.LOCATION) 
+							? "" : " | " + r.getValue(HEALTH_IMPACT_FUNCTION.LOCATION)
+						)
 					);
 
 				options.add(option);

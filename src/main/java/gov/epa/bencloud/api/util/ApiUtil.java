@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.jooq.Record;
+import org.jooq.Record1;
 import org.jooq.Record2;
 import org.jooq.Result;
 import org.jooq.impl.DSL;
@@ -20,6 +22,7 @@ import gov.epa.bencloud.server.database.JooqUtil;
 import gov.epa.bencloud.server.database.jooq.tables.records.InflationEntryRecord;
 import gov.epa.bencloud.server.database.jooq.tables.records.ValuationFunctionRecord;
 import gov.epa.bencloud.server.tasks.TaskComplete;
+import gov.epa.bencloud.server.tasks.TaskUtil;
 import gov.epa.bencloud.server.tasks.model.Task;
 import spark.Request;
 import spark.Response;
@@ -82,6 +85,29 @@ public class ApiUtil {
 			return ValuationApi.getValuationResultDetails(req, res);
 		default:
 				
+		}
+		
+		return null;
+	}
+
+	public static Object deleteTaskResults(Request req, Response res) {
+		String uuid = req.params("uuid");
+		
+		Result<Record> completedTasks = 
+				DSL.using(JooqUtil.getJooqConfiguration()).select().from(TASK_COMPLETE)
+				.where(TASK_COMPLETE.TASK_UUID.eq(uuid))
+				.fetch();
+
+		if (completedTasks.size() == 0) {
+			// System.out.println("no tasks to process");
+		} else {
+			Record taskCompleteRecord = completedTasks.get(0);
+			
+			if (taskCompleteRecord.get(TASK_COMPLETE.TASK_TYPE).equals("HIF")) {
+				TaskUtil.deleteHifResults(uuid);
+			} else if (taskCompleteRecord.get(TASK_COMPLETE.TASK_TYPE).equals("Valuation")) {
+				TaskUtil.deleteValuationResults(uuid);
+			}
 		}
 		
 		return null;
