@@ -11,6 +11,8 @@
 
 <div style="padding: 25px;">
 
+	<div class="pending-tasks-header">Pending Tasks</div>
+
 	<div class="datatable-wrapper">
 		<table id="pending-datatable" class="table table-striped" style="width:100%">
 			<thead>
