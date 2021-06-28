@@ -6,7 +6,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.math3.distribution.NormalDistribution;
+import org.apache.commons.math3.distribution.WeibullDistribution;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jooq.Record10;
+import org.jooq.Record12;
+import org.jooq.Record13;
 import org.jooq.Record2;
 import org.jooq.Result;
 import org.mariuszgromada.math.mxparser.Expression;
@@ -22,6 +27,7 @@ import gov.epa.bencloud.api.model.ValuationConfig;
 import gov.epa.bencloud.api.model.ValuationTaskConfig;
 import gov.epa.bencloud.api.util.ApiUtil;
 import gov.epa.bencloud.api.util.ValuationUtil;
+import gov.epa.bencloud.server.database.jooq.tables.records.HealthImpactFunctionRecord;
 import gov.epa.bencloud.server.database.jooq.tables.records.ValuationFunctionRecord;
 import gov.epa.bencloud.server.database.jooq.tables.records.ValuationResultRecord;
 import gov.epa.bencloud.server.tasks.TaskComplete;
@@ -52,19 +58,27 @@ public class ValuationTaskRunnable implements Runnable {
 			List<Expression> valuationFunctionExpressionList = new ArrayList<Expression>();
 
 			List<ValuationFunctionRecord> vfDefinitionList = new ArrayList<ValuationFunctionRecord>();
+			ArrayList<double[]> vfBetaDistributionLists = new ArrayList<double[]>();
 			
 			// Inspect each selected valuation function and create parallel lists of math expressions and HIF config records
-			for (ValuationConfig vf : valuationTaskConfig.valuationFunctions) {
-				valuationFunctionExpressionList.add(ValuationUtil.getFunctionExpression(vf.vfId));
-				ValuationFunctionRecord h = ValuationUtil.getFunctionDefinition(vf.vfId);
-				vfDefinitionList.add(h);
+			for (ValuationConfig vfConfig : valuationTaskConfig.valuationFunctions) {
+				valuationFunctionExpressionList.add(ValuationUtil.getFunctionExpression(vfConfig.vfId));
+				ValuationFunctionRecord vfDefinition = ValuationUtil.getFunctionDefinition(vfConfig.vfId);
+				vfDefinitionList.add(vfDefinition);
+				
+				DescriptiveStatistics stats = getDistributionStats(vfDefinition);
+				double[] betaDist = new double[100];
+
+				//distList = stats.getSortedValues();
+				for(int i=0; i < 100; i++) {
+					betaDist[i] = stats.getPercentile(i+1);
+				}
+				vfBetaDistributionLists.add(betaDist);
 			}
 			
 			HIFTaskConfig hifTaskConfig = HIFApi.getHifTaskConfigFromDb(valuationTaskConfig.hifResultDatasetId);
-			Result<Record10<Long, Integer, Integer, Integer, Integer, Integer, Integer, Integer, BigDecimal, BigDecimal>> hifResults = HIFApi.getHifResultsForValuation(valuationTaskConfig.hifResultDatasetId);
+			Result<Record13<Long, Integer, Integer, Integer, Integer, Integer, Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal[]>> hifResults = HIFApi.getHifResultsForValuation(valuationTaskConfig.hifResultDatasetId);
 
-	        // Get variables by grid cell id (only median_income at this point)
-			
 			Integer inflationYear = hifTaskConfig.popYear > 2020 ? 2020 : hifTaskConfig.popYear;
 			
 			Map<String, Double> inflationIndices = ApiUtil.getInflationIndices(4, inflationYear);
@@ -83,7 +97,7 @@ public class ValuationTaskRunnable implements Runnable {
 			/*
 			 * FOR EACH ROW IN THE HIF RESULTS
 			 */
-			for (Record10<Long, Integer, Integer, Integer, Integer, Integer, Integer, Integer, BigDecimal, BigDecimal> hifResult : hifResults) {
+			for (Record13<Long, Integer, Integer, Integer, Integer, Integer, Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal[]> hifResult : hifResults) {
 				//<	HIF_RESULT.GRID_CELL_ID,HIF_RESULT.GRID_COL,HIF_RESULT.GRID_ROW,HIF_RESULT.HIF_ID,
 				//HEALTH_IMPACT_FUNCTION.ENDPOINT_GROUP_ID,HEALTH_IMPACT_FUNCTION.ENDPOINT_ID,
 				//HIF_RESULT_FUNCTION_CONFIG.START_AGE,HIF_RESULT_FUNCTION_CONFIG.END_AGE,HIF_RESULT.RESULT,HIF_RESULT.POPULATION>
@@ -104,7 +118,7 @@ public class ValuationTaskRunnable implements Runnable {
 
 					ValuationConfig vfConfig = valuationTaskConfig.valuationFunctions.get(vfIdx);
 					if (vfConfig.hifId.equals(hifResult.value4())) {
-						Record2<Short, BigDecimal> tmp = incomeGrowthFactors.getOrDefault(hifResult.value5(), null);
+						Record2<Short, BigDecimal> tmp = incomeGrowthFactors.getOrDefault(hifResult.value5().shortValue(), null);
 						Double incomeGrowthFactor = tmp == null ? 1.0 : tmp.value2().doubleValue();
 						
 						Double hifEstimate = hifResult.value9().doubleValue();
@@ -112,7 +126,7 @@ public class ValuationTaskRunnable implements Runnable {
 						Expression valuationFunctionExpression = valuationFunctionExpressionList.get(vfIdx);
 
 						ValuationFunctionRecord vfDefinition = vfDefinitionList.get(vfIdx);
-
+						double[] betaDist = vfBetaDistributionLists.get(vfIdx);
 
 						//If the function uses a variable that was loaded, set the appropriate argument value for this cell
 						for(Entry<String, Map<Long, Double>> variable  : variables.entrySet()) {
@@ -125,18 +139,44 @@ public class ValuationTaskRunnable implements Runnable {
 						valuationFunctionExpression.setArgumentValue("WageIndex", inflationIndices.get("WageIndex"));
 
 						Double valuationFunctionEstimate = valuationFunctionExpression.calculate();
-
+						valuationFunctionEstimate = valuationFunctionEstimate * incomeGrowthFactor * hifEstimate;
+						
+						DescriptiveStatistics distStats = new DescriptiveStatistics();
+						BigDecimal[] hifPercentiles = hifResult.value13();
+						
+						for(int hifPctIdx=0; hifPctIdx < hifPercentiles.length; hifPctIdx++) {
+							for(int betaIdx=0; betaIdx < betaDist.length; betaIdx++) {
+								//valuation estimate * hif percentiles * betaDist / hif point estimate * A
+								if(vfDefinition.getValA() == null || vfDefinition.getValA().doubleValue() == 0.0) {
+									distStats.addValue(valuationFunctionEstimate * hifPercentiles[hifPctIdx].doubleValue() / hifEstimate);
+									
+								} else {
+									distStats.addValue(valuationFunctionEstimate * hifPercentiles[hifPctIdx].doubleValue() * betaDist[betaIdx] / (hifEstimate * vfDefinition.getValA().doubleValue()));			
+								}
+							}
+						}
+						
 						ValuationResultRecord rec = new ValuationResultRecord();
 						rec.setGridCellId(hifResult.value1());
 						rec.setGridCol(hifResult.value2());
 						rec.setGridRow(hifResult.value3());
 						rec.setHifId(vfConfig.hifId);
 						rec.setVfId(vfConfig.vfId);
-						//TODO: Set population here from hif results? Or, should we reload since valuation functions have their own age ranges?
-						//	Need to look at BenMAP to see how this handled
-						
-						rec.setResult(BigDecimal.valueOf(incomeGrowthFactor * valuationFunctionEstimate * hifEstimate)); 
 
+						rec.setResult(BigDecimal.valueOf(valuationFunctionEstimate)); 
+						try {
+							rec.setPct2_5(BigDecimal.valueOf(distStats.getPercentile(2.5)));
+							rec.setPct97_5(BigDecimal.valueOf(distStats.getPercentile(97.5)));
+							rec.setStandardDev(BigDecimal.valueOf(distStats.getStandardDeviation()));
+							rec.setResultMean(BigDecimal.valueOf(distStats.getMean()));
+							rec.setResultVariance(BigDecimal.valueOf(distStats.getVariance()));
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+
+
+						
 						valuationResults.add(rec);
 
 					}
@@ -186,6 +226,28 @@ public class ValuationTaskRunnable implements Runnable {
 			valuationConfig.vfId = function.get("vfId").asInt();
 			valuationTaskConfig.valuationFunctions.add(valuationConfig);
 		}
+	}
+	
+	private DescriptiveStatistics getDistributionStats(ValuationFunctionRecord vfRecord) {
+		DescriptiveStatistics stats = new DescriptiveStatistics();
+		double[] samples;
+		switch (vfRecord.getDistA().toLowerCase()) {
+		case "normal":
+			NormalDistribution normalDistribution = new NormalDistribution(vfRecord.getValA().doubleValue(), vfRecord.getP1a().doubleValue());
+			samples = normalDistribution.sample(10000);
+			break;
+		case "weibull":
+			WeibullDistribution weibullDistribution = new WeibullDistribution(vfRecord.getP2a().doubleValue(), vfRecord.getP1a().doubleValue());
+			samples = weibullDistribution.sample(10000);
+			break;
+		default:
+			return null;
+		}
+
+		for( int i = 0; i < samples.length; i++) {
+	        stats.addValue(samples[i]);
+		}
+		return stats;
 	}
 
 }

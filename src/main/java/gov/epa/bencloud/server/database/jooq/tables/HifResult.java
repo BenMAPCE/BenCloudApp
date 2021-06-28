@@ -13,7 +13,7 @@ import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row14;
+import org.jooq.Row15;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -114,6 +114,11 @@ public class HifResult extends TableImpl<HifResultRecord> {
      */
     public final TableField<HifResultRecord, BigDecimal> PCT97_5 = createField(DSL.name("pct97_5"), SQLDataType.NUMERIC, this, "");
 
+    /**
+     * The column <code>data.hif_result.percentiles</code>.
+     */
+    public final TableField<HifResultRecord, BigDecimal[]> PERCENTILES = createField(DSL.name("percentiles"), SQLDataType.NUMERIC.getArrayDataType(), this, "");
+
     private HifResult(Name alias, Table<HifResultRecord> aliased) {
         this(alias, aliased, null);
     }
@@ -179,11 +184,11 @@ public class HifResult extends TableImpl<HifResultRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row14 type methods
+    // Row15 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row14<Integer, Integer, Integer, Integer, Long, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal> fieldsRow() {
-        return (Row14) super.fieldsRow();
+    public Row15<Integer, Integer, Integer, Integer, Long, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal[]> fieldsRow() {
+        return (Row15) super.fieldsRow();
     }
 }

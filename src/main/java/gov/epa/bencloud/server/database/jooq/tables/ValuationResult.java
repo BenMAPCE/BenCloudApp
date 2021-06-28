@@ -13,7 +13,7 @@ import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row13;
+import org.jooq.Row14;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -109,6 +109,11 @@ public class ValuationResult extends TableImpl<ValuationResultRecord> {
      */
     public final TableField<ValuationResultRecord, BigDecimal> PCT97_5 = createField(DSL.name("pct97_5"), SQLDataType.NUMERIC, this, "");
 
+    /**
+     * The column <code>data.valuation_result.percentiles</code>.
+     */
+    public final TableField<ValuationResultRecord, BigDecimal[]> PERCENTILES = createField(DSL.name("percentiles"), SQLDataType.NUMERIC.getArrayDataType(), this, "");
+
     private ValuationResult(Name alias, Table<ValuationResultRecord> aliased) {
         this(alias, aliased, null);
     }
@@ -174,11 +179,11 @@ public class ValuationResult extends TableImpl<ValuationResultRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row13 type methods
+    // Row14 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row13<Integer, Integer, Integer, Integer, Integer, Long, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal> fieldsRow() {
-        return (Row13) super.fieldsRow();
+    public Row14<Integer, Integer, Integer, Integer, Integer, Long, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal[]> fieldsRow() {
+        return (Row14) super.fieldsRow();
     }
 }

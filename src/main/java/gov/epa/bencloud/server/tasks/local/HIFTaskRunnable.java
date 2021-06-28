@@ -57,7 +57,7 @@ public class HIFTaskRunnable implements Runnable {
 			ArrayList<Expression> hifBaselineExpressionList = new ArrayList<Expression>();
 			ArrayList<HealthImpactFunctionRecord> hifDefinitionList = new ArrayList<HealthImpactFunctionRecord>();
 			ArrayList<Map<Long, Map<Integer, Double>>> incidenceLists = new ArrayList<Map<Long, Map<Integer, Double>>>();
-			ArrayList<DescriptiveStatistics> hifDistributionStats = new ArrayList<DescriptiveStatistics>();
+			ArrayList<double[]> hifBetaDistributionLists = new ArrayList<double[]>();
 			
 			TaskQueue.updateTaskPercentage(taskUuid, 1);
 			TaskWorker.updateTaskWorkerHeartbeat(taskWorkerUuid);
@@ -79,13 +79,14 @@ public class HIFTaskRunnable implements Runnable {
 				Map<Long, Map<Integer, Double>> incidenceMap = IncidenceApi.getIncidenceEntryGroups(hifTaskConfig, hif, h);
 				incidenceLists.add(incidenceMap);
 				
-				NormalDistribution normalDistribution = new NormalDistribution(h.getBeta().doubleValue(), h.getP1Beta().doubleValue());
-				double[] samples = normalDistribution.sample(10000);
-				DescriptiveStatistics stats = new DescriptiveStatistics();
-				for( int i = 0; i < samples.length; i++) {
-			        stats.addValue(samples[i]);
+				DescriptiveStatistics stats = getDistributionStats(h);
+				double[] betaDist = new double[20];
+				double idx = 2.5;
+				for(int i=0; i < 20; i++) {
+					betaDist[i] = stats.getPercentile(idx);
+					idx += 5;
 				}
-				hifDistributionStats.add(stats);
+				hifBetaDistributionLists.add(betaDist);
 			}
 
 			TaskQueue.updateTaskPercentage(taskUuid, 2);
@@ -140,8 +141,7 @@ public class HIFTaskRunnable implements Runnable {
 				if (baselineCell.getValue().equals(scenarioCell.getValue())) {
 					continue;
 				}
-				Result<Record6<Long, Integer, Integer, Integer, Integer, BigDecimal>> populationCell = populationMap
-						.getOrDefault(baselineEntry.getKey(), null);
+				Result<Record6<Long, Integer, Integer, Integer, Integer, BigDecimal>> populationCell = populationMap.getOrDefault(baselineEntry.getKey(), null);
 				if (populationCell == null) {
 					continue;
 				}
@@ -156,8 +156,19 @@ public class HIFTaskRunnable implements Runnable {
 					Expression hifBaselineExpression = hifBaselineExpressionList.get(hifIdx);
 					HIFConfig hifConfig = hifTaskConfig.hifs.get(hifIdx);
 					HealthImpactFunctionRecord hifDefinition = hifDefinitionList.get(hifIdx);
-					DescriptiveStatistics stats = hifDistributionStats.get(hifIdx);
+					double[] betaDist = hifBetaDistributionLists.get(hifIdx);
 					
+					//TODO: kludge to scale ozone results by the number of days between May 1 - Sept 30
+					//IF the HIF metric statistic == 0 (None) then it's a daily function and we need to scale by the year or global season
+					
+					Double seasonalScalar = 1.0;
+					if(hifDefinition.getMetricStatistic() == 0) { // NONE
+						if(hifDefinition.getPollutantId() == 4) { // Ozone
+							seasonalScalar = 153.0;
+						} else {
+							seasonalScalar = 365.0;
+						}
+					}
 					// If we have variable values, grab them for use in the standard deviation calc below. 
 					// Else, set to 1 so they won't have any effect.
 					Double varA = hifDefinition.getValA().doubleValue() != 0 ? hifDefinition.getValA().doubleValue() : 1.0;
@@ -187,9 +198,7 @@ public class HIFTaskRunnable implements Runnable {
 					Double totalPop = 0.0;
 					Double hifFunctionEstimate = 0.0;
 					Double hifBaselineEstimate = 0.0;
-					Double hifStandardDev = 0.0;
-					Double hifPct25 = 0.0;
-					Double hifPct975 = 0.0;
+					double[] resultPercentiles = new double[20];
 					
 					for (Record6<Long, Integer, Integer, Integer, Integer, BigDecimal> popCategory : populationCell) {
 						// <gridCellId, race, gender, ethnicity, agerange, pop>
@@ -203,34 +212,18 @@ public class HIFTaskRunnable implements Runnable {
 							hifFunctionExpression.setArgumentValue("BETA", beta);
 							hifFunctionExpression.setArgumentValue("INCIDENCE", incidence);
 							hifFunctionExpression.setArgumentValue("POPULATION", rangePop);
-							hifFunctionEstimate += hifFunctionExpression.calculate();
+							hifFunctionEstimate += hifFunctionExpression.calculate() * seasonalScalar;
 							
-							//SEPE = SEβ * DELTAQ / eβ*DELTAQ * Incidence*POP*A
-							//SEPE = SEβ * DELTAQ /((1 - Incidence)*eβ*DELTAQ + Incidence) * Incidence*A*POP
-							//TODO: Handle second form
-							//TODO: Handle variables, if they're present
-							//hifStandardDev += (p1Beta * deltaQ) / Math.exp(p1Beta * deltaQ) * incidence * rangePop * varA * varB * varC;
-							hifFunctionExpression.setArgumentValue("BETA", stats.getPercentile(2.5));
-							hifPct25 += hifFunctionExpression.calculate();
-
-							hifFunctionExpression.setArgumentValue("BETA", stats.getPercentile(97.5));
-							hifPct975 += hifFunctionExpression.calculate();
+							for(int i=0; i < resultPercentiles.length; i++) {
+								hifFunctionExpression.setArgumentValue("BETA", betaDist[i]);								
+								resultPercentiles[i] += hifFunctionExpression.calculate() * seasonalScalar;
+							}
 							
 							hifBaselineExpression.setArgumentValue("INCIDENCE", incidence);
 							hifBaselineExpression.setArgumentValue("POPULATION", rangePop);
-							hifBaselineEstimate += hifBaselineExpression.calculate();
+							hifBaselineEstimate += hifBaselineExpression.calculate() * seasonalScalar;
 						}
 					}
-
-/*
-					System.out.println(stats.getMean());
-					System.out.println(stats.getStandardDeviation());
-					System.out.println(stats.getVariance());
-					System.out.println(stats.getPercentile(2.5));
-					System.out.println(stats.getPercentile(97.5));
-*/
-					
-					
 					
 					HifResultRecord rec = new HifResultRecord();
 					rec.setGridCellId(baselineEntry.getKey());
@@ -238,16 +231,24 @@ public class HIFTaskRunnable implements Runnable {
 					rec.setGridRow(baselineCell.getGridRow());
 					rec.setHifId(hifConfig.hifId);
 					rec.setPopulation(new BigDecimal(totalPop));
-					rec.setDelta(baselineCell.getValue().subtract(scenarioCell.getValue()));
+					rec.setDelta(BigDecimal.valueOf(deltaQ));
 					rec.setResult(BigDecimal.valueOf(hifFunctionEstimate));
-					rec.setStandardDev(new BigDecimal(hifStandardDev));
+					rec.setPct2_5(BigDecimal.valueOf(resultPercentiles[0]));
+					rec.setPct97_5(BigDecimal.valueOf(resultPercentiles[19]));
 					
-					//rec.setPct2_5(new BigDecimal(hifFunctionEstimate - (1.96 * hifStandardDev)));
-					//rec.setPct97_5(new BigDecimal(hifFunctionEstimate + (1.96 * hifStandardDev)));
-					rec.setPct2_5(new BigDecimal(hifPct25));
-					rec.setPct97_5(new BigDecimal(hifPct975));
+					BigDecimal[] tmp = new BigDecimal[resultPercentiles.length];
+					for(int i=0; i<resultPercentiles.length; i++) {
+						tmp[i] = BigDecimal.valueOf(resultPercentiles[i]);
+					}
+					rec.setPercentiles(tmp);
 					
-					
+					DescriptiveStatistics stats = new DescriptiveStatistics();
+					for( int i = 0; i < resultPercentiles.length; i++) {
+				        stats.addValue(resultPercentiles[i]);
+					}
+					rec.setStandardDev(BigDecimal.valueOf(stats.getStandardDeviation()));
+					rec.setResultMean(BigDecimal.valueOf(stats.getMean()));
+					rec.setResultVariance(BigDecimal.valueOf(stats.getVariance()));
 					rec.setBaseline(BigDecimal.valueOf(hifBaselineEstimate));
 					hifResults.add(rec);
 				}
@@ -378,6 +379,17 @@ public class HIFTaskRunnable implements Runnable {
 //			hifConfig.variable = function.get("variable").asInt();
 			hifTaskConfig.hifs.add(hifConfig);
 		}
+	}
+	
+	private DescriptiveStatistics getDistributionStats(HealthImpactFunctionRecord h) {
+		//TODO: At the moment, all HIFs are normal distribution. Need to build this out to support other types.
+		NormalDistribution normalDistribution = new NormalDistribution(h.getBeta().doubleValue(), h.getP1Beta().doubleValue());
+		double[] samples = normalDistribution.sample(10000);
+		DescriptiveStatistics stats = new DescriptiveStatistics();
+		for( int i = 0; i < samples.length; i++) {
+	        stats.addValue(samples[i]);
+		}
+		return stats;
 	}
 
 }

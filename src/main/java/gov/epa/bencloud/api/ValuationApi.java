@@ -10,6 +10,7 @@ import org.jooq.Result;
 import org.jooq.JSONFormat.RecordFormat;
 import org.jooq.Record;
 import org.jooq.Record1;
+import org.jooq.Record12;
 import org.jooq.Record7;
 import org.jooq.impl.DSL;
 
@@ -28,14 +29,19 @@ public class ValuationApi {
 				.where(VALUATION_RESULT_DATASET.TASK_UUID.eq(uuid)).fetchOne();
 
 
-		Result<Record7<Integer, Integer, String, String, Integer, Integer, BigDecimal>> valuationRecords = create.select(
+		Result<Record12<Integer, Integer, String, String, Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> valuationRecords = create.select(
 				VALUATION_RESULT.GRID_COL.as("column"),
 				VALUATION_RESULT.GRID_ROW.as("row"),
 				ENDPOINT.NAME.as("endpoint"),
 				VALUATION_FUNCTION.QUALIFIER,
 				VALUATION_FUNCTION.START_AGE,
 				VALUATION_FUNCTION.END_AGE,
-				VALUATION_RESULT.RESULT.as("point_estimate")
+				VALUATION_RESULT.RESULT.as("point_estimate"),
+				VALUATION_RESULT.RESULT_MEAN.as("mean"),
+				VALUATION_RESULT.STANDARD_DEV.as("standard_deviation"),
+				VALUATION_RESULT.RESULT_VARIANCE.as("variance"),
+				VALUATION_RESULT.PCT2_5,
+				VALUATION_RESULT.PCT97_5
 				)
 				.from(VALUATION_RESULT)
 				.join(VALUATION_RESULT_FUNCTION_CONFIG)
