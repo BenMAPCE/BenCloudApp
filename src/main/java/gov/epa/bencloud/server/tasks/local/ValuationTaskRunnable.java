@@ -5,13 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Random;
-
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.distribution.WeibullDistribution;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.jooq.Record10;
-import org.jooq.Record12;
 import org.jooq.Record13;
 import org.jooq.Record2;
 import org.jooq.Result;
@@ -28,7 +24,6 @@ import gov.epa.bencloud.api.model.ValuationConfig;
 import gov.epa.bencloud.api.model.ValuationTaskConfig;
 import gov.epa.bencloud.api.util.ApiUtil;
 import gov.epa.bencloud.api.util.ValuationUtil;
-import gov.epa.bencloud.server.database.jooq.tables.records.HealthImpactFunctionRecord;
 import gov.epa.bencloud.server.database.jooq.tables.records.ValuationFunctionRecord;
 import gov.epa.bencloud.server.database.jooq.tables.records.ValuationResultRecord;
 import gov.epa.bencloud.server.tasks.TaskComplete;
@@ -54,6 +49,9 @@ public class ValuationTaskRunnable implements Runnable {
 		Task task = TaskQueue.getTaskFromQueueRecord(taskUuid);
 
 		try {
+			TaskQueue.updateTaskPercentage(taskUuid, 1, "Loading datasets");
+			TaskWorker.updateTaskWorkerHeartbeat(taskWorkerUuid);
+			
 			ValuationTaskConfig valuationTaskConfig = parseTaskParameters(task);
 
 			List<Expression> valuationFunctionExpressionList = new ArrayList<Expression>();
@@ -110,7 +108,7 @@ public class ValuationTaskRunnable implements Runnable {
 				currentCell++;
 
 				if (prevPct != currentPct) {
-					TaskQueue.updateTaskPercentage(taskUuid, currentPct);
+					TaskQueue.updateTaskPercentage(taskUuid, currentPct, "Running valuation functions");
 					TaskWorker.updateTaskWorkerHeartbeat(taskWorkerUuid);
 					prevPct = currentPct;
 				}
@@ -216,6 +214,8 @@ public class ValuationTaskRunnable implements Runnable {
 					}
 				}
 			}
+			TaskQueue.updateTaskPercentage(taskUuid, 100, "Saving your results");
+			TaskWorker.updateTaskWorkerHeartbeat(taskWorkerUuid);
 			ValuationUtil.storeResults(task, valuationTaskConfig, valuationResults);
 
 			TaskComplete.addTaskToCompleteAndRemoveTaskFromQueue(taskUuid, taskWorkerUuid, taskSuccessful, taskCompleteMessage);

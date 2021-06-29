@@ -59,7 +59,7 @@ public class HIFTaskRunnable implements Runnable {
 			ArrayList<Map<Long, Map<Integer, Double>>> incidenceLists = new ArrayList<Map<Long, Map<Integer, Double>>>();
 			ArrayList<double[]> hifBetaDistributionLists = new ArrayList<double[]>();
 			
-			TaskQueue.updateTaskPercentage(taskUuid, 1);
+			TaskQueue.updateTaskPercentage(taskUuid, 1, "Loading incidence data");
 			TaskWorker.updateTaskWorkerHeartbeat(taskWorkerUuid);
 			
 			
@@ -104,7 +104,7 @@ public class HIFTaskRunnable implements Runnable {
 				hifBetaDistributionLists.add(betaDist);
 			}
 
-			TaskQueue.updateTaskPercentage(taskUuid, 2);
+			TaskQueue.updateTaskPercentage(taskUuid, 2, "Loading population data");
 			TaskWorker.updateTaskWorkerHeartbeat(taskWorkerUuid);
 			
 			// For each HIF, keep track of which age groups (and what percentage) apply
@@ -143,7 +143,7 @@ public class HIFTaskRunnable implements Runnable {
 				currentCell++;
 
 				if (prevPct != currentPct) {
-					TaskQueue.updateTaskPercentage(taskUuid, currentPct);
+					TaskQueue.updateTaskPercentage(taskUuid, currentPct, "Running health impact functions");
 					TaskWorker.updateTaskWorkerHeartbeat(taskWorkerUuid);
 					prevPct = currentPct;
 				}
@@ -274,6 +274,9 @@ public class HIFTaskRunnable implements Runnable {
 					hifResults.add(rec);
 				}
 			}
+			
+			TaskQueue.updateTaskPercentage(taskUuid, 100, "Saving your results");
+			TaskWorker.updateTaskWorkerHeartbeat(taskWorkerUuid);
 			HIFUtil.storeResults(task, hifTaskConfig, hifResults);
 
 			TaskComplete.addTaskToCompleteAndRemoveTaskFromQueue(taskUuid, taskWorkerUuid, taskSuccessful, taskCompleteMessage);

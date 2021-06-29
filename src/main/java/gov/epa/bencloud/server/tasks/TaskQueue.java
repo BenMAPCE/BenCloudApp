@@ -109,6 +109,42 @@ public class TaskQueue {
 
 		}
 	}
+	
+	public static void updateTaskPercentage(String taskUuid, int percentage, String message) {
+
+		try {
+
+			DSL.using(JooqUtil.getJooqConfiguration())
+			.transactionResult(ctx -> {
+
+				Result<Record> result = DSL.using(ctx).select().from(TASK_QUEUE)
+						.where(TASK_QUEUE.TASK_UUID.eq(taskUuid))
+						.limit(1)
+						.forUpdate()
+						.fetch();
+
+				if (result.size() == 0) {
+					// System.out.println("no tasks to process");
+				} else if (result.size() > 1) {
+					System.out.println("recieved more than 1 task record");
+				} else {
+					Record record = result.get(0);
+
+					DSL.using(ctx).update(TASK_QUEUE)
+					.set(TASK_QUEUE.TASK_PERCENTAGE, percentage)
+					.set(TASK_QUEUE.TASK_MESSAGE, message)
+					.where(TASK_QUEUE.TASK_UUID.eq(taskUuid))
+					.execute();
+				}
+				return taskUuid;
+			});
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+
+		}
+	}
 
 
 	public static void returnTaskToQueue(String uuid) {
