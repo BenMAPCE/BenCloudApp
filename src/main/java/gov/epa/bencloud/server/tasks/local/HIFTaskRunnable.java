@@ -81,11 +81,26 @@ public class HIFTaskRunnable implements Runnable {
 				
 				DescriptiveStatistics stats = getDistributionStats(h);
 				double[] betaDist = new double[20];
-				double idx = 2.5;
+				
+				double[] distValues = stats.getSortedValues();
+				
+				int idxMedian = 0 + distValues.length / 20 / 2; //the median of the first segment
+				for(int i=0; i < 20; i++) {
+					// Grab the median from each of the 20 slices of distList
+					/*
+					System.out.println(idxMedian+","+(idxMedian-1));
+					*/
+					betaDist[i] = (distValues[idxMedian]+distValues[idxMedian-1])/2.0;
+					idxMedian += distValues.length / 20;
+				}
+				
+				/*
+				double idx=2.5;
 				for(int i=0; i < 20; i++) {
 					betaDist[i] = stats.getPercentile(idx);
 					idx += 5;
 				}
+				*/
 				hifBetaDistributionLists.add(betaDist);
 			}
 
@@ -250,6 +265,12 @@ public class HIFTaskRunnable implements Runnable {
 					rec.setResultMean(BigDecimal.valueOf(stats.getMean()));
 					rec.setResultVariance(BigDecimal.valueOf(stats.getVariance()));
 					rec.setBaseline(BigDecimal.valueOf(hifBaselineEstimate));
+					/*
+					System.out.println("\nHIF Percentiles");
+					for(int hifPctIdx=0; hifPctIdx < resultPercentiles.length; hifPctIdx++) {
+							System.out.println(resultPercentiles[hifPctIdx]);
+					}
+					*/
 					hifResults.add(rec);
 				}
 			}

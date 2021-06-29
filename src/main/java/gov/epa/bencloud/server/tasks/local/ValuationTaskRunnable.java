@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.distribution.WeibullDistribution;
@@ -68,10 +69,13 @@ public class ValuationTaskRunnable implements Runnable {
 				
 				DescriptiveStatistics stats = getDistributionStats(vfDefinition);
 				double[] betaDist = new double[100];
-
-				//distList = stats.getSortedValues();
+				double[] distValues = stats.getSortedValues();
+				int idxMedian = 0 + distValues.length / 100 / 2; //the median of the first segment
+				
 				for(int i=0; i < 100; i++) {
-					betaDist[i] = stats.getPercentile(i+1);
+					// Grab the median from each of the 100 slices of distList
+					betaDist[i] = (distValues[idxMedian]+distValues[idxMedian-1])/2.0;
+					idxMedian += distValues.length / 100;
 				}
 				vfBetaDistributionLists.add(betaDist);
 			}
@@ -144,6 +148,18 @@ public class ValuationTaskRunnable implements Runnable {
 						DescriptiveStatistics distStats = new DescriptiveStatistics();
 						BigDecimal[] hifPercentiles = hifResult.value13();
 						
+						/*
+						System.out.println("\nHIF Percentiles");
+						for(int hifPctIdx=0; hifPctIdx < hifPercentiles.length; hifPctIdx++) {
+								System.out.println(hifPercentiles[hifPctIdx].doubleValue());
+						}
+						System.out.println("\nValuation Distribution");
+						for(int betaIdx=0; betaIdx < betaDist.length; betaIdx++) {
+							System.out.println(betaDist[betaIdx]);
+						}
+						*/
+						
+						
 						for(int hifPctIdx=0; hifPctIdx < hifPercentiles.length; hifPctIdx++) {
 							for(int betaIdx=0; betaIdx < betaDist.length; betaIdx++) {
 								//valuation estimate * hif percentiles * betaDist / hif point estimate * A
@@ -165,11 +181,29 @@ public class ValuationTaskRunnable implements Runnable {
 
 						rec.setResult(BigDecimal.valueOf(valuationFunctionEstimate)); 
 						try {
-							rec.setPct2_5(BigDecimal.valueOf(distStats.getPercentile(2.5)));
-							rec.setPct97_5(BigDecimal.valueOf(distStats.getPercentile(97.5)));
-							rec.setStandardDev(BigDecimal.valueOf(distStats.getStandardDeviation()));
-							rec.setResultMean(BigDecimal.valueOf(distStats.getMean()));
-							rec.setResultVariance(BigDecimal.valueOf(distStats.getVariance()));
+							double[] percentiles = new double[100];
+							
+							double[] distValues = distStats.getSortedValues();
+							int idxMedian = 0 + distValues.length / 100 / 2; //the median of the first segment
+							DescriptiveStatistics statsPercentiles = new DescriptiveStatistics();
+							
+							for(int i=0; i < 100; i++) {
+								// Grab the median from each of the 100 slices of distStats
+								percentiles[i] = (distValues[idxMedian]+distValues[idxMedian-1])/2.0;
+								statsPercentiles.addValue(percentiles[i]);
+								idxMedian += distValues.length / 100;
+							}
+							/*
+							System.out.println("2.5 old way: " + distStats.getPercentile(2.5));
+							System.out.println("97.5 old way: " + distStats.getPercentile(97.5));
+							System.out.println("2.5 new way: " + percentiles[0]);
+							System.out.println("97.5 new way: " + percentiles[99]);
+							*/
+							rec.setPct2_5(BigDecimal.valueOf(percentiles[0]));
+							rec.setPct97_5(BigDecimal.valueOf(percentiles[99]));
+							rec.setStandardDev(BigDecimal.valueOf(statsPercentiles.getStandardDeviation()));
+							rec.setResultMean(BigDecimal.valueOf(statsPercentiles.getMean()));
+							rec.setResultVariance(BigDecimal.valueOf(statsPercentiles.getVariance()));
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -230,11 +264,24 @@ public class ValuationTaskRunnable implements Runnable {
 	
 	private DescriptiveStatistics getDistributionStats(ValuationFunctionRecord vfRecord) {
 		DescriptiveStatistics stats = new DescriptiveStatistics();
-		double[] samples;
+		double[] samples = new double[10000];
 		switch (vfRecord.getDistA().toLowerCase()) {
+		case "none":		
+			for (int i = 0; i < 10000; i++)
+			{
+				samples[i]=vfRecord.getValA().doubleValue();
+			}
+			break;
 		case "normal":
 			NormalDistribution normalDistribution = new NormalDistribution(vfRecord.getValA().doubleValue(), vfRecord.getP1a().doubleValue());
 			samples = normalDistribution.sample(10000);
+			/*
+			Random rng = new Random(1);
+			for (int i = 0; i < 10000; i++)
+			{
+				double x = normalDistribution.inverseCumulativeProbability(rng.nextDouble());
+				samples[i]=x;
+			}*/
 			break;
 		case "weibull":
 			WeibullDistribution weibullDistribution = new WeibullDistribution(vfRecord.getP2a().doubleValue(), vfRecord.getP1a().doubleValue());
