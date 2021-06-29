@@ -35,7 +35,9 @@ public class TaskUtil {
 						.fetch();
 				
 				if (hifResultDatasets.size() == 0) {
-					// System.out.println("no tasks to process");
+					DSL.using(ctx).deleteFrom(TASK_COMPLETE)
+					.where(TASK_COMPLETE.TASK_UUID.eq(uuid))
+					.execute();
 				} else if (hifResultDatasets.size() > 1) {
 					System.out.println("recieved more than 1 HIF Result Dataset record");
 				} else {
@@ -85,7 +87,9 @@ public class TaskUtil {
 						.fetch();
 
 				if (valuationResultDatasets.size() == 0) {
-					// System.out.println("no tasks to process");
+					DSL.using(ctx).deleteFrom(TASK_COMPLETE)
+					.where(TASK_COMPLETE.TASK_UUID.eq(uuid))
+					.execute();
 				} else if (valuationResultDatasets.size() > 1) {
 					System.out.println("recieved more than 1 Valuation Result Dataset record");
 				} else {

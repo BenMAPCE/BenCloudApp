@@ -321,6 +321,7 @@
 	
 		})
 		.always(function() {
+		    $(window).scrollTop(0);
 		});
 	}
 
