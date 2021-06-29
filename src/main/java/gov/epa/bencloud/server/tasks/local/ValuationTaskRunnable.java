@@ -221,7 +221,7 @@ public class ValuationTaskRunnable implements Runnable {
 			TaskComplete.addTaskToCompleteAndRemoveTaskFromQueue(taskUuid, taskWorkerUuid, taskSuccessful, taskCompleteMessage);
 
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			TaskComplete.addTaskToCompleteAndRemoveTaskFromQueue(taskUuid, taskWorkerUuid, false, "Task Failed");
 			e.printStackTrace();
 		}
 	}

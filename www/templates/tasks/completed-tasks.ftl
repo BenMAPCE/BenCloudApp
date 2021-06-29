@@ -110,8 +110,6 @@
 				initComplete: function () {
 					// Apply the search
 					var api = this.api();
-					api.column(4).visible( false );
-
 
 					api.columns().every( function () {
 						var that = this;
@@ -141,7 +139,7 @@
 		}
 		
 		$('#results-datatable tfoot th').each( function () {
-	        if ($(this).index() < 4) {
+	        if ($(this).index() < 3) {
 		        $(this).html( '<input type="text" placeholder="Filter" />' );
 	        }
 	    } );
