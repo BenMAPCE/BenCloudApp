@@ -173,8 +173,8 @@
 	}
 	
 /*	
-	function loadValuationFunctionsOptions(endpoint_id, valuations_select_name) {
-		$.getJSON( "/api/load-valuation-functions", {endpointId:endpoint_id}, function(respond) {
+	function loadValuationFunctionsOptions(endpoint_group_id, valuations_select_name) {
+		$.getJSON( "/api/load-valuation-functions", {endpointGroupId:endpoint_group_id}, function(respond) {
                 $("select[name='" + valuations_select_name + "']").select2({
                     multiple: true,
                     data: respond
@@ -183,14 +183,14 @@
   	}           
 */
              
-	function loadValuationFunctionsOptions(endpoint_id, valuations_select_name) {
+	function loadValuationFunctionsOptions(endpoint_group_id, valuations_select_name) {
 			
 		formData = new FormData();
 	
 		$.ajax({
 			type 		: "GET", 
 			url 		: "/api/load-valuation-functions", 
-			data 		: "endpointId=" + endpoint_id,
+			data 		: "endpointGroupId=" + endpoint_group_id,
 			dataType 	: "json",
 			cache		: false,
 			processData	: false,
@@ -301,7 +301,7 @@
 				
 //				$("select[name='valuations[" + i + "]'").val(null).trigger('change');
 
-//				loadValuationFunctionsOptions(data[i].hif_endpoint_id, "valuations[" + i + "]");
+//				loadValuationFunctionsOptions(data[i].hif_endpoint_group_id, "valuations[" + i + "]");
 				
 				// ????
 				// remove extra entries persisting
@@ -324,7 +324,7 @@
 			}
 			
 			for(var i = 0; i < data.length; i++) {
-				loadValuationFunctionsOptions(data[i].hif_endpoint_id, "valuations[" + i + "]");
+				loadValuationFunctionsOptions(data[i].hif_endpoint_group_id, "valuations[" + i + "]");
 			}
 			
 			//console.log(data);

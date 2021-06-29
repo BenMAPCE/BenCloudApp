@@ -17,6 +17,7 @@ import javax.servlet.MultipartConfigElement;
 
 import org.jooq.Record;
 import org.jooq.Record13;
+import org.jooq.Record14;
 import org.jooq.Record6;
 import org.jooq.Result;
 import org.jooq.impl.DSL;
@@ -239,13 +240,14 @@ public class ApiRoutes extends RoutesBase {
 			try {
 				resultsetId = Integer.parseInt(resultsetIdParameter);
 
-				Result<Record13<Integer, Integer, Integer, Integer, String, String, String, Integer, Integer, String, String, String, String>> result = DSL.using(JooqUtil.getJooqConfiguration())
+				Result<Record14<Integer, Integer, Integer, Integer, String, String, Integer, String, Integer, Integer, String, String, String, String>> result = DSL.using(JooqUtil.getJooqConfiguration())
 						.select(HIF_RESULT_FUNCTION_CONFIG.HIF_RESULT_DATASET_ID, 
 								HIF_RESULT_FUNCTION_CONFIG.HIF_ID,
 								HEALTH_IMPACT_FUNCTION.ENDPOINT_ID,
 								HEALTH_IMPACT_FUNCTION.ID,
 								HIF_RESULT_DATASET.NAME,
 								ENDPOINT.NAME,
+								HEALTH_IMPACT_FUNCTION.ENDPOINT_GROUP_ID,
 								HEALTH_IMPACT_FUNCTION.AUTHOR,
 								HEALTH_IMPACT_FUNCTION.START_AGE,
 								HEALTH_IMPACT_FUNCTION.END_AGE,
@@ -270,6 +272,7 @@ public class ApiRoutes extends RoutesBase {
 					option.put("hif_result_dataset_name", r.getValue(HIF_RESULT_DATASET.NAME));
 					option.put("hif_id", r.getValue(HEALTH_IMPACT_FUNCTION.ID));
 					option.put("hif_endpoint_id", r.getValue(HEALTH_IMPACT_FUNCTION.ENDPOINT_ID));
+					option.put("hif_endpoint_group_id", r.getValue(HEALTH_IMPACT_FUNCTION.ENDPOINT_GROUP_ID));
 					String hif_options = 
 						r.getValue(ENDPOINT.NAME) + " | " + 
 						r.getValue(HEALTH_IMPACT_FUNCTION.AUTHOR) + " | " + 
@@ -296,17 +299,17 @@ public class ApiRoutes extends RoutesBase {
 
 		service.get("/api/load-valuation-functions", (request, response) -> {
 
-			String endpointIdParamater = request.raw().getParameter("endpointId");
+			String endpointGroupIdParamater = request.raw().getParameter("endpointGroupId");
 
 			ObjectMapper mapper = new ObjectMapper();
 
 			ArrayNode options = mapper.createArrayNode();
 			ObjectNode option = mapper.createObjectNode();
 
-			Integer endpointId;
+			Integer endpointGroupId;
 
 			try {
-				endpointId = Integer.parseInt(endpointIdParamater);
+				endpointGroupId = Integer.parseInt(endpointGroupIdParamater);
 
 				Result<Record6<Integer, Integer, Integer, String, String, String>> result = DSL.using(JooqUtil.getJooqConfiguration())
 						.select(VALUATION_FUNCTION.ID, 
@@ -317,7 +320,7 @@ public class ApiRoutes extends RoutesBase {
 								ENDPOINT.NAME)
 						.from(VALUATION_FUNCTION)
 						.join(ENDPOINT).on(VALUATION_FUNCTION.ENDPOINT_ID.eq(ENDPOINT.ID))
-						.where(VALUATION_FUNCTION.ENDPOINT_ID.eq(endpointId))
+						.where(VALUATION_FUNCTION.ENDPOINT_GROUP_ID.eq(endpointGroupId))
 						.orderBy(ENDPOINT.NAME, 
 								VALUATION_FUNCTION.START_AGE,
 								VALUATION_FUNCTION.END_AGE,
