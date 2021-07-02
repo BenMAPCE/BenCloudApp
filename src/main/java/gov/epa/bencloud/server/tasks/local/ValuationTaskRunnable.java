@@ -2,10 +2,14 @@ package gov.epa.bencloud.server.tasks.local;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
+
 import org.apache.commons.math3.distribution.NormalDistribution;
+import org.apache.commons.math3.distribution.RealDistribution;
 import org.apache.commons.math3.distribution.WeibullDistribution;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jooq.Record13;
@@ -65,23 +69,22 @@ public class ValuationTaskRunnable implements Runnable {
 				ValuationFunctionRecord vfDefinition = ValuationUtil.getFunctionDefinition(vfConfig.vfId);
 				vfDefinitionList.add(vfDefinition);
 				
-				DescriptiveStatistics stats = getDistributionStats(vfDefinition);
-				double[] betaDist = new double[100];
-				double[] distValues = stats.getSortedValues();
-				int idxMedian = 0 + distValues.length / 100 / 2; //the median of the first segment
+				double[] distBetas = new double[100];
+				double[] distSamples = getDistributionSamples(vfDefinition);
+				int idxMedian = 0 + distSamples.length / distBetas.length / 2; //the median of the first segment
 				
-				for(int i=0; i < 100; i++) {
+				for(int i=0; i < distBetas.length; i++) {
 					// Grab the median from each of the 100 slices of distList
-					betaDist[i] = (distValues[idxMedian]+distValues[idxMedian-1])/2.0;
-					idxMedian += distValues.length / 100;
+					distBetas[i] = (distSamples[idxMedian]+distSamples[idxMedian-1])/2.0;
+					idxMedian += distSamples.length / distBetas.length;
 				}
-				vfBetaDistributionLists.add(betaDist);
+				vfBetaDistributionLists.add(distBetas);
 			}
 			
 			HIFTaskConfig hifTaskConfig = HIFApi.getHifTaskConfigFromDb(valuationTaskConfig.hifResultDatasetId);
 			Result<Record13<Long, Integer, Integer, Integer, Integer, Integer, Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal[]>> hifResults = HIFApi.getHifResultsForValuation(valuationTaskConfig.hifResultDatasetId);
 
-			Integer inflationYear = hifTaskConfig.popYear > 2020 ? 2020 : hifTaskConfig.popYear;
+			int inflationYear = hifTaskConfig.popYear > 2020 ? 2020 : hifTaskConfig.popYear;
 			
 			Map<String, Double> inflationIndices = ApiUtil.getInflationIndices(4, inflationYear);
 			Map<Short, Record2<Short, BigDecimal>> incomeGrowthFactors = ApiUtil.getIncomeGrowthFactors(2, hifTaskConfig.popYear);
@@ -121,9 +124,9 @@ public class ValuationTaskRunnable implements Runnable {
 					ValuationConfig vfConfig = valuationTaskConfig.valuationFunctions.get(vfIdx);
 					if (vfConfig.hifId.equals(hifResult.value4())) {
 						Record2<Short, BigDecimal> tmp = incomeGrowthFactors.getOrDefault(hifResult.value5().shortValue(), null);
-						Double incomeGrowthFactor = tmp == null ? 1.0 : tmp.value2().doubleValue();
+						double incomeGrowthFactor = tmp == null ? 1.0 : tmp.value2().doubleValue();
 						
-						Double hifEstimate = hifResult.value9().doubleValue();
+						double hifEstimate = hifResult.value9().doubleValue();
 						
 						Expression valuationFunctionExpression = valuationFunctionExpressionList.get(vfIdx);
 
@@ -140,23 +143,11 @@ public class ValuationTaskRunnable implements Runnable {
 						valuationFunctionExpression.setArgumentValue("MedicalCostIndex", inflationIndices.get("MedicalCostIndex"));
 						valuationFunctionExpression.setArgumentValue("WageIndex", inflationIndices.get("WageIndex"));
 
-						Double valuationFunctionEstimate = valuationFunctionExpression.calculate();
+						double valuationFunctionEstimate = valuationFunctionExpression.calculate();
 						valuationFunctionEstimate = valuationFunctionEstimate * incomeGrowthFactor * hifEstimate;
 						
 						DescriptiveStatistics distStats = new DescriptiveStatistics();
 						BigDecimal[] hifPercentiles = hifResult.value13();
-						
-						/*
-						System.out.println("\nHIF Percentiles");
-						for(int hifPctIdx=0; hifPctIdx < hifPercentiles.length; hifPctIdx++) {
-								System.out.println(hifPercentiles[hifPctIdx].doubleValue());
-						}
-						System.out.println("\nValuation Distribution");
-						for(int betaIdx=0; betaIdx < betaDist.length; betaIdx++) {
-							System.out.println(betaDist[betaIdx]);
-						}
-						*/
-						
 						
 						for(int hifPctIdx=0; hifPctIdx < hifPercentiles.length; hifPctIdx++) {
 							for(int betaIdx=0; betaIdx < betaDist.length; betaIdx++) {
@@ -182,28 +173,27 @@ public class ValuationTaskRunnable implements Runnable {
 							double[] percentiles = new double[100];
 							
 							double[] distValues = distStats.getSortedValues();
-							int idxMedian = 0 + distValues.length / 100 / 2; //the median of the first segment
+							int idxMedian = 0 + distValues.length / percentiles.length / 2; //the median of the first segment
 							DescriptiveStatistics statsPercentiles = new DescriptiveStatistics();
 							
-							for(int i=0; i < 100; i++) {
+							for(int i=0; i < percentiles.length; i++) {
 								// Grab the median from each of the 100 slices of distStats
 								percentiles[i] = (distValues[idxMedian]+distValues[idxMedian-1])/2.0;
 								statsPercentiles.addValue(percentiles[i]);
-								idxMedian += distValues.length / 100;
+								idxMedian += distValues.length / percentiles.length;
 							}
-							/*
-							System.out.println("2.5 old way: " + distStats.getPercentile(2.5));
-							System.out.println("97.5 old way: " + distStats.getPercentile(97.5));
-							System.out.println("2.5 new way: " + percentiles[0]);
-							System.out.println("97.5 new way: " + percentiles[99]);
-							*/
-							rec.setPct2_5(BigDecimal.valueOf(percentiles[0]));
-							rec.setPct97_5(BigDecimal.valueOf(percentiles[99]));
+
+							rec.setPct2_5(BigDecimal.valueOf((percentiles[1] + percentiles[2])/2.0));
+							rec.setPct97_5(BigDecimal.valueOf((percentiles[96]+percentiles[97])/2.0));
 							rec.setStandardDev(BigDecimal.valueOf(statsPercentiles.getStandardDeviation()));
 							rec.setResultMean(BigDecimal.valueOf(statsPercentiles.getMean()));
 							rec.setResultVariance(BigDecimal.valueOf(statsPercentiles.getVariance()));
 						} catch (Exception e) {
-							// TODO Auto-generated catch block
+							rec.setPct2_5(BigDecimal.valueOf(0.0));
+							rec.setPct97_5(BigDecimal.valueOf(0.0));
+							rec.setStandardDev(BigDecimal.valueOf(0.0));
+							rec.setResultMean(BigDecimal.valueOf(0.0));
+							rec.setResultVariance(BigDecimal.valueOf(0.0));
 							e.printStackTrace();
 						}
 
@@ -262,39 +252,35 @@ public class ValuationTaskRunnable implements Runnable {
 		}
 	}
 	
-	private DescriptiveStatistics getDistributionStats(ValuationFunctionRecord vfRecord) {
-		DescriptiveStatistics stats = new DescriptiveStatistics();
+	private double[] getDistributionSamples(ValuationFunctionRecord vfRecord) {
 		double[] samples = new double[10000];
+		Random rng = new Random(1);
+		RealDistribution distribution;
+		
 		switch (vfRecord.getDistA().toLowerCase()) {
 		case "none":		
-			for (int i = 0; i < 10000; i++)
+			for (int i = 0; i < samples.length; i++)
 			{
 				samples[i]=vfRecord.getValA().doubleValue();
 			}
-			break;
+			return samples;
 		case "normal":
-			NormalDistribution normalDistribution = new NormalDistribution(vfRecord.getValA().doubleValue(), vfRecord.getP1a().doubleValue());
-			samples = normalDistribution.sample(10000);
-			/*
-			Random rng = new Random(1);
-			for (int i = 0; i < 10000; i++)
-			{
-				double x = normalDistribution.inverseCumulativeProbability(rng.nextDouble());
-				samples[i]=x;
-			}*/
+			distribution = new NormalDistribution(vfRecord.getValA().doubleValue(), vfRecord.getP1a().doubleValue());
 			break;
 		case "weibull":
-			WeibullDistribution weibullDistribution = new WeibullDistribution(vfRecord.getP2a().doubleValue(), vfRecord.getP1a().doubleValue());
-			samples = weibullDistribution.sample(10000);
+			distribution = new WeibullDistribution(vfRecord.getP2a().doubleValue(), vfRecord.getP1a().doubleValue());
 			break;
 		default:
 			return null;
 		}
-
-		for( int i = 0; i < samples.length; i++) {
-	        stats.addValue(samples[i]);
+		
+		for (int i = 0; i < samples.length; i++)
+		{
+			double x = distribution.inverseCumulativeProbability(rng.nextDouble());
+			samples[i]=x;
 		}
-		return stats;
+		Arrays.sort(samples);
+		return samples;
 	}
 
 }

@@ -63,9 +63,14 @@ public class ValuationUtil {
 	public static void storeResults(Task task, ValuationTaskConfig valuationTaskConfig, ArrayList<ValuationResultRecord> valuationResults) {
 		DSLContext create = DSL.using(JooqUtil.getJooqConfiguration());
 		
-		// HIF result dataset record links the result dataset id to the task uuid
-		ValuationResultDatasetRecord valuationResultDatasetRecord = create.insertInto(VALUATION_RESULT_DATASET, VALUATION_RESULT_DATASET.TASK_UUID)
-		.values(task.getUuid())
+		// Valuation result dataset record links the result dataset id to the task uuid
+		ValuationResultDatasetRecord valuationResultDatasetRecord = create.insertInto(VALUATION_RESULT_DATASET
+				, VALUATION_RESULT_DATASET.TASK_UUID
+				, VALUATION_RESULT_DATASET.NAME
+				, VALUATION_RESULT_DATASET.VARIABLE_DATASET_ID)
+		.values(task.getUuid()
+				,task.getName()
+				,valuationTaskConfig.variableDatasetId)
 		.returning(VALUATION_RESULT_DATASET.ID)
 		.fetchOne();
 		

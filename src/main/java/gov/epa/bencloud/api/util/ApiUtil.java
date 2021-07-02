@@ -45,7 +45,7 @@ public class ApiUtil {
 	}
 
 	public static void main(String[] args) {
-		System.out.println(ApiUtil.getCellId(164, 92));
+		//System.out.println(ApiUtil.getCellId(164, 92));
 	}
 
 	public static Map<String, Double> getInflationIndices(int id, Integer inflationYear) {

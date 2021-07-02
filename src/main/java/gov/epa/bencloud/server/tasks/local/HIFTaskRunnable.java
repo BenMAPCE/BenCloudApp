@@ -6,8 +6,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 
 import org.apache.commons.math3.distribution.NormalDistribution;
+import org.apache.commons.math3.distribution.RealDistribution;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jooq.Record3;
 import org.jooq.Record6;
@@ -79,29 +81,17 @@ public class HIFTaskRunnable implements Runnable {
 				Map<Long, Map<Integer, Double>> incidenceMap = IncidenceApi.getIncidenceEntryGroups(hifTaskConfig, hif, h);
 				incidenceLists.add(incidenceMap);
 				
-				DescriptiveStatistics stats = getDistributionStats(h);
-				double[] betaDist = new double[20];
+				double[] distSamples = getDistributionSamples(h);
+				double[] distBeta = new double[20];
 				
-				double[] distValues = stats.getSortedValues();
-				
-				int idxMedian = 0 + distValues.length / 20 / 2; //the median of the first segment
-				for(int i=0; i < 20; i++) {
-					// Grab the median from each of the 20 slices of distList
-					/*
-					System.out.println(idxMedian+","+(idxMedian-1));
-					*/
-					betaDist[i] = (distValues[idxMedian]+distValues[idxMedian-1])/2.0;
-					idxMedian += distValues.length / 20;
+				int idxMedian = 0 + distSamples.length / distBeta.length / 2; //the median of the first segment
+				for(int i=0; i < distBeta.length; i++) {
+					// Grab the median from each of the 20 slices of distSamples
+					distBeta[i] = (distSamples[idxMedian]+distSamples[idxMedian-1])/2.0;
+					idxMedian += distSamples.length / distBeta.length;
 				}
 				
-				/*
-				double idx=2.5;
-				for(int i=0; i < 20; i++) {
-					betaDist[i] = stats.getPercentile(idx);
-					idx += 5;
-				}
-				*/
-				hifBetaDistributionLists.add(betaDist);
+				hifBetaDistributionLists.add(distBeta);
 			}
 
 			TaskQueue.updateTaskPercentage(taskUuid, 2, "Loading population data");
@@ -153,9 +143,13 @@ public class HIFTaskRunnable implements Runnable {
 				if (scenarioCell == null) {
 					continue;
 				}
+				
+				/*
 				if (baselineCell.getValue().equals(scenarioCell.getValue())) {
 					continue;
 				}
+				*/
+				
 				Result<Record6<Long, Integer, Integer, Integer, Integer, BigDecimal>> populationCell = populationMap.getOrDefault(baselineEntry.getKey(), null);
 				if (populationCell == null) {
 					continue;
@@ -176,7 +170,7 @@ public class HIFTaskRunnable implements Runnable {
 					//TODO: kludge to scale ozone results by the number of days between May 1 - Sept 30
 					//IF the HIF metric statistic == 0 (None) then it's a daily function and we need to scale by the year or global season
 					
-					Double seasonalScalar = 1.0;
+					double seasonalScalar = 1.0;
 					if(hifDefinition.getMetricStatistic() == 0) { // NONE
 						if(hifDefinition.getPollutantId() == 4) { // Ozone
 							seasonalScalar = 153.0;
@@ -186,33 +180,38 @@ public class HIFTaskRunnable implements Runnable {
 					}
 					// If we have variable values, grab them for use in the standard deviation calc below. 
 					// Else, set to 1 so they won't have any effect.
-					Double varA = hifDefinition.getValA().doubleValue() != 0 ? hifDefinition.getValA().doubleValue() : 1.0;
-					Double varB = hifDefinition.getValB().doubleValue() != 0 ? hifDefinition.getValB().doubleValue() : 1.0;
-					Double varC = hifDefinition.getValC().doubleValue() != 0 ? hifDefinition.getValC().doubleValue() : 1.0;
+					//Double varA = hifDefinition.getValA().doubleValue() != 0 ? hifDefinition.getValA().doubleValue() : 1.0;
+					//Double varB = hifDefinition.getValB().doubleValue() != 0 ? hifDefinition.getValB().doubleValue() : 1.0;
+					//Double varC = hifDefinition.getValC().doubleValue() != 0 ? hifDefinition.getValC().doubleValue() : 1.0;
 					
-					hifFunctionExpression.setArgumentValue("DELTAQ",baselineCell.getValue().subtract(scenarioCell.getValue()).doubleValue());
+					double beta = hifDefinition.getBeta().doubleValue();
+
+					// NOTE: This is a bad idea. We are using floats rather than doubles here
+					// because this is what BenMAP does and we're trying to match the results
+					// After we complete validation, we should change these to doubles and document this
+					float baselineValue = baselineCell.getValue().floatValue();
+					float scenarioValue = scenarioCell.getValue().floatValue();
+					double deltaQ = baselineValue - scenarioValue;					
+					
+					hifFunctionExpression.setArgumentValue("DELTAQ",deltaQ);
 					hifFunctionExpression.setArgumentValue("Q0", baselineCell.getValue().doubleValue());
 					hifFunctionExpression.setArgumentValue("Q1", scenarioCell.getValue().doubleValue());
 
-					hifBaselineExpression.setArgumentValue("DELTAQ",baselineCell.getValue().subtract(scenarioCell.getValue()).doubleValue());
+					hifBaselineExpression.setArgumentValue("DELTAQ",deltaQ);
 					hifBaselineExpression.setArgumentValue("Q0", baselineCell.getValue().doubleValue());
 					hifBaselineExpression.setArgumentValue("Q1", scenarioCell.getValue().doubleValue());
 
 					HashMap<Integer, Double> popAgeRangeHifMap = hifPopAgeRangeMapping.get(hifIdx);
-					
 					Map<Long, Map<Integer, Double>> incidenceMap = incidenceLists.get(hifIdx);
 					Map<Integer, Double> incidenceCell = incidenceMap.get(baselineCell.getGridCellId());
 
 					/*
 					 * ACCUMULATE THE ESTIMATE FOR EACH AGE CATEGORY IN THIS CELL
 					 */
-					Double beta = hifDefinition.getBeta().doubleValue();
-					Double p1Beta = hifDefinition.getP1Beta().doubleValue();
-					Double deltaQ = baselineCell.getValue().subtract(scenarioCell.getValue()).doubleValue();
-					
-					Double totalPop = 0.0;
-					Double hifFunctionEstimate = 0.0;
-					Double hifBaselineEstimate = 0.0;
+
+					double totalPop = 0.0;
+					double hifFunctionEstimate = 0.0;
+					double hifBaselineEstimate = 0.0;
 					double[] resultPercentiles = new double[20];
 					
 					for (Record6<Long, Integer, Integer, Integer, Integer, BigDecimal> popCategory : populationCell) {
@@ -220,8 +219,8 @@ public class HIFTaskRunnable implements Runnable {
 						Integer popAgeRange = popCategory.value5();
 						
 						if (popAgeRangeHifMap.containsKey(popAgeRange)) {
-							Double rangePop = popCategory.value6().doubleValue() * popAgeRangeHifMap.get(popAgeRange);
-							Double incidence = incidenceCell.getOrDefault(popAgeRange, 0.0);
+							double rangePop = popCategory.value6().doubleValue() * popAgeRangeHifMap.get(popAgeRange);
+							double incidence = incidenceCell.getOrDefault(popAgeRange, 0.0);
 							totalPop += rangePop;
 
 							hifFunctionExpression.setArgumentValue("BETA", beta);
@@ -239,6 +238,11 @@ public class HIFTaskRunnable implements Runnable {
 							hifBaselineEstimate += hifBaselineExpression.calculate() * seasonalScalar;
 						}
 					}
+					//This can happen if we're running multiple functions but we don't have any
+					//of the population ranges that this function wants
+					if(totalPop==0) {
+						continue;
+					}
 					
 					HifResultRecord rec = new HifResultRecord();
 					rec.setGridCellId(baselineEntry.getKey());
@@ -252,7 +256,7 @@ public class HIFTaskRunnable implements Runnable {
 					rec.setPct97_5(BigDecimal.valueOf(resultPercentiles[19]));
 					
 					BigDecimal[] tmp = new BigDecimal[resultPercentiles.length];
-					for(int i=0; i<resultPercentiles.length; i++) {
+					for(int i=0; i < resultPercentiles.length; i++) {
 						tmp[i] = BigDecimal.valueOf(resultPercentiles[i]);
 					}
 					rec.setPercentiles(tmp);
@@ -265,12 +269,7 @@ public class HIFTaskRunnable implements Runnable {
 					rec.setResultMean(BigDecimal.valueOf(stats.getMean()));
 					rec.setResultVariance(BigDecimal.valueOf(stats.getVariance()));
 					rec.setBaseline(BigDecimal.valueOf(hifBaselineEstimate));
-					/*
-					System.out.println("\nHIF Percentiles");
-					for(int hifPctIdx=0; hifPctIdx < resultPercentiles.length; hifPctIdx++) {
-							System.out.println(resultPercentiles[hifPctIdx]);
-					}
-					*/
+
 					hifResults.add(rec);
 				}
 			}
@@ -405,15 +404,21 @@ public class HIFTaskRunnable implements Runnable {
 		}
 	}
 	
-	private DescriptiveStatistics getDistributionStats(HealthImpactFunctionRecord h) {
+	private double[] getDistributionSamples(HealthImpactFunctionRecord h) {
 		//TODO: At the moment, all HIFs are normal distribution. Need to build this out to support other types.
-		NormalDistribution normalDistribution = new NormalDistribution(h.getBeta().doubleValue(), h.getP1Beta().doubleValue());
-		double[] samples = normalDistribution.sample(10000);
-		DescriptiveStatistics stats = new DescriptiveStatistics();
-		for( int i = 0; i < samples.length; i++) {
-	        stats.addValue(samples[i]);
+		double[] samples = new double[10000];
+		
+		RealDistribution distribution = new NormalDistribution(h.getBeta().doubleValue(), h.getP1Beta().doubleValue());
+		
+		Random rng = new Random(1);
+		for (int i = 0; i < samples.length; i++)
+		{
+			double x = distribution.inverseCumulativeProbability(rng.nextDouble());
+			samples[i]=x;
 		}
-		return stats;
+		
+		Arrays.sort(samples);
+		return samples;
 	}
 
 }
