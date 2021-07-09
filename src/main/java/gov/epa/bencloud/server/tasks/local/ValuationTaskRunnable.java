@@ -8,8 +8,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 
+import org.apache.commons.math3.distribution.LogNormalDistribution;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.distribution.RealDistribution;
+import org.apache.commons.math3.distribution.TriangularDistribution;
 import org.apache.commons.math3.distribution.WeibullDistribution;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jooq.Record13;
@@ -273,6 +275,13 @@ public class ValuationTaskRunnable implements Runnable {
 			break;
 		case "weibull":
 			distribution = new WeibullDistribution(vfRecord.getP2a().doubleValue(), vfRecord.getP1a().doubleValue());
+			break;
+		case "lognormal":
+			distribution = new LogNormalDistribution(vfRecord.getP1a().doubleValue(), vfRecord.getP2a().doubleValue());
+			break;
+		case "triangular":
+			//lower, mode, upper
+			distribution = new TriangularDistribution(vfRecord.getP1a().doubleValue(), vfRecord.getValA().doubleValue(), vfRecord.getP2a().doubleValue());
 			break;
 		default:
 			return null;
