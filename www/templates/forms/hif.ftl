@@ -109,6 +109,18 @@
 	            <@forms.end_smartforms_column />
             <@forms.end_smartforms_row />
 
+           <@forms.start_smartforms_row />
+	            <@forms.start_smartforms_column width=4 />
+            		<@forms.start_smartforms_section />
+		               	<@forms.smartforms_checkbox 
+		                		id="preserve_legacy_behavior"
+		 						text="Preserve Legacy Behavior"
+		 						checked=false
+		 						/>
+	            	<@forms.end_smartforms_section />
+	            <@forms.end_smartforms_column />
+            <@forms.end_smartforms_row />
+            
           <@forms.start_smartforms_row />
 	            <@forms.start_smartforms_column width=4 />
             		<@forms.start_smartforms_section />
@@ -353,6 +365,7 @@
 		population.year = population.id=='41' ? 2020 : 2010;
 		
 		hifJSON.population = population;
+		hifJSON.preserveLegacyBehavior = $('#preserve_legacy_behavior').is(":checked");
 		
 		hifJSON.functions = [];
 		

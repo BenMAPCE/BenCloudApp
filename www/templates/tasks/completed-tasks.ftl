@@ -1,4 +1,4 @@
-<#assign page_title = "Conpleted Tasks">
+<#assign page_title = "Completed Tasks">
 
 <html>
 <head>

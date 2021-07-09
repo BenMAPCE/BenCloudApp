@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
-
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.distribution.RealDistribution;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
@@ -123,7 +122,7 @@ public class HIFTaskRunnable implements Runnable {
 			
 			ArrayList<HifResultRecord> hifResults = new ArrayList<HifResultRecord>();
 			mXparser.setToOverrideBuiltinTokens();
-
+			
 			/*
 			 * FOR EACH CELL IN THE BASELINE AIR QUALITY SURFACE
 			 */
@@ -186,11 +185,12 @@ public class HIFTaskRunnable implements Runnable {
 					
 					double beta = hifDefinition.getBeta().doubleValue();
 
-					// NOTE: This is a bad idea. We are using floats rather than doubles here
-					// because this is what BenMAP does and we're trying to match the results
-					// After we complete validation, we should change these to doubles and document this
-					float baselineValue = baselineCell.getValue().floatValue();
-					float scenarioValue = scenarioCell.getValue().floatValue();
+
+					// BenMAP-CE stores air quality values as floats but performs HIF estimates using doubles.
+					// Testing has shown that float to double conversion can cause small changes in values 
+					// Normal operation in BenCloud will use all doubles but, during validation with BenMAP results, it may be useful to preserve the legacy behavior
+					double baselineValue = hifTaskConfig.preserveLegacyBehavior ? baselineCell.getValue().floatValue() : baselineCell.getValue().doubleValue();
+					double scenarioValue = hifTaskConfig.preserveLegacyBehavior ? scenarioCell.getValue().floatValue() : scenarioCell.getValue().doubleValue();
 					double deltaQ = baselineValue - scenarioValue;					
 					
 					hifFunctionExpression.setArgumentValue("DELTAQ",deltaQ);
@@ -373,11 +373,13 @@ public class HIFTaskRunnable implements Runnable {
 				}
 			}
 			JsonNode popConfig = params.get("population");
-
 			hifTaskConfig.popId = popConfig.get("id").asInt();
 			hifTaskConfig.popYear = popConfig.get("year").asInt();
 			JsonNode functions = params.get("functions");
 			parseFunctions(functions, hifTaskConfig);
+			
+			hifTaskConfig.preserveLegacyBehavior = params.get("preserveLegacyBehavior").asBoolean(false);
+			
 		} catch (JsonMappingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

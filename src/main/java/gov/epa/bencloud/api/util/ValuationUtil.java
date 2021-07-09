@@ -30,10 +30,10 @@ public class ValuationUtil {
 		
 		// Populate/create the necessary arguments
 		//{ A, B, C, D, AllGoodsIndex, MedicalCostIndex, WageIndex, LagAdjustment, dicSetupVariables };
-		Argument a = new Argument("A", record.getValA().doubleValue());
-		Argument b = new Argument("B", record.getValB().doubleValue());
-		Argument c = new Argument("C", record.getValC().doubleValue());
-		Argument d = new Argument("D", record.getValD().doubleValue());
+		Constant a = new Constant("A", record.getValA().doubleValue());
+		Constant b = new Constant("B", record.getValB().doubleValue());
+		Constant c = new Constant("C", record.getValC().doubleValue());
+		Constant d = new Constant("D", record.getValD().doubleValue());
 		Argument allGoodsIndex = new Argument("AllGoodsIndex", 0.0);
 		Argument medicalCostIndex = new Argument("MedicalCostIndex", 0.0);
 		Argument wageIndex = new Argument("WageIndex", 0.0);
@@ -41,8 +41,6 @@ public class ValuationUtil {
 		//TODO: Inspect function for variables and create arguments to match
 		//Hardcoding median_income for now
 		Argument medianIncome = new Argument("median_income", 0.0);
-
-		
 
 		return new Expression(record.getFunctionText(), a, b, c, d, allGoodsIndex, medicalCostIndex, wageIndex, medianIncome);
 	}

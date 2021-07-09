@@ -29,14 +29,14 @@ public class HIFUtil {
 				.where(HEALTH_IMPACT_FUNCTION.ID.eq(id))
 				.fetchOne();
 		
-		// Populate/create the necessary arguments
+		// Populate/create the necessary arguments and constants
 		//{ a, b, c, beta, deltaq, q0, q1, incidence, pop, prevalence };
-		Argument a = new Argument("A", record.getValA().doubleValue());
-		Argument b = new Argument("B", record.getValB().doubleValue());
-		Argument c = new Argument("C", record.getValC().doubleValue());
-		Argument beta = new Argument("BETA", record.getBeta().doubleValue());
+		Constant a = new Constant("A", record.getValA().doubleValue());
+		Constant b = new Constant("B", record.getValB().doubleValue());
+		Constant c = new Constant("C", record.getValC().doubleValue());
 		
 		//The following will be set while iterating cells
+		Argument beta = new Argument("BETA", record.getBeta().doubleValue());
 		Argument deltaQ = new Argument("DELTAQ", 0.0);
 		Argument q1 = new Argument("Q0", 0.0);
 		Argument q2 = new Argument("Q1", 0.0);

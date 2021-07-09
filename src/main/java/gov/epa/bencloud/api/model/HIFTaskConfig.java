@@ -9,6 +9,7 @@ public class HIFTaskConfig {
 	public Integer aqScenarioId = 0;
 	public Integer popId = 0;
 	public Integer popYear = 0;
+	public Boolean preserveLegacyBehavior = false;
 	public List<HIFConfig> hifs = new ArrayList<HIFConfig>();
 
 }

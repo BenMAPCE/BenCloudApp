@@ -168,26 +168,30 @@ public class ValuationTaskRunnable implements Runnable {
 						rec.setHifId(vfConfig.hifId);
 						rec.setVfId(vfConfig.vfId);
 
-						rec.setResult(BigDecimal.valueOf(valuationFunctionEstimate)); 
+						rec.setResult(BigDecimal.valueOf(valuationFunctionEstimate));
 						try {
-							double[] percentiles = new double[100];
-							
-							double[] distValues = distStats.getSortedValues();
-							int idxMedian = 0 + distValues.length / percentiles.length / 2; //the median of the first segment
-							DescriptiveStatistics statsPercentiles = new DescriptiveStatistics();
-							
-							for(int i=0; i < percentiles.length; i++) {
-								// Grab the median from each of the 100 slices of distStats
-								percentiles[i] = (distValues[idxMedian]+distValues[idxMedian-1])/2.0;
-								statsPercentiles.addValue(percentiles[i]);
-								idxMedian += distValues.length / percentiles.length;
-							}
 
-							rec.setPct2_5(BigDecimal.valueOf((percentiles[1] + percentiles[2])/2.0));
-							rec.setPct97_5(BigDecimal.valueOf((percentiles[96]+percentiles[97])/2.0));
-							rec.setStandardDev(BigDecimal.valueOf(statsPercentiles.getStandardDeviation()));
-							rec.setResultMean(BigDecimal.valueOf(statsPercentiles.getMean()));
-							rec.setResultVariance(BigDecimal.valueOf(statsPercentiles.getVariance()));
+							if (valuationFunctionEstimate == 0.0) {
+
+							} else {
+
+								double[] percentiles = new double[100];
+
+								double[] distValues = distStats.getSortedValues();
+								int idxMedian = distValues.length / percentiles.length / 2; // the median of the first segment
+								DescriptiveStatistics statsPercentiles = new DescriptiveStatistics();
+								for (int i = 0; i < percentiles.length; i++) {
+									// Grab the median from each of the 100 slices of distStats
+									percentiles[i] = (distValues[idxMedian] + distValues[idxMedian - 1]) / 2.0;
+									statsPercentiles.addValue(percentiles[i]);
+									idxMedian += distValues.length / percentiles.length;
+								}
+								rec.setPct2_5(BigDecimal.valueOf((percentiles[1] + percentiles[2]) / 2.0));
+								rec.setPct97_5(BigDecimal.valueOf((percentiles[96] + percentiles[97]) / 2.0));
+								rec.setStandardDev(BigDecimal.valueOf(statsPercentiles.getStandardDeviation()));
+								rec.setResultMean(BigDecimal.valueOf(statsPercentiles.getMean()));
+								rec.setResultVariance(BigDecimal.valueOf(statsPercentiles.getVariance()));
+							}
 						} catch (Exception e) {
 							rec.setPct2_5(BigDecimal.valueOf(0.0));
 							rec.setPct97_5(BigDecimal.valueOf(0.0));
