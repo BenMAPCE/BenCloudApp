@@ -7,6 +7,8 @@ package gov.epa.bencloud.server.database.jooq;
 import gov.epa.bencloud.server.database.jooq.tables.AgeRange;
 import gov.epa.bencloud.server.database.jooq.tables.AirQualityCell;
 import gov.epa.bencloud.server.database.jooq.tables.AirQualityLayer;
+import gov.epa.bencloud.server.database.jooq.tables.CrosswalkDataset;
+import gov.epa.bencloud.server.database.jooq.tables.CrosswalkEntry;
 import gov.epa.bencloud.server.database.jooq.tables.Endpoint;
 import gov.epa.bencloud.server.database.jooq.tables.EndpointGroup;
 import gov.epa.bencloud.server.database.jooq.tables.Ethnicity;
@@ -68,6 +70,16 @@ public class Tables {
      * The table <code>data.air_quality_layer</code>.
      */
     public static final AirQualityLayer AIR_QUALITY_LAYER = AirQualityLayer.AIR_QUALITY_LAYER;
+
+    /**
+     * The table <code>data.crosswalk_dataset</code>.
+     */
+    public static final CrosswalkDataset CROSSWALK_DATASET = CrosswalkDataset.CROSSWALK_DATASET;
+
+    /**
+     * The table <code>data.crosswalk_entry</code>.
+     */
+    public static final CrosswalkEntry CROSSWALK_ENTRY = CrosswalkEntry.CROSSWALK_ENTRY;
 
     /**
      * The table <code>data.endpoint</code>.

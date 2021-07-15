@@ -13,6 +13,8 @@ import static gov.epa.bencloud.server.database.jooq.Tables.POPULATION_DATASET;
 import static gov.epa.bencloud.server.database.jooq.Tables.RACE;
 import static gov.epa.bencloud.server.database.jooq.Tables.VALUATION_FUNCTION;
 
+import java.util.UUID;
+
 import javax.servlet.MultipartConfigElement;
 
 import org.jooq.Record;
@@ -24,6 +26,7 @@ import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -33,7 +36,11 @@ import gov.epa.bencloud.api.AirQualityApi;
 import gov.epa.bencloud.api.GridDefinitionApi;
 import gov.epa.bencloud.api.HIFApi;
 import gov.epa.bencloud.api.PollutantApi;
+import gov.epa.bencloud.api.util.ApiUtil;
 import gov.epa.bencloud.server.database.JooqUtil;
+import gov.epa.bencloud.server.tasks.TaskComplete;
+import gov.epa.bencloud.server.tasks.TaskQueue;
+import gov.epa.bencloud.server.tasks.model.Task;
 import spark.Service;
 
 public class ApiRoutes extends RoutesBase {
@@ -49,32 +56,32 @@ public class ApiRoutes extends RoutesBase {
 	private void addRoutes(Configuration freeMarkerConfiguration) {
 
 		// GET	
-		service.get("/api/v1/grid-definitions", (request, response) -> {
+		service.get("/api/grid-definitions", (request, response) -> {
 			return GridDefinitionApi.getAllGridDefinitions(response);
 		});
 		
-		service.get("/api/v1/pollutants", (request, response) -> {
+		service.get("/api/pollutants", (request, response) -> {
 			return PollutantApi.getAllPollutantDefinitions(response);
 		});
 		
-		service.get("/api/v1/air-quality-data", (request, response) -> {
+		service.get("/api/air-quality-data", (request, response) -> {
 			return AirQualityApi.getAllAirQualityLayerDefinitions(response);
 		});
 
-		service.get("/api/v1/air-quality-data/:id/definition", (request, response) -> {
+		service.get("/api/air-quality-data/:id/definition", (request, response) -> {
 			return AirQualityApi.getAirQualityLayerDefinition(request, response);
 		});
 
-		service.get("/api/v1/air-quality-data/:id/details", (request, response) -> {
+		service.get("/api/air-quality-data/:id/details", (request, response) -> {
 			return AirQualityApi.getAirQualityLayerDetails(request, response);
 		});
 
-		service.get("/api/v1/health-impact-functions", (request, response) -> {
+		service.get("/api/health-impact-functions", (request, response) -> {
 			return HIFApi.getAllHealthImpactFunctions(request, response);
 		});
 		
 		// POST
-		service.post("/api/v1/air-quality-data", (request, response) -> {
+		service.post("/api/air-quality-data", (request, response) -> {
 			
 			request.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp"));
 			String layerName = getPostParameterValue(request, "name");
@@ -404,6 +411,69 @@ public class ApiRoutes extends RoutesBase {
 			return options;
 		});
 
+		service.get("/api/tasks/:uuid/results", (req, res) -> {
+			
+			String bcoUserIdentifier = getOrSetOrExtendCookie(req, res);
+			
+			return ApiUtil.getTaskResultDetails(req, res);
+
+		});
+
+		service.get("/api/tasks/:uuid/results/delete", (req, res) -> {
+			
+			String bcoUserIdentifier = getOrSetOrExtendCookie(req, res);
+			
+			return ApiUtil.deleteTaskResults(req, res);
+
+		});
+		
+		service.get("/api/tasks/pending", (req, res) -> {
+			
+			String bcoUserIdentifier = getOrSetOrExtendCookie(req, res);
+			
+			ObjectNode data = TaskQueue.getPendingTasks(bcoUserIdentifier, getPostParametersAsMap(req));
+			res.type("application/json");
+			return data;
+
+		});
+		
+		service.get("/api/tasks/completed", (req, res) -> {
+			
+			String bcoUserIdentifier = getOrSetOrExtendCookie(req, res);
+			
+			ObjectNode data = TaskComplete.getCompletedTasks(bcoUserIdentifier, getPostParametersAsMap(req));
+			res.type("application/json");
+			return data;
+
+		});
+		
+		// Submit a new task
+		service.post("/api/tasks", (req, res) -> {
+
+			String bcoUserIdentifier = getOrSetOrExtendCookie(req, res);
+			String body = req.body();
+			
+			ObjectMapper mapper = new ObjectMapper();
+			JsonNode params = mapper.readTree(body);
+			
+			
+			Task task = new Task();
+			task.setName(params.get("name").asText());
+			
+			task.setParameters(body);
+			task.setUuid(UUID.randomUUID().toString());
+			task.setUserIdentifier(bcoUserIdentifier);
+			task.setType(params.get("type").asText());
+			
+			TaskQueue.writeTaskToQueue(task);
+
+			ObjectNode ret = mapper.createObjectNode();
+			ret.put("task_uuid", task.getUuid());
+			res.type("application/json");
+			return ret;
+
+		});
+		
 	}
 
 }

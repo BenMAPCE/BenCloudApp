@@ -26,6 +26,11 @@ public class Sequences {
     public static final Sequence<Integer> AIR_QUALITY_LAYER_ID_SEQ = Internal.createSequence("air_quality_layer_id_seq", Data.DATA, SQLDataType.INTEGER.nullable(false), null, null, null, null, false, null);
 
     /**
+     * The sequence <code>data.crosswalk_dataset_id_seq</code>
+     */
+    public static final Sequence<Integer> CROSSWALK_DATASET_ID_SEQ = Internal.createSequence("crosswalk_dataset_id_seq", Data.DATA, SQLDataType.INTEGER.nullable(false), null, null, null, null, false, null);
+
+    /**
      * The sequence <code>data.endpoint_group_id_seq</code>
      */
     public static final Sequence<Integer> ENDPOINT_GROUP_ID_SEQ = Internal.createSequence("endpoint_group_id_seq", Data.DATA, SQLDataType.INTEGER.nullable(false), null, null, null, null, false, null);

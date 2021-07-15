@@ -2,7 +2,7 @@
 		
 		$.ajax({
 			type 		: "GET", 
-			url 		: "/api/v1/air-quality-data/" + id + "/details", 
+			url 		: "/api/air-quality-data/" + id + "/details", 
 			data 		: {},
             dataType	: "text",
 			cache		: false,

@@ -30,43 +30,6 @@ public class TaskRoutes extends RoutesBase {
 
 	private void addRoutes(Configuration freeMarkerConfiguration) {
 
-		// Submit a new task
-		service.post("/api/v1/tasks", (req, res) -> {
-
-			String bcoUserIdentifier = getOrSetOrExtendCookie(req, res);
-			String body = req.body();
-			
-			ObjectMapper mapper = new ObjectMapper();
-			JsonNode params = mapper.readTree(body);
-			
-			
-			Task task = new Task();
-			task.setName(params.get("name").asText());
-			
-			//task.setDescription(faker.funnyName().name());
-			task.setParameters(body);
-			task.setUuid(UUID.randomUUID().toString());
-			task.setUserIdentifier(bcoUserIdentifier);
-			task.setType(params.get("type").asText());
-			
-			TaskQueue.writeTaskToQueue(task);
-
-			ObjectNode ret = mapper.createObjectNode();
-			ret.put("task_uuid", task.getUuid());
-			res.type("application/json");
-			return ret;
-
-		});
-
-		service.get("/api/v1/tasks/pending", (req, res) -> {
-			
-			String bcoUserIdentifier = getOrSetOrExtendCookie(req, res);
-			
-			ObjectNode data = TaskQueue.getPendingTasks(bcoUserIdentifier, getPostParametersAsMap(req));
-			res.type("application/json");
-			return data;
-
-		});
 
 		service.get("/tasks/pending-tasks", (req, res) -> {
 
@@ -77,16 +40,6 @@ public class TaskRoutes extends RoutesBase {
 			return FreeMarkerRenderUtil.render(freeMarkerConfiguration, attributes, "/tasks/pending-tasks.ftl");
 
 		});
-		
-		service.get("/api/v1/tasks/completed", (req, res) -> {
-			
-			String bcoUserIdentifier = getOrSetOrExtendCookie(req, res);
-			
-			ObjectNode data = TaskComplete.getCompletedTasks(bcoUserIdentifier, getPostParametersAsMap(req));
-			res.type("application/json");
-			return data;
-
-		});
 
 		service.get("/tasks/completed-tasks", (req, res) -> {
 
@@ -95,22 +48,6 @@ public class TaskRoutes extends RoutesBase {
 			Map<String, Object> attributes = new HashMap<>();
 
 			return FreeMarkerRenderUtil.render(freeMarkerConfiguration, attributes, "/tasks/completed-tasks.ftl");
-
-		});
-
-		service.get("/api/v1/tasks/:uuid/results", (req, res) -> {
-			
-			String bcoUserIdentifier = getOrSetOrExtendCookie(req, res);
-			
-			return ApiUtil.getTaskResultDetails(req, res);
-
-		});
-
-		service.get("/api/v1/tasks/:uuid/results/delete", (req, res) -> {
-			
-			String bcoUserIdentifier = getOrSetOrExtendCookie(req, res);
-			
-			return ApiUtil.deleteTaskResults(req, res);
 
 		});
 

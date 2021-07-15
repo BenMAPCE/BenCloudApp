@@ -48,7 +48,7 @@
 
 <script>
 
-	var getResultsUrl = "/api/v1/tasks/pending";
+	var getResultsUrl = "/api/tasks/pending";
 		
 	var resultsDatatableColumns = 
 	[

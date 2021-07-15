@@ -6,6 +6,7 @@ package gov.epa.bencloud.server.database.jooq;
 
 import gov.epa.bencloud.server.database.jooq.tables.AgeRange;
 import gov.epa.bencloud.server.database.jooq.tables.AirQualityLayer;
+import gov.epa.bencloud.server.database.jooq.tables.CrosswalkDataset;
 import gov.epa.bencloud.server.database.jooq.tables.Endpoint;
 import gov.epa.bencloud.server.database.jooq.tables.EndpointGroup;
 import gov.epa.bencloud.server.database.jooq.tables.Ethnicity;
@@ -41,6 +42,7 @@ import gov.epa.bencloud.server.database.jooq.tables.VariableDataset;
 import gov.epa.bencloud.server.database.jooq.tables.VariableEntry;
 import gov.epa.bencloud.server.database.jooq.tables.records.AgeRangeRecord;
 import gov.epa.bencloud.server.database.jooq.tables.records.AirQualityLayerRecord;
+import gov.epa.bencloud.server.database.jooq.tables.records.CrosswalkDatasetRecord;
 import gov.epa.bencloud.server.database.jooq.tables.records.EndpointGroupRecord;
 import gov.epa.bencloud.server.database.jooq.tables.records.EndpointRecord;
 import gov.epa.bencloud.server.database.jooq.tables.records.EthnicityRecord;
@@ -95,6 +97,7 @@ public class Keys {
 
     public static final UniqueKey<AgeRangeRecord> AGE_RANGE_PKEY = Internal.createUniqueKey(AgeRange.AGE_RANGE, DSL.name("age_range_pkey"), new TableField[] { AgeRange.AGE_RANGE.ID }, true);
     public static final UniqueKey<AirQualityLayerRecord> AIR_QUALITY_LAYER_PKEY = Internal.createUniqueKey(AirQualityLayer.AIR_QUALITY_LAYER, DSL.name("air_quality_layer_pkey"), new TableField[] { AirQualityLayer.AIR_QUALITY_LAYER.ID }, true);
+    public static final UniqueKey<CrosswalkDatasetRecord> CROSSWALK_DATASET_PKEY = Internal.createUniqueKey(CrosswalkDataset.CROSSWALK_DATASET, DSL.name("crosswalk_dataset_pkey"), new TableField[] { CrosswalkDataset.CROSSWALK_DATASET.ID }, true);
     public static final UniqueKey<EndpointRecord> ENDPOINT_PKEY = Internal.createUniqueKey(Endpoint.ENDPOINT, DSL.name("endpoint_pkey"), new TableField[] { Endpoint.ENDPOINT.ID }, true);
     public static final UniqueKey<EndpointGroupRecord> ENDPOINT_GROUP_PKEY = Internal.createUniqueKey(EndpointGroup.ENDPOINT_GROUP, DSL.name("endpoint_group_pkey"), new TableField[] { EndpointGroup.ENDPOINT_GROUP.ID }, true);
     public static final UniqueKey<EthnicityRecord> ETHNICITY_PKEY = Internal.createUniqueKey(Ethnicity.ETHNICITY, DSL.name("ethnicity_pkey"), new TableField[] { Ethnicity.ETHNICITY.ID }, true);

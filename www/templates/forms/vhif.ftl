@@ -397,7 +397,7 @@
 			
 		$.ajax({
 			type 		: "POST", 
-			url 		: "/api/v1/tasks", 
+			url 		: "/api/tasks", 
 			data 		: parameters,
 			dataType 	: "json",
 			cache		: false,

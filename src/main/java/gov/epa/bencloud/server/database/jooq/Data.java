@@ -7,6 +7,8 @@ package gov.epa.bencloud.server.database.jooq;
 import gov.epa.bencloud.server.database.jooq.tables.AgeRange;
 import gov.epa.bencloud.server.database.jooq.tables.AirQualityCell;
 import gov.epa.bencloud.server.database.jooq.tables.AirQualityLayer;
+import gov.epa.bencloud.server.database.jooq.tables.CrosswalkDataset;
+import gov.epa.bencloud.server.database.jooq.tables.CrosswalkEntry;
 import gov.epa.bencloud.server.database.jooq.tables.Endpoint;
 import gov.epa.bencloud.server.database.jooq.tables.EndpointGroup;
 import gov.epa.bencloud.server.database.jooq.tables.Ethnicity;
@@ -83,6 +85,16 @@ public class Data extends SchemaImpl {
      * The table <code>data.air_quality_layer</code>.
      */
     public final AirQualityLayer AIR_QUALITY_LAYER = AirQualityLayer.AIR_QUALITY_LAYER;
+
+    /**
+     * The table <code>data.crosswalk_dataset</code>.
+     */
+    public final CrosswalkDataset CROSSWALK_DATASET = CrosswalkDataset.CROSSWALK_DATASET;
+
+    /**
+     * The table <code>data.crosswalk_entry</code>.
+     */
+    public final CrosswalkEntry CROSSWALK_ENTRY = CrosswalkEntry.CROSSWALK_ENTRY;
 
     /**
      * The table <code>data.endpoint</code>.
@@ -297,6 +309,7 @@ public class Data extends SchemaImpl {
         return Arrays.<Sequence<?>>asList(
             Sequences.AGE_RANGE_ID_SEQ,
             Sequences.AIR_QUALITY_LAYER_ID_SEQ,
+            Sequences.CROSSWALK_DATASET_ID_SEQ,
             Sequences.ENDPOINT_GROUP_ID_SEQ,
             Sequences.ENDPOINT_ID_SEQ,
             Sequences.ETHNICITY_ID_SEQ,
@@ -333,6 +346,8 @@ public class Data extends SchemaImpl {
             AgeRange.AGE_RANGE,
             AirQualityCell.AIR_QUALITY_CELL,
             AirQualityLayer.AIR_QUALITY_LAYER,
+            CrosswalkDataset.CROSSWALK_DATASET,
+            CrosswalkEntry.CROSSWALK_ENTRY,
             Endpoint.ENDPOINT,
             EndpointGroup.ENDPOINT_GROUP,
             Ethnicity.ETHNICITY,

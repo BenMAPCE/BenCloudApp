@@ -184,7 +184,7 @@
 	
 		$.ajax({
 			type 		: "GET", 
-			url 		: "/api/v1/air-quality-data/" + id + "/details", 
+			url 		: "/api/air-quality-data/" + id + "/details", 
 			data 		: {},
             dataType	: "text",
 			cache		: false,
@@ -322,7 +322,7 @@
 
 		$.ajax({
 			type 		: "POST", 
-			url 		: "/api/v1/air-quality-data", 
+			url 		: "/api/air-quality-data", 
 			data 		: formData,
 			dataType 	: "json",
 			cache		: false,

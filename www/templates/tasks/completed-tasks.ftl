@@ -46,7 +46,7 @@
 
 <script>
 
-	var getResultsUrl = "/api/v1/tasks/completed";
+	var getResultsUrl = "/api/tasks/completed";
 		
 	var resultsDatatableColumns = 
 	[
@@ -184,7 +184,7 @@
 		
 		$.ajax({
 			type 		: "GET", 
-			url 		: "/api/v1/tasks/" + uuid + "/results", 
+			url 		: "/api/tasks/" + uuid + "/results", 
 			data 		: {},
             dataType	: "text",
 			cache		: false,
@@ -216,7 +216,7 @@
 		
 		$.ajax({
 			type 		: "GET", 
-			url 		: "/api/v1/tasks/" + uuid + "/results/delete", 
+			url 		: "/api/tasks/" + uuid + "/results/delete", 
 			data 		: {},
             dataType	: "text",
 			cache		: false,
