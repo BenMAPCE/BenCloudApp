@@ -8,6 +8,7 @@ import gov.epa.bencloud.server.database.jooq.Data;
 import gov.epa.bencloud.server.database.jooq.Keys;
 import gov.epa.bencloud.server.database.jooq.tables.records.AirQualityLayerRecord;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
@@ -16,7 +17,7 @@ import org.jooq.ForeignKey;
 import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row4;
+import org.jooq.Row11;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -67,6 +68,41 @@ public class AirQualityLayer extends TableImpl<AirQualityLayerRecord> {
      * The column <code>data.air_quality_layer.grid_definition_id</code>.
      */
     public final TableField<AirQualityLayerRecord, Integer> GRID_DEFINITION_ID = createField(DSL.name("grid_definition_id"), SQLDataType.INTEGER, this, "");
+
+    /**
+     * The column <code>data.air_quality_layer.cell_count</code>.
+     */
+    public final TableField<AirQualityLayerRecord, Integer> CELL_COUNT = createField(DSL.name("cell_count"), SQLDataType.INTEGER, this, "");
+
+    /**
+     * The column <code>data.air_quality_layer.min_value</code>.
+     */
+    public final TableField<AirQualityLayerRecord, BigDecimal> MIN_VALUE = createField(DSL.name("min_value"), SQLDataType.NUMERIC, this, "");
+
+    /**
+     * The column <code>data.air_quality_layer.max_value</code>.
+     */
+    public final TableField<AirQualityLayerRecord, BigDecimal> MAX_VALUE = createField(DSL.name("max_value"), SQLDataType.NUMERIC, this, "");
+
+    /**
+     * The column <code>data.air_quality_layer.mean_value</code>.
+     */
+    public final TableField<AirQualityLayerRecord, BigDecimal> MEAN_VALUE = createField(DSL.name("mean_value"), SQLDataType.NUMERIC, this, "");
+
+    /**
+     * The column <code>data.air_quality_layer.pct_2_5</code>.
+     */
+    public final TableField<AirQualityLayerRecord, BigDecimal> PCT_2_5 = createField(DSL.name("pct_2_5"), SQLDataType.NUMERIC, this, "");
+
+    /**
+     * The column <code>data.air_quality_layer.pct_97_5</code>.
+     */
+    public final TableField<AirQualityLayerRecord, BigDecimal> PCT_97_5 = createField(DSL.name("pct_97_5"), SQLDataType.NUMERIC, this, "");
+
+    /**
+     * The column <code>data.air_quality_layer.locked</code>.
+     */
+    public final TableField<AirQualityLayerRecord, Boolean> LOCKED = createField(DSL.name("locked"), SQLDataType.BOOLEAN.defaultValue(DSL.field("false", SQLDataType.BOOLEAN)), this, "");
 
     private AirQualityLayer(Name alias, Table<AirQualityLayerRecord> aliased) {
         this(alias, aliased, null);
@@ -122,28 +158,6 @@ public class AirQualityLayer extends TableImpl<AirQualityLayerRecord> {
     }
 
     @Override
-    public List<ForeignKey<AirQualityLayerRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<AirQualityLayerRecord, ?>>asList(Keys.AIR_QUALITY_LAYER__AIR_QUALITY_LAYER_POLLUTANT_ID_FKEY, Keys.AIR_QUALITY_LAYER__AIR_QUALITY_LAYER_GRID_DEFINITION_ID_FKEY);
-    }
-
-    private transient Pollutant _pollutant;
-    private transient GridDefinition _gridDefinition;
-
-    public Pollutant pollutant() {
-        if (_pollutant == null)
-            _pollutant = new Pollutant(this, Keys.AIR_QUALITY_LAYER__AIR_QUALITY_LAYER_POLLUTANT_ID_FKEY);
-
-        return _pollutant;
-    }
-
-    public GridDefinition gridDefinition() {
-        if (_gridDefinition == null)
-            _gridDefinition = new GridDefinition(this, Keys.AIR_QUALITY_LAYER__AIR_QUALITY_LAYER_GRID_DEFINITION_ID_FKEY);
-
-        return _gridDefinition;
-    }
-
-    @Override
     public AirQualityLayer as(String alias) {
         return new AirQualityLayer(DSL.name(alias), this);
     }
@@ -170,11 +184,11 @@ public class AirQualityLayer extends TableImpl<AirQualityLayerRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row4 type methods
+    // Row11 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row4<Integer, String, Integer, Integer> fieldsRow() {
-        return (Row4) super.fieldsRow();
+    public Row11<Integer, String, Integer, Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, Boolean> fieldsRow() {
+        return (Row11) super.fieldsRow();
     }
 }

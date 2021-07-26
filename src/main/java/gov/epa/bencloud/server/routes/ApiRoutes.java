@@ -41,6 +41,7 @@ import gov.epa.bencloud.server.database.JooqUtil;
 import gov.epa.bencloud.server.tasks.TaskComplete;
 import gov.epa.bencloud.server.tasks.TaskQueue;
 import gov.epa.bencloud.server.tasks.model.Task;
+import spark.Request;
 import spark.Service;
 
 public class ApiRoutes extends RoutesBase {
@@ -64,8 +65,9 @@ public class ApiRoutes extends RoutesBase {
 			return PollutantApi.getAllPollutantDefinitions(response);
 		});
 		
+		//Supports optional ?pollutant=:id query string parameter
 		service.get("/api/air-quality-data", (request, response) -> {
-			return AirQualityApi.getAllAirQualityLayerDefinitions(response);
+			return AirQualityApi.getAirQualityLayerDefinitions(request, response);
 		});
 
 		service.get("/api/air-quality-data/:id/definition", (request, response) -> {
@@ -92,6 +94,7 @@ public class ApiRoutes extends RoutesBase {
 			return AirQualityApi.postAirQualityLayer(request, layerName, pollutantId, gridId, layerType, response);
 		});
 
+		//TODO: Revise UI to use /api/air-quality-data and then remove this method
 		service.get("/api/load-air-quality-options", (request, response) -> {
 			
 			ObjectMapper mapper = new ObjectMapper();
@@ -124,7 +127,7 @@ public class ApiRoutes extends RoutesBase {
 			return options;
 		});
 		
-
+		//TODO: Revise UI to use /api/pollutants and then remove this method
 		service.get("/api/load-pollutant-options", (request, response) -> {
 			
 			ObjectMapper mapper = new ObjectMapper();
@@ -151,6 +154,7 @@ public class ApiRoutes extends RoutesBase {
 			
 		});
 		
+		//TODO: Revise UI to use /api/grid-definitions and then remove this method
 		service.get("/api/load-grid-options", (request, response) -> {
 			
 			ObjectMapper mapper = new ObjectMapper();
@@ -177,6 +181,7 @@ public class ApiRoutes extends RoutesBase {
 			
 		});
 		
+		//TODO: Change to /api/population
 		service.get("/api/load-population-options", (request, response) -> {
 			
 			ObjectMapper mapper = new ObjectMapper();

@@ -100,14 +100,14 @@ public class ValuationResult extends TableImpl<ValuationResultRecord> {
     public final TableField<ValuationResultRecord, BigDecimal> RESULT_VARIANCE = createField(DSL.name("result_variance"), SQLDataType.NUMERIC, this, "");
 
     /**
-     * The column <code>data.valuation_result.pct2_5</code>.
+     * The column <code>data.valuation_result.pct_2_5</code>.
      */
-    public final TableField<ValuationResultRecord, BigDecimal> PCT2_5 = createField(DSL.name("pct2_5"), SQLDataType.NUMERIC, this, "");
+    public final TableField<ValuationResultRecord, BigDecimal> PCT_2_5 = createField(DSL.name("pct_2_5"), SQLDataType.NUMERIC, this, "");
 
     /**
-     * The column <code>data.valuation_result.pct97_5</code>.
+     * The column <code>data.valuation_result.pct_97_5</code>.
      */
-    public final TableField<ValuationResultRecord, BigDecimal> PCT97_5 = createField(DSL.name("pct97_5"), SQLDataType.NUMERIC, this, "");
+    public final TableField<ValuationResultRecord, BigDecimal> PCT_97_5 = createField(DSL.name("pct_97_5"), SQLDataType.NUMERIC, this, "");
 
     /**
      * The column <code>data.valuation_result.percentiles</code>.

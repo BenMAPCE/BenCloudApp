@@ -252,8 +252,8 @@ public class HIFTaskRunnable implements Runnable {
 					rec.setPopulation(new BigDecimal(totalPop));
 					rec.setDelta(BigDecimal.valueOf(deltaQ));
 					rec.setResult(BigDecimal.valueOf(hifFunctionEstimate));
-					rec.setPct2_5(BigDecimal.valueOf(resultPercentiles[0]));
-					rec.setPct97_5(BigDecimal.valueOf(resultPercentiles[19]));
+					rec.setPct_2_5(BigDecimal.valueOf(resultPercentiles[0]));
+					rec.setPct_97_5(BigDecimal.valueOf(resultPercentiles[19]));
 					
 					BigDecimal[] tmp = new BigDecimal[resultPercentiles.length];
 					for(int i=0; i < resultPercentiles.length; i++) {

@@ -14,6 +14,12 @@ import org.jooq.Result;
 import org.jooq.JSONFormat.RecordFormat;
 import org.jooq.exception.DataAccessException;
 import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.Record11;
+import org.jooq.Record12;
+import org.jooq.Record13;
+import org.jooq.Record2;
+import org.jooq.Record5;
 import org.jooq.Record6;
 import org.jooq.impl.DSL;
 import org.jooq.tools.csv.CSVReader;
@@ -32,18 +38,35 @@ import spark.Response;
 
 public class AirQualityApi {
 
-	public static Object getAllAirQualityLayerDefinitions(Response response) {
-		Result<Record6<Integer, String, Integer, Integer, String, String>> aqRecords = DSL.using(JooqUtil.getJooqConfiguration())
+	public static Object getAirQualityLayerDefinitions(Request request, Response response) {
+		String pollutantParam = request.raw().getParameter("pollutant");
+		
+		Integer pollutantId = null;
+		
+		if(pollutantParam != null && !pollutantParam.isEmpty()) {
+			pollutantId = Integer.valueOf(pollutantParam);
+		}
+		
+		Result<Record13<Integer, String, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, Boolean, Integer, String, Integer, String>> aqRecords = DSL.using(JooqUtil.getJooqConfiguration())
 				.select(
 						AIR_QUALITY_LAYER.ID, 
 						AIR_QUALITY_LAYER.NAME,
+						AIR_QUALITY_LAYER.CELL_COUNT,
+						AIR_QUALITY_LAYER.MIN_VALUE,
+						AIR_QUALITY_LAYER.MAX_VALUE,
+						AIR_QUALITY_LAYER.MEAN_VALUE,
+						AIR_QUALITY_LAYER.PCT_2_5,
+						AIR_QUALITY_LAYER.PCT_97_5,
+						AIR_QUALITY_LAYER.LOCKED,
 						AIR_QUALITY_LAYER.GRID_DEFINITION_ID,
+						GRID_DEFINITION.NAME.as("grid_definition_name"),
 						AIR_QUALITY_LAYER.POLLUTANT_ID,
-						POLLUTANT.NAME.as("pollutant_name"), 
-						GRID_DEFINITION.NAME.as("grid_definition_name"))
+						POLLUTANT.NAME.as("pollutant_name")
+						)
 				.from(AIR_QUALITY_LAYER)
 				.join(POLLUTANT).on(POLLUTANT.ID.eq(AIR_QUALITY_LAYER.POLLUTANT_ID))				
 				.join(GRID_DEFINITION).on(GRID_DEFINITION.ID.eq(AIR_QUALITY_LAYER.GRID_DEFINITION_ID))
+				.where(pollutantId==null ? DSL.noCondition() : AIR_QUALITY_LAYER.POLLUTANT_ID.eq(pollutantId))
 				.orderBy(AIR_QUALITY_LAYER.NAME)
 				.fetch();
 		
@@ -51,41 +74,86 @@ public class AirQualityApi {
 		return aqRecords.formatJSON(new JSONFormat().header(false).recordFormat(RecordFormat.OBJECT));
 	}
 	
+	/**
+	 * @param request - expected to contain id param
+	 * @param response
+	 * @return Single air quality layer definition as json string 
+	 */
 	public static Object getAirQualityLayerDefinition(Request request, Response response) {
-		Record6<Integer, String, Integer, Integer, String, String> aqRecord = DSL.using(JooqUtil.getJooqConfiguration())
-				.select(
-						AIR_QUALITY_LAYER.ID, 
-						AIR_QUALITY_LAYER.NAME,
-						AIR_QUALITY_LAYER.GRID_DEFINITION_ID,
-						AIR_QUALITY_LAYER.POLLUTANT_ID,
-						POLLUTANT.NAME.as("pollutant_name"), 
-						GRID_DEFINITION.NAME.as("grid_definition_name"))
-				.from(AIR_QUALITY_LAYER)
-				.join(POLLUTANT).on(POLLUTANT.ID.eq(AIR_QUALITY_LAYER.POLLUTANT_ID))				
-				.join(GRID_DEFINITION).on(GRID_DEFINITION.ID.eq(AIR_QUALITY_LAYER.GRID_DEFINITION_ID))
-				.where(AIR_QUALITY_LAYER.ID.eq(Integer.valueOf(request.params("id"))))
-				.fetchOne();
+		Integer id = Integer.valueOf(request.params("id"));
+		
+		Record13<Integer, String, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, Boolean, Integer, Integer, String, String> aqRecord = getAirQualityLayerDefinition(id);
 		response.type("application/json");
 		return aqRecord.formatJSON(new JSONFormat().header(false).recordFormat(RecordFormat.OBJECT));
 	}
 	
+	private static Record13<Integer, String, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, Boolean, Integer, Integer, String, String> getAirQualityLayerDefinition(Integer id) {
+		return DSL.using(JooqUtil.getJooqConfiguration())
+		.select(
+				AIR_QUALITY_LAYER.ID, 
+				AIR_QUALITY_LAYER.NAME,
+				AIR_QUALITY_LAYER.CELL_COUNT,
+				AIR_QUALITY_LAYER.MIN_VALUE,
+				AIR_QUALITY_LAYER.MAX_VALUE,
+				AIR_QUALITY_LAYER.MEAN_VALUE,
+				AIR_QUALITY_LAYER.PCT_2_5,
+				AIR_QUALITY_LAYER.PCT_97_5,
+				AIR_QUALITY_LAYER.LOCKED,
+				AIR_QUALITY_LAYER.GRID_DEFINITION_ID,
+				AIR_QUALITY_LAYER.POLLUTANT_ID,
+				POLLUTANT.NAME.as("pollutant_name"), 
+				GRID_DEFINITION.NAME.as("grid_definition_name"))
+		.from(AIR_QUALITY_LAYER)
+		.join(POLLUTANT).on(POLLUTANT.ID.eq(AIR_QUALITY_LAYER.POLLUTANT_ID))				
+		.join(GRID_DEFINITION).on(GRID_DEFINITION.ID.eq(AIR_QUALITY_LAYER.GRID_DEFINITION_ID))
+		.where(AIR_QUALITY_LAYER.ID.eq(id))
+		.fetchOne();
+	}
+
 	public static Object getAirQualityLayerDetails(Request request, Response response) {
 		Integer id = Integer.valueOf(request.params("id"));
 				
-		Result<AirQualityCellRecord> aqRecords = DSL.using(JooqUtil.getJooqConfiguration())
-				.selectFrom(AIR_QUALITY_CELL)
+		Result<Record6<Integer, Integer, String, String, String, BigDecimal>> aqRecords = DSL.using(JooqUtil.getJooqConfiguration())
+				.select(
+						AIR_QUALITY_CELL.GRID_COL,
+						AIR_QUALITY_CELL.GRID_ROW,
+						POLLUTANT_METRIC.NAME.as("metric"),
+						SEASONAL_METRIC.NAME.as("seasonal_metric"),
+						AIR_QUALITY_CELL.ANNUAL_METRIC,
+						AIR_QUALITY_CELL.VALUE
+						)
+				.from(AIR_QUALITY_CELL)
+				.leftJoin(POLLUTANT_METRIC).on(AIR_QUALITY_CELL.METRIC_ID.eq(POLLUTANT_METRIC.ID))
+				.leftJoin(SEASONAL_METRIC).on(AIR_QUALITY_CELL.SEASONAL_METRIC_ID.eq(SEASONAL_METRIC.ID))
 				.where(AIR_QUALITY_CELL.AIR_QUALITY_LAYER_ID.eq(id))
 				.orderBy(AIR_QUALITY_CELL.GRID_COL, AIR_QUALITY_CELL.GRID_ROW)
 				.fetch();
 		
+		Record1<String> layerInfo = DSL.using(JooqUtil.getJooqConfiguration())
+				.select(AIR_QUALITY_LAYER.NAME)
+				.from(AIR_QUALITY_LAYER)
+				.where(AIR_QUALITY_LAYER.ID.eq(id))
+				.fetchOne();
+		
+		
+		String fileName = createFilename(layerInfo.value1());
+		
+		
 		if(request.headers("Accept").equalsIgnoreCase("text/csv")) {
 			response.type("text/csv");
+			response.raw().setHeader("Content-disposition", "attachment; filename="+ fileName);
 			return aqRecords.formatCSV();
 		} else {
 			response.type("application/json");
 			return aqRecords.formatJSON(new JSONFormat().header(false).recordFormat(RecordFormat.OBJECT));
 		}
 	}
+
+	public static String createFilename(String layerName) {
+		// Currently allowing periods so we don't break extensions. Need to improve this.
+		return layerName.replaceAll("[^A-Za-z0-9._-]+", "") + ".csv";
+	}
+
 
 	public static Map<Long, AirQualityCellRecord> getAirQualityLayerMap(Integer id) {
 
@@ -106,7 +174,6 @@ public class AirQualityApi {
 			
 			CSVReader csvReader = new CSVReader (new InputStreamReader(is));
 			
-			//TODO: Add logic to determine column positions
 			int columnIdx=-999;
 			int rowIdx=-999;
 			int metricIdx=-999;
@@ -155,8 +222,8 @@ public class AirQualityApi {
 			
 			//Create the air_quality_layer record
 			aqRecord = DSL.using(JooqUtil.getJooqConfiguration())
-			.insertInto(AIR_QUALITY_LAYER, AIR_QUALITY_LAYER.NAME, AIR_QUALITY_LAYER.POLLUTANT_ID, AIR_QUALITY_LAYER.GRID_DEFINITION_ID)
-			.values(layerName, pollutantId, gridId)
+			.insertInto(AIR_QUALITY_LAYER, AIR_QUALITY_LAYER.NAME, AIR_QUALITY_LAYER.POLLUTANT_ID, AIR_QUALITY_LAYER.GRID_DEFINITION_ID, AIR_QUALITY_LAYER.LOCKED)
+			.values(layerName, pollutantId, gridId, false)
 			.returning(AIR_QUALITY_LAYER.ID, AIR_QUALITY_LAYER.NAME, AIR_QUALITY_LAYER.POLLUTANT_ID, AIR_QUALITY_LAYER.GRID_DEFINITION_ID)
 			.fetchOne();
 			
@@ -188,12 +255,32 @@ public class AirQualityApi {
 			}
 			
 		    batch.execute();
+		    
+		    
+			//Now that the rows are in the database, let's get the cell count, mean, min, max and update the layer's header record
+			DSL.using(JooqUtil.getJooqConfiguration())
+			.update(AIR_QUALITY_LAYER)
+			.set(DSL.row(AIR_QUALITY_LAYER.CELL_COUNT, AIR_QUALITY_LAYER.MIN_VALUE, AIR_QUALITY_LAYER.MAX_VALUE, AIR_QUALITY_LAYER.MEAN_VALUE, AIR_QUALITY_LAYER.PCT_2_5, AIR_QUALITY_LAYER.PCT_97_5),	
+    		DSL.select(
+				DSL.count().as("cell_count"),
+				DSL.min(AIR_QUALITY_CELL.VALUE).as("min_value"),
+				DSL.max(AIR_QUALITY_CELL.VALUE).as("max_value"),
+				DSL.avg(AIR_QUALITY_CELL.VALUE).as("mean_value"),
+				DSL.percentileCont(0.025).withinGroupOrderBy(AIR_QUALITY_CELL.VALUE).as("pct_2_5"),
+				DSL.percentileCont(0.975).withinGroupOrderBy(AIR_QUALITY_CELL.VALUE).as("pct_97_5")
+    		)
+    		.from(AIR_QUALITY_CELL)
+			.where(AIR_QUALITY_CELL.AIR_QUALITY_LAYER_ID.eq(aqRecord.value1()))
+			)
+			.where(AIR_QUALITY_LAYER.ID.eq(aqRecord.value1()))
+			.execute();
+		
 			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		response.type("application/json");
-		return aqRecord.formatJSON(new JSONFormat().header(false).recordFormat(RecordFormat.OBJECT));
+		return getAirQualityLayerDefinition(aqRecord.value1()).formatJSON(new JSONFormat().header(false).recordFormat(RecordFormat.OBJECT));
 	}
 	
 	public static ObjectNode getAirQualityLayers(String userIdentifier) {
@@ -219,10 +306,16 @@ public class AirQualityApi {
 
 			try {
 
-				Result<Record6<Integer, String, Integer, Integer, String, String>> aqRecords = DSL.using(JooqUtil.getJooqConfiguration())
+				Result<Record12<Integer, String, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, Integer, Integer, String, String>> aqRecords = DSL.using(JooqUtil.getJooqConfiguration())
 						.select(
 								AIR_QUALITY_LAYER.ID, 
 								AIR_QUALITY_LAYER.NAME,
+								AIR_QUALITY_LAYER.CELL_COUNT,
+								AIR_QUALITY_LAYER.MIN_VALUE,
+								AIR_QUALITY_LAYER.MAX_VALUE,
+								AIR_QUALITY_LAYER.MEAN_VALUE,
+								AIR_QUALITY_LAYER.PCT_2_5,
+								AIR_QUALITY_LAYER.PCT_97_5,
 								AIR_QUALITY_LAYER.GRID_DEFINITION_ID,
 								AIR_QUALITY_LAYER.POLLUTANT_ID,
 								POLLUTANT.NAME, 

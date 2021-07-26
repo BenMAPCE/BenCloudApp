@@ -177,30 +177,30 @@ public class ValuationResultRecord extends TableRecordImpl<ValuationResultRecord
     }
 
     /**
-     * Setter for <code>data.valuation_result.pct2_5</code>.
+     * Setter for <code>data.valuation_result.pct_2_5</code>.
      */
-    public void setPct2_5(BigDecimal value) {
+    public void setPct_2_5(BigDecimal value) {
         set(11, value);
     }
 
     /**
-     * Getter for <code>data.valuation_result.pct2_5</code>.
+     * Getter for <code>data.valuation_result.pct_2_5</code>.
      */
-    public BigDecimal getPct2_5() {
+    public BigDecimal getPct_2_5() {
         return (BigDecimal) get(11);
     }
 
     /**
-     * Setter for <code>data.valuation_result.pct97_5</code>.
+     * Setter for <code>data.valuation_result.pct_97_5</code>.
      */
-    public void setPct97_5(BigDecimal value) {
+    public void setPct_97_5(BigDecimal value) {
         set(12, value);
     }
 
     /**
-     * Getter for <code>data.valuation_result.pct97_5</code>.
+     * Getter for <code>data.valuation_result.pct_97_5</code>.
      */
-    public BigDecimal getPct97_5() {
+    public BigDecimal getPct_97_5() {
         return (BigDecimal) get(12);
     }
 
@@ -289,12 +289,12 @@ public class ValuationResultRecord extends TableRecordImpl<ValuationResultRecord
 
     @Override
     public Field<BigDecimal> field12() {
-        return ValuationResult.VALUATION_RESULT.PCT2_5;
+        return ValuationResult.VALUATION_RESULT.PCT_2_5;
     }
 
     @Override
     public Field<BigDecimal> field13() {
-        return ValuationResult.VALUATION_RESULT.PCT97_5;
+        return ValuationResult.VALUATION_RESULT.PCT_97_5;
     }
 
     @Override
@@ -359,12 +359,12 @@ public class ValuationResultRecord extends TableRecordImpl<ValuationResultRecord
 
     @Override
     public BigDecimal component12() {
-        return getPct2_5();
+        return getPct_2_5();
     }
 
     @Override
     public BigDecimal component13() {
-        return getPct97_5();
+        return getPct_97_5();
     }
 
     @Override
@@ -429,12 +429,12 @@ public class ValuationResultRecord extends TableRecordImpl<ValuationResultRecord
 
     @Override
     public BigDecimal value12() {
-        return getPct2_5();
+        return getPct_2_5();
     }
 
     @Override
     public BigDecimal value13() {
-        return getPct97_5();
+        return getPct_97_5();
     }
 
     @Override
@@ -510,13 +510,13 @@ public class ValuationResultRecord extends TableRecordImpl<ValuationResultRecord
 
     @Override
     public ValuationResultRecord value12(BigDecimal value) {
-        setPct2_5(value);
+        setPct_2_5(value);
         return this;
     }
 
     @Override
     public ValuationResultRecord value13(BigDecimal value) {
-        setPct97_5(value);
+        setPct_97_5(value);
         return this;
     }
 
@@ -559,7 +559,7 @@ public class ValuationResultRecord extends TableRecordImpl<ValuationResultRecord
     /**
      * Create a detached, initialised ValuationResultRecord
      */
-    public ValuationResultRecord(Integer valuationResultDatasetId, Integer vfId, Integer hifId, Integer gridCol, Integer gridRow, Long gridCellId, BigDecimal population, BigDecimal result, BigDecimal resultMean, BigDecimal standardDev, BigDecimal resultVariance, BigDecimal pct2_5, BigDecimal pct97_5, BigDecimal[] percentiles) {
+    public ValuationResultRecord(Integer valuationResultDatasetId, Integer vfId, Integer hifId, Integer gridCol, Integer gridRow, Long gridCellId, BigDecimal population, BigDecimal result, BigDecimal resultMean, BigDecimal standardDev, BigDecimal resultVariance, BigDecimal pct_2_5, BigDecimal pct_97_5, BigDecimal[] percentiles) {
         super(ValuationResult.VALUATION_RESULT);
 
         setValuationResultDatasetId(valuationResultDatasetId);
@@ -573,8 +573,8 @@ public class ValuationResultRecord extends TableRecordImpl<ValuationResultRecord
         setResultMean(resultMean);
         setStandardDev(standardDev);
         setResultVariance(resultVariance);
-        setPct2_5(pct2_5);
-        setPct97_5(pct97_5);
+        setPct_2_5(pct_2_5);
+        setPct_97_5(pct_97_5);
         setPercentiles(percentiles);
     }
 }

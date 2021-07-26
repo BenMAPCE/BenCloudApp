@@ -191,30 +191,30 @@ public class HifResultRecord extends TableRecordImpl<HifResultRecord> implements
     }
 
     /**
-     * Setter for <code>data.hif_result.pct2_5</code>.
+     * Setter for <code>data.hif_result.pct_2_5</code>.
      */
-    public void setPct2_5(BigDecimal value) {
+    public void setPct_2_5(BigDecimal value) {
         set(12, value);
     }
 
     /**
-     * Getter for <code>data.hif_result.pct2_5</code>.
+     * Getter for <code>data.hif_result.pct_2_5</code>.
      */
-    public BigDecimal getPct2_5() {
+    public BigDecimal getPct_2_5() {
         return (BigDecimal) get(12);
     }
 
     /**
-     * Setter for <code>data.hif_result.pct97_5</code>.
+     * Setter for <code>data.hif_result.pct_97_5</code>.
      */
-    public void setPct97_5(BigDecimal value) {
+    public void setPct_97_5(BigDecimal value) {
         set(13, value);
     }
 
     /**
-     * Getter for <code>data.hif_result.pct97_5</code>.
+     * Getter for <code>data.hif_result.pct_97_5</code>.
      */
-    public BigDecimal getPct97_5() {
+    public BigDecimal getPct_97_5() {
         return (BigDecimal) get(13);
     }
 
@@ -308,12 +308,12 @@ public class HifResultRecord extends TableRecordImpl<HifResultRecord> implements
 
     @Override
     public Field<BigDecimal> field13() {
-        return HifResult.HIF_RESULT.PCT2_5;
+        return HifResult.HIF_RESULT.PCT_2_5;
     }
 
     @Override
     public Field<BigDecimal> field14() {
-        return HifResult.HIF_RESULT.PCT97_5;
+        return HifResult.HIF_RESULT.PCT_97_5;
     }
 
     @Override
@@ -383,12 +383,12 @@ public class HifResultRecord extends TableRecordImpl<HifResultRecord> implements
 
     @Override
     public BigDecimal component13() {
-        return getPct2_5();
+        return getPct_2_5();
     }
 
     @Override
     public BigDecimal component14() {
-        return getPct97_5();
+        return getPct_97_5();
     }
 
     @Override
@@ -458,12 +458,12 @@ public class HifResultRecord extends TableRecordImpl<HifResultRecord> implements
 
     @Override
     public BigDecimal value13() {
-        return getPct2_5();
+        return getPct_2_5();
     }
 
     @Override
     public BigDecimal value14() {
-        return getPct97_5();
+        return getPct_97_5();
     }
 
     @Override
@@ -545,13 +545,13 @@ public class HifResultRecord extends TableRecordImpl<HifResultRecord> implements
 
     @Override
     public HifResultRecord value13(BigDecimal value) {
-        setPct2_5(value);
+        setPct_2_5(value);
         return this;
     }
 
     @Override
     public HifResultRecord value14(BigDecimal value) {
-        setPct97_5(value);
+        setPct_97_5(value);
         return this;
     }
 
@@ -595,7 +595,7 @@ public class HifResultRecord extends TableRecordImpl<HifResultRecord> implements
     /**
      * Create a detached, initialised HifResultRecord
      */
-    public HifResultRecord(Integer hifResultDatasetId, Integer hifId, Integer gridCol, Integer gridRow, Long gridCellId, BigDecimal population, BigDecimal delta, BigDecimal result, BigDecimal baseline, BigDecimal resultMean, BigDecimal standardDev, BigDecimal resultVariance, BigDecimal pct2_5, BigDecimal pct97_5, BigDecimal[] percentiles) {
+    public HifResultRecord(Integer hifResultDatasetId, Integer hifId, Integer gridCol, Integer gridRow, Long gridCellId, BigDecimal population, BigDecimal delta, BigDecimal result, BigDecimal baseline, BigDecimal resultMean, BigDecimal standardDev, BigDecimal resultVariance, BigDecimal pct_2_5, BigDecimal pct_97_5, BigDecimal[] percentiles) {
         super(HifResult.HIF_RESULT);
 
         setHifResultDatasetId(hifResultDatasetId);
@@ -610,8 +610,8 @@ public class HifResultRecord extends TableRecordImpl<HifResultRecord> implements
         setResultMean(resultMean);
         setStandardDev(standardDev);
         setResultVariance(resultVariance);
-        setPct2_5(pct2_5);
-        setPct97_5(pct97_5);
+        setPct_2_5(pct_2_5);
+        setPct_97_5(pct_97_5);
         setPercentiles(percentiles);
     }
 }

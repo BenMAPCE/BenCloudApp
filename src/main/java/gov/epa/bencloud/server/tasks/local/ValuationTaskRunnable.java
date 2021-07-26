@@ -188,15 +188,15 @@ public class ValuationTaskRunnable implements Runnable {
 									statsPercentiles.addValue(percentiles[i]);
 									idxMedian += distValues.length / percentiles.length;
 								}
-								rec.setPct2_5(BigDecimal.valueOf((percentiles[1] + percentiles[2]) / 2.0));
-								rec.setPct97_5(BigDecimal.valueOf((percentiles[96] + percentiles[97]) / 2.0));
+								rec.setPct_2_5(  BigDecimal.valueOf((percentiles[1] + percentiles[2]) / 2.0));
+								rec.setPct_97_5(BigDecimal.valueOf((percentiles[96] + percentiles[97]) / 2.0));
 								rec.setStandardDev(BigDecimal.valueOf(statsPercentiles.getStandardDeviation()));
 								rec.setResultMean(BigDecimal.valueOf(statsPercentiles.getMean()));
 								rec.setResultVariance(BigDecimal.valueOf(statsPercentiles.getVariance()));
 							}
 						} catch (Exception e) {
-							rec.setPct2_5(BigDecimal.valueOf(0.0));
-							rec.setPct97_5(BigDecimal.valueOf(0.0));
+							rec.setPct_2_5(BigDecimal.valueOf(0.0));
+							rec.setPct_97_5(BigDecimal.valueOf(0.0));
 							rec.setStandardDev(BigDecimal.valueOf(0.0));
 							rec.setResultMean(BigDecimal.valueOf(0.0));
 							rec.setResultVariance(BigDecimal.valueOf(0.0));
