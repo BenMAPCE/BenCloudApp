@@ -94,6 +94,17 @@ public class ApiRoutes extends RoutesBase {
 			return AirQualityApi.postAirQualityLayer(request, layerName, pollutantId, gridId, layerType, response);
 		});
 
+		service.delete("/api/air-quality-data/:id", (request, response) -> {
+
+			if(AirQualityApi.deleteAirQualityLayerDefinition(request, response)) {
+				response.status(204);
+			} else {
+				response.status(404);
+			}
+			
+			return "";
+		});
+		
 		//TODO: Revise UI to use /api/air-quality-data and then remove this method
 		service.get("/api/load-air-quality-options", (request, response) -> {
 			
@@ -125,7 +136,7 @@ public class ApiRoutes extends RoutesBase {
 			}
 						
 			return options;
-		});
+		});	
 		
 		//TODO: Revise UI to use /api/pollutants and then remove this method
 		service.get("/api/load-pollutant-options", (request, response) -> {

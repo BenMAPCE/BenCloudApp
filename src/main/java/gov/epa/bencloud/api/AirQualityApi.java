@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.util.Map;
 
+import org.jooq.DSLContext;
 import org.jooq.InsertValuesStep7;
 import org.jooq.InsertValuesStep8;
 import org.jooq.JSONFormat;
@@ -357,6 +358,20 @@ public class AirQualityApi {
 		}
 
 		return data;
+	}
+
+	public static boolean deleteAirQualityLayerDefinition(Request request, Response response) {
+		Integer id = Integer.valueOf(request.params("id"));
+		DSLContext create = DSL.using(JooqUtil.getJooqConfiguration());
+		
+		int cellRows = create.deleteFrom(AIR_QUALITY_CELL).where(AIR_QUALITY_CELL.AIR_QUALITY_LAYER_ID.eq(id)).execute();
+		int headerRows = create.deleteFrom(AIR_QUALITY_LAYER).where(AIR_QUALITY_LAYER.ID.eq(id)).execute();
+		
+		if(cellRows + headerRows == 0) {
+			return false;
+		} else {
+			return true;
+		}
 	} 
 
 }
