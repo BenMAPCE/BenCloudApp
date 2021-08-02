@@ -1,30 +1,44 @@
 package gov.epa.bencloud.api;
 
-import static gov.epa.bencloud.server.database.jooq.Tables.*;
+import static gov.epa.bencloud.server.database.jooq.Tables.AIR_QUALITY_CELL;
+import static gov.epa.bencloud.server.database.jooq.Tables.AIR_QUALITY_LAYER;
+import static gov.epa.bencloud.server.database.jooq.Tables.GRID_DEFINITION;
+import static gov.epa.bencloud.server.database.jooq.Tables.POLLUTANT;
+import static gov.epa.bencloud.server.database.jooq.Tables.POLLUTANT_METRIC;
+import static gov.epa.bencloud.server.database.jooq.Tables.SEASONAL_METRIC;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
+import org.jooq.Condition;
 import org.jooq.DSLContext;
-import org.jooq.InsertValuesStep7;
+import org.jooq.Field;
 import org.jooq.InsertValuesStep8;
 import org.jooq.JSONFormat;
-import org.jooq.Result;
 import org.jooq.JSONFormat.RecordFormat;
-import org.jooq.exception.DataAccessException;
+import org.jooq.OrderField;
 import org.jooq.Record;
 import org.jooq.Record1;
-import org.jooq.Record11;
 import org.jooq.Record12;
 import org.jooq.Record13;
-import org.jooq.Record2;
-import org.jooq.Record5;
 import org.jooq.Record6;
+import org.jooq.Result;
+import org.jooq.SortOrder;
+import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 import org.jooq.tools.csv.CSVReader;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -34,21 +48,71 @@ import gov.epa.bencloud.api.util.ApiUtil;
 import gov.epa.bencloud.server.database.JooqUtil;
 import gov.epa.bencloud.server.database.jooq.tables.records.AirQualityCellRecord;
 import gov.epa.bencloud.server.database.jooq.tables.records.AirQualityLayerRecord;
+import gov.epa.bencloud.server.util.DataConversionUtil;
+import gov.epa.bencloud.server.util.ParameterUtil;
 import spark.Request;
 import spark.Response;
 
 public class AirQualityApi {
 
 	public static Object getAirQualityLayerDefinitions(Request request, Response response) {
+		
 		String pollutantParam = request.raw().getParameter("pollutant");
 		
+		int page = ParameterUtil.getParameterValueAsInteger(request.raw().getParameter("page"), 1);
+		int rowsPerPage = ParameterUtil.getParameterValueAsInteger(request.raw().getParameter("rowsPerPage"), 10);
+		String sortBy = ParameterUtil.getParameterValueAsString(request.raw().getParameter("sortBy"), "");
+		boolean descending = ParameterUtil.getParameterValueAsBoolean(request.raw().getParameter("descending"), false);
+		String filter = ParameterUtil.getParameterValueAsString(request.raw().getParameter("filter"), "");
+		
+		List<OrderField<?>> orderFields = new ArrayList<>();
+		
+		setAirQualityLayersSortOrder(sortBy, descending, orderFields);
+		
+		//Condition searchCondition = DSL.falseCondition();
+		Condition filterCondition = DSL.trueCondition();
+
 		Integer pollutantId = null;
 		
-		if(pollutantParam != null && !pollutantParam.isEmpty()) {
+		if (pollutantParam != null && !pollutantParam.isEmpty()) {
 			pollutantId = Integer.valueOf(pollutantParam);
 		}
 		
-		Result<Record13<Integer, String, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, Boolean, Integer, String, Integer, String>> aqRecords = DSL.using(JooqUtil.getJooqConfiguration())
+		Condition pollutantCondition = DSL.trueCondition();
+
+		if (pollutantId != null) {
+			
+			pollutantCondition = DSL.field(AIR_QUALITY_LAYER.ID.getName(), Integer.class.getName()).eq(pollutantId);
+			
+		}
+		filterCondition = filterCondition.and(pollutantCondition);
+
+		
+		if (!"".equals(filter)) {
+			filterCondition = filterCondition.and(buildAirQualityLayersFilterCondition(filter));
+
+			// System.out.println(filterCondition);
+		}
+		
+		//System.out.println(orderFields);
+	
+		ObjectMapper mapper = new ObjectMapper();
+		ObjectNode data = mapper.createObjectNode();
+
+		Integer filteredRecordsCount = 
+				DSL.using(JooqUtil.getJooqConfiguration()).select(DSL.count())
+				.from(AIR_QUALITY_LAYER)
+				.join(POLLUTANT).on(POLLUTANT.ID.eq(AIR_QUALITY_LAYER.POLLUTANT_ID))				
+				.join(GRID_DEFINITION).on(GRID_DEFINITION.ID.eq(AIR_QUALITY_LAYER.GRID_DEFINITION_ID))
+				
+				.where(filterCondition)
+				.fetchOne(DSL.count());
+		
+		System.out.println("filteredRecordsCount: " + filteredRecordsCount);
+		data.put("filteredRecordsCount", filteredRecordsCount);
+		
+		Result<Record13<Integer, String, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, Boolean, Integer, String, Integer, String>> aqRecords = 
+			DSL.using(JooqUtil.getJooqConfiguration())
 				.select(
 						AIR_QUALITY_LAYER.ID, 
 						AIR_QUALITY_LAYER.NAME,
@@ -67,12 +131,35 @@ public class AirQualityApi {
 				.from(AIR_QUALITY_LAYER)
 				.join(POLLUTANT).on(POLLUTANT.ID.eq(AIR_QUALITY_LAYER.POLLUTANT_ID))				
 				.join(GRID_DEFINITION).on(GRID_DEFINITION.ID.eq(AIR_QUALITY_LAYER.GRID_DEFINITION_ID))
-				.where(pollutantId==null ? DSL.noCondition() : AIR_QUALITY_LAYER.POLLUTANT_ID.eq(pollutantId))
-				.orderBy(AIR_QUALITY_LAYER.NAME)
+				
+				.where(filterCondition)
+				.orderBy(orderFields)
+				.offset(page)
+				.limit(rowsPerPage)
 				.fetch();
+	
+		
+		System.out.println("aqRecords: " + aqRecords.size());
+
+		try {
+			JsonFactory factory = mapper.getFactory();
+			JsonParser jp = factory.createParser(
+					aqRecords.formatJSON(new JSONFormat().header(false).recordFormat(RecordFormat.OBJECT)));
+			JsonNode actualObj = mapper.readTree(jp);
+			data.set("records", actualObj);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		//System.out.println(data);
+		//System.out.println(aqRecords.formatJSON(new JSONFormat().header(false).recordFormat(RecordFormat.OBJECT)));
 		
 		response.type("application/json");
-		return aqRecords.formatJSON(new JSONFormat().header(false).recordFormat(RecordFormat.OBJECT));
+		return data;
 	}
 	
 	/**
@@ -112,8 +199,11 @@ public class AirQualityApi {
 	}
 
 	public static Object getAirQualityLayerDetails(Request request, Response response) {
+		
 		Integer id = Integer.valueOf(request.params("id"));
 				
+		System.out.println("id: " + id);
+		
 		Result<Record6<Integer, Integer, String, String, String, BigDecimal>> aqRecords = DSL.using(JooqUtil.getJooqConfiguration())
 				.select(
 						AIR_QUALITY_CELL.GRID_COL,
@@ -128,6 +218,7 @@ public class AirQualityApi {
 				.leftJoin(SEASONAL_METRIC).on(AIR_QUALITY_CELL.SEASONAL_METRIC_ID.eq(SEASONAL_METRIC.ID))
 				.where(AIR_QUALITY_CELL.AIR_QUALITY_LAYER_ID.eq(id))
 				.orderBy(AIR_QUALITY_CELL.GRID_COL, AIR_QUALITY_CELL.GRID_ROW)
+				.limit(10)
 				.fetch();
 		
 		Record1<String> layerInfo = DSL.using(JooqUtil.getJooqConfiguration())
@@ -135,12 +226,9 @@ public class AirQualityApi {
 				.from(AIR_QUALITY_LAYER)
 				.where(AIR_QUALITY_LAYER.ID.eq(id))
 				.fetchOne();
-		
-		
-		String fileName = createFilename(layerInfo.value1());
-		
-		
+
 		if(request.headers("Accept").equalsIgnoreCase("text/csv")) {
+			String fileName = createFilename(layerInfo.value1());
 			response.type("text/csv");
 			response.raw().setHeader("Content-disposition", "attachment; filename="+ fileName);
 			return aqRecords.formatCSV();
@@ -373,5 +461,81 @@ public class AirQualityApi {
 			return true;
 		}
 	} 
+	
+	private static Condition buildAirQualityLayersFilterCondition(String filterValue) {
+
+		Condition filterCondition = DSL.trueCondition();
+		Condition searchCondition = DSL.falseCondition();
+
+		Integer filterValueAsInteger = DataConversionUtil.getFilterValueAsInteger(filterValue);
+		Long filterValueAsLong = DataConversionUtil.getFilterValueAsLong(filterValue);
+		Double filterValueAsDouble = DataConversionUtil.getFilterValueAsDouble(filterValue);
+		BigDecimal filterValueAsBigDecimal = DataConversionUtil.getFilterValueAsBigDecimal(filterValue);
+		Date filterValueAsDate = DataConversionUtil.getFilterValueAsDate(filterValue, "MM/dd/yyyy");
+		
+		searchCondition = 
+				searchCondition.or(AIR_QUALITY_LAYER.NAME
+						.containsIgnoreCase(filterValue));
+
+		searchCondition = 
+				searchCondition.or(GRID_DEFINITION.NAME
+						.containsIgnoreCase(filterValue));
+
+		if (null != filterValueAsInteger) {
+			searchCondition = 
+					searchCondition.or(AIR_QUALITY_LAYER.CELL_COUNT
+							.eq(filterValueAsInteger));
+		}
+
+		if (null != filterValueAsBigDecimal) {
+			searchCondition = 
+					searchCondition.or(AIR_QUALITY_LAYER.MEAN_VALUE
+							.eq(filterValueAsBigDecimal));		
+		}
+		
+		filterCondition = filterCondition.and(searchCondition);
+
+		return filterCondition;
+	}
+
+	private static void setAirQualityLayersSortOrder(
+			String sortBy, Boolean descending, List<OrderField<?>> orderFields) {
+		
+		if (null != sortBy) {
+			
+			SortOrder sortDirection = SortOrder.ASC;
+			Field<?> sortField = null;
+			
+			sortDirection = descending ? SortOrder.DESC : SortOrder.ASC;
+			
+			switch (sortBy) {
+			case "name":
+				sortField = DSL.field(sortBy, String.class.getName());
+				break;
+
+			case "grid_definition_name":
+				sortField = DSL.field(sortBy, Integer.class.getName());
+				break;
+
+			case "cell_count":
+				sortField = DSL.field(sortBy, Integer.class.getName());
+				break;
+
+			case "mean_value":
+				sortField = DSL.field(sortBy, Double.class.getName());
+				break;
+
+			default:
+				sortField = DSL.field(sortBy, String.class.getName());
+				break;
+			}
+			
+			orderFields.add(sortField.sort(sortDirection));
+			
+		} else {
+			orderFields.add(DSL.field("name", String.class.getName()).sort(SortOrder.ASC));	
+		}
+	}
+
 
 }

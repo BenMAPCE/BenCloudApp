@@ -18,7 +18,6 @@ import java.util.UUID;
 import javax.servlet.MultipartConfigElement;
 
 import org.jooq.Record;
-import org.jooq.Record13;
 import org.jooq.Record14;
 import org.jooq.Record6;
 import org.jooq.Result;
@@ -41,7 +40,6 @@ import gov.epa.bencloud.server.database.JooqUtil;
 import gov.epa.bencloud.server.tasks.TaskComplete;
 import gov.epa.bencloud.server.tasks.TaskQueue;
 import gov.epa.bencloud.server.tasks.model.Task;
-import spark.Request;
 import spark.Service;
 
 public class ApiRoutes extends RoutesBase {
