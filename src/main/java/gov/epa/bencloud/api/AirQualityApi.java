@@ -65,6 +65,13 @@ public class AirQualityApi {
 		boolean descending = ParameterUtil.getParameterValueAsBoolean(request.raw().getParameter("descending"), false);
 		String filter = ParameterUtil.getParameterValueAsString(request.raw().getParameter("filter"), "");
 		
+//		System.out.println("");
+//		System.out.println("page: " + page);
+//		System.out.println("rowsPerPage: " + rowsPerPage);
+//		System.out.println("sortBy: " + sortBy);
+//		System.out.println("descending" + descending);
+//		System.out.println("filter: " + filter);
+		
 		List<OrderField<?>> orderFields = new ArrayList<>();
 		
 		setAirQualityLayersSortOrder(sortBy, descending, orderFields);
@@ -87,6 +94,7 @@ public class AirQualityApi {
 		}
 		filterCondition = filterCondition.and(pollutantCondition);
 
+		System.out.println(buildAirQualityLayersFilterCondition(filter));
 		
 		if (!"".equals(filter)) {
 			filterCondition = filterCondition.and(buildAirQualityLayersFilterCondition(filter));
@@ -134,7 +142,7 @@ public class AirQualityApi {
 				
 				.where(filterCondition)
 				.orderBy(orderFields)
-				.offset(page)
+				.offset((page * rowsPerPage) - rowsPerPage)
 				.limit(rowsPerPage)
 				.fetch();
 	
