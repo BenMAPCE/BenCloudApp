@@ -77,6 +77,28 @@ public class BenCloudServer {
 		benCloudService.staticFiles.externalLocation(applicationPath + 
 				ApplicationUtil.getProperties().getProperty("static.files.directory"));
 
+		benCloudService.options("/*",
+		        (request, response) -> {
+
+		            String accessControlRequestHeaders = request
+		                    .headers("Access-Control-Request-Headers");
+		            if (accessControlRequestHeaders != null) {
+		                response.header("Access-Control-Allow-Headers",
+		                        accessControlRequestHeaders);
+		            }
+
+		            String accessControlRequestMethod = request
+		                    .headers("Access-Control-Request-Method");
+		            if (accessControlRequestMethod != null) {
+		                response.header("Access-Control-Allow-Methods",
+		                        accessControlRequestMethod);
+		            }
+
+		            return "OK";
+		        });
+
+		benCloudService.before((request, response) -> response.header("Access-Control-Allow-Origin", "*"));
+		
 		new PublicRoutes(benCloudService, freeMarkerConfiguration);
 		new AdminRoutes(benCloudService, freeMarkerConfiguration);
 		new ApiRoutes(benCloudService, freeMarkerConfiguration);
