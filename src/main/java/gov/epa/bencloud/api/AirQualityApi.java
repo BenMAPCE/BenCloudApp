@@ -57,7 +57,7 @@ public class AirQualityApi {
 
 	public static Object getAirQualityLayerDefinitions(Request request, Response response) {
 		
-		String pollutantParam = request.raw().getParameter("pollutant");
+		int pollutantId = ParameterUtil.getParameterValueAsInteger(request.raw().getParameter("pollutantId"), 0);
 		
 		int page = ParameterUtil.getParameterValueAsInteger(request.raw().getParameter("page"), 1);
 		int rowsPerPage = ParameterUtil.getParameterValueAsInteger(request.raw().getParameter("rowsPerPage"), 10);
@@ -78,23 +78,15 @@ public class AirQualityApi {
 		
 		//Condition searchCondition = DSL.falseCondition();
 		Condition filterCondition = DSL.trueCondition();
-
-		Integer pollutantId = null;
-		
-		if (pollutantParam != null && !pollutantParam.isEmpty()) {
-			pollutantId = Integer.valueOf(pollutantParam);
-		}
 		
 		Condition pollutantCondition = DSL.trueCondition();
 
-		if (pollutantId != null) {
+		if (pollutantId != 0) {
 			
-			pollutantCondition = DSL.field(AIR_QUALITY_LAYER.ID.getName(), Integer.class.getName()).eq(pollutantId);
+			pollutantCondition = DSL.field(AIR_QUALITY_LAYER.POLLUTANT_ID).eq(pollutantId);
 			
 		}
 		filterCondition = filterCondition.and(pollutantCondition);
-
-		System.out.println(buildAirQualityLayersFilterCondition(filter));
 		
 		if (!"".equals(filter)) {
 			filterCondition = filterCondition.and(buildAirQualityLayersFilterCondition(filter));
