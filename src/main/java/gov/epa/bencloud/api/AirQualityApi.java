@@ -82,11 +82,9 @@ public class AirQualityApi {
 		Condition pollutantCondition = DSL.trueCondition();
 
 		if (pollutantId != 0) {
-			
 			pollutantCondition = DSL.field(AIR_QUALITY_LAYER.POLLUTANT_ID).eq(pollutantId);
-			
+			filterCondition = filterCondition.and(pollutantCondition);
 		}
-		filterCondition = filterCondition.and(pollutantCondition);
 		
 		if (!"".equals(filter)) {
 			filterCondition = filterCondition.and(buildAirQualityLayersFilterCondition(filter));
@@ -96,8 +94,6 @@ public class AirQualityApi {
 		
 		//System.out.println(orderFields);
 	
-		ObjectMapper mapper = new ObjectMapper();
-		ObjectNode data = mapper.createObjectNode();
 
 		Integer filteredRecordsCount = 
 				DSL.using(JooqUtil.getJooqConfiguration()).select(DSL.count())
@@ -109,7 +105,6 @@ public class AirQualityApi {
 				.fetchOne(DSL.count());
 		
 		System.out.println("filteredRecordsCount: " + filteredRecordsCount);
-		data.put("filteredRecordsCount", filteredRecordsCount);
 		
 		Result<Record13<Integer, String, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, Boolean, Integer, String, Integer, String>> aqRecords = 
 			DSL.using(JooqUtil.getJooqConfiguration())
@@ -140,6 +135,11 @@ public class AirQualityApi {
 	
 		
 		System.out.println("aqRecords: " + aqRecords.size());
+
+		ObjectMapper mapper = new ObjectMapper();
+		ObjectNode data = mapper.createObjectNode();
+		
+		data.put("filteredRecordsCount", filteredRecordsCount);
 
 		try {
 			JsonFactory factory = mapper.getFactory();
@@ -201,9 +201,49 @@ public class AirQualityApi {
 	public static Object getAirQualityLayerDetails(Request request, Response response) {
 		
 		Integer id = Integer.valueOf(request.params("id"));
-				
-		System.out.println("id: " + id);
 		
+		System.out.println("in getAirQualityLayerDetails");
+
+		//int id = ParameterUtil.getParameterValueAsInteger(request.raw().getParameter("id"), 0);
+		
+		int page = ParameterUtil.getParameterValueAsInteger(request.raw().getParameter("page"), 1);
+		int rowsPerPage = ParameterUtil.getParameterValueAsInteger(request.raw().getParameter("rowsPerPage"), 10);
+		String sortBy = ParameterUtil.getParameterValueAsString(request.raw().getParameter("sortBy"), "");
+		boolean descending = ParameterUtil.getParameterValueAsBoolean(request.raw().getParameter("descending"), false);
+		String filter = ParameterUtil.getParameterValueAsString(request.raw().getParameter("filter"), "");
+
+		System.out.println("id: " + id);
+		System.out.println("filter: " + filter);
+		System.out.println("rowsPerPage: " + rowsPerPage);
+
+		Condition filterCondition = DSL.trueCondition();
+		Condition airQualityLayerCondition = DSL.trueCondition();
+		
+		if (id != 0) {
+			airQualityLayerCondition = DSL.field(AIR_QUALITY_CELL.AIR_QUALITY_LAYER_ID).eq(id);
+			filterCondition = filterCondition.and(airQualityLayerCondition);
+		}
+
+		if (!"".equals(filter)) {
+			filterCondition = filterCondition.and(buildAirQualityCellsFilterCondition(filter));
+		}
+
+	
+		List<OrderField<?>> orderFields = new ArrayList<>();
+		
+		setAirQualityCellsSortOrder(sortBy, descending, orderFields);
+
+
+		Integer filteredRecordsCount = 
+				DSL.using(JooqUtil.getJooqConfiguration()).select(DSL.count())
+				.from(AIR_QUALITY_CELL)
+				.leftJoin(POLLUTANT_METRIC).on(AIR_QUALITY_CELL.METRIC_ID.eq(POLLUTANT_METRIC.ID))
+				.leftJoin(SEASONAL_METRIC).on(AIR_QUALITY_CELL.SEASONAL_METRIC_ID.eq(SEASONAL_METRIC.ID))
+				.where(filterCondition)
+				.fetchOne(DSL.count());
+
+		System.out.println("filteredRecordsCount: " + filteredRecordsCount);
+
 		Result<Record6<Integer, Integer, String, String, String, BigDecimal>> aqRecords = DSL.using(JooqUtil.getJooqConfiguration())
 				.select(
 						AIR_QUALITY_CELL.GRID_COL,
@@ -216,9 +256,11 @@ public class AirQualityApi {
 				.from(AIR_QUALITY_CELL)
 				.leftJoin(POLLUTANT_METRIC).on(AIR_QUALITY_CELL.METRIC_ID.eq(POLLUTANT_METRIC.ID))
 				.leftJoin(SEASONAL_METRIC).on(AIR_QUALITY_CELL.SEASONAL_METRIC_ID.eq(SEASONAL_METRIC.ID))
-				.where(AIR_QUALITY_CELL.AIR_QUALITY_LAYER_ID.eq(id))
+
+				.where(filterCondition)
 				.orderBy(AIR_QUALITY_CELL.GRID_COL, AIR_QUALITY_CELL.GRID_ROW)
-				.limit(10)
+				.offset((page * rowsPerPage) - rowsPerPage)
+				.limit(rowsPerPage)
 				.fetch();
 		
 		Record1<String> layerInfo = DSL.using(JooqUtil.getJooqConfiguration())
@@ -228,13 +270,37 @@ public class AirQualityApi {
 				.fetchOne();
 
 		if(request.headers("Accept").equalsIgnoreCase("text/csv")) {
-			String fileName = createFilename(layerInfo.value1());
+			String fileName = createFilename(layerInfo.get(AIR_QUALITY_LAYER.NAME));
 			response.type("text/csv");
-			response.raw().setHeader("Content-disposition", "attachment; filename="+ fileName);
+			response.header("Content-Disposition", "attachment; filename="+ fileName);
+			response.header("Access-Control-Expose-Headers", "Content-Disposition");
+						
 			return aqRecords.formatCSV();
 		} else {
+
+			System.out.println("aqRecords: " + aqRecords.size());
+
+			ObjectMapper mapper = new ObjectMapper();
+			ObjectNode data = mapper.createObjectNode();
+			
+			data.put("filteredRecordsCount", filteredRecordsCount);
+
+			try {
+				JsonFactory factory = mapper.getFactory();
+				JsonParser jp = factory.createParser(
+						aqRecords.formatJSON(new JSONFormat().header(false).recordFormat(RecordFormat.OBJECT)));
+				JsonNode actualObj = mapper.readTree(jp);
+				data.set("records", actualObj);
+			} catch (JsonParseException e) {
+				e.printStackTrace();
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
 			response.type("application/json");
-			return aqRecords.formatJSON(new JSONFormat().header(false).recordFormat(RecordFormat.OBJECT));
+			return data;
 		}
 	}
 
@@ -498,6 +564,53 @@ public class AirQualityApi {
 		return filterCondition;
 	}
 
+	private static Condition buildAirQualityCellsFilterCondition(String filterValue) {
+
+		Condition filterCondition = DSL.trueCondition();
+		Condition searchCondition = DSL.falseCondition();
+
+		Integer filterValueAsInteger = DataConversionUtil.getFilterValueAsInteger(filterValue);
+		Long filterValueAsLong = DataConversionUtil.getFilterValueAsLong(filterValue);
+		Double filterValueAsDouble = DataConversionUtil.getFilterValueAsDouble(filterValue);
+		BigDecimal filterValueAsBigDecimal = DataConversionUtil.getFilterValueAsBigDecimal(filterValue);
+		Date filterValueAsDate = DataConversionUtil.getFilterValueAsDate(filterValue, "MM/dd/yyyy");
+		
+
+		searchCondition = 
+				searchCondition.or(POLLUTANT_METRIC.NAME
+						.containsIgnoreCase(filterValue));
+
+		searchCondition = 
+				searchCondition.or(SEASONAL_METRIC.NAME
+						.containsIgnoreCase(filterValue));
+
+		searchCondition = 
+				searchCondition.or(AIR_QUALITY_CELL.ANNUAL_METRIC
+						.containsIgnoreCase(filterValue));
+
+
+		if (null != filterValueAsInteger) {
+
+			searchCondition = 
+					searchCondition.or(AIR_QUALITY_CELL.GRID_COL
+							.eq(filterValueAsInteger));
+
+			searchCondition = 
+					searchCondition.or(AIR_QUALITY_CELL.GRID_ROW
+							.eq(filterValueAsInteger));
+		}
+
+		if (null != filterValueAsBigDecimal) {
+			searchCondition = 
+					searchCondition.or(AIR_QUALITY_CELL.VALUE
+							.eq(filterValueAsBigDecimal));		
+		}
+		
+		filterCondition = filterCondition.and(searchCondition);
+
+		return filterCondition;
+	}
+
 	private static void setAirQualityLayersSortOrder(
 			String sortBy, Boolean descending, List<OrderField<?>> orderFields) {
 		
@@ -537,5 +650,65 @@ public class AirQualityApi {
 		}
 	}
 
+	private static void setAirQualityCellsSortOrder(
+			String sortBy, Boolean descending, List<OrderField<?>> orderFields) {
+		
+		if (null != sortBy) {
+			
+			SortOrder sortDirection = SortOrder.ASC;
+			Field<?> sortField = null;
+			
+			sortDirection = descending ? SortOrder.DESC : SortOrder.ASC;
+			
+			switch (sortBy) {
+			case "name":
+				sortField = DSL.field(sortBy, String.class.getName());
+				break;
 
+			case "grid_definition_name":
+				sortField = DSL.field(sortBy, Integer.class.getName());
+				break;
+
+			case "cell_count":
+				sortField = DSL.field(sortBy, Integer.class.getName());
+				break;
+
+			case "mean_value":
+				sortField = DSL.field(sortBy, Double.class.getName());
+				break;
+
+			default:
+				sortField = DSL.field(sortBy, String.class.getName());
+				break;
+			}
+			
+			orderFields.add(sortField.sort(sortDirection));
+			
+		} else {
+			orderFields.add(DSL.field("name", String.class.getName()).sort(SortOrder.ASC));	
+		}
+	}
+
+	private static JsonNode transformRecordsToJSON(Record records) {
+		
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode data = mapper.createObjectNode();
+
+        JsonNode recordsJSON = null;
+		try {
+			JsonFactory factory = mapper.getFactory();
+			JsonParser jp = factory.createParser(
+					records.formatJSON(new JSONFormat().header(false).recordFormat(RecordFormat.OBJECT)));
+			recordsJSON = mapper.readTree(jp);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return recordsJSON;
+		
+	}
 }
