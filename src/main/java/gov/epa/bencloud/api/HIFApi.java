@@ -14,11 +14,13 @@ import org.jooq.Record10;
 import org.jooq.Record12;
 import org.jooq.Record13;
 import org.jooq.Record16;
+import org.jooq.Record3;
 import org.jooq.impl.DSL;
 
 import gov.epa.bencloud.api.model.HIFTaskConfig;
 import gov.epa.bencloud.server.database.JooqUtil;
 import gov.epa.bencloud.server.database.jooq.tables.records.HifResultDatasetRecord;
+import gov.epa.bencloud.server.util.ParameterUtil;
 import spark.Request;
 import spark.Response;
 
@@ -116,6 +118,27 @@ public class HIFApi {
 		return hifRecords.formatJSON(new JSONFormat().header(false).recordFormat(RecordFormat.OBJECT));
 	}
 
+	public static Object getHifGroups(Request request, Response response) {
+			
+		int pollutantId = ParameterUtil.getParameterValueAsInteger(request.raw().getParameter("pollutantId"), 0);
+		
+		Result<Record3<String, Integer, Integer[]>> hifGroupRecords = DSL.using(JooqUtil.getJooqConfiguration())
+				.select(HEALTH_IMPACT_FUNCTION_GROUP.NAME
+						, HEALTH_IMPACT_FUNCTION_GROUP.ID
+						, DSL.arrayAggDistinct(HEALTH_IMPACT_FUNCTION_GROUP_MEMBER.HEALTH_IMPACT_FUNCTION_ID).as("functions")
+						)
+				.from(HEALTH_IMPACT_FUNCTION_GROUP)
+				.join(HEALTH_IMPACT_FUNCTION_GROUP_MEMBER).on(HEALTH_IMPACT_FUNCTION_GROUP.ID.eq(HEALTH_IMPACT_FUNCTION_GROUP_MEMBER.HEALTH_IMPACT_FUNCTION_GROUP_ID))
+				.where(pollutantId == 0 ? DSL.noCondition() : HEALTH_IMPACT_FUNCTION_GROUP.POLLUTANT_ID.eq(pollutantId))
+				.groupBy(HEALTH_IMPACT_FUNCTION_GROUP.NAME
+						, HEALTH_IMPACT_FUNCTION_GROUP.ID)
+				.orderBy(HEALTH_IMPACT_FUNCTION_GROUP.NAME)
+				.fetch();
+		
+		response.type("application/json");
+		return hifGroupRecords.formatJSON(new JSONFormat().header(false).recordFormat(RecordFormat.OBJECT));
+	}
+	
 	public static HIFTaskConfig getHifTaskConfigFromDb(Integer hifResultDatasetId) {
 		DSLContext create = DSL.using(JooqUtil.getJooqConfiguration());
 

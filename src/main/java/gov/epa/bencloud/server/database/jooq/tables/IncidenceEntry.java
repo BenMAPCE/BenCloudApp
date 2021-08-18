@@ -59,9 +59,9 @@ public class IncidenceEntry extends TableImpl<IncidenceEntryRecord> {
     public final TableField<IncidenceEntryRecord, Integer> INCIDENCE_DATASET_ID = createField(DSL.name("incidence_dataset_id"), SQLDataType.INTEGER, this, "");
 
     /**
-     * The column <code>data.incidence_entry.grid_definition_id</code>.
+     * The column <code>data.incidence_entry.year</code>.
      */
-    public final TableField<IncidenceEntryRecord, Integer> GRID_DEFINITION_ID = createField(DSL.name("grid_definition_id"), SQLDataType.INTEGER, this, "");
+    public final TableField<IncidenceEntryRecord, Integer> YEAR = createField(DSL.name("year"), SQLDataType.INTEGER, this, "");
 
     /**
      * The column <code>data.incidence_entry.endpoint_group_id</code>.
@@ -96,7 +96,7 @@ public class IncidenceEntry extends TableImpl<IncidenceEntryRecord> {
     /**
      * The column <code>data.incidence_entry.prevalence</code>.
      */
-    public final TableField<IncidenceEntryRecord, String> PREVALENCE = createField(DSL.name("prevalence"), SQLDataType.VARCHAR(1), this, "");
+    public final TableField<IncidenceEntryRecord, Boolean> PREVALENCE = createField(DSL.name("prevalence"), SQLDataType.BOOLEAN, this, "");
 
     /**
      * The column <code>data.incidence_entry.ethnicity_id</code>.
@@ -201,7 +201,7 @@ public class IncidenceEntry extends TableImpl<IncidenceEntryRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Row11<Integer, Integer, Integer, Integer, Integer, Integer, Integer, Short, Short, String, Integer> fieldsRow() {
+    public Row11<Integer, Integer, Integer, Integer, Integer, Integer, Integer, Short, Short, Boolean, Integer> fieldsRow() {
         return (Row11) super.fieldsRow();
     }
 }

@@ -198,6 +198,15 @@ public class AirQualityApi {
 		.fetchOne();
 	}
 
+	public static Integer getAirQualityLayerGridId(Integer id) {
+		return DSL.using(JooqUtil.getJooqConfiguration())
+		.select(
+				AIR_QUALITY_LAYER.GRID_DEFINITION_ID)
+		.from(AIR_QUALITY_LAYER)
+		.where(AIR_QUALITY_LAYER.ID.eq(id))
+		.fetchOne().value1();
+	}
+	
 	public static Object getAirQualityLayerDetails(Request request, Response response) {
 		
 		Integer id = Integer.valueOf(request.params("id"));

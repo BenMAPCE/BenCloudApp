@@ -496,6 +496,34 @@ public class HealthImpactFunctionRecord extends UpdatableRecordImpl<HealthImpact
         return (Integer) get(33);
     }
 
+    /**
+     * Setter for <code>data.health_impact_function.start_day</code>.
+     */
+    public void setStartDay(Integer value) {
+        set(34, value);
+    }
+
+    /**
+     * Getter for <code>data.health_impact_function.start_day</code>.
+     */
+    public Integer getStartDay() {
+        return (Integer) get(34);
+    }
+
+    /**
+     * Setter for <code>data.health_impact_function.end_day</code>.
+     */
+    public void setEndDay(Integer value) {
+        set(35, value);
+    }
+
+    /**
+     * Getter for <code>data.health_impact_function.end_day</code>.
+     */
+    public Integer getEndDay() {
+        return (Integer) get(35);
+    }
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -519,7 +547,7 @@ public class HealthImpactFunctionRecord extends UpdatableRecordImpl<HealthImpact
     /**
      * Create a detached, initialised HealthImpactFunctionRecord
      */
-    public HealthImpactFunctionRecord(Integer id, Integer healthImpactFunctionDatasetId, Integer endpointGroupId, Integer endpointId, Integer pollutantId, Integer metricId, Integer seasonalMetricId, Integer metricStatistic, String author, Integer functionYear, String location, String otherPollutants, String qualifier, String reference, Integer startAge, Integer endAge, String functionText, Integer incidenceDatasetId, Integer prevalenceDatasetId, Integer variableDatasetId, BigDecimal beta, String distBeta, BigDecimal p1Beta, BigDecimal p2Beta, BigDecimal valA, String nameA, BigDecimal valB, String nameB, BigDecimal valC, String nameC, String baselineFunctionText, Integer raceId, Integer genderId, Integer ethnicityId) {
+    public HealthImpactFunctionRecord(Integer id, Integer healthImpactFunctionDatasetId, Integer endpointGroupId, Integer endpointId, Integer pollutantId, Integer metricId, Integer seasonalMetricId, Integer metricStatistic, String author, Integer functionYear, String location, String otherPollutants, String qualifier, String reference, Integer startAge, Integer endAge, String functionText, Integer incidenceDatasetId, Integer prevalenceDatasetId, Integer variableDatasetId, BigDecimal beta, String distBeta, BigDecimal p1Beta, BigDecimal p2Beta, BigDecimal valA, String nameA, BigDecimal valB, String nameB, BigDecimal valC, String nameC, String baselineFunctionText, Integer raceId, Integer genderId, Integer ethnicityId, Integer startDay, Integer endDay) {
         super(HealthImpactFunction.HEALTH_IMPACT_FUNCTION);
 
         setId(id);
@@ -556,5 +584,7 @@ public class HealthImpactFunctionRecord extends UpdatableRecordImpl<HealthImpact
         setRaceId(raceId);
         setGenderId(genderId);
         setEthnicityId(ethnicityId);
+        setStartDay(startDay);
+        setEndDay(endDay);
     }
 }

@@ -92,7 +92,7 @@ public class ValuationTaskRunnable implements Runnable {
 			Map<Short, Record2<Short, BigDecimal>> incomeGrowthFactors = ApiUtil.getIncomeGrowthFactors(2, hifTaskConfig.popYear);
 			
 			//<variableName, <gridCellId, value>>
-			Map<String, Map<Long, Double>> variables = ApiUtil.getVariablesForValuation(valuationTaskConfig, vfDefinitionList);
+			Map<String, Map<Long, Double>> variables = ApiUtil.getVariableValues(valuationTaskConfig, vfDefinitionList);
 			
 			int totalCells = hifResults.size();
 			int currentCell = 0;

@@ -13,9 +13,14 @@ import gov.epa.bencloud.server.database.jooq.tables.Endpoint;
 import gov.epa.bencloud.server.database.jooq.tables.EndpointGroup;
 import gov.epa.bencloud.server.database.jooq.tables.Ethnicity;
 import gov.epa.bencloud.server.database.jooq.tables.Gender;
+import gov.epa.bencloud.server.database.jooq.tables.GetIncidence;
+import gov.epa.bencloud.server.database.jooq.tables.GetPopulation;
+import gov.epa.bencloud.server.database.jooq.tables.GetVariable;
 import gov.epa.bencloud.server.database.jooq.tables.GridDefinition;
 import gov.epa.bencloud.server.database.jooq.tables.HealthImpactFunction;
 import gov.epa.bencloud.server.database.jooq.tables.HealthImpactFunctionDataset;
+import gov.epa.bencloud.server.database.jooq.tables.HealthImpactFunctionGroup;
+import gov.epa.bencloud.server.database.jooq.tables.HealthImpactFunctionGroupMember;
 import gov.epa.bencloud.server.database.jooq.tables.HifResult;
 import gov.epa.bencloud.server.database.jooq.tables.HifResultDataset;
 import gov.epa.bencloud.server.database.jooq.tables.HifResultFunctionConfig;
@@ -34,6 +39,7 @@ import gov.epa.bencloud.server.database.jooq.tables.PopConfigGender;
 import gov.epa.bencloud.server.database.jooq.tables.PopConfigRace;
 import gov.epa.bencloud.server.database.jooq.tables.PopulationDataset;
 import gov.epa.bencloud.server.database.jooq.tables.PopulationEntry;
+import gov.epa.bencloud.server.database.jooq.tables.PopulationYear;
 import gov.epa.bencloud.server.database.jooq.tables.Race;
 import gov.epa.bencloud.server.database.jooq.tables.SeasonalMetric;
 import gov.epa.bencloud.server.database.jooq.tables.SeasonalMetricSeason;
@@ -48,6 +54,13 @@ import gov.epa.bencloud.server.database.jooq.tables.ValuationResultFunctionConfi
 import gov.epa.bencloud.server.database.jooq.tables.VariableDataset;
 import gov.epa.bencloud.server.database.jooq.tables.VariableEntry;
 import gov.epa.bencloud.server.database.jooq.tables.VariableValue;
+import gov.epa.bencloud.server.database.jooq.tables.records.GetIncidenceRecord;
+import gov.epa.bencloud.server.database.jooq.tables.records.GetPopulationRecord;
+import gov.epa.bencloud.server.database.jooq.tables.records.GetVariableRecord;
+
+import org.jooq.Configuration;
+import org.jooq.Field;
+import org.jooq.Result;
 
 
 /**
@@ -102,6 +115,267 @@ public class Tables {
     public static final Gender GENDER = Gender.GENDER;
 
     /**
+     * The table <code>data.get_incidence</code>.
+     */
+    public static final GetIncidence GET_INCIDENCE = GetIncidence.GET_INCIDENCE;
+
+    /**
+     * Call <code>data.get_incidence</code>.
+     */
+    public static Result<GetIncidenceRecord> GET_INCIDENCE(
+          Configuration configuration
+        , Integer _DatasetId
+        , Integer _Year
+        , Integer _EndpointId
+        , Integer[] _RaceId
+        , Integer[] _EthnicityId
+        , Integer[] _GenderId
+        , Short _StartAge
+        , Short _EndAge
+        , Boolean _GroupByRace
+        , Boolean _GroupByEthnicity
+        , Boolean _GroupByGender
+        , Boolean _GroupByAgeRange
+        , Integer _OutputGridDefinitionId
+    ) {
+        return configuration.dsl().selectFrom(gov.epa.bencloud.server.database.jooq.tables.GetIncidence.GET_INCIDENCE.call(
+              _DatasetId
+            , _Year
+            , _EndpointId
+            , _RaceId
+            , _EthnicityId
+            , _GenderId
+            , _StartAge
+            , _EndAge
+            , _GroupByRace
+            , _GroupByEthnicity
+            , _GroupByGender
+            , _GroupByAgeRange
+            , _OutputGridDefinitionId
+        )).fetch();
+    }
+
+    /**
+     * Get <code>data.get_incidence</code> as a table.
+     */
+    public static GetIncidence GET_INCIDENCE(
+          Integer _DatasetId
+        , Integer _Year
+        , Integer _EndpointId
+        , Integer[] _RaceId
+        , Integer[] _EthnicityId
+        , Integer[] _GenderId
+        , Short _StartAge
+        , Short _EndAge
+        , Boolean _GroupByRace
+        , Boolean _GroupByEthnicity
+        , Boolean _GroupByGender
+        , Boolean _GroupByAgeRange
+        , Integer _OutputGridDefinitionId
+    ) {
+        return gov.epa.bencloud.server.database.jooq.tables.GetIncidence.GET_INCIDENCE.call(
+              _DatasetId
+            , _Year
+            , _EndpointId
+            , _RaceId
+            , _EthnicityId
+            , _GenderId
+            , _StartAge
+            , _EndAge
+            , _GroupByRace
+            , _GroupByEthnicity
+            , _GroupByGender
+            , _GroupByAgeRange
+            , _OutputGridDefinitionId
+        );
+    }
+
+    /**
+     * Get <code>data.get_incidence</code> as a table.
+     */
+    public static GetIncidence GET_INCIDENCE(
+          Field<Integer> _DatasetId
+        , Field<Integer> _Year
+        , Field<Integer> _EndpointId
+        , Field<Integer[]> _RaceId
+        , Field<Integer[]> _EthnicityId
+        , Field<Integer[]> _GenderId
+        , Field<Short> _StartAge
+        , Field<Short> _EndAge
+        , Field<Boolean> _GroupByRace
+        , Field<Boolean> _GroupByEthnicity
+        , Field<Boolean> _GroupByGender
+        , Field<Boolean> _GroupByAgeRange
+        , Field<Integer> _OutputGridDefinitionId
+    ) {
+        return gov.epa.bencloud.server.database.jooq.tables.GetIncidence.GET_INCIDENCE.call(
+              _DatasetId
+            , _Year
+            , _EndpointId
+            , _RaceId
+            , _EthnicityId
+            , _GenderId
+            , _StartAge
+            , _EndAge
+            , _GroupByRace
+            , _GroupByEthnicity
+            , _GroupByGender
+            , _GroupByAgeRange
+            , _OutputGridDefinitionId
+        );
+    }
+
+    /**
+     * The table <code>data.get_population</code>.
+     */
+    public static final GetPopulation GET_POPULATION = GetPopulation.GET_POPULATION;
+
+    /**
+     * Call <code>data.get_population</code>.
+     */
+    public static Result<GetPopulationRecord> GET_POPULATION(
+          Configuration configuration
+        , Integer _DatasetId
+        , Integer _Year
+        , Integer[] _RaceId
+        , Integer[] _EthnicityId
+        , Integer[] _GenderId
+        , Integer[] _AgeRangeId
+        , Boolean _GroupByRace
+        , Boolean _GroupByEthnicity
+        , Boolean _GroupByGender
+        , Boolean _GroupByAgeRange
+        , Integer _OutputGridDefinitionId
+    ) {
+        return configuration.dsl().selectFrom(gov.epa.bencloud.server.database.jooq.tables.GetPopulation.GET_POPULATION.call(
+              _DatasetId
+            , _Year
+            , _RaceId
+            , _EthnicityId
+            , _GenderId
+            , _AgeRangeId
+            , _GroupByRace
+            , _GroupByEthnicity
+            , _GroupByGender
+            , _GroupByAgeRange
+            , _OutputGridDefinitionId
+        )).fetch();
+    }
+
+    /**
+     * Get <code>data.get_population</code> as a table.
+     */
+    public static GetPopulation GET_POPULATION(
+          Integer _DatasetId
+        , Integer _Year
+        , Integer[] _RaceId
+        , Integer[] _EthnicityId
+        , Integer[] _GenderId
+        , Integer[] _AgeRangeId
+        , Boolean _GroupByRace
+        , Boolean _GroupByEthnicity
+        , Boolean _GroupByGender
+        , Boolean _GroupByAgeRange
+        , Integer _OutputGridDefinitionId
+    ) {
+        return gov.epa.bencloud.server.database.jooq.tables.GetPopulation.GET_POPULATION.call(
+              _DatasetId
+            , _Year
+            , _RaceId
+            , _EthnicityId
+            , _GenderId
+            , _AgeRangeId
+            , _GroupByRace
+            , _GroupByEthnicity
+            , _GroupByGender
+            , _GroupByAgeRange
+            , _OutputGridDefinitionId
+        );
+    }
+
+    /**
+     * Get <code>data.get_population</code> as a table.
+     */
+    public static GetPopulation GET_POPULATION(
+          Field<Integer> _DatasetId
+        , Field<Integer> _Year
+        , Field<Integer[]> _RaceId
+        , Field<Integer[]> _EthnicityId
+        , Field<Integer[]> _GenderId
+        , Field<Integer[]> _AgeRangeId
+        , Field<Boolean> _GroupByRace
+        , Field<Boolean> _GroupByEthnicity
+        , Field<Boolean> _GroupByGender
+        , Field<Boolean> _GroupByAgeRange
+        , Field<Integer> _OutputGridDefinitionId
+    ) {
+        return gov.epa.bencloud.server.database.jooq.tables.GetPopulation.GET_POPULATION.call(
+              _DatasetId
+            , _Year
+            , _RaceId
+            , _EthnicityId
+            , _GenderId
+            , _AgeRangeId
+            , _GroupByRace
+            , _GroupByEthnicity
+            , _GroupByGender
+            , _GroupByAgeRange
+            , _OutputGridDefinitionId
+        );
+    }
+
+    /**
+     * The table <code>data.get_variable</code>.
+     */
+    public static final GetVariable GET_VARIABLE = GetVariable.GET_VARIABLE;
+
+    /**
+     * Call <code>data.get_variable</code>.
+     */
+    public static Result<GetVariableRecord> GET_VARIABLE(
+          Configuration configuration
+        , Integer _DatasetId
+        , String[] _VariableName
+        , Integer _OutputGridDefinitionId
+    ) {
+        return configuration.dsl().selectFrom(gov.epa.bencloud.server.database.jooq.tables.GetVariable.GET_VARIABLE.call(
+              _DatasetId
+            , _VariableName
+            , _OutputGridDefinitionId
+        )).fetch();
+    }
+
+    /**
+     * Get <code>data.get_variable</code> as a table.
+     */
+    public static GetVariable GET_VARIABLE(
+          Integer _DatasetId
+        , String[] _VariableName
+        , Integer _OutputGridDefinitionId
+    ) {
+        return gov.epa.bencloud.server.database.jooq.tables.GetVariable.GET_VARIABLE.call(
+              _DatasetId
+            , _VariableName
+            , _OutputGridDefinitionId
+        );
+    }
+
+    /**
+     * Get <code>data.get_variable</code> as a table.
+     */
+    public static GetVariable GET_VARIABLE(
+          Field<Integer> _DatasetId
+        , Field<String[]> _VariableName
+        , Field<Integer> _OutputGridDefinitionId
+    ) {
+        return gov.epa.bencloud.server.database.jooq.tables.GetVariable.GET_VARIABLE.call(
+              _DatasetId
+            , _VariableName
+            , _OutputGridDefinitionId
+        );
+    }
+
+    /**
      * The table <code>data.grid_definition</code>.
      */
     public static final GridDefinition GRID_DEFINITION = GridDefinition.GRID_DEFINITION;
@@ -115,6 +389,16 @@ public class Tables {
      * The table <code>data.health_impact_function_dataset</code>.
      */
     public static final HealthImpactFunctionDataset HEALTH_IMPACT_FUNCTION_DATASET = HealthImpactFunctionDataset.HEALTH_IMPACT_FUNCTION_DATASET;
+
+    /**
+     * The table <code>data.health_impact_function_group</code>.
+     */
+    public static final HealthImpactFunctionGroup HEALTH_IMPACT_FUNCTION_GROUP = HealthImpactFunctionGroup.HEALTH_IMPACT_FUNCTION_GROUP;
+
+    /**
+     * The table <code>data.health_impact_function_group_member</code>.
+     */
+    public static final HealthImpactFunctionGroupMember HEALTH_IMPACT_FUNCTION_GROUP_MEMBER = HealthImpactFunctionGroupMember.HEALTH_IMPACT_FUNCTION_GROUP_MEMBER;
 
     /**
      * The table <code>data.hif_result</code>.
@@ -205,6 +489,11 @@ public class Tables {
      * The table <code>data.population_entry</code>.
      */
     public static final PopulationEntry POPULATION_ENTRY = PopulationEntry.POPULATION_ENTRY;
+
+    /**
+     * The table <code>data.population_year</code>.
+     */
+    public static final PopulationYear POPULATION_YEAR = PopulationYear.POPULATION_YEAR;
 
     /**
      * The table <code>data.race</code>.

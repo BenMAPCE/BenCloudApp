@@ -1,17 +1,6 @@
 package gov.epa.bencloud.server.routes;
 
-import static gov.epa.bencloud.server.database.jooq.Tables.AIR_QUALITY_LAYER;
-import static gov.epa.bencloud.server.database.jooq.Tables.ENDPOINT;
-import static gov.epa.bencloud.server.database.jooq.Tables.ETHNICITY;
-import static gov.epa.bencloud.server.database.jooq.Tables.GENDER;
-import static gov.epa.bencloud.server.database.jooq.Tables.GRID_DEFINITION;
-import static gov.epa.bencloud.server.database.jooq.Tables.HEALTH_IMPACT_FUNCTION;
-import static gov.epa.bencloud.server.database.jooq.Tables.HIF_RESULT_DATASET;
-import static gov.epa.bencloud.server.database.jooq.Tables.HIF_RESULT_FUNCTION_CONFIG;
-import static gov.epa.bencloud.server.database.jooq.Tables.POLLUTANT;
-import static gov.epa.bencloud.server.database.jooq.Tables.POPULATION_DATASET;
-import static gov.epa.bencloud.server.database.jooq.Tables.RACE;
-import static gov.epa.bencloud.server.database.jooq.Tables.VALUATION_FUNCTION;
+import static gov.epa.bencloud.server.database.jooq.Tables.*;
 
 import java.util.UUID;
 
@@ -31,10 +20,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import freemarker.template.Configuration;
-import gov.epa.bencloud.api.AirQualityApi;
-import gov.epa.bencloud.api.GridDefinitionApi;
-import gov.epa.bencloud.api.HIFApi;
-import gov.epa.bencloud.api.PollutantApi;
+import gov.epa.bencloud.api.*;
 import gov.epa.bencloud.api.util.ApiUtil;
 import gov.epa.bencloud.server.database.JooqUtil;
 import gov.epa.bencloud.server.tasks.TaskComplete;
@@ -63,7 +49,7 @@ public class ApiRoutes extends RoutesBase {
 			return PollutantApi.getAllPollutantDefinitions(response);
 		});
 		
-		//Supports optional ?pollutant=:id query string parameter
+		//Supports optional ?pollutantId=:id query string parameter
 		service.get("/api/air-quality-data", (request, response) -> {
 			return AirQualityApi.getAirQualityLayerDefinitions(request, response);
 		});
@@ -76,8 +62,25 @@ public class ApiRoutes extends RoutesBase {
 			return AirQualityApi.getAirQualityLayerDetails(request, response);
 		});
 
+		service.get("/api/population", (request, response) -> {
+			return PopulationApi.getAllPopulationDatasets(response);
+		});
+		
 		service.get("/api/health-impact-functions", (request, response) -> {
 			return HIFApi.getAllHealthImpactFunctions(request, response);
+		});
+
+		//Supports optional ?pollutantId=:id query string parameter		
+		service.get("/api/health-impact-function-groups", (request, response) -> {
+			return HIFApi.getHifGroups(request, response);
+		});
+		
+		service.get("/api/incidence", (request, response) -> {
+			return IncidenceApi.getAllIncidenceDatasets(response);
+		});
+		
+		service.get("/api/prevalence", (request, response) -> {
+			return IncidenceApi.getAllPrevalenceDatasets(response);
 		});
 		
 		// POST

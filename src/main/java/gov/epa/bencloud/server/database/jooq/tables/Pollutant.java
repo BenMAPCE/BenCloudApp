@@ -16,7 +16,7 @@ import org.jooq.ForeignKey;
 import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row3;
+import org.jooq.Row4;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -62,6 +62,11 @@ public class Pollutant extends TableImpl<PollutantRecord> {
      * The column <code>data.pollutant.observation_type</code>.
      */
     public final TableField<PollutantRecord, Short> OBSERVATION_TYPE = createField(DSL.name("observation_type"), SQLDataType.SMALLINT, this, "");
+
+    /**
+     * The column <code>data.pollutant.friendly_name</code>.
+     */
+    public final TableField<PollutantRecord, String> FRIENDLY_NAME = createField(DSL.name("friendly_name"), SQLDataType.CLOB, this, "");
 
     private Pollutant(Name alias, Table<PollutantRecord> aliased) {
         this(alias, aliased, null);
@@ -143,11 +148,11 @@ public class Pollutant extends TableImpl<PollutantRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row3 type methods
+    // Row4 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row3<Integer, String, Short> fieldsRow() {
-        return (Row3) super.fieldsRow();
+    public Row4<Integer, String, Short, String> fieldsRow() {
+        return (Row4) super.fieldsRow();
     }
 }

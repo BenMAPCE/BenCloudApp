@@ -2,64 +2,50 @@ package gov.epa.bencloud.api;
 
 import static gov.epa.bencloud.server.database.jooq.Tables.*;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Map;
 
+import org.jooq.JSONFormat;
 import org.jooq.Record1;
 import org.jooq.Record3;
-import org.jooq.Record6;
+import org.jooq.Record4;
 import org.jooq.Result;
+import org.jooq.JSONFormat.RecordFormat;
 import org.jooq.impl.DSL;
 
 import gov.epa.bencloud.api.model.HIFConfig;
 import gov.epa.bencloud.api.model.HIFTaskConfig;
 import gov.epa.bencloud.server.database.JooqUtil;
+import gov.epa.bencloud.server.database.jooq.Routines;
+import gov.epa.bencloud.server.database.jooq.tables.records.GetPopulationRecord;
 import gov.epa.bencloud.server.database.jooq.tables.records.HealthImpactFunctionRecord;
+import spark.Response;
 
 public class PopulationApi {
 
-	public static Map<Long, Result<Record6<Long, Integer, Integer, Integer, Integer, BigDecimal>>> getPopulationEntryGroups(ArrayList<HealthImpactFunctionRecord> hifDefinitionList, HIFTaskConfig hifTaskConfig) {
+	public static Map<Long, Result<GetPopulationRecord>> getPopulationEntryGroups(ArrayList<HealthImpactFunctionRecord> hifDefinitionList, HIFTaskConfig hifTaskConfig) {
 
 		//TODO: Need to grow the population using the selected popYear
 		//NOTE: For now, we're focusing on age groups and not dealing with race, gender, ethnicity
-		/*
-		Map<Long, Result<Record6<Long, Integer, Integer, Integer, Integer, BigDecimal>>> popRecords = DSL.using(JooqUtil.getJooqConfiguration())
-				.select(POPULATION_ENTRY.GRID_CELL_ID, 
-						POPULATION_ENTRY.RACE_ID,
-						POPULATION_ENTRY.GENDER_ID,
-						POPULATION_ENTRY.ETHNICITY_ID,
-						POPULATION_ENTRY.AGE_RANGE_ID,
-						DSL.sum(POPULATION_ENTRY.POP_VALUE))
-				.from(POPULATION_ENTRY)
-				.where(POPULATION_ENTRY.POP_DATASET_ID.eq(id))
-				.groupBy(POPULATION_ENTRY.GRID_CELL_ID,
-						POPULATION_ENTRY.RACE_ID,
-						POPULATION_ENTRY.GENDER_ID,
-						POPULATION_ENTRY.ETHNICITY_ID,
-						POPULATION_ENTRY.AGE_RANGE_ID)
-				.fetchGroups(POPULATION_ENTRY.GRID_CELL_ID);
-		*/
 		
 		// Get the array of age ranges to include based on the configured hifs
 		ArrayList<Integer> ageRangeIds = getAgeRangesForHifs(hifTaskConfig);
-		
-		Map<Long, Result<Record6<Long, Integer, Integer, Integer, Integer, BigDecimal>>> popRecords = DSL.using(JooqUtil.getJooqConfiguration())
-				.select(POPULATION_ENTRY.GRID_CELL_ID, 
-						DSL.val(6).as("RACE_ID"),
-						DSL.val(3).as("GENDER_ID"),
-						DSL.val(3).as("ETHNICITY_ID"),
-						POPULATION_ENTRY.AGE_RANGE_ID,
-						DSL.sum(POPULATION_ENTRY.POP_VALUE))
-				.from(POPULATION_ENTRY)
-				.where(POPULATION_ENTRY.POP_DATASET_ID.eq(hifTaskConfig.popId)
-						.and(POPULATION_ENTRY.AGE_RANGE_ID.in(ageRangeIds)))
-				.groupBy(POPULATION_ENTRY.GRID_CELL_ID,
-						DSL.val(6).as("RACE_ID"),
-						DSL.val(3).as("GENDER_ID"),
-						DSL.val(3).as("ETHNICITY_ID"),
-						POPULATION_ENTRY.AGE_RANGE_ID)
-				.fetchGroups(POPULATION_ENTRY.GRID_CELL_ID);
+        Integer arrAgeRangeIds[] = new Integer[ageRangeIds.size()];
+        arrAgeRangeIds = ageRangeIds.toArray(arrAgeRangeIds);
+        
+		Map<Long, Result<GetPopulationRecord>> popRecords = Routines.getPopulation(JooqUtil.getJooqConfiguration(), 
+				hifTaskConfig.popId, 
+				hifTaskConfig.popYear,
+				null, 
+				null, 
+				null, 
+				arrAgeRangeIds, 
+				null, 
+				null, 
+				null, 
+				true, 
+				28).intoGroups(GET_POPULATION.GRID_CELL_ID);
+
 		return popRecords;
 	}
 
@@ -113,5 +99,25 @@ public class PopulationApi {
 				.fetch();
 		
 		return popAgeRanges;
+	}
+	
+	public static Object getAllPopulationDatasets(Response response) {
+
+			Result<Record4<String, Integer, Integer, Integer[]>> records = DSL.using(JooqUtil.getJooqConfiguration())
+					.select(POPULATION_DATASET.NAME,
+							POPULATION_DATASET.ID,
+							POPULATION_DATASET.GRID_DEFINITION_ID,
+							DSL.arrayAggDistinct(POPULATION_YEAR.POP_YEAR).orderBy(POPULATION_YEAR.POP_YEAR).as("years"))
+					.from(POPULATION_DATASET)
+					.join(POPULATION_YEAR).on(POPULATION_DATASET.ID.eq(POPULATION_YEAR.POPULATION_DATASET_ID))
+					.groupBy(POPULATION_DATASET.NAME,
+							POPULATION_DATASET.ID,
+							POPULATION_DATASET.GRID_DEFINITION_ID)
+					.orderBy(POPULATION_DATASET.NAME)
+					.fetch();
+			
+			response.type("application/json");
+			return records.formatJSON(new JSONFormat().header(false).recordFormat(RecordFormat.OBJECT));
+
 	}
 }

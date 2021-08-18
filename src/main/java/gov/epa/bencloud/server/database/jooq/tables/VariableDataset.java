@@ -16,7 +16,7 @@ import org.jooq.ForeignKey;
 import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row2;
+import org.jooq.Row3;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -57,6 +57,11 @@ public class VariableDataset extends TableImpl<VariableDatasetRecord> {
      * The column <code>data.variable_dataset.name</code>.
      */
     public final TableField<VariableDatasetRecord, String> NAME = createField(DSL.name("name"), SQLDataType.CLOB.nullable(false), this, "");
+
+    /**
+     * The column <code>data.variable_dataset.grid_definition_id</code>.
+     */
+    public final TableField<VariableDatasetRecord, Integer> GRID_DEFINITION_ID = createField(DSL.name("grid_definition_id"), SQLDataType.INTEGER, this, "");
 
     private VariableDataset(Name alias, Table<VariableDatasetRecord> aliased) {
         this(alias, aliased, null);
@@ -138,11 +143,11 @@ public class VariableDataset extends TableImpl<VariableDatasetRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row2 type methods
+    // Row3 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row2<Integer, String> fieldsRow() {
-        return (Row2) super.fieldsRow();
+    public Row3<Integer, String, Integer> fieldsRow() {
+        return (Row3) super.fieldsRow();
     }
 }

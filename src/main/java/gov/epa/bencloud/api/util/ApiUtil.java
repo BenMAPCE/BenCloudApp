@@ -3,6 +3,7 @@ package gov.epa.bencloud.api.util;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -19,6 +20,8 @@ import gov.epa.bencloud.api.ValuationApi;
 import gov.epa.bencloud.api.model.ValuationConfig;
 import gov.epa.bencloud.api.model.ValuationTaskConfig;
 import gov.epa.bencloud.server.database.JooqUtil;
+import gov.epa.bencloud.server.database.jooq.Routines;
+import gov.epa.bencloud.server.database.jooq.tables.records.GetVariableRecord;
 import gov.epa.bencloud.server.database.jooq.tables.records.InflationEntryRecord;
 import gov.epa.bencloud.server.database.jooq.tables.records.ValuationFunctionRecord;
 import gov.epa.bencloud.server.tasks.TaskComplete;
@@ -113,11 +116,19 @@ public class ApiUtil {
 		return null;
 	}
 
-	public static Map<String, Map<Long, Double>> getVariablesForValuation(ValuationTaskConfig valuationTaskConfig, List<ValuationFunctionRecord> vfDefinitionList) {
+	public static Map<String, Map<Long, Double>> getVariableValues(ValuationTaskConfig valuationTaskConfig, List<ValuationFunctionRecord> vfDefinitionList) {
 		 // Load list of functions from the database
+		
+		//TODO: Change this to only load what we need
 		List<String> allVariableNames = ApiUtil.getAllVariableNames(valuationTaskConfig.variableDatasetId);
+		
+		
 		HashMap<String, Map<Long, Double>> variableMap = new HashMap<String, Map<Long, Double>>();
 		
+		Result<GetVariableRecord> variableRecords = Routines.getVariable(JooqUtil.getJooqConfiguration(), 
+				1, 
+				allVariableNames.toArray(new String[0]), 
+				28);
 		//Look at all valuation functions to determine which variables are needed
 		for(String variableName: allVariableNames) {
 			for(ValuationFunctionRecord function : vfDefinitionList) {
@@ -129,28 +140,11 @@ public class ApiUtil {
 			}
 		}
 		// Finally load the cell values for each needed variable
-		for(Entry<String, Map<Long, Double>> variable : variableMap.entrySet()) {
-			variable.setValue(ApiUtil.getVariableCellMap(variable.getKey()));
+		for (GetVariableRecord variableRecord : variableRecords) {
+			variableMap.get(variableRecord.getVariableName()).put(variableRecord.getGridCellId(), variableRecord.getValue().doubleValue());
 		}
 		
 		return variableMap;
-	}
-
-	private static Map<Long, Double> getVariableCellMap(String key) {
-		Map<Long, Double> cellMap = new HashMap<Long, Double>();
-
-		Result<Record2<Integer, BigDecimal>> results = DSL.using(JooqUtil.getJooqConfiguration())
-		.select(VARIABLE_VALUE.GRID_CELL_ID
-				, VARIABLE_VALUE.VALUE)
-		.from(VARIABLE_VALUE)
-		.join(VARIABLE_ENTRY).on(VARIABLE_ENTRY.ID.eq(VARIABLE_VALUE.VARIABLE_ENTRY_ID))
-		.where(VARIABLE_ENTRY.NAME.equalIgnoreCase(key))
-		.fetch();
-		
-		for(Record2<Integer, BigDecimal> result : results) {
-			cellMap.put(result.value1().longValue(), result.value2().doubleValue());
-		}
-		return cellMap;
 	}
 
 	private static List<String> getAllVariableNames(Integer variableDatasetId) {

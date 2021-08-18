@@ -5,6 +5,7 @@ package gov.epa.bencloud.server.database.jooq;
 
 
 import gov.epa.bencloud.server.database.jooq.tables.AgeRange;
+import gov.epa.bencloud.server.database.jooq.tables.AirQualityCell;
 import gov.epa.bencloud.server.database.jooq.tables.AirQualityLayer;
 import gov.epa.bencloud.server.database.jooq.tables.CrosswalkDataset;
 import gov.epa.bencloud.server.database.jooq.tables.Endpoint;
@@ -14,6 +15,7 @@ import gov.epa.bencloud.server.database.jooq.tables.Gender;
 import gov.epa.bencloud.server.database.jooq.tables.GridDefinition;
 import gov.epa.bencloud.server.database.jooq.tables.HealthImpactFunction;
 import gov.epa.bencloud.server.database.jooq.tables.HealthImpactFunctionDataset;
+import gov.epa.bencloud.server.database.jooq.tables.HealthImpactFunctionGroup;
 import gov.epa.bencloud.server.database.jooq.tables.HifResultDataset;
 import gov.epa.bencloud.server.database.jooq.tables.IncidenceDataset;
 import gov.epa.bencloud.server.database.jooq.tables.IncidenceEntry;
@@ -41,6 +43,7 @@ import gov.epa.bencloud.server.database.jooq.tables.ValuationResultDataset;
 import gov.epa.bencloud.server.database.jooq.tables.VariableDataset;
 import gov.epa.bencloud.server.database.jooq.tables.VariableEntry;
 import gov.epa.bencloud.server.database.jooq.tables.records.AgeRangeRecord;
+import gov.epa.bencloud.server.database.jooq.tables.records.AirQualityCellRecord;
 import gov.epa.bencloud.server.database.jooq.tables.records.AirQualityLayerRecord;
 import gov.epa.bencloud.server.database.jooq.tables.records.CrosswalkDatasetRecord;
 import gov.epa.bencloud.server.database.jooq.tables.records.EndpointGroupRecord;
@@ -49,6 +52,7 @@ import gov.epa.bencloud.server.database.jooq.tables.records.EthnicityRecord;
 import gov.epa.bencloud.server.database.jooq.tables.records.GenderRecord;
 import gov.epa.bencloud.server.database.jooq.tables.records.GridDefinitionRecord;
 import gov.epa.bencloud.server.database.jooq.tables.records.HealthImpactFunctionDatasetRecord;
+import gov.epa.bencloud.server.database.jooq.tables.records.HealthImpactFunctionGroupRecord;
 import gov.epa.bencloud.server.database.jooq.tables.records.HealthImpactFunctionRecord;
 import gov.epa.bencloud.server.database.jooq.tables.records.HifResultDatasetRecord;
 import gov.epa.bencloud.server.database.jooq.tables.records.IncidenceDatasetRecord;
@@ -105,6 +109,7 @@ public class Keys {
     public static final UniqueKey<GridDefinitionRecord> GRID_DEFINITION_PKEY = Internal.createUniqueKey(GridDefinition.GRID_DEFINITION, DSL.name("grid_definition_pkey"), new TableField[] { GridDefinition.GRID_DEFINITION.ID }, true);
     public static final UniqueKey<HealthImpactFunctionRecord> HEALTH_IMPACT_FUNCTION_PKEY = Internal.createUniqueKey(HealthImpactFunction.HEALTH_IMPACT_FUNCTION, DSL.name("health_impact_function_pkey"), new TableField[] { HealthImpactFunction.HEALTH_IMPACT_FUNCTION.ID }, true);
     public static final UniqueKey<HealthImpactFunctionDatasetRecord> HEALTH_IMPACT_FUNCTION_DATASET_PKEY = Internal.createUniqueKey(HealthImpactFunctionDataset.HEALTH_IMPACT_FUNCTION_DATASET, DSL.name("health_impact_function_dataset_pkey"), new TableField[] { HealthImpactFunctionDataset.HEALTH_IMPACT_FUNCTION_DATASET.ID }, true);
+    public static final UniqueKey<HealthImpactFunctionGroupRecord> HEALTH_IMPACT_FUNCTION_GROUP_PKEY = Internal.createUniqueKey(HealthImpactFunctionGroup.HEALTH_IMPACT_FUNCTION_GROUP, DSL.name("health_impact_function_group_pkey"), new TableField[] { HealthImpactFunctionGroup.HEALTH_IMPACT_FUNCTION_GROUP.ID }, true);
     public static final UniqueKey<HifResultDatasetRecord> HIF_RESULT_DATASET_PKEY = Internal.createUniqueKey(HifResultDataset.HIF_RESULT_DATASET, DSL.name("hif_result_dataset_pkey"), new TableField[] { HifResultDataset.HIF_RESULT_DATASET.ID }, true);
     public static final UniqueKey<IncidenceDatasetRecord> INCIDENCE_DATASET_PKEY = Internal.createUniqueKey(IncidenceDataset.INCIDENCE_DATASET, DSL.name("incidence_dataset_pkey"), new TableField[] { IncidenceDataset.INCIDENCE_DATASET.ID }, true);
     public static final UniqueKey<IncidenceEntryRecord> INCIDENCE_ENTRY_PKEY = Internal.createUniqueKey(IncidenceEntry.INCIDENCE_ENTRY, DSL.name("incidence_entry_pkey"), new TableField[] { IncidenceEntry.INCIDENCE_ENTRY.ID }, true);
@@ -132,6 +137,11 @@ public class Keys {
     // -------------------------------------------------------------------------
 
     public static final ForeignKey<AgeRangeRecord, PopConfigRecord> AGE_RANGE__AGE_RANGE_POP_CONFIG_ID_FKEY = Internal.createForeignKey(AgeRange.AGE_RANGE, DSL.name("age_range_pop_config_id_fkey"), new TableField[] { AgeRange.AGE_RANGE.POP_CONFIG_ID }, Keys.POP_CONFIG_PKEY, new TableField[] { PopConfig.POP_CONFIG.ID }, true);
+    public static final ForeignKey<AirQualityCellRecord, AirQualityLayerRecord> AIR_QUALITY_CELL__AIR_QUALITY_CELL_AIR_QUALITY_LAYER_ID_FKEY = Internal.createForeignKey(AirQualityCell.AIR_QUALITY_CELL, DSL.name("air_quality_cell_air_quality_layer_id_fkey"), new TableField[] { AirQualityCell.AIR_QUALITY_CELL.AIR_QUALITY_LAYER_ID }, Keys.AIR_QUALITY_LAYER_PKEY, new TableField[] { AirQualityLayer.AIR_QUALITY_LAYER.ID }, true);
+    public static final ForeignKey<AirQualityCellRecord, PollutantMetricRecord> AIR_QUALITY_CELL__AIR_QUALITY_CELL_METRIC_ID_FKEY = Internal.createForeignKey(AirQualityCell.AIR_QUALITY_CELL, DSL.name("air_quality_cell_metric_id_fkey"), new TableField[] { AirQualityCell.AIR_QUALITY_CELL.METRIC_ID }, Keys.POLLUTANT_METRIC_PKEY, new TableField[] { PollutantMetric.POLLUTANT_METRIC.ID }, true);
+    public static final ForeignKey<AirQualityCellRecord, SeasonalMetricRecord> AIR_QUALITY_CELL__AIR_QUALITY_CELL_SEASONAL_METRIC_ID_FKEY = Internal.createForeignKey(AirQualityCell.AIR_QUALITY_CELL, DSL.name("air_quality_cell_seasonal_metric_id_fkey"), new TableField[] { AirQualityCell.AIR_QUALITY_CELL.SEASONAL_METRIC_ID }, Keys.SEASONAL_METRIC_PKEY, new TableField[] { SeasonalMetric.SEASONAL_METRIC.ID }, true);
+    public static final ForeignKey<AirQualityLayerRecord, GridDefinitionRecord> AIR_QUALITY_LAYER__AIR_QUALITY_LAYER_GRID_DEFINITION_ID_FKEY = Internal.createForeignKey(AirQualityLayer.AIR_QUALITY_LAYER, DSL.name("air_quality_layer_grid_definition_id_fkey"), new TableField[] { AirQualityLayer.AIR_QUALITY_LAYER.GRID_DEFINITION_ID }, Keys.GRID_DEFINITION_PKEY, new TableField[] { GridDefinition.GRID_DEFINITION.ID }, true);
+    public static final ForeignKey<AirQualityLayerRecord, PollutantRecord> AIR_QUALITY_LAYER__AIR_QUALITY_LAYER_POLLUTANT_ID_FKEY = Internal.createForeignKey(AirQualityLayer.AIR_QUALITY_LAYER, DSL.name("air_quality_layer_pollutant_id_fkey"), new TableField[] { AirQualityLayer.AIR_QUALITY_LAYER.POLLUTANT_ID }, Keys.POLLUTANT_PKEY, new TableField[] { Pollutant.POLLUTANT.ID }, true);
     public static final ForeignKey<EndpointRecord, EndpointGroupRecord> ENDPOINT__ENDPOINT_ENDPOINT_GROUP_ID_FKEY = Internal.createForeignKey(Endpoint.ENDPOINT, DSL.name("endpoint_endpoint_group_id_fkey"), new TableField[] { Endpoint.ENDPOINT.ENDPOINT_GROUP_ID }, Keys.ENDPOINT_GROUP_PKEY, new TableField[] { EndpointGroup.ENDPOINT_GROUP.ID }, true);
     public static final ForeignKey<IncidenceDatasetRecord, GridDefinitionRecord> INCIDENCE_DATASET__INCIDENCE_DATASET_GRID_DEFINITION_ID_FKEY = Internal.createForeignKey(IncidenceDataset.INCIDENCE_DATASET, DSL.name("incidence_dataset_grid_definition_id_fkey"), new TableField[] { IncidenceDataset.INCIDENCE_DATASET.GRID_DEFINITION_ID }, Keys.GRID_DEFINITION_PKEY, new TableField[] { GridDefinition.GRID_DEFINITION.ID }, true);
     public static final ForeignKey<IncidenceEntryRecord, IncidenceDatasetRecord> INCIDENCE_ENTRY__INCIDENCE_ENTRY_INCIDENCE_DATASET_ID_FKEY = Internal.createForeignKey(IncidenceEntry.INCIDENCE_ENTRY, DSL.name("incidence_entry_incidence_dataset_id_fkey"), new TableField[] { IncidenceEntry.INCIDENCE_ENTRY.INCIDENCE_DATASET_ID }, Keys.INCIDENCE_DATASET_PKEY, new TableField[] { IncidenceDataset.INCIDENCE_DATASET.ID }, true);

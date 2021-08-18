@@ -158,6 +158,28 @@ public class AirQualityLayer extends TableImpl<AirQualityLayerRecord> {
     }
 
     @Override
+    public List<ForeignKey<AirQualityLayerRecord, ?>> getReferences() {
+        return Arrays.<ForeignKey<AirQualityLayerRecord, ?>>asList(Keys.AIR_QUALITY_LAYER__AIR_QUALITY_LAYER_POLLUTANT_ID_FKEY, Keys.AIR_QUALITY_LAYER__AIR_QUALITY_LAYER_GRID_DEFINITION_ID_FKEY);
+    }
+
+    private transient Pollutant _pollutant;
+    private transient GridDefinition _gridDefinition;
+
+    public Pollutant pollutant() {
+        if (_pollutant == null)
+            _pollutant = new Pollutant(this, Keys.AIR_QUALITY_LAYER__AIR_QUALITY_LAYER_POLLUTANT_ID_FKEY);
+
+        return _pollutant;
+    }
+
+    public GridDefinition gridDefinition() {
+        if (_gridDefinition == null)
+            _gridDefinition = new GridDefinition(this, Keys.AIR_QUALITY_LAYER__AIR_QUALITY_LAYER_GRID_DEFINITION_ID_FKEY);
+
+        return _gridDefinition;
+    }
+
+    @Override
     public AirQualityLayer as(String alias) {
         return new AirQualityLayer(DSL.name(alias), this);
     }

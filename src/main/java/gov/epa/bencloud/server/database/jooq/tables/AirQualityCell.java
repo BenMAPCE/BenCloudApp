@@ -5,9 +5,12 @@ package gov.epa.bencloud.server.database.jooq.tables;
 
 
 import gov.epa.bencloud.server.database.jooq.Data;
+import gov.epa.bencloud.server.database.jooq.Keys;
 import gov.epa.bencloud.server.database.jooq.tables.records.AirQualityCellRecord;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
@@ -120,6 +123,36 @@ public class AirQualityCell extends TableImpl<AirQualityCellRecord> {
     @Override
     public Schema getSchema() {
         return Data.DATA;
+    }
+
+    @Override
+    public List<ForeignKey<AirQualityCellRecord, ?>> getReferences() {
+        return Arrays.<ForeignKey<AirQualityCellRecord, ?>>asList(Keys.AIR_QUALITY_CELL__AIR_QUALITY_CELL_AIR_QUALITY_LAYER_ID_FKEY, Keys.AIR_QUALITY_CELL__AIR_QUALITY_CELL_METRIC_ID_FKEY, Keys.AIR_QUALITY_CELL__AIR_QUALITY_CELL_SEASONAL_METRIC_ID_FKEY);
+    }
+
+    private transient AirQualityLayer _airQualityLayer;
+    private transient PollutantMetric _pollutantMetric;
+    private transient SeasonalMetric _seasonalMetric;
+
+    public AirQualityLayer airQualityLayer() {
+        if (_airQualityLayer == null)
+            _airQualityLayer = new AirQualityLayer(this, Keys.AIR_QUALITY_CELL__AIR_QUALITY_CELL_AIR_QUALITY_LAYER_ID_FKEY);
+
+        return _airQualityLayer;
+    }
+
+    public PollutantMetric pollutantMetric() {
+        if (_pollutantMetric == null)
+            _pollutantMetric = new PollutantMetric(this, Keys.AIR_QUALITY_CELL__AIR_QUALITY_CELL_METRIC_ID_FKEY);
+
+        return _pollutantMetric;
+    }
+
+    public SeasonalMetric seasonalMetric() {
+        if (_seasonalMetric == null)
+            _seasonalMetric = new SeasonalMetric(this, Keys.AIR_QUALITY_CELL__AIR_QUALITY_CELL_SEASONAL_METRIC_ID_FKEY);
+
+        return _seasonalMetric;
     }
 
     @Override

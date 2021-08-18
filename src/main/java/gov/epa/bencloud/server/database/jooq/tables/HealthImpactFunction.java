@@ -218,6 +218,16 @@ public class HealthImpactFunction extends TableImpl<HealthImpactFunctionRecord> 
      */
     public final TableField<HealthImpactFunctionRecord, Integer> ETHNICITY_ID = createField(DSL.name("ethnicity_id"), SQLDataType.INTEGER, this, "");
 
+    /**
+     * The column <code>data.health_impact_function.start_day</code>.
+     */
+    public final TableField<HealthImpactFunctionRecord, Integer> START_DAY = createField(DSL.name("start_day"), SQLDataType.INTEGER, this, "");
+
+    /**
+     * The column <code>data.health_impact_function.end_day</code>.
+     */
+    public final TableField<HealthImpactFunctionRecord, Integer> END_DAY = createField(DSL.name("end_day"), SQLDataType.INTEGER, this, "");
+
     private HealthImpactFunction(Name alias, Table<HealthImpactFunctionRecord> aliased) {
         this(alias, aliased, null);
     }

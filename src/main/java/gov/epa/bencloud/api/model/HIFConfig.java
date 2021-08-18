@@ -8,7 +8,11 @@ public class HIFConfig {
 	public Integer ethnicity = null;
 	public Integer gender = null;
 	public Integer incidence = null;
+	public Integer incidenceYear = null;
 	public Integer prevalence = null;
+	public Integer prevalenceYear = null;
 	public Integer variable = null;
-
+	public Integer startDay = null;
+	public Integer endDay = null;
+	public Integer totalDays = null;
 }

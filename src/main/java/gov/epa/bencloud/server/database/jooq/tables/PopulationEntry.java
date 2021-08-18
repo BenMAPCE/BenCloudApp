@@ -5,6 +5,7 @@ package gov.epa.bencloud.server.database.jooq.tables;
 
 
 import gov.epa.bencloud.server.database.jooq.Data;
+import gov.epa.bencloud.server.database.jooq.Indexes;
 import gov.epa.bencloud.server.database.jooq.Keys;
 import gov.epa.bencloud.server.database.jooq.tables.records.PopulationEntryRecord;
 
@@ -14,6 +15,7 @@ import java.util.List;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Row10;
@@ -133,6 +135,11 @@ public class PopulationEntry extends TableImpl<PopulationEntryRecord> {
     @Override
     public Schema getSchema() {
         return Data.DATA;
+    }
+
+    @Override
+    public List<Index> getIndexes() {
+        return Arrays.<Index>asList(Indexes.POPULATION_ENTRY_POP_DATASET_ID_IDX);
     }
 
     @Override

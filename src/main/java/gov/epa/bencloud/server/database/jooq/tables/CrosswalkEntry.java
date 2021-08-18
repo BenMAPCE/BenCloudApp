@@ -5,12 +5,16 @@ package gov.epa.bencloud.server.database.jooq.tables;
 
 
 import gov.epa.bencloud.server.database.jooq.Data;
+import gov.epa.bencloud.server.database.jooq.Indexes;
 import gov.epa.bencloud.server.database.jooq.tables.records.CrosswalkEntryRecord;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Row8;
@@ -62,7 +66,7 @@ public class CrosswalkEntry extends TableImpl<CrosswalkEntryRecord> {
     /**
      * The column <code>data.crosswalk_entry.source_grid_cell_id</code>.
      */
-    public final TableField<CrosswalkEntryRecord, Integer> SOURCE_GRID_CELL_ID = createField(DSL.name("source_grid_cell_id"), SQLDataType.INTEGER, this, "");
+    public final TableField<CrosswalkEntryRecord, Long> SOURCE_GRID_CELL_ID = createField(DSL.name("source_grid_cell_id"), SQLDataType.BIGINT, this, "");
 
     /**
      * The column <code>data.crosswalk_entry.target_col</code>.
@@ -77,7 +81,7 @@ public class CrosswalkEntry extends TableImpl<CrosswalkEntryRecord> {
     /**
      * The column <code>data.crosswalk_entry.target_grid_cell_id</code>.
      */
-    public final TableField<CrosswalkEntryRecord, Integer> TARGET_GRID_CELL_ID = createField(DSL.name("target_grid_cell_id"), SQLDataType.INTEGER, this, "");
+    public final TableField<CrosswalkEntryRecord, Long> TARGET_GRID_CELL_ID = createField(DSL.name("target_grid_cell_id"), SQLDataType.BIGINT, this, "");
 
     /**
      * The column <code>data.crosswalk_entry.percentage</code>.
@@ -123,6 +127,11 @@ public class CrosswalkEntry extends TableImpl<CrosswalkEntryRecord> {
     }
 
     @Override
+    public List<Index> getIndexes() {
+        return Arrays.<Index>asList(Indexes.CROSSWALK_ENTRY_CROSSWALK_ID_IDX);
+    }
+
+    @Override
     public CrosswalkEntry as(String alias) {
         return new CrosswalkEntry(DSL.name(alias), this);
     }
@@ -153,7 +162,7 @@ public class CrosswalkEntry extends TableImpl<CrosswalkEntryRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Row8<Integer, Integer, Integer, Integer, Integer, Integer, Integer, BigDecimal> fieldsRow() {
+    public Row8<Integer, Integer, Integer, Long, Integer, Integer, Long, BigDecimal> fieldsRow() {
         return (Row8) super.fieldsRow();
     }
 }

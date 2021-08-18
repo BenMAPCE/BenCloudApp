@@ -61,6 +61,11 @@ public class Sequences {
     public static final Sequence<Integer> HEALTH_IMPACT_FUNCTION_DATASET_ID_SEQ = Internal.createSequence("health_impact_function_dataset_id_seq", Data.DATA, SQLDataType.INTEGER.nullable(false), null, null, null, null, false, null);
 
     /**
+     * The sequence <code>data.health_impact_function_group_id_seq</code>
+     */
+    public static final Sequence<Integer> HEALTH_IMPACT_FUNCTION_GROUP_ID_SEQ = Internal.createSequence("health_impact_function_group_id_seq", Data.DATA, SQLDataType.INTEGER.nullable(false), null, null, null, null, false, null);
+
+    /**
      * The sequence <code>data.health_impact_function_id_seq</code>
      */
     public static final Sequence<Integer> HEALTH_IMPACT_FUNCTION_ID_SEQ = Internal.createSequence("health_impact_function_id_seq", Data.DATA, SQLDataType.INTEGER.nullable(false), null, null, null, null, false, null);

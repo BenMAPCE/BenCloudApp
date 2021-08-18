@@ -5,6 +5,7 @@ package gov.epa.bencloud.server.database.jooq.tables;
 
 
 import gov.epa.bencloud.server.database.jooq.Data;
+import gov.epa.bencloud.server.database.jooq.Indexes;
 import gov.epa.bencloud.server.database.jooq.Keys;
 import gov.epa.bencloud.server.database.jooq.tables.records.IncidenceValueRecord;
 
@@ -14,6 +15,7 @@ import java.util.List;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Row5;
@@ -108,6 +110,11 @@ public class IncidenceValue extends TableImpl<IncidenceValueRecord> {
     @Override
     public Schema getSchema() {
         return Data.DATA;
+    }
+
+    @Override
+    public List<Index> getIndexes() {
+        return Arrays.<Index>asList(Indexes.INCIDENCE_VALUE_INCIDENCE_ENTRY_ID_IDX);
     }
 
     @Override

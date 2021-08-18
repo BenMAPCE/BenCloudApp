@@ -27,6 +27,7 @@ import gov.epa.bencloud.api.model.HIFConfig;
 import gov.epa.bencloud.api.model.HIFTaskConfig;
 import gov.epa.bencloud.api.util.HIFUtil;
 import gov.epa.bencloud.server.database.jooq.tables.records.AirQualityCellRecord;
+import gov.epa.bencloud.server.database.jooq.tables.records.GetPopulationRecord;
 import gov.epa.bencloud.server.database.jooq.tables.records.HealthImpactFunctionRecord;
 import gov.epa.bencloud.server.database.jooq.tables.records.HifResultRecord;
 import gov.epa.bencloud.server.tasks.TaskComplete;
@@ -104,7 +105,7 @@ public class HIFTaskRunnable implements Runnable {
 			Map<Long, AirQualityCellRecord> scenario = AirQualityApi.getAirQualityLayerMap(hifTaskConfig.aqScenarioId);
 
 			// Load the population dataset
-			Map<Long, Result<Record6<Long, Integer, Integer, Integer, Integer, BigDecimal>>> populationMap = PopulationApi.getPopulationEntryGroups(hifDefinitionList, hifTaskConfig);
+			Map<Long, Result<GetPopulationRecord>> populationMap = PopulationApi.getPopulationEntryGroups(hifDefinitionList, hifTaskConfig);
 
 			// Load data for the selected HIFs
 			// Determine the race/gender/ethnicity groups and age ranges needed for the
@@ -143,13 +144,8 @@ public class HIFTaskRunnable implements Runnable {
 					continue;
 				}
 				
-				/*
-				if (baselineCell.getValue().equals(scenarioCell.getValue())) {
-					continue;
-				}
-				*/
 				
-				Result<Record6<Long, Integer, Integer, Integer, Integer, BigDecimal>> populationCell = populationMap.getOrDefault(baselineEntry.getKey(), null);
+				Result<GetPopulationRecord> populationCell = populationMap.getOrDefault(baselineEntry.getKey(), null);
 				if (populationCell == null) {
 					continue;
 				}
@@ -171,11 +167,7 @@ public class HIFTaskRunnable implements Runnable {
 					
 					double seasonalScalar = 1.0;
 					if(hifDefinition.getMetricStatistic() == 0) { // NONE
-						if(hifDefinition.getPollutantId() == 4) { // Ozone
-							seasonalScalar = 153.0;
-						} else {
-							seasonalScalar = 365.0;
-						}
+						seasonalScalar = hifConfig.totalDays.doubleValue();
 					}
 					// If we have variable values, grab them for use in the standard deviation calc below. 
 					// Else, set to 1 so they won't have any effect.
@@ -213,13 +205,13 @@ public class HIFTaskRunnable implements Runnable {
 					double hifFunctionEstimate = 0.0;
 					double hifBaselineEstimate = 0.0;
 					double[] resultPercentiles = new double[20];
-					
-					for (Record6<Long, Integer, Integer, Integer, Integer, BigDecimal> popCategory : populationCell) {
+
+					for (GetPopulationRecord popCategory : populationCell) {
 						// <gridCellId, race, gender, ethnicity, agerange, pop>
-						Integer popAgeRange = popCategory.value5();
+						Integer popAgeRange = popCategory.getAgeRangeId();
 						
 						if (popAgeRangeHifMap.containsKey(popAgeRange)) {
-							double rangePop = popCategory.value6().doubleValue() * popAgeRangeHifMap.get(popAgeRange);
+							double rangePop = popCategory.getPopValue().doubleValue() * popAgeRangeHifMap.get(popAgeRange);
 							double incidence = incidenceCell.getOrDefault(popAgeRange, 0.0);
 							totalPop += rangePop;
 
@@ -309,9 +301,9 @@ public class HIFTaskRunnable implements Runnable {
 		//the standard EPA functions don't have incidence assigned in the db
 		if(hif.incidence==null) {
 			if(h.getEndpointGroupId().equals(12)) {
-				hif.incidence = 100; //Mortality Incidence (2020)
+				hif.incidence = 41; //Mortality Incidence (2020)
 			} else {
-				hif.incidence = 101; //Other Incidence (2014)
+				hif.incidence = 38; //Other Incidence (2014)
 			}
 		}
 		if(hif.prevalence == null) {
@@ -320,7 +312,26 @@ public class HIFTaskRunnable implements Runnable {
 		if(hif.variable == null) {
 			hif.variable = h.getVariableDatasetId();
 		}
+		if(hif.startDay == null) {
+			if(h.getStartDay() == null) {
+				hif.startDay = 1;
+			} else {
+				hif.startDay = h.getStartDay();
+			}
+		}
+		if(hif.endDay == null) {
+			if(h.getEndDay() == null) {
+				hif.endDay = 365;
+			} else {
+				hif.endDay = h.getEndDay();
+			}
+		}
 		
+		if(hif.startDay > hif.endDay) {
+			hif.totalDays = 365 - (hif.startDay - hif.endDay) + 1;
+		} else {
+			hif.totalDays = hif.endDay - hif.startDay + 1;
+		}
 	}
 
 	private ArrayList<HashMap<Integer, Double>> getPopAgeRangeMapping(HIFTaskConfig hifTaskConfig, ArrayList<HealthImpactFunctionRecord> hifDefinitionList) {
@@ -394,14 +405,16 @@ public class HIFTaskRunnable implements Runnable {
 		for (JsonNode function : functions) {
 			HIFConfig hifConfig = new HIFConfig();
 			hifConfig.hifId = function.get("id").asInt();
-//			hifConfig.startAge = function.get("startAge").asInt();
-//			hifConfig.endAge = function.get("endAge").asInt();
-//			hifConfig.race = function.get("race").asInt();
-//			hifConfig.ethnicity = function.get("ethnicity").asInt();
-//			hifConfig.gender = function.get("gender").asInt();
-//			hifConfig.incidence = function.get("incidence").asInt();
-//			hifConfig.prevalence = function.get("prevalence").asInt();
-//			hifConfig.variable = function.get("variable").asInt();
+			hifConfig.startAge = function.get("startAge").asInt();
+			hifConfig.endAge = function.get("endAge").asInt();
+			hifConfig.race = function.get("race").asInt();
+			hifConfig.ethnicity = function.get("ethnicity").asInt();
+			hifConfig.gender = function.get("gender").asInt();
+			hifConfig.incidence = function.get("incidence").asInt();
+			hifConfig.incidenceYear = function.get("incidenceYear").asInt();
+			hifConfig.prevalence = function.get("prevalence").asInt();
+			hifConfig.prevalenceYear = function.get("prevalenceYear").asInt();
+			hifConfig.variable = function.get("variable").asInt();
 			hifTaskConfig.hifs.add(hifConfig);
 		}
 	}

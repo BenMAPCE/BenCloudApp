@@ -16,7 +16,7 @@ import org.jooq.ForeignKey;
 import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row4;
+import org.jooq.Row5;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -57,6 +57,11 @@ public class ValuationResultDataset extends TableImpl<ValuationResultDatasetReco
      * The column <code>data.valuation_result_dataset.task_uuid</code>.
      */
     public final TableField<ValuationResultDatasetRecord, String> TASK_UUID = createField(DSL.name("task_uuid"), SQLDataType.CLOB, this, "");
+
+    /**
+     * The column <code>data.valuation_result_dataset.hif_result_dataset_id</code>.
+     */
+    public final TableField<ValuationResultDatasetRecord, Integer> HIF_RESULT_DATASET_ID = createField(DSL.name("hif_result_dataset_id"), SQLDataType.INTEGER, this, "");
 
     /**
      * The column <code>data.valuation_result_dataset.name</code>.
@@ -148,11 +153,11 @@ public class ValuationResultDataset extends TableImpl<ValuationResultDatasetReco
     }
 
     // -------------------------------------------------------------------------
-    // Row4 type methods
+    // Row5 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row4<Integer, String, String, Integer> fieldsRow() {
-        return (Row4) super.fieldsRow();
+    public Row5<Integer, String, Integer, String, Integer> fieldsRow() {
+        return (Row5) super.fieldsRow();
     }
 }
