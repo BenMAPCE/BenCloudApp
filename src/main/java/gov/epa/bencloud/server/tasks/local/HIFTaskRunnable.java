@@ -212,7 +212,7 @@ public class HIFTaskRunnable implements Runnable {
 						
 						if (popAgeRangeHifMap.containsKey(popAgeRange)) {
 							double rangePop = popCategory.getPopValue().doubleValue() * popAgeRangeHifMap.get(popAgeRange);
-							double incidence = incidenceCell.getOrDefault(popAgeRange, 0.0);
+							double incidence = incidenceCell == null ? 0.0 : incidenceCell.getOrDefault(popAgeRange, 0.0);
 							totalPop += rangePop;
 
 							hifFunctionExpression.setArgumentValue("BETA", beta);
@@ -301,9 +301,11 @@ public class HIFTaskRunnable implements Runnable {
 		//the standard EPA functions don't have incidence assigned in the db
 		if(hif.incidence==null) {
 			if(h.getEndpointGroupId().equals(12)) {
-				hif.incidence = 41; //Mortality Incidence (2020)
+				hif.incidence = 1; //Mortality Incidence
+				hif.incidenceYear = 2020;
 			} else {
-				hif.incidence = 38; //Other Incidence (2014)
+				hif.incidence = 12; //Other Incidence
+				hif.incidenceYear = 2014;
 			}
 		}
 		if(hif.prevalence == null) {
@@ -405,16 +407,16 @@ public class HIFTaskRunnable implements Runnable {
 		for (JsonNode function : functions) {
 			HIFConfig hifConfig = new HIFConfig();
 			hifConfig.hifId = function.get("id").asInt();
-			hifConfig.startAge = function.get("startAge").asInt();
-			hifConfig.endAge = function.get("endAge").asInt();
-			hifConfig.race = function.get("race").asInt();
-			hifConfig.ethnicity = function.get("ethnicity").asInt();
-			hifConfig.gender = function.get("gender").asInt();
-			hifConfig.incidence = function.get("incidence").asInt();
-			hifConfig.incidenceYear = function.get("incidenceYear").asInt();
-			hifConfig.prevalence = function.get("prevalence").asInt();
-			hifConfig.prevalenceYear = function.get("prevalenceYear").asInt();
-			hifConfig.variable = function.get("variable").asInt();
+			hifConfig.startAge = function.has("startAge") ? function.get("startAge").asInt() : null;
+			hifConfig.endAge = function.has("endAge") ? function.get("endAge").asInt() : null;
+			hifConfig.race = function.has("race") ? function.get("race").asInt() : null;
+			hifConfig.ethnicity = function.has("ethnicity") ? function.get("ethnicity").asInt() : null;
+			hifConfig.gender = function.has("gender") ? function.get("gender").asInt() : null;
+			hifConfig.incidence = function.has("incidence") ? function.get("incidence").asInt() : null;
+			hifConfig.incidenceYear = function.has("incidenceYear") ? function.get("incidenceYear").asInt() : null;
+			hifConfig.prevalence = function.has("prevalence") ? function.get("prevalence").asInt() : null;
+			hifConfig.prevalenceYear = function.has("prevalenceYear") ? function.get("prevalenceYear").asInt() : null;
+			hifConfig.variable = function.has("variable") ? function.get("variable").asInt() : null;
 			hifTaskConfig.hifs.add(hifConfig);
 		}
 	}

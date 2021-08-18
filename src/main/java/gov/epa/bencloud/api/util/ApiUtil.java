@@ -122,6 +122,8 @@ public class ApiUtil {
 		//TODO: Change this to only load what we need
 		List<String> allVariableNames = ApiUtil.getAllVariableNames(valuationTaskConfig.variableDatasetId);
 		
+		//TODO: Temp override until we can improve variable selection
+		allVariableNames.removeIf(n -> (!n.equals("median_income")));
 		
 		HashMap<String, Map<Long, Double>> variableMap = new HashMap<String, Map<Long, Double>>();
 		
@@ -141,7 +143,9 @@ public class ApiUtil {
 		}
 		// Finally load the cell values for each needed variable
 		for (GetVariableRecord variableRecord : variableRecords) {
-			variableMap.get(variableRecord.getVariableName()).put(variableRecord.getGridCellId(), variableRecord.getValue().doubleValue());
+			if(variableMap.containsKey(variableRecord.getVariableName())) {
+				variableMap.get(variableRecord.getVariableName()).put(variableRecord.getGridCellId(), variableRecord.getValue().doubleValue());
+			}
 		}
 		
 		return variableMap;
