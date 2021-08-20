@@ -160,4 +160,29 @@ public class HIFApi {
 		return hifTaskConfig;
 	}
 
+	public static Object getHealthImpactFunction(Request request, Response response) {
+		String id = request.params("id");
+		
+		Result<Record> hifRecords = DSL.using(JooqUtil.getJooqConfiguration())
+				.select(HEALTH_IMPACT_FUNCTION.asterisk()
+						, ENDPOINT_GROUP.NAME.as("endpoint_group_name")
+						, ENDPOINT.NAME.as("endpoint_name")
+						, RACE.NAME.as("race_name")
+						, GENDER.NAME.as("gender_name")
+						, ETHNICITY.NAME.as("ethnicity_name")
+						)
+				.from(HEALTH_IMPACT_FUNCTION)
+				.join(ENDPOINT_GROUP).on(HEALTH_IMPACT_FUNCTION.ENDPOINT_GROUP_ID.eq(ENDPOINT_GROUP.ID))
+				.join(ENDPOINT).on(HEALTH_IMPACT_FUNCTION.ENDPOINT_ID.eq(ENDPOINT.ID))
+				.join(RACE).on(HEALTH_IMPACT_FUNCTION.RACE_ID.eq(RACE.ID))
+				.join(GENDER).on(HEALTH_IMPACT_FUNCTION.GENDER_ID.eq(GENDER.ID))
+				.join(ETHNICITY).on(HEALTH_IMPACT_FUNCTION.ETHNICITY_ID.eq(ETHNICITY.ID))
+				.where(HEALTH_IMPACT_FUNCTION.ID.eq(Integer.valueOf(id)))
+				.orderBy(ENDPOINT_GROUP.NAME, ENDPOINT.NAME, HEALTH_IMPACT_FUNCTION.AUTHOR)
+				.fetch();
+		
+		response.type("application/json");
+		return hifRecords.formatJSON(new JSONFormat().header(false).recordFormat(RecordFormat.OBJECT));
+	}
+
 }

@@ -60,6 +60,8 @@ public class ValuationTaskRunnable implements Runnable {
 			
 			ValuationTaskConfig valuationTaskConfig = parseTaskParameters(task);
 
+			//TODO: Add code here to use the hifTaskUuid (if the result dataset id is null) to determine if valuation is ready to run. If not, return to queue.
+			
 			List<Expression> valuationFunctionExpressionList = new ArrayList<Expression>();
 
 			List<ValuationFunctionRecord> vfDefinitionList = new ArrayList<ValuationFunctionRecord>();

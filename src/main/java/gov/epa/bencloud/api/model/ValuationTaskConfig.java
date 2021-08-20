@@ -6,6 +6,7 @@ import java.util.List;
 public class ValuationTaskConfig {
 	public String name;
 	public Integer hifResultDatasetId = null;
+	public String hifTaskUuid = null;
 	public Integer variableDatasetId = null;
 	public List<ValuationConfig> valuationFunctions = new ArrayList<ValuationConfig>();
 
