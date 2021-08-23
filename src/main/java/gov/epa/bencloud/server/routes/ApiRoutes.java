@@ -76,7 +76,12 @@ public class ApiRoutes extends RoutesBase {
 		
 		//Supports optional ?pollutantId=:id query string parameter		
 		service.get("/api/health-impact-function-groups", (request, response) -> {
-			return HIFApi.getHifGroups(request, response);
+			return HIFApi.getAllHifGroups(request, response);
+		});
+		
+		//Supports optional ?pollutantId=:id query string parameter		
+		service.get("/api/health-impact-function-groups/:ids", (request, response) -> {
+			return HIFApi.getSelectedHifGroups(request, response);
 		});
 		
 		service.get("/api/incidence", (request, response) -> {

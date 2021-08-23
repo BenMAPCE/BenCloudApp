@@ -3,6 +3,10 @@ package gov.epa.bencloud.api;
 import static gov.epa.bencloud.server.database.jooq.Tables.*;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 import org.jooq.DSLContext;
 import org.jooq.JSONFormat;
@@ -16,6 +20,10 @@ import org.jooq.Record13;
 import org.jooq.Record16;
 import org.jooq.Record3;
 import org.jooq.impl.DSL;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import gov.epa.bencloud.api.model.HIFTaskConfig;
 import gov.epa.bencloud.server.database.JooqUtil;
@@ -118,7 +126,7 @@ public class HIFApi {
 		return hifRecords.formatJSON(new JSONFormat().header(false).recordFormat(RecordFormat.OBJECT));
 	}
 
-	public static Object getHifGroups(Request request, Response response) {
+	public static Object getAllHifGroups(Request request, Response response) {
 			
 		int pollutantId = ParameterUtil.getParameterValueAsInteger(request.raw().getParameter("pollutantId"), 0);
 		
@@ -138,6 +146,101 @@ public class HIFApi {
 		response.type("application/json");
 		return hifGroupRecords.formatJSON(new JSONFormat().header(false).recordFormat(RecordFormat.OBJECT));
 	}
+
+	public static Object getSelectedHifGroups(Request request, Response response) {
+		
+		String idsParam = request.params("ids");
+		List<Integer> ids = Stream.of(idsParam.split(",")).mapToInt(Integer::parseInt).boxed().collect(Collectors.toList());
+		
+		Result<Record> hifGroupRecords = DSL.using(JooqUtil.getJooqConfiguration())
+				.select(HEALTH_IMPACT_FUNCTION_GROUP.NAME
+						, HEALTH_IMPACT_FUNCTION_GROUP.ID
+						, HEALTH_IMPACT_FUNCTION.asterisk()
+						, ENDPOINT_GROUP.NAME.as("endpoint_group_name")
+						, ENDPOINT.NAME.as("endpoint_name")
+						, RACE.NAME.as("race_name")
+						, GENDER.NAME.as("gender_name")
+						, ETHNICITY.NAME.as("ethnicity_name")
+						)
+				.from(HEALTH_IMPACT_FUNCTION_GROUP)
+				.join(HEALTH_IMPACT_FUNCTION_GROUP_MEMBER).on(HEALTH_IMPACT_FUNCTION_GROUP.ID.eq(HEALTH_IMPACT_FUNCTION_GROUP_MEMBER.HEALTH_IMPACT_FUNCTION_GROUP_ID))
+				.join(HEALTH_IMPACT_FUNCTION).on(HEALTH_IMPACT_FUNCTION_GROUP_MEMBER.HEALTH_IMPACT_FUNCTION_ID.eq(HEALTH_IMPACT_FUNCTION.ID))
+				.join(ENDPOINT_GROUP).on(HEALTH_IMPACT_FUNCTION.ENDPOINT_GROUP_ID.eq(ENDPOINT_GROUP.ID))
+				.join(ENDPOINT).on(HEALTH_IMPACT_FUNCTION.ENDPOINT_ID.eq(ENDPOINT.ID))
+				.join(RACE).on(HEALTH_IMPACT_FUNCTION.RACE_ID.eq(RACE.ID))
+				.join(GENDER).on(HEALTH_IMPACT_FUNCTION.GENDER_ID.eq(GENDER.ID))
+				.join(ETHNICITY).on(HEALTH_IMPACT_FUNCTION.ETHNICITY_ID.eq(ETHNICITY.ID))
+				.where(HEALTH_IMPACT_FUNCTION_GROUP.ID.in(ids))
+				.orderBy(HEALTH_IMPACT_FUNCTION_GROUP.NAME)
+				.fetch();
+		
+		ObjectMapper mapper = new ObjectMapper();
+		ArrayNode groups = mapper.createArrayNode();
+		ObjectNode group = null;
+		ArrayNode functions = null;
+		int currentGroupId = -1;
+		
+		for(Record r : hifGroupRecords) {
+			if(currentGroupId != r.getValue(HEALTH_IMPACT_FUNCTION_GROUP.ID)) {
+				currentGroupId = r.getValue(HEALTH_IMPACT_FUNCTION_GROUP.ID);
+				group = mapper.createObjectNode();
+				group.put("id", currentGroupId);
+				group.put("name", r.getValue(HEALTH_IMPACT_FUNCTION_GROUP.NAME));
+				functions = group.putArray("functions");
+				groups.add(group);
+			}
+			
+			ObjectNode function = mapper.createObjectNode();
+			function.put("id", r.getValue(HEALTH_IMPACT_FUNCTION.ID));
+			function.put("health_impact_function_dataset_id",r.getValue(HEALTH_IMPACT_FUNCTION.HEALTH_IMPACT_FUNCTION_DATASET_ID));
+			function.put("endpoint_group_id",r.getValue(HEALTH_IMPACT_FUNCTION.ENDPOINT_GROUP_ID));
+			function.put("endpoint_id",r.getValue(HEALTH_IMPACT_FUNCTION.ENDPOINT_ID));
+			function.put("pollutant_id",r.getValue(HEALTH_IMPACT_FUNCTION.POLLUTANT_ID));
+			function.put("metric_id",r.getValue(HEALTH_IMPACT_FUNCTION.METRIC_ID));
+			function.put("seasonal_metric_id",r.getValue(HEALTH_IMPACT_FUNCTION.SEASONAL_METRIC_ID));
+			function.put("metric_statistic",r.getValue(HEALTH_IMPACT_FUNCTION.METRIC_STATISTIC));
+			function.put("author",r.getValue(HEALTH_IMPACT_FUNCTION.AUTHOR));
+			function.put("function_year",r.getValue(HEALTH_IMPACT_FUNCTION.FUNCTION_YEAR));
+			function.put("location",r.getValue(HEALTH_IMPACT_FUNCTION.LOCATION));
+			function.put("other_pollutants",r.getValue(HEALTH_IMPACT_FUNCTION.OTHER_POLLUTANTS));
+			function.put("qualifier",r.getValue(HEALTH_IMPACT_FUNCTION.QUALIFIER));
+			function.put("reference",r.getValue(HEALTH_IMPACT_FUNCTION.REFERENCE));
+			function.put("start_age",r.getValue(HEALTH_IMPACT_FUNCTION.START_AGE));
+			function.put("end_age",r.getValue(HEALTH_IMPACT_FUNCTION.END_AGE));
+			function.put("function_text",r.getValue(HEALTH_IMPACT_FUNCTION.FUNCTION_TEXT));
+			function.put("incidence_dataset_id",r.getValue(HEALTH_IMPACT_FUNCTION.INCIDENCE_DATASET_ID));
+			function.put("prevalence_dataset_id",r.getValue(HEALTH_IMPACT_FUNCTION.PREVALENCE_DATASET_ID));
+			function.put("variable_dataset_id",r.getValue(HEALTH_IMPACT_FUNCTION.VARIABLE_DATASET_ID));
+			function.put("beta",r.getValue(HEALTH_IMPACT_FUNCTION.BETA));
+			function.put("dist_beta",r.getValue(HEALTH_IMPACT_FUNCTION.DIST_BETA));
+			function.put("p1_beta",r.getValue(HEALTH_IMPACT_FUNCTION.P1_BETA));
+			function.put("p2_beta",r.getValue(HEALTH_IMPACT_FUNCTION.P2_BETA));
+			function.put("val_a",r.getValue(HEALTH_IMPACT_FUNCTION.VAL_A));
+			function.put("name_a",r.getValue(HEALTH_IMPACT_FUNCTION.NAME_A));
+			function.put("val_b",r.getValue(HEALTH_IMPACT_FUNCTION.VAL_B));
+			function.put("name_b",r.getValue(HEALTH_IMPACT_FUNCTION.NAME_B));
+			function.put("val_c",r.getValue(HEALTH_IMPACT_FUNCTION.VAL_C));
+			function.put("name_c",r.getValue(HEALTH_IMPACT_FUNCTION.NAME_C));
+			function.put("baseline_function_text",r.getValue(HEALTH_IMPACT_FUNCTION.BASELINE_FUNCTION_TEXT));
+			function.put("race_id",r.getValue(HEALTH_IMPACT_FUNCTION.RACE_ID));
+			function.put("gender_id",r.getValue(HEALTH_IMPACT_FUNCTION.GENDER_ID));
+			function.put("ethnicity_id",r.getValue(HEALTH_IMPACT_FUNCTION.ETHNICITY_ID));
+			function.put("start_day",r.getValue(HEALTH_IMPACT_FUNCTION.START_DAY));
+			function.put("end_day",r.getValue(HEALTH_IMPACT_FUNCTION.END_DAY));
+			function.put("endpoint_group_name",r.getValue("endpoint_group_name",String.class));
+			function.put("endpoint_name",r.getValue("endpoint_name", String.class));
+			function.put("race_name",r.getValue("race_name", String.class));
+			function.put("gender_name",r.getValue("gender_name", String.class));
+			function.put("ethnicity_name",r.getValue("ethnicity_name", String.class));
+			
+			functions.add(function);
+			
+		}
+		
+		response.type("application/json");
+		return groups;
+	}
+
 	
 	public static HIFTaskConfig getHifTaskConfigFromDb(Integer hifResultDatasetId) {
 		DSLContext create = DSL.using(JooqUtil.getJooqConfiguration());
