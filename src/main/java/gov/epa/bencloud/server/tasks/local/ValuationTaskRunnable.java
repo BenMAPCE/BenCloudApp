@@ -63,6 +63,7 @@ public class ValuationTaskRunnable implements Runnable {
 			//Use the hifTaskUuid (if the result dataset id is null) to determine if valuation is ready to run. If not, return to queue.
 			String hifTaskStatus = HIFApi.getHIFTaskStatus(valuationTaskConfig.hifTaskUuid);
 			if(hifTaskStatus.equals("pending")) {
+				TaskQueue.updateTaskPercentage(taskUuid, 0, "Waiting for HIF analysis");
 				TaskQueue.returnTaskToQueue(taskUuid);
 				return;
 				
