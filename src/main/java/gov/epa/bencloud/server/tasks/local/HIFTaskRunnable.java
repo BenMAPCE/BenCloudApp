@@ -78,6 +78,7 @@ public class HIFTaskRunnable implements Runnable {
 				// Override hif config where user has not provided a value
 				updateHifConfigValues(hif, h);
 				
+				//TODO: Add code here set incidence/prevalence year as appropriate based on population year
 				Map<Long, Map<Integer, Double>> incidenceMap = IncidenceApi.getIncidenceEntryGroups(hifTaskConfig, hif, h);
 				incidenceLists.add(incidenceMap);
 				
@@ -297,20 +298,30 @@ public class HIFTaskRunnable implements Runnable {
 		if(hif.incidence == null) {
 			hif.incidence = h.getIncidenceDatasetId();
 		}
-		//This is a temporary solution to the fact that user's can't select incidence and 
-		//the standard EPA functions don't have incidence assigned in the db
-		if(hif.incidence==null) {
-			if(h.getEndpointGroupId().equals(12)) {
-				hif.incidence = 1; //Mortality Incidence
-				hif.incidenceYear = 2020;
-			} else {
-				hif.incidence = 12; //Other Incidence
-				hif.incidenceYear = 2014;
-			}
-		}
 		if(hif.prevalence == null) {
 			hif.prevalence = h.getPrevalenceDatasetId();
 		}
+
+		//This is a temporary solution to the fact that user's can't select incidence and 
+		//the standard EPA functions don't have incidence assigned in the db
+		// If the UI passes the year and incidence hints to the methods that get health impact functions, these should already be set
+		if(h.getFunctionText().toLowerCase().contains("incidence")) {
+			if(hif.incidence==null) {
+				if(h.getEndpointGroupId().equals(12)) {
+					hif.incidence = 1; //Mortality Incidence
+					hif.incidenceYear = 2020;
+				} else {
+					hif.incidence = 12; //Other Incidence
+					hif.incidenceYear = 2014;
+				}
+			}			
+		} else if (h.getFunctionText().toLowerCase().contains("prevalence")) {
+			if(hif.prevalence==null) {
+					hif.prevalence = 19; //Prevalence
+					hif.prevalenceYear = 2008;
+			}				
+		}
+
 		if(hif.variable == null) {
 			hif.variable = h.getVariableDatasetId();
 		}
@@ -391,7 +402,7 @@ public class HIFTaskRunnable implements Runnable {
 			JsonNode functions = params.get("functions");
 			parseFunctions(functions, hifTaskConfig);
 			
-			hifTaskConfig.preserveLegacyBehavior = params.get("preserveLegacyBehavior").asBoolean(false);
+			hifTaskConfig.preserveLegacyBehavior = params.has("preserveLegacyBehavior") ? params.get("preserveLegacyBehavior").asBoolean(false) : false;
 			
 		} catch (JsonMappingException e) {
 			// TODO Auto-generated catch block

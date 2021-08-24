@@ -26,8 +26,10 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import gov.epa.bencloud.api.model.HIFTaskConfig;
+import gov.epa.bencloud.api.util.HIFUtil;
 import gov.epa.bencloud.server.database.JooqUtil;
 import gov.epa.bencloud.server.database.jooq.tables.records.HifResultDatasetRecord;
+import gov.epa.bencloud.server.database.jooq.tables.records.TaskCompleteRecord;
 import gov.epa.bencloud.server.util.ParameterUtil;
 import spark.Request;
 import spark.Response;
@@ -150,6 +152,9 @@ public class HIFApi {
 	public static Object getSelectedHifGroups(Request request, Response response) {
 		
 		String idsParam = request.params("ids");
+		int popYear = ParameterUtil.getParameterValueAsInteger(request.raw().getParameter("popYear"), 0);
+		int defaultIncidencePrevalenceDataset = ParameterUtil.getParameterValueAsInteger(request.raw().getParameter("incidencePrevalenceDataset"), 0);
+		
 		List<Integer> ids = Stream.of(idsParam.split(",")).mapToInt(Integer::parseInt).boxed().collect(Collectors.toList());
 		
 		Result<Record> hifGroupRecords = DSL.using(JooqUtil.getJooqConfiguration())
@@ -208,8 +213,6 @@ public class HIFApi {
 			function.put("start_age",r.getValue(HEALTH_IMPACT_FUNCTION.START_AGE));
 			function.put("end_age",r.getValue(HEALTH_IMPACT_FUNCTION.END_AGE));
 			function.put("function_text",r.getValue(HEALTH_IMPACT_FUNCTION.FUNCTION_TEXT));
-			function.put("incidence_dataset_id",r.getValue(HEALTH_IMPACT_FUNCTION.INCIDENCE_DATASET_ID));
-			function.put("prevalence_dataset_id",r.getValue(HEALTH_IMPACT_FUNCTION.PREVALENCE_DATASET_ID));
 			function.put("variable_dataset_id",r.getValue(HEALTH_IMPACT_FUNCTION.VARIABLE_DATASET_ID));
 			function.put("beta",r.getValue(HEALTH_IMPACT_FUNCTION.BETA));
 			function.put("dist_beta",r.getValue(HEALTH_IMPACT_FUNCTION.DIST_BETA));
@@ -232,6 +235,9 @@ public class HIFApi {
 			function.put("race_name",r.getValue("race_name", String.class));
 			function.put("gender_name",r.getValue("gender_name", String.class));
 			function.put("ethnicity_name",r.getValue("ethnicity_name", String.class));
+			
+			//This will select the most appropriate incidence/prevalence dataset and year based on user selection and function definition
+			HIFUtil.setIncidencePrevalence(function, popYear, defaultIncidencePrevalenceDataset, r.getValue(HEALTH_IMPACT_FUNCTION.INCIDENCE_DATASET_ID), r.getValue(HEALTH_IMPACT_FUNCTION.PREVALENCE_DATASET_ID));
 			
 			functions.add(function);
 			
@@ -286,6 +292,36 @@ public class HIFApi {
 		
 		response.type("application/json");
 		return hifRecords.formatJSON(new JSONFormat().header(false).recordFormat(RecordFormat.OBJECT));
+	}
+
+	public static String getHIFTaskStatus(String hifTaskUuid) {
+		TaskCompleteRecord completedTask = DSL.using(JooqUtil.getJooqConfiguration())
+				.select(TASK_COMPLETE.asterisk())
+				.from(TASK_COMPLETE)
+				.where(TASK_COMPLETE.TASK_UUID.eq(hifTaskUuid))
+				.fetchOneInto(TASK_COMPLETE);
+		
+		if(completedTask == null) {
+			return "pending";
+		} else if(completedTask.getTaskSuccessful()) {
+			return "success";
+		}
+		// We found the completed tasks, but it was not successful
+		return "failed";
+	}
+
+	public static Integer getHIFResultDatasetId(String hifTaskUuid) {
+
+		HifResultDatasetRecord hifResultDataset = DSL.using(JooqUtil.getJooqConfiguration())
+		.select(HIF_RESULT_DATASET.asterisk())
+		.from(HIF_RESULT_DATASET)
+		.where(HIF_RESULT_DATASET.TASK_UUID.eq(hifTaskUuid))
+		.fetchOneInto(HIF_RESULT_DATASET);
+		
+		if(hifResultDataset == null) {
+			return null;
+		}
+		return hifResultDataset.getId();
 	}
 
 }

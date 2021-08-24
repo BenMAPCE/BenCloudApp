@@ -60,7 +60,24 @@ public class ValuationTaskRunnable implements Runnable {
 			
 			ValuationTaskConfig valuationTaskConfig = parseTaskParameters(task);
 
-			//TODO: Add code here to use the hifTaskUuid (if the result dataset id is null) to determine if valuation is ready to run. If not, return to queue.
+			//Use the hifTaskUuid (if the result dataset id is null) to determine if valuation is ready to run. If not, return to queue.
+			String hifTaskStatus = HIFApi.getHIFTaskStatus(valuationTaskConfig.hifTaskUuid);
+			if(hifTaskStatus.equals("pending")) {
+				TaskQueue.returnTaskToQueue(taskUuid);
+				return;
+				
+			} else if(hifTaskStatus.equals("failed")) {
+				TaskComplete.addTaskToCompleteAndRemoveTaskFromQueue(taskUuid, taskWorkerUuid, false, "Associated HIF task failed");
+				return;
+			}
+			
+			//If the HIF task isn't pending or failed, it must be "success" so we can continue
+			valuationTaskConfig.hifResultDatasetId = HIFApi.getHIFResultDatasetId(valuationTaskConfig.hifTaskUuid);
+			
+			if(valuationTaskConfig.hifResultDatasetId == null) {
+				TaskComplete.addTaskToCompleteAndRemoveTaskFromQueue(taskUuid, taskWorkerUuid, false, "Unable to load HIF estimates");
+				return;
+			}
 			
 			List<Expression> valuationFunctionExpressionList = new ArrayList<Expression>();
 
@@ -229,12 +246,12 @@ public class ValuationTaskRunnable implements Runnable {
 		ValuationTaskConfig valuationTaskConfig = new ValuationTaskConfig();
 
 		try {
-			valuationTaskConfig.name = task.getName();
-			
 			String paramString = task.getParameters();
 			ObjectMapper mapper = new ObjectMapper();
 			JsonNode params = mapper.readTree(paramString);
 
+			valuationTaskConfig.name = task.getName();
+			valuationTaskConfig.hifTaskUuid = params.get("hifTaskUuid").asText();
 			valuationTaskConfig.hifResultDatasetId = params.get("hifResultDatasetId").asInt();
 			valuationTaskConfig.variableDatasetId = params.get("variableDatasetId")==null || params.get("variableDatasetId").isEmpty() ? 1 : params.get("variableDatasetId").asInt();
 

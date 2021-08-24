@@ -11,7 +11,10 @@ import org.jooq.Record3;
 import org.jooq.Record4;
 import org.jooq.Result;
 import org.jooq.JSONFormat.RecordFormat;
+import org.jooq.Record1;
 import org.jooq.impl.DSL;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 import gov.epa.bencloud.api.model.HIFConfig;
 import gov.epa.bencloud.api.model.HIFTaskConfig;
@@ -29,8 +32,8 @@ public class IncidenceApi {
 		//TODO: Need to add in handling for race, ethnicity, gender
 		
 		Map<Long, Result<GetIncidenceRecord>> incRecords = Routines.getIncidence(JooqUtil.getJooqConfiguration(), 
-				hifConfig.incidence,
-				hifConfig.incidenceYear,
+				hifConfig.prevalence == null || hifConfig.prevalence == 0 ? hifConfig.incidence : hifConfig.prevalence,
+				hifConfig.prevalence == null || hifConfig.prevalence == 0 ? hifConfig.incidenceYear : hifConfig.prevalenceYear,
 				hifRecord.getEndpointId(), 
 				null, 
 				null, 
@@ -108,6 +111,17 @@ public class IncidenceApi {
 		
 		response.type("application/json");
 		return records.formatJSON(new JSONFormat().header(false).recordFormat(RecordFormat.OBJECT));
+	}
+
+	public static String getIncidenceDatasetName(int id) {
+
+		Record1<String> record = DSL.using(JooqUtil.getJooqConfiguration())
+				.select(INCIDENCE_DATASET.NAME)
+				.from(INCIDENCE_DATASET)
+				.where(INCIDENCE_DATASET.ID.eq(id))
+				.fetchOne();
+		
+		return record.value1();
 	}
 
 }

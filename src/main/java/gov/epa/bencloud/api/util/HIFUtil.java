@@ -3,17 +3,24 @@ package gov.epa.bencloud.api.util;
 import static gov.epa.bencloud.server.database.jooq.Tables.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.jooq.DSLContext;
+import org.jooq.Record1;
 import org.jooq.impl.DSL;
 import org.mariuszgromada.math.mxparser.*;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import gov.epa.bencloud.api.IncidenceApi;
 import gov.epa.bencloud.api.model.HIFConfig;
 import gov.epa.bencloud.api.model.HIFTaskConfig;
 import gov.epa.bencloud.server.database.JooqUtil;
 import gov.epa.bencloud.server.database.jooq.tables.records.HealthImpactFunctionRecord;
 import gov.epa.bencloud.server.database.jooq.tables.records.HifResultDatasetRecord;
 import gov.epa.bencloud.server.database.jooq.tables.records.HifResultRecord;
+import gov.epa.bencloud.server.database.jooq.tables.records.IncidenceDatasetRecord;
 import gov.epa.bencloud.server.tasks.model.Task;
 
 public class HIFUtil {
@@ -122,6 +129,127 @@ public class HIFUtil {
 		create
 		.batchInsert(hifResults)
 		.execute();	
+	}
+
+	public static void setIncidencePrevalence(ObjectNode function, int popYear, int defaultIncidencePrevalenceDataset, Integer functionIncidenceDataset, Integer functionPrevalenceDataset) {
+
+		int endpointGroupId = function.get("endpoint_group_id").asInt();
+		String functionText = function.get("function_text").asText().toLowerCase();
+		boolean isPrevalenceFunction = functionText.contains("prevalence");
+		boolean isIncidenceFunction = functionText.contains("incidence");
+		boolean defaultDatasetSupportsIncidenceForEndpointGroup = false;
+		boolean defaultDatasetSupportsPrevalenceForEndpointGroup = false;
+
+
+		if(defaultIncidencePrevalenceDataset != 0) {		
+			//Determine if this dataset supports incidence and/or prevalence for this function's endpoint group
+			Record1<Integer> countIncidence = DSL.using(JooqUtil.getJooqConfiguration())
+					.select(DSL.count())
+					.from(INCIDENCE_ENTRY)
+					.where(INCIDENCE_ENTRY.INCIDENCE_DATASET_ID.eq(defaultIncidencePrevalenceDataset)
+							.and(INCIDENCE_ENTRY.PREVALENCE.ne(true))
+							.and(INCIDENCE_ENTRY.ENDPOINT_GROUP_ID.eq(endpointGroupId)))
+					.fetchOne();
+			defaultDatasetSupportsIncidenceForEndpointGroup = countIncidence.value1() > 0;
+			
+			Record1<Integer> countPrevalence = DSL.using(JooqUtil.getJooqConfiguration())
+					.select(DSL.count())
+					.from(INCIDENCE_ENTRY)
+					.where(INCIDENCE_ENTRY.INCIDENCE_DATASET_ID.eq(defaultIncidencePrevalenceDataset)
+							.and(INCIDENCE_ENTRY.PREVALENCE.eq(true))
+							.and(INCIDENCE_ENTRY.ENDPOINT_GROUP_ID.eq(endpointGroupId)))
+					.fetchOne();
+			defaultDatasetSupportsPrevalenceForEndpointGroup = countPrevalence.value1() > 0;
+		}
+		
+		if (isIncidenceFunction) {
+			if (defaultDatasetSupportsIncidenceForEndpointGroup) {
+				function.put("incidence_dataset_id", defaultIncidencePrevalenceDataset);
+				function.put("incidence_year", HIFUtil.getClosestIncidenceYear(defaultIncidencePrevalenceDataset, false, endpointGroupId, popYear));
+				function.put("incidence_dataset_name", IncidenceApi.getIncidenceDatasetName(defaultIncidencePrevalenceDataset));
+
+			} else if (functionIncidenceDataset != null && functionIncidenceDataset != 0) {
+				// Default selection won't work so use what's defined in the function
+				function.put("incidence_dataset_id", functionIncidenceDataset);
+				function.put("incidence_year", HIFUtil.getClosestIncidenceYear(functionIncidenceDataset, false, endpointGroupId, popYear));
+				function.put("incidence_dataset_name", IncidenceApi.getIncidenceDatasetName(functionIncidenceDataset));
+	
+			} else {
+				// Choose the default incidence based on endpoint group
+				int dsId = endpointGroupId == 12 ? 1 : 12; //Mortality Incidence or Other Incidence
+				function.put("incidence_dataset_id", dsId); 
+				function.put("incidence_year", HIFUtil.getClosestIncidenceYear(dsId, false, endpointGroupId, popYear));
+				function.put("incidence_dataset_name", IncidenceApi.getIncidenceDatasetName(dsId));
+
+			}
+		} else {
+			function.putNull("incidence_dataset_id");
+			function.putNull("incidence_year");
+			function.putNull("incidence_dataset_name");
+		}
+				
+		if(isPrevalenceFunction) {
+			if (defaultDatasetSupportsPrevalenceForEndpointGroup) {
+				function.put("prevalence_dataset_id", defaultIncidencePrevalenceDataset);
+				function.put("prevalence_year", HIFUtil.getClosestIncidenceYear(defaultIncidencePrevalenceDataset, true, endpointGroupId, popYear));
+				function.put("prevalence_dataset_name", IncidenceApi.getIncidenceDatasetName(defaultIncidencePrevalenceDataset));
+			} else if (functionPrevalenceDataset != null && functionPrevalenceDataset != 0) {
+				// Default selection won't work so use what's defined in the function
+				function.put("prevalence_dataset_id", functionPrevalenceDataset);
+				function.put("prevalence_year", HIFUtil.getClosestIncidenceYear(functionPrevalenceDataset, true, endpointGroupId, popYear));
+				function.put("prevalence_dataset_name", IncidenceApi.getIncidenceDatasetName(functionPrevalenceDataset));
+			} else {
+				int dsId = (endpointGroupId == 30 || endpointGroupId == 28) ? 52 : 19; //National Incidence & Prevalence OR Prevalence
+				function.put("prevalence_dataset_id", dsId);
+				function.put("prevalence_year", HIFUtil.getClosestIncidenceYear(dsId, true, endpointGroupId, popYear));
+				function.put("prevalence_dataset_name", IncidenceApi.getIncidenceDatasetName(dsId));
+			}
+		} else {
+			function.putNull("prevalence_dataset_id");
+			function.putNull("prevalence_year");
+			function.putNull("prevalence_dataset_name");
+		}	
+	}
+
+	private static int getClosestIncidenceYear(int defaultIncidencePrevalenceDataset, boolean isPrevalence, int endpointGroupId, int popYear) {
+
+		Record1<Integer>[] incidenceYears = DSL.using(JooqUtil.getJooqConfiguration())
+				.selectDistinct(INCIDENCE_ENTRY.YEAR)
+				.from(INCIDENCE_ENTRY)
+				.where(INCIDENCE_ENTRY.INCIDENCE_DATASET_ID.eq(defaultIncidencePrevalenceDataset)
+						.and(INCIDENCE_ENTRY.ENDPOINT_GROUP_ID.eq(endpointGroupId))
+						.and(DSL.coalesce(INCIDENCE_ENTRY.PREVALENCE, false).eq(isPrevalence))
+						)
+				.orderBy(INCIDENCE_ENTRY.YEAR)
+				.fetchArray();
+		
+		int[] years = new int[incidenceYears.length];
+		int i = 0;
+		for(Record1<Integer> year : incidenceYears) {
+			years[i++] = year.value1();
+		}
+		
+		if(years.length == 1) {
+			return years[0];
+		}
+		
+		int n = Arrays.binarySearch(years, popYear);
+		if (n >= 0) {
+			return n;
+		} else {
+			int l = Math.abs(n) - 2;
+			int u = Math.abs(n) - 1;
+			if(u > years.length-1) {
+				return years[l];
+			} else if (l < 0) {
+				return years[0];
+			} else if(popYear - years[l] < years[u] - popYear) {
+				return years[l];
+			} else {
+				return years[u];
+			}
+		}
+		 
 	}
 	
 	
