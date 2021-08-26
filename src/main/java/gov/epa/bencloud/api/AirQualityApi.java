@@ -67,6 +67,7 @@ public class AirQualityApi {
 		
 //		System.out.println("");
 //		System.out.println("page: " + page);
+//		System.out.println("pollutantId: " + pollutantId);
 //		System.out.println("rowsPerPage: " + rowsPerPage);
 //		System.out.println("sortBy: " + sortBy);
 //		System.out.println("descending" + descending);
@@ -240,6 +241,8 @@ public class AirQualityApi {
 	
 		List<OrderField<?>> orderFields = new ArrayList<>();
 		
+		System.out.println("sortBy: " + sortBy);
+		
 		setAirQualityCellsSortOrder(sortBy, descending, orderFields);
 
 
@@ -267,7 +270,7 @@ public class AirQualityApi {
 				.leftJoin(SEASONAL_METRIC).on(AIR_QUALITY_CELL.SEASONAL_METRIC_ID.eq(SEASONAL_METRIC.ID))
 
 				.where(filterCondition)
-				.orderBy(AIR_QUALITY_CELL.GRID_COL, AIR_QUALITY_CELL.GRID_ROW)
+				.orderBy(orderFields)
 				.offset((page * rowsPerPage) - rowsPerPage)
 				.limit(rowsPerPage)
 				.fetch();
@@ -331,6 +334,8 @@ public class AirQualityApi {
 	
 	public static Object postAirQualityLayer(Request request, String layerName, Integer pollutantId, Integer gridId, String layerType, Response response) {
 
+		System.out.println("postAirQualityLayer");
+
 		AirQualityLayerRecord aqRecord=null;
 		
 		//Create the air_quality_cell records
@@ -373,8 +378,11 @@ public class AirQualityApi {
 			String tmp = AirQualityUtil.validateModelColumnHeadings(columnIdx, rowIdx, metricIdx, seasonalMetricIdx, annualMetricIdx, valuesIdx);
 			if(tmp.length() > 0) {
 				response.status(400);
+				System.out.println("The following columns are missing: " + tmp);
 				return "The following columns are missing: " + tmp;
 			}
+			
+			System.out.println("100");
 			
 			//TODO: Finish creating lookups for these metrics so we can fill them in properly in the insert below
 			//HashMap<String, Integer> pollutantMetricIdLookup = AirQualityUtil.getPollutantMetricIdLookup(pollutantId);
@@ -441,6 +449,7 @@ public class AirQualityApi {
 		
 			
 		} catch (Exception e) {
+			System.out.println(e.getMessage());
 			e.printStackTrace();
 		}
 		response.type("application/json");
@@ -623,7 +632,7 @@ public class AirQualityApi {
 	private static void setAirQualityLayersSortOrder(
 			String sortBy, Boolean descending, List<OrderField<?>> orderFields) {
 		
-		if (null != sortBy) {
+		if (!"".equals(sortBy)) {
 			
 			SortOrder sortDirection = SortOrder.ASC;
 			Field<?> sortField = null;
@@ -670,31 +679,41 @@ public class AirQualityApi {
 			sortDirection = descending ? SortOrder.DESC : SortOrder.ASC;
 			
 			switch (sortBy) {
-			case "name":
+			case "grid_col":
+				sortField = DSL.field(sortBy, Integer.class.getName());
+				orderFields.add(sortField.sort(sortDirection));
+				break;
+
+			case "grid_row":
+				sortField = DSL.field(sortBy, Integer.class.getName());
+				orderFields.add(sortField.sort(sortDirection));
+				break;
+
+			case "seasonal_metric":
 				sortField = DSL.field(sortBy, String.class.getName());
+				orderFields.add(sortField.sort(sortDirection));
 				break;
 
-			case "grid_definition_name":
-				sortField = DSL.field(sortBy, Integer.class.getName());
+			case "annual_metric":
+				sortField = DSL.field(sortBy, String.class.getName());
+				orderFields.add(sortField.sort(sortDirection));
 				break;
 
-			case "cell_count":
-				sortField = DSL.field(sortBy, Integer.class.getName());
-				break;
-
-			case "mean_value":
+			case "value":
 				sortField = DSL.field(sortBy, Double.class.getName());
+				orderFields.add(sortField.sort(sortDirection));
 				break;
 
 			default:
-				sortField = DSL.field(sortBy, String.class.getName());
+				System.out.println("... in default...");
+				orderFields.add(DSL.field("grid_col", Integer.class.getName()).sort(SortOrder.ASC));	
+				orderFields.add(DSL.field("grid_row", Integer.class.getName()).sort(SortOrder.ASC));	
 				break;
 			}
 			
-			orderFields.add(sortField.sort(sortDirection));
-			
 		} else {
-			orderFields.add(DSL.field("name", String.class.getName()).sort(SortOrder.ASC));	
+			orderFields.add(DSL.field("grid_col", Integer.class.getName()).sort(SortOrder.ASC));	
+			orderFields.add(DSL.field("grid_row", Integer.class.getName()).sort(SortOrder.ASC));	
 		}
 	}
 

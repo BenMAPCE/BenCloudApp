@@ -26,6 +26,7 @@ import gov.epa.bencloud.server.database.JooqUtil;
 import gov.epa.bencloud.server.tasks.TaskComplete;
 import gov.epa.bencloud.server.tasks.TaskQueue;
 import gov.epa.bencloud.server.tasks.model.Task;
+import io.vavr.control.Validation;
 import spark.Service;
 
 public class ApiRoutes extends RoutesBase {
@@ -91,7 +92,11 @@ public class ApiRoutes extends RoutesBase {
 		service.get("/api/prevalence", (request, response) -> {
 			return IncidenceApi.getAllPrevalenceDatasets(response);
 		});
-		
+
+		service.get("/api/valuation-functions", (request, response) -> {
+			return ValuationApi.getAllValuationFunctions(request, response);
+		});
+
 		// POST
 		service.post("/api/air-quality-data", (request, response) -> {
 			

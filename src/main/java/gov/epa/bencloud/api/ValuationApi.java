@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import org.jooq.DSLContext;
 import org.jooq.JSONFormat;
 import org.jooq.Result;
+import org.jooq.exception.DataAccessException;
 import org.jooq.JSONFormat.RecordFormat;
 import org.jooq.Record;
 import org.jooq.Record1;
@@ -63,19 +64,23 @@ public class ValuationApi {
 	}
 
 	public static Object getAllValuationFunctions(Request request, Response response) {
-		Result<Record> valuationRecords = DSL.using(JooqUtil.getJooqConfiguration())
-				.select(VALUATION_FUNCTION.asterisk()
-						, ENDPOINT_GROUP.NAME.as("endpoint_group_name")
-						, ENDPOINT.NAME.as("endpoint_name")
-						, RACE.NAME.as("race_name")
-						, GENDER.NAME.as("gender_name")
-						, ETHNICITY.NAME.as("ethnicity_name")
-						)
-				.from(VALUATION_FUNCTION)
-				.join(ENDPOINT_GROUP).on(VALUATION_FUNCTION.ENDPOINT_GROUP_ID.eq(ENDPOINT_GROUP.ID))
-				.join(ENDPOINT).on(VALUATION_FUNCTION.ENDPOINT_ID.eq(ENDPOINT.ID))
-				.orderBy(ENDPOINT_GROUP.NAME, ENDPOINT.NAME, VALUATION_FUNCTION.QUALIFIER)
-				.fetch();
+
+		Result<Record> valuationRecords = null;
+		try {
+			valuationRecords = DSL.using(JooqUtil.getJooqConfiguration())
+					.select(VALUATION_FUNCTION.asterisk()
+							, ENDPOINT_GROUP.NAME.as("endpoint_group_name")
+							, ENDPOINT.NAME.as("endpoint_name")
+							)
+					.from(VALUATION_FUNCTION)
+					.join(ENDPOINT_GROUP).on(VALUATION_FUNCTION.ENDPOINT_GROUP_ID.eq(ENDPOINT_GROUP.ID))
+					.join(ENDPOINT).on(VALUATION_FUNCTION.ENDPOINT_ID.eq(ENDPOINT.ID))
+					.orderBy(ENDPOINT_GROUP.NAME, ENDPOINT.NAME, VALUATION_FUNCTION.QUALIFIER)
+					.fetch();
+		} catch (DataAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		response.type("application/json");
 		return valuationRecords.formatJSON(new JSONFormat().header(false).recordFormat(RecordFormat.OBJECT));
