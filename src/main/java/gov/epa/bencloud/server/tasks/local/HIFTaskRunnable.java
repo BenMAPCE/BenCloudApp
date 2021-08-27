@@ -78,7 +78,7 @@ public class HIFTaskRunnable implements Runnable {
 				// Override hif config where user has not provided a value
 				updateHifConfigValues(hif, h);
 				
-				//TODO: Add code here set incidence/prevalence year as appropriate based on population year
+				//This will get the incidence (or prevalence) dataset for the year specified in the hif config
 				Map<Long, Map<Integer, Double>> incidenceMap = IncidenceApi.getIncidenceEntryGroups(hifTaskConfig, hif, h);
 				incidenceLists.add(incidenceMap);
 				
@@ -155,17 +155,13 @@ public class HIFTaskRunnable implements Runnable {
 				 * FOR EACH FUNCTION THE USER SELECTED
 				 */
 				for (int hifIdx = 0; hifIdx < hifTaskConfig.hifs.size(); hifIdx++) {
-					// TODO: Loop over all the population cells and sum the results for all the
-					// relevant bins
 					Expression hifFunctionExpression = hifFunctionExpressionList.get(hifIdx);
 					Expression hifBaselineExpression = hifBaselineExpressionList.get(hifIdx);
 					HIFConfig hifConfig = hifTaskConfig.hifs.get(hifIdx);
 					HealthImpactFunctionRecord hifDefinition = hifDefinitionList.get(hifIdx);
 					double[] betaDist = hifBetaDistributionLists.get(hifIdx);
 					
-					//TODO: kludge to scale ozone results by the number of days between May 1 - Sept 30
-					//IF the HIF metric statistic == 0 (None) then it's a daily function and we need to scale by the year or global season
-					
+
 					double seasonalScalar = 1.0;
 					if(hifDefinition.getMetricStatistic() == 0) { // NONE
 						seasonalScalar = hifConfig.totalDays.doubleValue();
@@ -177,7 +173,6 @@ public class HIFTaskRunnable implements Runnable {
 					//Double varC = hifDefinition.getValC().doubleValue() != 0 ? hifDefinition.getValC().doubleValue() : 1.0;
 					
 					double beta = hifDefinition.getBeta().doubleValue();
-
 
 					// BenMAP-CE stores air quality values as floats but performs HIF estimates using doubles.
 					// Testing has shown that float to double conversion can cause small changes in values 

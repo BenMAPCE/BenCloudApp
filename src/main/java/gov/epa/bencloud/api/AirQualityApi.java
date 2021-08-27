@@ -382,8 +382,6 @@ public class AirQualityApi {
 				return "The following columns are missing: " + tmp;
 			}
 			
-			System.out.println("100");
-			
 			//TODO: Finish creating lookups for these metrics so we can fill them in properly in the insert below
 			//HashMap<String, Integer> pollutantMetricIdLookup = AirQualityUtil.getPollutantMetricIdLookup(pollutantId);
 			//HashMap<String, Integer> seasonalMetricIdLookup = AirQualityUtil.getSeasonalMetricIdLookup(pollutantId);
