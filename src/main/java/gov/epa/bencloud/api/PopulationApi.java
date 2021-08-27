@@ -1,6 +1,6 @@
 package gov.epa.bencloud.api;
 
-import static gov.epa.bencloud.server.database.jooq.Tables.*;
+import static gov.epa.bencloud.server.database.jooq.data.Tables.*;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -16,9 +16,9 @@ import org.jooq.impl.DSL;
 import gov.epa.bencloud.api.model.HIFConfig;
 import gov.epa.bencloud.api.model.HIFTaskConfig;
 import gov.epa.bencloud.server.database.JooqUtil;
-import gov.epa.bencloud.server.database.jooq.Routines;
-import gov.epa.bencloud.server.database.jooq.tables.records.GetPopulationRecord;
-import gov.epa.bencloud.server.database.jooq.tables.records.HealthImpactFunctionRecord;
+import gov.epa.bencloud.server.database.jooq.data.Routines;
+import gov.epa.bencloud.server.database.jooq.data.tables.records.GetPopulationRecord;
+import gov.epa.bencloud.server.database.jooq.data.tables.records.HealthImpactFunctionRecord;
 import spark.Response;
 
 public class PopulationApi {

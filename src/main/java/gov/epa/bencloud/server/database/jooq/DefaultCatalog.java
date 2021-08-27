@@ -4,6 +4,9 @@
 package gov.epa.bencloud.server.database.jooq;
 
 
+import gov.epa.bencloud.server.database.jooq.data.Data;
+import gov.epa.bencloud.server.database.jooq.grids.Grids;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -30,6 +33,11 @@ public class DefaultCatalog extends CatalogImpl {
     public final Data DATA = Data.DATA;
 
     /**
+     * The schema <code>grids</code>.
+     */
+    public final Grids GRIDS = Grids.GRIDS;
+
+    /**
      * No further instances allowed
      */
     private DefaultCatalog() {
@@ -39,6 +47,7 @@ public class DefaultCatalog extends CatalogImpl {
     @Override
     public final List<Schema> getSchemas() {
         return Arrays.<Schema>asList(
-            Data.DATA);
+            Data.DATA,
+            Grids.GRIDS);
     }
 }

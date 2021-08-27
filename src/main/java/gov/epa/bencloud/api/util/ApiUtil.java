@@ -1,29 +1,23 @@
 package gov.epa.bencloud.api.util;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-
 import org.jooq.Record;
-import org.jooq.Record1;
 import org.jooq.Record2;
 import org.jooq.Result;
 import org.jooq.impl.DSL;
-import static gov.epa.bencloud.server.database.jooq.Tables.*;
+import static gov.epa.bencloud.server.database.jooq.data.Tables.*;
 
 import gov.epa.bencloud.api.HIFApi;
 import gov.epa.bencloud.api.ValuationApi;
-import gov.epa.bencloud.api.model.ValuationConfig;
 import gov.epa.bencloud.api.model.ValuationTaskConfig;
 import gov.epa.bencloud.server.database.JooqUtil;
-import gov.epa.bencloud.server.database.jooq.Routines;
-import gov.epa.bencloud.server.database.jooq.tables.records.GetVariableRecord;
-import gov.epa.bencloud.server.database.jooq.tables.records.InflationEntryRecord;
-import gov.epa.bencloud.server.database.jooq.tables.records.ValuationFunctionRecord;
+import gov.epa.bencloud.server.database.jooq.data.Routines;
+import gov.epa.bencloud.server.database.jooq.data.tables.records.GetVariableRecord;
+import gov.epa.bencloud.server.database.jooq.data.tables.records.InflationEntryRecord;
+import gov.epa.bencloud.server.database.jooq.data.tables.records.ValuationFunctionRecord;
 import gov.epa.bencloud.server.tasks.TaskComplete;
 import gov.epa.bencloud.server.tasks.TaskUtil;
 import gov.epa.bencloud.server.tasks.model.Task;

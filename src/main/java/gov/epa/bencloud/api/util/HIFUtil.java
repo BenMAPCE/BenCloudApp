@@ -1,6 +1,6 @@
 package gov.epa.bencloud.api.util;
 
-import static gov.epa.bencloud.server.database.jooq.Tables.*;
+import static gov.epa.bencloud.server.database.jooq.data.Tables.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,17 +10,15 @@ import org.jooq.Record1;
 import org.jooq.impl.DSL;
 import org.mariuszgromada.math.mxparser.*;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import gov.epa.bencloud.api.IncidenceApi;
 import gov.epa.bencloud.api.model.HIFConfig;
 import gov.epa.bencloud.api.model.HIFTaskConfig;
 import gov.epa.bencloud.server.database.JooqUtil;
-import gov.epa.bencloud.server.database.jooq.tables.records.HealthImpactFunctionRecord;
-import gov.epa.bencloud.server.database.jooq.tables.records.HifResultDatasetRecord;
-import gov.epa.bencloud.server.database.jooq.tables.records.HifResultRecord;
-import gov.epa.bencloud.server.database.jooq.tables.records.IncidenceDatasetRecord;
+import gov.epa.bencloud.server.database.jooq.data.tables.records.HealthImpactFunctionRecord;
+import gov.epa.bencloud.server.database.jooq.data.tables.records.HifResultDatasetRecord;
+import gov.epa.bencloud.server.database.jooq.data.tables.records.HifResultRecord;
 import gov.epa.bencloud.server.tasks.model.Task;
 
 public class HIFUtil {

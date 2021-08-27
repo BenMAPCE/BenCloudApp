@@ -1,6 +1,6 @@
 package gov.epa.bencloud.api;
 
-import static gov.epa.bencloud.server.database.jooq.Tables.*;
+import static gov.epa.bencloud.server.database.jooq.data.Tables.*;
 
 import java.math.BigDecimal;
 
@@ -12,7 +12,6 @@ import org.jooq.JSONFormat.RecordFormat;
 import org.jooq.Record;
 import org.jooq.Record1;
 import org.jooq.Record12;
-import org.jooq.Record7;
 import org.jooq.impl.DSL;
 
 import gov.epa.bencloud.server.database.JooqUtil;

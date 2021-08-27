@@ -1,11 +1,6 @@
 package gov.epa.bencloud.api;
 
-import static gov.epa.bencloud.server.database.jooq.Tables.AIR_QUALITY_CELL;
-import static gov.epa.bencloud.server.database.jooq.Tables.AIR_QUALITY_LAYER;
-import static gov.epa.bencloud.server.database.jooq.Tables.GRID_DEFINITION;
-import static gov.epa.bencloud.server.database.jooq.Tables.POLLUTANT;
-import static gov.epa.bencloud.server.database.jooq.Tables.POLLUTANT_METRIC;
-import static gov.epa.bencloud.server.database.jooq.Tables.SEASONAL_METRIC;
+import static gov.epa.bencloud.server.database.jooq.data.Tables.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,8 +41,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import gov.epa.bencloud.api.util.AirQualityUtil;
 import gov.epa.bencloud.api.util.ApiUtil;
 import gov.epa.bencloud.server.database.JooqUtil;
-import gov.epa.bencloud.server.database.jooq.tables.records.AirQualityCellRecord;
-import gov.epa.bencloud.server.database.jooq.tables.records.AirQualityLayerRecord;
+import gov.epa.bencloud.server.database.jooq.data.tables.records.AirQualityCellRecord;
+import gov.epa.bencloud.server.database.jooq.data.tables.records.AirQualityLayerRecord;
 import gov.epa.bencloud.server.util.DataConversionUtil;
 import gov.epa.bencloud.server.util.ParameterUtil;
 import spark.Request;

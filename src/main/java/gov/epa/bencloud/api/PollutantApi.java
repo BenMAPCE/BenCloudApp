@@ -1,6 +1,6 @@
 package gov.epa.bencloud.api;
 
-import static gov.epa.bencloud.server.database.jooq.Tables.*;
+import static gov.epa.bencloud.server.database.jooq.data.Tables.*;
 
 import org.jooq.JSONFormat;
 import org.jooq.Result;

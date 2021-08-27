@@ -1,6 +1,6 @@
 package gov.epa.bencloud.api;
 
-import static gov.epa.bencloud.server.database.jooq.Tables.*;
+import static gov.epa.bencloud.server.database.jooq.data.Tables.*;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -28,8 +28,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import gov.epa.bencloud.api.model.HIFTaskConfig;
 import gov.epa.bencloud.api.util.HIFUtil;
 import gov.epa.bencloud.server.database.JooqUtil;
-import gov.epa.bencloud.server.database.jooq.tables.records.HifResultDatasetRecord;
-import gov.epa.bencloud.server.database.jooq.tables.records.TaskCompleteRecord;
+import gov.epa.bencloud.server.database.jooq.data.tables.records.HifResultDatasetRecord;
+import gov.epa.bencloud.server.database.jooq.data.tables.records.TaskCompleteRecord;
 import gov.epa.bencloud.server.util.ParameterUtil;
 import spark.Request;
 import spark.Response;

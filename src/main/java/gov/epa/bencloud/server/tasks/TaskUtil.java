@@ -1,12 +1,6 @@
 package gov.epa.bencloud.server.tasks;
 
-import static gov.epa.bencloud.server.database.jooq.Tables.HIF_RESULT;
-import static gov.epa.bencloud.server.database.jooq.Tables.HIF_RESULT_DATASET;
-import static gov.epa.bencloud.server.database.jooq.Tables.HIF_RESULT_FUNCTION_CONFIG;
-import static gov.epa.bencloud.server.database.jooq.Tables.VALUATION_RESULT;
-import static gov.epa.bencloud.server.database.jooq.Tables.VALUATION_RESULT_DATASET;
-import static gov.epa.bencloud.server.database.jooq.Tables.VALUATION_RESULT_FUNCTION_CONFIG;
-import static gov.epa.bencloud.server.database.jooq.Tables.TASK_COMPLETE;
+import static gov.epa.bencloud.server.database.jooq.data.Tables.*;
 
 import org.jooq.Record;
 import org.jooq.Record1;

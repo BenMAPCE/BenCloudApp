@@ -1,6 +1,6 @@
 package gov.epa.bencloud.api.util;
 
-import static gov.epa.bencloud.server.database.jooq.Tables.*;
+import static gov.epa.bencloud.server.database.jooq.data.Tables.*;
 
 import java.util.ArrayList;
 
@@ -11,9 +11,9 @@ import org.mariuszgromada.math.mxparser.*;
 import gov.epa.bencloud.api.model.ValuationConfig;
 import gov.epa.bencloud.api.model.ValuationTaskConfig;
 import gov.epa.bencloud.server.database.JooqUtil;
-import gov.epa.bencloud.server.database.jooq.tables.records.ValuationFunctionRecord;
-import gov.epa.bencloud.server.database.jooq.tables.records.ValuationResultDatasetRecord;
-import gov.epa.bencloud.server.database.jooq.tables.records.ValuationResultRecord;
+import gov.epa.bencloud.server.database.jooq.data.tables.records.ValuationFunctionRecord;
+import gov.epa.bencloud.server.database.jooq.data.tables.records.ValuationResultDatasetRecord;
+import gov.epa.bencloud.server.database.jooq.data.tables.records.ValuationResultRecord;
 import gov.epa.bencloud.server.tasks.model.Task;
 
 public class ValuationUtil {

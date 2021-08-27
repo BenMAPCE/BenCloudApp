@@ -1,6 +1,6 @@
 package gov.epa.bencloud.server.routes;
 
-import static gov.epa.bencloud.server.database.jooq.Tables.*;
+import static gov.epa.bencloud.server.database.jooq.data.Tables.*;
 
 import java.util.UUID;
 

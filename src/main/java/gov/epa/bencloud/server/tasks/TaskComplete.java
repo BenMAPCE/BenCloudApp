@@ -1,8 +1,8 @@
 package gov.epa.bencloud.server.tasks;
 
-import static gov.epa.bencloud.server.database.jooq.Tables.TASK_COMPLETE;
-import static gov.epa.bencloud.server.database.jooq.Tables.TASK_QUEUE;
-import static gov.epa.bencloud.server.database.jooq.Tables.TASK_WORKER;
+import static gov.epa.bencloud.server.database.jooq.data.Tables.TASK_COMPLETE;
+import static gov.epa.bencloud.server.database.jooq.data.Tables.TASK_QUEUE;
+import static gov.epa.bencloud.server.database.jooq.data.Tables.TASK_WORKER;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
