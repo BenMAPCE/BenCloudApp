@@ -1,0 +1,9 @@
+{
+  "vetur.validation.template": false,
+  "vetur.format.enable": false,
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "vue"],
+  
+  "vetur.experimental.templateInterpolationService": true,
+  "git.ignoreLimitWarning": true,
+  "vue3snippets.enable-compile-vue-file-on-did-save-code": false
+}

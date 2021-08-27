@@ -1,0 +1,32 @@
+<template>
+  <div class="bencloud-page">
+    <div class="app-header">BenCLOUD - Environmental Benefits &amp; Mapping Tool
+    <app-top-navigation></app-top-navigation>
+  </div>
+ 
+</template>
+
+<script>
+
+export default {
+  name: 'App',
+  components: {
+  }
+}
+</script>
+
+<style lang="css">
+
+.app-header {
+  font-size: 20px;
+  font-weight: 700;
+  text-align: left;
+}
+
+.bencloud-page {
+
+  padding: 25px;
+
+}
+
+</style>
