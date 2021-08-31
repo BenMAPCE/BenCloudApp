@@ -54,14 +54,14 @@ public class HealthImpactFunctionGroup extends TableImpl<HealthImpactFunctionGro
     public final TableField<HealthImpactFunctionGroupRecord, Integer> ID = createField(DSL.name("id"), SQLDataType.INTEGER.nullable(false).identity(true), this, "");
 
     /**
-     * The column <code>data.health_impact_function_group.pollutant_id</code>.
-     */
-    public final TableField<HealthImpactFunctionGroupRecord, Integer> POLLUTANT_ID = createField(DSL.name("pollutant_id"), SQLDataType.INTEGER, this, "");
-
-    /**
      * The column <code>data.health_impact_function_group.name</code>.
      */
     public final TableField<HealthImpactFunctionGroupRecord, String> NAME = createField(DSL.name("name"), SQLDataType.CLOB.nullable(false), this, "");
+
+    /**
+     * The column <code>data.health_impact_function_group.help_text</code>.
+     */
+    public final TableField<HealthImpactFunctionGroupRecord, String> HELP_TEXT = createField(DSL.name("help_text"), SQLDataType.CLOB, this, "");
 
     private HealthImpactFunctionGroup(Name alias, Table<HealthImpactFunctionGroupRecord> aliased) {
         this(alias, aliased, null);
@@ -147,7 +147,7 @@ public class HealthImpactFunctionGroup extends TableImpl<HealthImpactFunctionGro
     // -------------------------------------------------------------------------
 
     @Override
-    public Row3<Integer, Integer, String> fieldsRow() {
+    public Row3<Integer, String, String> fieldsRow() {
         return (Row3) super.fieldsRow();
     }
 }

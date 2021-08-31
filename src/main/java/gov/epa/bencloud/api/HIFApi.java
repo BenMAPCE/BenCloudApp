@@ -19,6 +19,7 @@ import org.jooq.Record12;
 import org.jooq.Record13;
 import org.jooq.Record16;
 import org.jooq.Record3;
+import org.jooq.Record4;
 import org.jooq.impl.DSL;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -132,14 +133,16 @@ public class HIFApi {
 			
 		int pollutantId = ParameterUtil.getParameterValueAsInteger(request.raw().getParameter("pollutantId"), 0);
 		
-		Result<Record3<String, Integer, Integer[]>> hifGroupRecords = DSL.using(JooqUtil.getJooqConfiguration())
+		Result<Record4<String, Integer, String, Integer[]>> hifGroupRecords = DSL.using(JooqUtil.getJooqConfiguration())
 				.select(HEALTH_IMPACT_FUNCTION_GROUP.NAME
 						, HEALTH_IMPACT_FUNCTION_GROUP.ID
+						, HEALTH_IMPACT_FUNCTION_GROUP.HELP_TEXT
 						, DSL.arrayAggDistinct(HEALTH_IMPACT_FUNCTION_GROUP_MEMBER.HEALTH_IMPACT_FUNCTION_ID).as("functions")
 						)
 				.from(HEALTH_IMPACT_FUNCTION_GROUP)
 				.join(HEALTH_IMPACT_FUNCTION_GROUP_MEMBER).on(HEALTH_IMPACT_FUNCTION_GROUP.ID.eq(HEALTH_IMPACT_FUNCTION_GROUP_MEMBER.HEALTH_IMPACT_FUNCTION_GROUP_ID))
-				.where(pollutantId == 0 ? DSL.noCondition() : HEALTH_IMPACT_FUNCTION_GROUP.POLLUTANT_ID.eq(pollutantId))
+				.join(HEALTH_IMPACT_FUNCTION).on(HEALTH_IMPACT_FUNCTION.ID.eq(HEALTH_IMPACT_FUNCTION_GROUP_MEMBER.HEALTH_IMPACT_FUNCTION_ID))
+				.where(pollutantId == 0 ? DSL.noCondition() : HEALTH_IMPACT_FUNCTION.POLLUTANT_ID.eq(pollutantId))
 				.groupBy(HEALTH_IMPACT_FUNCTION_GROUP.NAME
 						, HEALTH_IMPACT_FUNCTION_GROUP.ID)
 				.orderBy(HEALTH_IMPACT_FUNCTION_GROUP.NAME)
@@ -154,12 +157,14 @@ public class HIFApi {
 		String idsParam = request.params("ids");
 		int popYear = ParameterUtil.getParameterValueAsInteger(request.raw().getParameter("popYear"), 0);
 		int defaultIncidencePrevalenceDataset = ParameterUtil.getParameterValueAsInteger(request.raw().getParameter("incidencePrevalenceDataset"), 0);
+		int pollutantId = ParameterUtil.getParameterValueAsInteger(request.raw().getParameter("pollutantId"), 0);
 		
 		List<Integer> ids = Stream.of(idsParam.split(",")).mapToInt(Integer::parseInt).boxed().collect(Collectors.toList());
 		
 		Result<Record> hifGroupRecords = DSL.using(JooqUtil.getJooqConfiguration())
 				.select(HEALTH_IMPACT_FUNCTION_GROUP.NAME
 						, HEALTH_IMPACT_FUNCTION_GROUP.ID
+						, HEALTH_IMPACT_FUNCTION_GROUP.HELP_TEXT
 						, HEALTH_IMPACT_FUNCTION.asterisk()
 						, ENDPOINT_GROUP.NAME.as("endpoint_group_name")
 						, ENDPOINT.NAME.as("endpoint_name")
@@ -175,7 +180,8 @@ public class HIFApi {
 				.join(RACE).on(HEALTH_IMPACT_FUNCTION.RACE_ID.eq(RACE.ID))
 				.join(GENDER).on(HEALTH_IMPACT_FUNCTION.GENDER_ID.eq(GENDER.ID))
 				.join(ETHNICITY).on(HEALTH_IMPACT_FUNCTION.ETHNICITY_ID.eq(ETHNICITY.ID))
-				.where(HEALTH_IMPACT_FUNCTION_GROUP.ID.in(ids))
+				.where(HEALTH_IMPACT_FUNCTION_GROUP.ID.in(ids)
+						.and(HEALTH_IMPACT_FUNCTION.POLLUTANT_ID.eq(pollutantId)))
 				.orderBy(HEALTH_IMPACT_FUNCTION_GROUP.NAME)
 				.fetch();
 		
@@ -191,6 +197,7 @@ public class HIFApi {
 				group = mapper.createObjectNode();
 				group.put("id", currentGroupId);
 				group.put("name", r.getValue(HEALTH_IMPACT_FUNCTION_GROUP.NAME));
+				group.put("help_text", r.getValue(HEALTH_IMPACT_FUNCTION_GROUP.HELP_TEXT));
 				functions = group.putArray("functions");
 				groups.add(group);
 			}
