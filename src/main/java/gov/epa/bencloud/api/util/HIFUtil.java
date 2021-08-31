@@ -174,7 +174,21 @@ public class HIFUtil {
 	
 			} else {
 				// Choose the default incidence based on endpoint group
-				int dsId = endpointGroupId == 12 ? 1 : 12; //Mortality Incidence or Other Incidence
+				// TODO: Improve this logic
+				int dsId = 0;
+				switch (endpointGroupId) {
+				case 12:
+					dsId = 1; //Mortality
+					break;
+				case 28:
+				case 29:
+				case 30:
+					dsId = 52; //National Incidence & Prevalence
+					break;
+				default:
+					dsId = 12; //Other Incidence
+				}
+				
 				function.put("incidence_dataset_id", dsId); 
 				function.put("incidence_year", HIFUtil.getClosestIncidenceYear(dsId, false, endpointGroupId, popYear));
 				function.put("incidence_dataset_name", IncidenceApi.getIncidenceDatasetName(dsId));
