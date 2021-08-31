@@ -52,4 +52,32 @@ export function postPolicyAirQuality (state) {
   return state.postPolicyAirQuality
 }
 
+export function valuationsForHealthImpactFunctionGroups (state) {
+  return state.valuationsForHealthImpactFunctionGroups
+}
+
+export const getValuationsForHealthFunctionId = (state) => (healthFunctionId) => {
+
+  console.log("######")
+  console.log(healthFunctionId)
+  console.log(state.valuationsForHealthImpactFunctionGroups)
+  console.log("######")
+
+  for (var v = 0; v < state.valuationsForHealthImpactFunctionGroups.length; v++) {
+    console.log("$$$")
+    console.log(state.valuationsForHealthImpactFunctionGroups[v])
+    if (
+      "health_function_id" in state.valuationsForHealthImpactFunctionGroups[v]
+     ) {
+         if (state.valuationsForHealthImpactFunctionGroups[v].health_function_id === healthFunctionId) {
+          console.log("... found health_function_id: " + healthFunctionId);
+          return state.valuationsForHealthImpactFunctionGroups[v];
+      }
+    }
+  }
+
+  return {};
+}
+
+
 

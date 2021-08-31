@@ -49,7 +49,7 @@
         <q-select
           filled
           v-model="valuationFunctionsSelected"
-          :options="valuationFunctions"
+          :options="valuationFunctionsForEndpointGroupId"
           option-value="id"
           option-label="qualifier"
           use-chips
@@ -75,10 +75,10 @@
 
 <script>
 import { ref } from "vue";
+import { useStore } from "vuex";
 
 export default {
-
-   data: () => ({
+  data: () => ({
     valuationFunctionsSelected: [],
     errorMessage: "",
   }),
@@ -90,7 +90,11 @@ export default {
       type: Object,
       default: null,
     },
-    valuationFunctions: {
+    valuationFunctionsForEndpointGroupId: {
+      type: Object,
+      default: null,
+    },
+    valuationsSelected: {
       type: Object,
       default: null,
     },
@@ -100,16 +104,30 @@ export default {
     // REQUIRED
     "ok",
     "hide",
-    "selectedValuationsFunctions"
+    "selectedValuationsFunctions",
   ],
 
   methods: {
     // following method is REQUIRED
     // (don't change its name --> "show")
     show() {
-      console.log("^^^^^^^^^^^^^^")
-      console.log(this.valuationFunctions)
-      console.log(this.row)
+      console.log("^^^^^^^^^^^^^^");
+      var selectedValidations = [];
+
+      if (this.valuationsSelected != undefined && this.valuationsSelected.valuation_ids != undefined) {
+        for (var vf = 0; vf < this.valuationFunctionsForEndpointGroupId.length; vf++) {
+          for (var vs = 0; vs < this.valuationsSelected.valuation_ids.length; vs++) {
+            if (
+              this.valuationFunctionsForEndpointGroupId[vf].id == this.valuationsSelected.valuation_ids[vs]
+            ) {
+              selectedValidations.push(this.valuationFunctionsForEndpointGroupId[vf]);
+            }
+          }
+        }
+      }
+
+      this.valuationFunctionsSelected = selectedValidations;
+
       this.$refs.dialog.show();
     },
 
@@ -139,8 +157,9 @@ export default {
     onSave() {
       var hasErrors = false;
       // then hiding dialog
-      console.log("--- onSave()")
-      console.log(this.row)
+      console.log("--- onSave()");
+      console.log(this.row);
+      console.log(this.valuationFunctionsSelected);
       this.$emit("ok", this.valuationFunctionsSelected, this.row.value);
       this.hide();
     },

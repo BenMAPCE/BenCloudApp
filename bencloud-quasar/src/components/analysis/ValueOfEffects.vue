@@ -48,6 +48,7 @@ import { useQuasar } from "quasar";
 
 import { loadHealthImpactFunctionGroups } from "../../composables/health-impact-function-groups";
 import { buildHealthImpactFunctionGroups } from "../../composables/health-impact-function-groups";
+import { updateValuationsForHealthImpactFunctionGroups } from "../../composables/valuations";
 import {
   getValuationFunctionsForEndpointGroupId,
   loadValuationFunctions,
@@ -79,6 +80,8 @@ export default defineComponent({
     const selectedItem = ref(store.state.analysis.incidenceId);
 
     const visibleColumns = [
+      "health_function_id",
+      "endpoint_group_id",
       "group_name",
       "author_year",
       "endpoint_name",
@@ -91,9 +94,16 @@ export default defineComponent({
 
     const columns = [
       {
+        name: "health_function_id",
+        align: "left",
+        label: "Health Function Id",
+        field: "health_function_id",
+        sortable: false,
+      },
+     {
         name: "endpoint_group_id",
         align: "left",
-        label: "Group",
+        label: "Endpoint Group Id",
         field: "endpoint_group_id",
         sortable: false,
       },
@@ -186,27 +196,53 @@ export default defineComponent({
       console.log(valuationFunctionsForEndpointGroupId);
       console.log("------------------");
 
+        console.log("*****")
+        console.log(row.health_function_id)
+      //  console.log(this.getValuationsForHealthFunctionId(row.health_function_id))
+      //  var valuationsForHealthFunction = this.getValuationsForHealthFunctionId(row.health_function_id);
+
+      var valuationsForHealthFunction = store.getters[
+        "analysis/getValuationsForHealthFunctionId"
+      ](row.health_function_id);
+
+        console.log("*****")
+
       $q.dialog({
         component: ValueOfEffectsEditForm,
         parent: this,
         persistent: true,
         componentProps: {
           row: row,
-          valuationFunctions: valuationFunctionsForEndpointGroupId,
+          valuationFunctionsForEndpointGroupId: valuationFunctionsForEndpointGroupId,
+          valuationsSelected: valuationsForHealthFunction
         },
       })
         .onOk((valuationFunctionsSelected) => {
           console.log("OK");
           console.log(row)
           console.log(valuationFunctionsSelected);
+
           var records = JSON.parse(JSON.stringify(valuationFunctionsSelected));
           var valuations = "";
+          var valuationIds = [];
           console.log(records.length)
           for (var i = 0; i <records.length; i++) {
             console.log(records[i].qualifier)
             valuations = valuations + "<p>" + records[i].qualifier + '</p>';
+            valuationIds.push(records[i].id)
           }
+          console.log(valuationIds)
           console.log(row)
+
+          var payload = {};
+          payload.endpoint_group_id = row.endpoint_group_id
+          payload.health_function_id = row.health_function_id
+          payload.valuation_ids = valuationIds;
+
+          store.commit("analysis/updateValuationsForHealthImpactFunctionGroups", payload);
+
+          //updateValuationsForHealthImpactFunctionGroups(store, row.endpoint_group_id, valuationIds);
+
           row.valuation = valuations;
           console.log(row.valuation)
         })
@@ -224,7 +260,7 @@ export default defineComponent({
         const response = await loadHealthImpactFunctionGroups().fetch();
         rows.value = response.data.value;
         console.log(rows.value);
-        rows.value = buildHealthImpactFunctionGroups(response.data.value);
+        rows.value = buildHealthImpactFunctionGroups(response.data.value, valuationFunctions, store);
       })();
 
       (async () => {

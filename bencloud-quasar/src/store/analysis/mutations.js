@@ -44,3 +44,41 @@ export function updatePostPolicyAirQuality(state, postPolicyAirQuality) {
     state.postPolicyAirQuality = postPolicyAirQuality;
 }
 
+export function updateValuationsForHealthImpactFunctionGroups(state, payload) {
+    console.log("--------------------------------------------");
+    console.log(payload)
+
+    var healthFunctionIdFound = false;
+
+    for (var v = 0; v < state.valuationsForHealthImpactFunctionGroups.length; v++) {
+      if (
+        "health_function_id" in state.valuationsForHealthImpactFunctionGroups[v]
+       ) {
+           if (state.valuationsForHealthImpactFunctionGroups[v].health_function_id === payload.health_function_id) {
+            console.log("... found health_function_id: " + payload.health_function_id);
+            console.log("   need to update")
+            state.valuationsForHealthImpactFunctionGroups[v].endpoint_group_id = payload.endpoint_group_id;
+            state.valuationsForHealthImpactFunctionGroups[v].valuation_ids = payload.valuation_ids;
+            healthFunctionIdFound = true;
+        }
+      }
+    }
+  
+    if (!healthFunctionIdFound) {
+      var vfhifg = {};
+      vfhifg.endpoint_group_id = payload.endpoint_group_id;
+      vfhifg.valuation_ids = payload.valuation_ids;
+      vfhifg.health_function_id = payload.health_function_id;
+      
+      console.log("@@@")
+      state.valuationsForHealthImpactFunctionGroups.push(vfhifg);
+    }
+
+    console.log(state.valuationsForHealthImpactFunctionGroups)
+    console.log("--------------------------------------------");
+
+
+
+    //state.valuationsForHealthImpactFunctionGroups = valuationsForHealthImpactFunctionGroups;
+}
+

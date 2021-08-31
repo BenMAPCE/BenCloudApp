@@ -13,6 +13,6 @@ export default function () {
     healthEffects: [],
     prePolicyAirQuality: [],
     postPolicyAirQuality: [],
-    
+    valuationsForHealthImpactFunctionGroups: []
   }
 }
