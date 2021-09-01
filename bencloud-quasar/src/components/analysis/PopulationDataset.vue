@@ -41,9 +41,12 @@ export default defineComponent({
           var name = rows.value.find((opt) => opt.id === currentSelectedItem).name;
           var years = rows.value.find((opt) => opt.id === currentSelectedItem).years;
           console.log(years);
-          store.commit("analysis/updatePopulationDataset", currentSelectedItem, name);
+          store.commit("analysis/updatePopulationDataset", {
+            populationDatasetId: currentSelectedItem,
+            populationDatasetName: name,
+          });
           store.commit("analysis/updatePopulationYears", years);
-          console.log(store.state.analysis.populationYears)
+          console.log(store.state.analysis.populationYears);
         }
       }
     );

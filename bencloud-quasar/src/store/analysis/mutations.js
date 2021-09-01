@@ -10,14 +10,14 @@ export function updatePollutantFriendlyName (state, pollutantFriendlyName ) {
     state.pollutantFriendlyName = pollutantFriendlyName;
 }
 
-export function updateIncidence(state, incidenceId, incidenceName) {
-    state.incidenceId = incidenceId;
-    state.incidenceName = incidenceName;
+export function updateIncidence(state, incidence) {
+    state.incidenceId = incidence.incidenceId;
+    state.incidenceName = incidence.incidenceName;
 }
 
-export function updatePopulationDataset(state, populationDatasetId, populationDatasetName) {
-    state.populationDatasetId = populationDatasetId;
-    state.populationDatasetName = populationDatasetName;
+export function updatePopulationDataset(state, populationDataset) {
+    state.populationDatasetId = populationDataset.populationDatasetId;
+    state.populationDatasetName = populationDataset.populationDatasetName;
 }
 
 export function updatePopulationYear(state, populationYear) {
@@ -28,20 +28,22 @@ export function updatePopulationYears(state, populationYears) {
     state.populationYears = populationYears;
 }
 
-export function updateAQ(state, aq) {
-    state.aq = aq;
-}
-
 export function updateHealthEffects(state, healthEffects) {
     state.healthEffects = healthEffects;
 }
 
+export function updateHealthImpactFunctions(state, healthImpactFunctions) {
+    state.healthImpactFunctions = healthImpactFunctions;
+}
+
 export function updatePrePolicyAirQuality(state, prePolicyAirQuality) {
-    state.prePolicyAirQuality = prePolicyAirQuality;
+    state.prePolicyAirQualityId = prePolicyAirQuality.prePolicyAirQualityId;
+    state.prePolicyAirQualityName = prePolicyAirQuality.prePolicyAirQualityName;
 }
 
 export function updatePostPolicyAirQuality(state, postPolicyAirQuality) {
-    state.postPolicyAirQuality = postPolicyAirQuality;
+    state.postPolicyAirQualityId = postPolicyAirQuality.postPolicyAirQualityId;
+    state.postPolicyAirQualityName = postPolicyAirQuality.postPolicyAirQualityName;
 }
 
 export function updateValuationsForHealthImpactFunctionGroups(state, payload) {

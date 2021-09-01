@@ -9,10 +9,12 @@ export default function () {
     populationDatasetName: "",
     populationYear: null,
     populationYears:[],
-    aq: [],
     healthEffects: [],
-    prePolicyAirQuality: [],
-    postPolicyAirQuality: [],
+    healthImpactFunctions: [],
+    prePolicyAirQualityId: null,
+    prePolicyAirQualityName: "",
+    postPolicyAirQualityId: null,
+    postPolicyAirQualityName: "",
     valuationsForHealthImpactFunctionGroups: []
   }
 }

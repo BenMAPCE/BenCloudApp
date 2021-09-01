@@ -15,7 +15,7 @@
               
               :src="`/images/pollutant_${row.id}.png`"
               spinner-color="white"
-              style="height: 140px; max-width: 150px;"
+              style="height: 100px; max-width: 100px;"
             />
           </div>
         </div>
@@ -56,6 +56,19 @@ export default defineComponent({
           store.commit("analysis/updatePollutantId", currentSelectedItem);
           store.commit("analysis/updatePollutantName", name);
           store.commit("analysis/updatePollutantFriendlyName", friendlyName);
+          
+          store.commit("analysis/updatePrePolicyAirQuality", 
+          { 
+            prePolicyAirQualityId: null,  
+            prePolicyAirQualityName: ""
+          });
+
+          store.commit("analysis/updatePostPolicyAirQuality", 
+          { 
+            postPolicyAirQualityId: null,  
+            postPolicyAirQualityName: ""
+          });
+
           selectedItemFriendlyName.value = friendlyName
         }
       }

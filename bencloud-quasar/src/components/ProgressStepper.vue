@@ -28,7 +28,7 @@
     </q-step>
 
     <q-step :name="6" title="Review &amp; Submit" :done="step > 6" prefix="6">
-      <ValueOfEffects></ValueOfEffects>
+      <ReviewAndSubmit></ReviewAndSubmit>
     </q-step>
 
     <template v-slot:navigation>
@@ -42,10 +42,11 @@
           class="q-ml-sm"
         />
         <q-btn
-          @click="$refs.stepper.next()"
+          @click="validateStep(); $refs.stepper.next()"
           color="primary"
           :label="step === 6 ? 'Finish' : 'Continue'"
-        />      </q-stepper-navigation>
+        />
+      </q-stepper-navigation>
     </template>
   </q-stepper>
 </template>
@@ -58,6 +59,7 @@ import WhatAirQuality from "src/pages/analysis/WhatAirQuality.vue";
 import WhoWillBeExposed from "src/pages/analysis/WhoWillBeExposed.vue";
 import WhatHealthEffects from "src/pages/analysis/WhatHealthEffects.vue";
 import ValueOfEffects from "src/pages/analysis/WhatValueOfEffects.vue";
+import ReviewAndSubmit from "src/pages/analysis/ReviewAndSubmit.vue";
 
 export default {
   components: {
@@ -65,11 +67,16 @@ export default {
     WhatAirQuality,
     WhoWillBeExposed,
     WhatHealthEffects,
-    ValueOfEffects
+    ValueOfEffects,
+    ReviewAndSubmit,
   },
   setup() {
+    function validateStep() {
+      console.log("*** validating step " + this.step);
+    }
     return {
       step: ref(1),
+      validateStep
     };
   },
 };

@@ -70,13 +70,15 @@ export default defineComponent({
     const valuationFunctions = ref([]);
     const filter = ref("");
     const loading = ref(false);
+    
     const pagination = ref({
       sortBy: "",
       descending: false,
       page: 1,
-      rowsPerPage: 10,
+      rowsPerPage: 1000,
       rowsNumber: 0,
     });
+    
     const selectedItem = ref(store.state.analysis.incidenceId);
 
     const visibleColumns = [
@@ -170,8 +172,10 @@ export default defineComponent({
         if (currentSelectedItem != prevSelectedItem) {
           console.log(rows.value.find((opt) => opt.id === currentSelectedItem).name);
           var name = rows.value.find((opt) => opt.id === currentSelectedItem).name;
-          store.commit("analysis/updateIncidence", currentSelectedItem, name);
-        }
+          store.commit("analysis/updateIncidence", {
+            incidenceId: currentSelectedItem,
+            incidenceName: name,
+          });        }
       }
     );
 
@@ -226,9 +230,16 @@ export default defineComponent({
           var valuations = "";
           var valuationIds = [];
           console.log(records.length)
+          var valuationDisplay = "";
           for (var i = 0; i <records.length; i++) {
             console.log(records[i].qualifier)
-            valuations = valuations + "<p>" + records[i].qualifier + '</p>';
+            valuationDisplay = 
+              records[i].endpoint_name + " | " + 
+              records[i].start_age + " - " + 
+              records[i].end_age + " | " + 
+              records[i].qualifier 
+
+            valuations = valuations + "<p>" + valuationDisplay + '</p>';
             valuationIds.push(records[i].id)
           }
           console.log(valuationIds)

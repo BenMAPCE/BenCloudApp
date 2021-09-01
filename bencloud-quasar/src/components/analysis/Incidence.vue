@@ -35,9 +35,12 @@ export default defineComponent({
       () => selectedItem.value,
       (currentSelectedItem, prevSelectedItem) => {
         if (currentSelectedItem != prevSelectedItem) {
-          console.log(rows.value.find(opt => opt.id === currentSelectedItem).name)
-          var name = rows.value.find(opt => opt.id === currentSelectedItem).name
-          store.commit("analysis/updateIncidence", currentSelectedItem, name);
+          console.log(rows.value.find((opt) => opt.id === currentSelectedItem).name);
+          var name = rows.value.find((opt) => opt.id === currentSelectedItem).name;
+          store.commit("analysis/updateIncidence", {
+            incidenceId: currentSelectedItem,
+            incidenceName: name,
+          });
         }
       }
     );
@@ -52,7 +55,7 @@ export default defineComponent({
     });
 
     onMounted(() => {
-      console.log("... " + store.state.analysis.incidenceId)
+      console.log("... " + store.state.analysis.incidenceId);
       if (store.state.analysis.incidenceId != null) {
         selectedItem.value = store.state.analysis.incidenceId;
         console.log("- selectedItem: " + selectedItem.value);

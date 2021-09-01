@@ -15,18 +15,37 @@ export const loadHealthImpactFunctionGroups = (url) => {
     loading.value = true;
     try {
       console.log(store.state.analysis.healthEffects);
-      var selectedHealthEffects = store.state.analysis.healthEffects;
-      console.log(selectedHealthEffects.length);
+      //var selectedHealthEffects = store.state.analysis.healthEffects;
+      //console.log(selectedHealthEffects.length);
+
+
+      var heItems = store.state.analysis.healthEffects
+      var healthEffects = "";
+      for (var i = 0; i < heItems.length; i++) {
+          console.log(heItems[i].healthEffectId)
+          healthEffects = healthEffects + heItems[i].healthEffectId + ",";
+      }
+/*
       var healthEffects = "";
       for (var he = 0; he < selectedHealthEffects.length; he++) {
         healthEffects = healthEffects + selectedHealthEffects[he] + ",";
       }
+ */ 
       console.log("healthEffects: " + healthEffects);
+
+      // /health-impact-function-groups/{ids}?incidencePrevalenceDataset=39&popYear=2020&pollutantId=6
+
       const result = await axios
         .get(
           store.state.app.apiServerURL +
             "/api/health-impact-function-groups/" +
-            healthEffects,
+            healthEffects + "?" + 
+            "incidencePrevalenceDataset=" + store.state.analysis.incidenceId + 
+            "&popYear=" + store.state.analysis.populationYear + 
+            "&pollutantId=" + store.state.analysis.pollutantId
+            
+            
+            ,
           {
             params: {},
           }
@@ -61,17 +80,25 @@ export const buildHealthImpactFunctionGroups = (
   var option = {};
   var functions = {};
 
+  var healthImpactFunctions = []
+
   for (var i = 0; i < records.length; i++) {
     option = {};
     functions = records[i].functions;
     console.log(functions.length);
+
     for (var f = 0; f < functions.length; f++) {
+
+      healthImpactFunctions.push(functions[f])
+      
       option = {};
       option.value = records[i].id;
       option.group_name = records[i].name;
 
       console.log(functions[f].id);
       option.health_function_id = functions[f].id;
+
+      
       option.endpoint_group_id = functions[f].endpoint_group_id;
       option.author_year =
         functions[f].author + " / " + functions[f].function_year;
@@ -95,7 +122,7 @@ export const buildHealthImpactFunctionGroups = (
           functions[f].prevalence_dataset_name +
           " (" +
           functions[f].prevalence_year +
-          "P)";
+          ")";
       }
 
       // load valuations
@@ -135,6 +162,9 @@ export const buildHealthImpactFunctionGroups = (
 
       options.push(option);
       console.log(option);
+
+      store.commit("analysis/updateHealthImpactFunctions", healthImpactFunctions);
+
     }
   }
 

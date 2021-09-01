@@ -32,11 +32,17 @@ async setup(props, context) {
 
     watch(
       () => selectedItem.value,
-      (selectedItem, prevSelectedItem) => {
-        console.log("watch: " + selectedItem + " |" + prevSelectedItem)
-        if (selectedItem != prevSelectedItem) {
-          console.log("selectedItem: " + selectedItem)
-          store.commit("analysis/updatePrePolicyAirQuality", selectedItem);
+      (currentSelectedItem, prevSelectedItem) => {
+        console.log("watch: " + currentSelectedItem + " | " + prevSelectedItem)
+        if (currentSelectedItem != prevSelectedItem) {
+          console.log("currentSelectedItem: " + currentSelectedItem)
+          var name = rows.value.find((opt) => opt.value === currentSelectedItem).label;
+
+          store.commit("analysis/updatePrePolicyAirQuality", 
+          { 
+            prePolicyAirQualityId: currentSelectedItem,  
+            prePolicyAirQualityName: name
+          });
         }
       });
 
@@ -45,8 +51,8 @@ async setup(props, context) {
           const response = await loadAirQualityLayers().fetch();
           rows.value = convertAirQualityLayers(response.data.value);
 
-        if (store.state.analysis.prePolicyAirQuality != null) {
-          selectedItem.value = store.state.analysis.prePolicyAirQuality;
+        if (store.state.analysis.prePolicyAirQualityId != null) {
+          selectedItem.value = store.state.analysis.prePolicyAirQualityId;
         }
 
         })()

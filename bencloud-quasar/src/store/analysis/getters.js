@@ -36,20 +36,28 @@ export function populationYear (state) {
   return state.populationYears
 }
 
-export function aq (state) {
-  return state.aq
-}
-
 export function healthEffects (state) {
   return state.healthEffects
 }
 
-export function prePolicyAirQuality (state) {
-  return state.prePolicyAirQuality
+export function healthImpactFunctions (state) {
+  return state.healthImpactFunctions
 }
 
-export function postPolicyAirQuality (state) {
-  return state.postPolicyAirQuality
+export function prePolicyAirQualityId (state) {
+  return state.prePolicyAirQualityId
+}
+
+export function prePolicyAirQualityName (state) {
+  return state.prePolicyAirQualityName
+}
+
+export function postPolicyAirQualityId (state) {
+  return state.postPolicyAirQualityId
+}
+
+export function postPolicyAirQualityName (state) {
+  return state.postPolicyAirQualityName
 }
 
 export function valuationsForHealthImpactFunctionGroups (state) {
