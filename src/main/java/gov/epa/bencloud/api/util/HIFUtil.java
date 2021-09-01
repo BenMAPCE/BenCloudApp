@@ -247,7 +247,7 @@ public class HIFUtil {
 		
 		int n = Arrays.binarySearch(years, popYear);
 		if (n >= 0) {
-			return n;
+			return years[n];
 		} else {
 			int l = Math.abs(n) - 2;
 			int u = Math.abs(n) - 1;
