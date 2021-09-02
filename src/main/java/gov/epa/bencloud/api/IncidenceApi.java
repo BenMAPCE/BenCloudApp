@@ -2,6 +2,7 @@ package gov.epa.bencloud.api;
 
 import static gov.epa.bencloud.server.database.jooq.data.Tables.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -24,14 +25,38 @@ import spark.Response;
 
 public class IncidenceApi {
 
-	public static Map<Long, Map<Integer, Double>> getIncidenceEntryGroups(HIFTaskConfig hifTaskConfig, HIFConfig hifConfig, HealthImpactFunctionRecord hifRecord) {
+	public static boolean addIncidenceEntryGroups(HIFTaskConfig hifTaskConfig, HIFConfig hifConfig, HealthImpactFunctionRecord hifRecord, ArrayList<Map<Long, Map<Integer, Double>>> incidenceLists, Map<String, Integer> incidenceCacheMap) {
 
+		Map<Long, Map<Integer, Double>> incidenceMap = new HashMap<Long, Map<Integer, Double>>();
+		
+		//Some functions don't use incidence or prevalence. Just return an empty map for those.
+		if(hifConfig.incidence == null && hifConfig.prevalence == null ) {
+			incidenceLists.add(incidenceMap);
+			return true;
+		}
+		
+		//Build a unique cache key for this incidence/prevalence result set
+		Integer incPrevId = hifConfig.prevalence == null || hifConfig.prevalence == 0 ? hifConfig.incidence : hifConfig.prevalence;
+		Integer incPrevYear = hifConfig.prevalence == null || hifConfig.prevalence == 0 ? hifConfig.incidenceYear : hifConfig.prevalenceYear;
+		
+		// Now, check the incidenceLists to see if we already have data for this function config
+		String cacheKey = incPrevId + "~" + incPrevYear + "~" + hifRecord.getEndpointId() + "~" + hifConfig.startAge + "~" + hifConfig.endAge;
+		
+		if(incidenceCacheMap.containsKey(cacheKey)) {
+			// Just add another reference to this map in the incidenceLists ArrayList
+			incidenceLists.add(incidenceLists.get(incidenceCacheMap.get(cacheKey)));
+			return true;
+		}
+		
+		// We don't already have results for this type of config, so keep track in this lookup map in case another function needs it
+		incidenceCacheMap.put(cacheKey, incidenceLists.size());
+		
 		//Return an average incidence for each population age range for a given hif
 		//TODO: Need to add in handling for race, ethnicity, gender
 		
 		Map<Long, Result<GetIncidenceRecord>> incRecords = Routines.getIncidence(JooqUtil.getJooqConfiguration(), 
-				hifConfig.prevalence == null || hifConfig.prevalence == 0 ? hifConfig.incidence : hifConfig.prevalence,
-				hifConfig.prevalence == null || hifConfig.prevalence == 0 ? hifConfig.incidenceYear : hifConfig.prevalenceYear,
+				incPrevId,
+				incPrevYear,
 				hifRecord.getEndpointId(), 
 				null, 
 				null, 
@@ -47,8 +72,6 @@ public class IncidenceApi {
 		
 		// Get the age groups for the population dataset
 		Result<Record3<Integer, Short, Short>> popAgeRanges = PopulationApi.getPopAgeRanges(hifTaskConfig.popId);
-
-		Map<Long, Map<Integer, Double>> incidenceMap = new HashMap<Long, Map<Integer, Double>>();
 
 		// Build a nested map like <grid_cell_id, <age_group_id, incidence_value>>
 		
@@ -80,7 +103,8 @@ public class IncidenceApi {
 			}
 			incidenceMap.put(cellIncidence.getKey(), incidenceCellMap);
 		}
-		return incidenceMap;
+		incidenceLists.add(incidenceMap);
+		return true;
 	}
 	
 	public static Object getAllIncidenceDatasets(Response response) {

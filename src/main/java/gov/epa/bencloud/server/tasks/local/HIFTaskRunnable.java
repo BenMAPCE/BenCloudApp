@@ -56,19 +56,31 @@ public class HIFTaskRunnable implements Runnable {
 		try {
 			HIFTaskConfig hifTaskConfig = parseTaskParameters(task);
 
+			TaskQueue.updateTaskPercentage(taskUuid, 1, "Loading air quality data");
+			Map<Long, AirQualityCellRecord> baseline = AirQualityApi.getAirQualityLayerMap(hifTaskConfig.aqBaselineId);
+			Map<Long, AirQualityCellRecord> scenario = AirQualityApi.getAirQualityLayerMap(hifTaskConfig.aqScenarioId);
+			
 			ArrayList<Expression> hifFunctionExpressionList = new ArrayList<Expression>();
 			ArrayList<Expression> hifBaselineExpressionList = new ArrayList<Expression>();
 			ArrayList<HealthImpactFunctionRecord> hifDefinitionList = new ArrayList<HealthImpactFunctionRecord>();
+			
+			// incidenceLists contains an array of incidence maps for each HIF
 			ArrayList<Map<Long, Map<Integer, Double>>> incidenceLists = new ArrayList<Map<Long, Map<Integer, Double>>>();
+			
+			// incidenceCachepMap is used inside addIncidenceEntryGroups to avoid querying for datasets we already have
+			Map<String, Integer> incidenceCacheMap = new HashMap<String, Integer>();
+			
 			ArrayList<double[]> hifBetaDistributionLists = new ArrayList<double[]>();
-			
-			TaskQueue.updateTaskPercentage(taskUuid, 1, "Loading incidence data");
-			TaskWorker.updateTaskWorkerHeartbeat(taskWorkerUuid);
-			
+						
 			
 			// Inspect each selected HIF and create parallel lists of math expressions and
 			// HIF config records
+			int idx=1;
 			for (HIFConfig hif : hifTaskConfig.hifs) {
+				TaskQueue.updateTaskPercentage(taskUuid, 2, "Loading incidence for function " + idx++ + " of " + hifTaskConfig.hifs.size());
+				
+				TaskWorker.updateTaskWorkerHeartbeat(taskWorkerUuid);
+
 				Expression[] e = HIFUtil.getFunctionAndBaselineExpression(hif.hifId);
 				hifFunctionExpressionList.add(e[0]);
 				hifBaselineExpressionList.add(e[1]);
@@ -80,8 +92,7 @@ public class HIFTaskRunnable implements Runnable {
 				updateHifConfigValues(hif, h);
 				
 				//This will get the incidence (or prevalence) dataset for the year specified in the hif config
-				Map<Long, Map<Integer, Double>> incidenceMap = IncidenceApi.getIncidenceEntryGroups(hifTaskConfig, hif, h);
-				incidenceLists.add(incidenceMap);
+				boolean ret = IncidenceApi.addIncidenceEntryGroups(hifTaskConfig, hif, h, incidenceLists, incidenceCacheMap);
 				
 				double[] distSamples = getDistributionSamples(h);
 				double[] distBeta = new double[20];
@@ -95,17 +106,14 @@ public class HIFTaskRunnable implements Runnable {
 				
 				hifBetaDistributionLists.add(distBeta);
 			}
-
-			TaskQueue.updateTaskPercentage(taskUuid, 2, "Loading population data");
+			
+			TaskQueue.updateTaskPercentage(taskUuid, 3, "Loading population data");
 			TaskWorker.updateTaskWorkerHeartbeat(taskWorkerUuid);
 			
 			// For each HIF, keep track of which age groups (and what percentage) apply
 			// Hashmap key is the population age range and the value is what percent of that range's population applies to the HIF
 			ArrayList<HashMap<Integer, Double>> hifPopAgeRangeMapping = getPopAgeRangeMapping(hifTaskConfig, hifDefinitionList);
 			
-			Map<Long, AirQualityCellRecord> baseline = AirQualityApi.getAirQualityLayerMap(hifTaskConfig.aqBaselineId);
-			Map<Long, AirQualityCellRecord> scenario = AirQualityApi.getAirQualityLayerMap(hifTaskConfig.aqScenarioId);
-
 			// Load the population dataset
 			Map<Long, Result<GetPopulationRecord>> populationMap = PopulationApi.getPopulationEntryGroups(hifDefinitionList, hifTaskConfig);
 
@@ -125,7 +133,9 @@ public class HIFTaskRunnable implements Runnable {
 			
 			ArrayList<HifResultRecord> hifResults = new ArrayList<HifResultRecord>();
 			mXparser.setToOverrideBuiltinTokens();
+			mXparser.disableUlpRounding();
 			
+
 			/*
 			 * FOR EACH CELL IN THE BASELINE AIR QUALITY SURFACE
 			 */
@@ -155,6 +165,8 @@ public class HIFTaskRunnable implements Runnable {
 				/*
 				 * FOR EACH FUNCTION THE USER SELECTED
 				 */
+				
+				//TODO: Convert this to a parallel loop. Make sure and tell mxparser how many functions we have (setThreadsNumber)
 				for (int hifIdx = 0; hifIdx < hifTaskConfig.hifs.size(); hifIdx++) {
 					Expression hifFunctionExpression = hifFunctionExpressionList.get(hifIdx);
 					Expression hifBaselineExpression = hifBaselineExpressionList.get(hifIdx);
