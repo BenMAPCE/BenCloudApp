@@ -130,7 +130,7 @@ public class ApiUtil {
 			for(ValuationFunctionRecord function : vfDefinitionList) {
 				if(function.getFunctionText().toLowerCase().contains(variableName)) {
 					if(!variableMap.containsKey(variableName)) {
-						variableMap.put(variableName, null);
+						variableMap.put(variableName, new HashMap<Long, Double>());
 					}
 				}
 			}

@@ -15,4 +15,5 @@ public class HIFConfig {
 	public Integer startDay = null;
 	public Integer endDay = null;
 	public Integer totalDays = null;
+	public int arrayIdx = 0;
 }

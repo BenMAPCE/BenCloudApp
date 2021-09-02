@@ -60,19 +60,30 @@ public class ValuationTaskRunnable implements Runnable {
 			
 			ValuationTaskConfig valuationTaskConfig = parseTaskParameters(task);
 
-			//Use the hifTaskUuid (if the result dataset id is null) to determine if valuation is ready to run. If not, return to queue.
+			//Use the hifTaskUuid to wait here until the HIF run is no longer pending
 			String hifTaskStatus = HIFApi.getHIFTaskStatus(valuationTaskConfig.hifTaskUuid);
+			
 			if(hifTaskStatus.equals("pending")) {
 				TaskQueue.updateTaskPercentage(taskUuid, 0, "Waiting for HIF analysis");
-				TaskQueue.returnTaskToQueue(taskUuid);
-				return;
 				
-			} else if(hifTaskStatus.equals("failed")) {
+				// Check again every 10 seconds. Keep the heartbeat updated so the worker doesn't look dead.
+				while(hifTaskStatus.equals("pending")) {
+					Thread.sleep(10000);
+					System.out.println("Valuation task waiting for: " + valuationTaskConfig.name);
+					TaskWorker.updateTaskWorkerHeartbeat(taskWorkerUuid);
+					hifTaskStatus = HIFApi.getHIFTaskStatus(valuationTaskConfig.hifTaskUuid);
+				}
+			}
+				
+			//If the HIF task is failed, let's also fail the valuation task			
+			if(hifTaskStatus.equals("failed")) {
 				TaskComplete.addTaskToCompleteAndRemoveTaskFromQueue(taskUuid, taskWorkerUuid, false, "Associated HIF task failed");
 				return;
 			}
+
+			// If we get here, the HIF task isn't pending or failed, so it must have succeeded
+			TaskQueue.updateTaskPercentage(taskUuid, 1, "Preparing datasets for valuation");
 			
-			//If the HIF task isn't pending or failed, it must be "success" so we can continue
 			valuationTaskConfig.hifResultDatasetId = HIFApi.getHIFResultDatasetId(valuationTaskConfig.hifTaskUuid);
 			
 			if(valuationTaskConfig.hifResultDatasetId == null) {
@@ -272,8 +283,8 @@ public class ValuationTaskRunnable implements Runnable {
 	private void parseFunctions(JsonNode functions, ValuationTaskConfig valuationTaskConfig) {
 		for (JsonNode function : functions) {
 			ValuationConfig valuationConfig = new ValuationConfig();
-			valuationConfig.hifId = function.get("hif_Id").asInt();
-			valuationConfig.vfId = function.get("vf_Id").asInt();
+			valuationConfig.hifId = function.get("hif_id").asInt();
+			valuationConfig.vfId = function.get("vf_id").asInt();
 			valuationTaskConfig.valuationFunctions.add(valuationConfig);
 		}
 	}

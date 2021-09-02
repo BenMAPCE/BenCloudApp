@@ -4,6 +4,7 @@ import static gov.epa.bencloud.server.database.jooq.data.Tables.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Vector;
 
 import org.jooq.DSLContext;
 import org.jooq.Record1;
@@ -69,7 +70,7 @@ public class HIFUtil {
 		return record;
 	}
 	
-	public static void storeResults(Task task, HIFTaskConfig hifTaskConfig, ArrayList<HifResultRecord> hifResults) {
+	public static void storeResults(Task task, HIFTaskConfig hifTaskConfig, Vector<HifResultRecord> hifResults) {
 		DSLContext create = DSL.using(JooqUtil.getJooqConfiguration());
 		
 		// HIF result dataset record links the result dataset id to the task uuid
