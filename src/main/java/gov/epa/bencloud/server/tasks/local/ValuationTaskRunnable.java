@@ -252,9 +252,9 @@ public class ValuationTaskRunnable implements Runnable {
 			JsonNode params = mapper.readTree(paramString);
 
 			valuationTaskConfig.name = task.getName();
-			valuationTaskConfig.hifTaskUuid = params.get("hifTaskUuid").asText();
-			valuationTaskConfig.hifResultDatasetId = params.get("hifResultDatasetId").asInt();
-			valuationTaskConfig.variableDatasetId = params.get("variableDatasetId")==null || params.get("variableDatasetId").isEmpty() ? 1 : params.get("variableDatasetId").asInt();
+			valuationTaskConfig.hifTaskUuid = params.get("hif_task_uuid").asText();
+			valuationTaskConfig.hifResultDatasetId = params.get("hif_result_dataset_id").asInt();
+			valuationTaskConfig.variableDatasetId = params.get("variable_dataset_id")==null || params.get("variable_dataset_id").isEmpty() ? 1 : params.get("variable_dataset_id").asInt();
 
 			JsonNode functions = params.get("functions");
 			parseFunctions(functions, valuationTaskConfig);
@@ -272,8 +272,8 @@ public class ValuationTaskRunnable implements Runnable {
 	private void parseFunctions(JsonNode functions, ValuationTaskConfig valuationTaskConfig) {
 		for (JsonNode function : functions) {
 			ValuationConfig valuationConfig = new ValuationConfig();
-			valuationConfig.hifId = function.get("hifId").asInt();
-			valuationConfig.vfId = function.get("vfId").asInt();
+			valuationConfig.hifId = function.get("hif_Id").asInt();
+			valuationConfig.vfId = function.get("vf_Id").asInt();
 			valuationTaskConfig.valuationFunctions.add(valuationConfig);
 		}
 	}

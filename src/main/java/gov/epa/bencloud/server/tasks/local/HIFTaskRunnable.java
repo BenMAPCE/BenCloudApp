@@ -7,11 +7,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
+
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.distribution.RealDistribution;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jooq.Record3;
-import org.jooq.Record6;
 import org.jooq.Result;
 import org.mariuszgromada.math.mxparser.Expression;
 import org.mariuszgromada.math.mxparser.mXparser;
@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import gov.epa.bencloud.api.AirQualityApi;
 import gov.epa.bencloud.api.IncidenceApi;
 import gov.epa.bencloud.api.PopulationApi;
@@ -377,7 +378,7 @@ public class HIFTaskRunnable implements Runnable {
 
 			ObjectMapper mapper = new ObjectMapper();
 			JsonNode params = mapper.readTree(paramString);
-			JsonNode aqLayers = params.get("airQualityData");
+			JsonNode aqLayers = params.get("air_quality_data");
 
 			hifTaskConfig.name = task.getName();
 
@@ -413,15 +414,15 @@ public class HIFTaskRunnable implements Runnable {
 		for (JsonNode function : functions) {
 			HIFConfig hifConfig = new HIFConfig();
 			hifConfig.hifId = function.get("id").asInt();
-			hifConfig.startAge = function.has("startAge") ? function.get("startAge").asInt() : null;
-			hifConfig.endAge = function.has("endAge") ? function.get("endAge").asInt() : null;
-			hifConfig.race = function.has("race") ? function.get("race").asInt() : null;
-			hifConfig.ethnicity = function.has("ethnicity") ? function.get("ethnicity").asInt() : null;
-			hifConfig.gender = function.has("gender") ? function.get("gender").asInt() : null;
-			hifConfig.incidence = function.has("incidence") ? function.get("incidence").asInt() : null;
-			hifConfig.incidenceYear = function.has("incidenceYear") ? function.get("incidenceYear").asInt() : null;
-			hifConfig.prevalence = function.has("prevalence") ? function.get("prevalence").asInt() : null;
-			hifConfig.prevalenceYear = function.has("prevalenceYear") ? function.get("prevalenceYear").asInt() : null;
+			hifConfig.startAge = function.has("start_age") ? function.get("start_age").asInt() : null;
+			hifConfig.endAge = function.has("end_age") ? function.get("end_age").asInt() : null;
+			hifConfig.race = function.has("race_id") ? function.get("race_id").asInt() : null;
+			hifConfig.ethnicity = function.has("ethnicity_id") ? function.get("ethnicity_id").asInt() : null;
+			hifConfig.gender = function.has("gender_id") ? function.get("gender_id").asInt() : null;
+			hifConfig.incidence = function.has("incidence_dataset_id") ? function.get("incidence_dataset_id").asInt() : null;
+			hifConfig.incidenceYear = function.has("incidence_year") ? function.get("incidence_year").asInt() : null;
+			hifConfig.prevalence = function.has("prevalence_dataset_id") ? function.get("prevalence_dataset_id").asInt() : null;
+			hifConfig.prevalenceYear = function.has("prevalence_year") ? function.get("prevalence_year").asInt() : null;
 			hifConfig.variable = function.has("variable") ? function.get("variable").asInt() : null;
 			hifTaskConfig.hifs.add(hifConfig);
 		}
