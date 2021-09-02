@@ -30,7 +30,7 @@ public class IncidenceApi {
 		Map<Long, Map<Integer, Double>> incidenceMap = new HashMap<Long, Map<Integer, Double>>();
 		
 		//Some functions don't use incidence or prevalence. Just return an empty map for those.
-		if(hifConfig.incidence == null && hifConfig.prevalence == null ) {
+		if((hifConfig.incidence == null || hifConfig.incidence == 0) && (hifConfig.prevalence == null || hifConfig.prevalence == 0)) {
 			incidenceLists.add(incidenceMap);
 			return true;
 		}

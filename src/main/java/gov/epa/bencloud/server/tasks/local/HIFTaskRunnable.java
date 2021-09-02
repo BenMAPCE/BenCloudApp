@@ -231,6 +231,7 @@ public class HIFTaskRunnable implements Runnable {
 
 							hifFunctionExpression.setArgumentValue("BETA", beta);
 							hifFunctionExpression.setArgumentValue("INCIDENCE", incidence);
+							hifFunctionExpression.setArgumentValue("PREVALENCE", incidence);
 							hifFunctionExpression.setArgumentValue("POPULATION", rangePop);
 							hifFunctionEstimate += hifFunctionExpression.calculate() * seasonalScalar;
 							
@@ -240,6 +241,7 @@ public class HIFTaskRunnable implements Runnable {
 							}
 							
 							hifBaselineExpression.setArgumentValue("INCIDENCE", incidence);
+							hifBaselineExpression.setArgumentValue("PREVALENCE", incidence);
 							hifBaselineExpression.setArgumentValue("POPULATION", rangePop);
 							hifBaselineEstimate += hifBaselineExpression.calculate() * seasonalScalar;
 						}
