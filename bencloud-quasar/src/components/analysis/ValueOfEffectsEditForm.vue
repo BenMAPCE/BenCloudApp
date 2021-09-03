@@ -51,7 +51,7 @@
           v-model="valuationFunctionsSelected"
           :options="valuationFunctionsForEndpointGroupId"
           option-value="id"
-          option-label="qualifier"
+          option-label="label"
           use-chips
           multiple
           stack-label

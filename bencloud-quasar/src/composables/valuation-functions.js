@@ -43,13 +43,16 @@ export const loadValuationFunctions = () => {
 }
 
 export const getValuationFunctionsForEndpointGroupId = (records, endpointGroupId) => {
-    console.log("getValuationFunctionsForEndpointGroupId");
-    console.log(records);
-    console.log(endpointGroupId);
+
     var options = [];
 
     for (var i = 0; i < records.length; i++){
         if (records[i].endpoint_group_id === endpointGroupId) {
+            records[i].['label'] = 
+                records[i].endpoint_name + " | " + 
+                records[i].start_age + " - " + 
+                records[i].end_age + " | " + 
+                records[i].qualifier 
             options.push(JSON.parse(JSON.stringify(records[i])))
         }
     }

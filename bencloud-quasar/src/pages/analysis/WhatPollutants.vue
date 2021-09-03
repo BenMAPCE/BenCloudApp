@@ -1,4 +1,5 @@
 <template>
+    <p class="pollutant-header">What pollutant do you want to assess?</p>
   <Suspense>
     <Pollutant></Pollutant>
   </Suspense>
@@ -33,3 +34,10 @@ export default defineComponent({
   //
 });
 </script>
+
+<style scoped>
+  .pollutant-header {
+    font-size: 16px;
+    font-weight: 500
+  }
+</style>

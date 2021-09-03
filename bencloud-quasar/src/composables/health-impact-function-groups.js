@@ -18,19 +18,18 @@ export const loadHealthImpactFunctionGroups = (url) => {
       //var selectedHealthEffects = store.state.analysis.healthEffects;
       //console.log(selectedHealthEffects.length);
 
-
-      var heItems = store.state.analysis.healthEffects
+      var heItems = store.state.analysis.healthEffects;
       var healthEffects = "";
       for (var i = 0; i < heItems.length; i++) {
-          console.log(heItems[i].healthEffectId)
-          healthEffects = healthEffects + heItems[i].healthEffectId + ",";
+        console.log(heItems[i].healthEffectId);
+        healthEffects = healthEffects + heItems[i].healthEffectId + ",";
       }
-/*
+      /*
       var healthEffects = "";
       for (var he = 0; he < selectedHealthEffects.length; he++) {
         healthEffects = healthEffects + selectedHealthEffects[he] + ",";
       }
- */ 
+ */
       console.log("healthEffects: " + healthEffects);
 
       // /health-impact-function-groups/{ids}?incidencePrevalenceDataset=39&popYear=2020&pollutantId=6
@@ -39,13 +38,15 @@ export const loadHealthImpactFunctionGroups = (url) => {
         .get(
           store.state.app.apiServerURL +
             "/api/health-impact-function-groups/" +
-            healthEffects + "?" + 
-            "incidencePrevalenceDataset=" + store.state.analysis.incidenceId + 
-            "&popYear=" + store.state.analysis.populationYear + 
-            "&pollutantId=" + store.state.analysis.pollutantId
-            
-            
-            ,
+            healthEffects +
+            "?" +
+            "incidencePrevalenceDataset=" +
+            store.state.analysis.incidenceId +
+            "&popYear=" +
+            store.state.analysis.populationYear +
+            "&pollutantId=" +
+            store.state.analysis.pollutantId,
+
           {
             params: {},
           }
@@ -80,7 +81,7 @@ export const buildHealthImpactFunctionGroups = (
   var option = {};
   var functions = {};
 
-  var healthImpactFunctions = []
+  var healthImpactFunctions = [];
 
   for (var i = 0; i < records.length; i++) {
     option = {};
@@ -88,9 +89,8 @@ export const buildHealthImpactFunctionGroups = (
     console.log(functions.length);
 
     for (var f = 0; f < functions.length; f++) {
+      healthImpactFunctions.push(functions[f]);
 
-      healthImpactFunctions.push(functions[f])
-      
       option = {};
       option.value = records[i].id;
       option.group_name = records[i].name;
@@ -98,8 +98,9 @@ export const buildHealthImpactFunctionGroups = (
       console.log(functions[f].id);
       option.health_function_id = functions[f].id;
 
-      
       option.endpoint_group_id = functions[f].endpoint_group_id;
+      option.location = functions[f].location;
+      option.endpoint_id = functions[f].endpoint_id;
       option.author_year =
         functions[f].author + " / " + functions[f].function_year;
       option.endpoint_name = functions[f].endpoint_name;
@@ -151,6 +152,12 @@ export const buildHealthImpactFunctionGroups = (
               valuations =
                 valuations +
                 "<p>" +
+                valuationFunctions.value[vf].endpoint_name +
+                " | " +
+                valuationFunctions.value[vf].start_age +
+                " - " +
+                valuationFunctions.value[vf].end_age +
+                " | " +
                 valuationFunctions.value[vf].qualifier +
                 "</p>";
             }
@@ -163,8 +170,10 @@ export const buildHealthImpactFunctionGroups = (
       options.push(option);
       console.log(option);
 
-      store.commit("analysis/updateHealthImpactFunctions", healthImpactFunctions);
-
+      store.commit(
+        "analysis/updateHealthImpactFunctions",
+        healthImpactFunctions
+      );
     }
   }
 

@@ -18,11 +18,16 @@
 
   <q-tab-panels v-model="tab" animated>
     <q-tab-panel name="standard">
-      <div class="text-h6">
+      <div class="header-text">
         Estimate a standard set of health effects
         <span>
           <q-icon name="mdi-information" />
-          <q-tooltip class="bg-yellow text-black" anchor="center right" self="center right" :offset="[100, 0]">
+          <q-tooltip
+            class="bg-grey-11 text-black"
+            anchor="center right"
+            self="center right"
+            :offset="[60, 0]"
+          >
             HELP!
           </q-tooltip>
         </span>
@@ -71,4 +76,10 @@ export default defineComponent({
   align-items: left;
   align-self: left;
 }
+
+.header-text {
+  font-size: 16px;
+  font-weight: 500;
+}
+
 </style>

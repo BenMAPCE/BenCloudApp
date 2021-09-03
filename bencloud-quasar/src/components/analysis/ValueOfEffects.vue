@@ -2,6 +2,7 @@
   <q-table
     :rows="rows"
     :columns="columns"
+    :rows-per-page-options="[0]"
     v-model:pagination="pagination"
     :loading="loading"
     :filter="filter"
@@ -32,11 +33,9 @@
 
     <template v-slot:body-cell-valuation="props">
       <q-td :props="props" class="valuation-column">
-        <div v-html="props.row.valuation" >
-        </div>
+        <div v-html="props.row.valuation"></div>
       </q-td>
     </template>
-
   </q-table>
 </template>
 
@@ -60,9 +59,8 @@ export default defineComponent({
   name: "ValueOfEffects",
 
   async setup(props, context) {
-
-    const valuations = ref("")
-    const trial = ref("")
+    const valuations = ref("");
+    const trial = ref("");
     const $q = useQuasar();
 
     const store = useStore();
@@ -70,20 +68,19 @@ export default defineComponent({
     const valuationFunctions = ref([]);
     const filter = ref("");
     const loading = ref(false);
-    
+
     const pagination = ref({
-      sortBy: "",
-      descending: false,
       page: 1,
-      rowsPerPage: 1000,
-      rowsNumber: 0,
+      rowsPerPage: 0,
     });
-    
+
     const selectedItem = ref(store.state.analysis.incidenceId);
 
     const visibleColumns = [
-      "health_function_id",
-      "endpoint_group_id",
+      //      "health_function_id",
+      //      "endpoint_group_id",
+      //      "endpoint_id",
+      "location",
       "group_name",
       "author_year",
       "endpoint_name",
@@ -102,11 +99,18 @@ export default defineComponent({
         field: "health_function_id",
         sortable: false,
       },
-     {
+      {
         name: "endpoint_group_id",
         align: "left",
         label: "Endpoint Group Id",
         field: "endpoint_group_id",
+        sortable: false,
+      },
+      {
+        name: "endpoint_id",
+        align: "left",
+        label: "Endpoint Id",
+        field: "endpoint_id",
         sortable: false,
       },
       {
@@ -145,6 +149,13 @@ export default defineComponent({
         sortable: true,
       },
       {
+        name: "location",
+        align: "left",
+        label: "Location",
+        field: "location",
+        sortable: true,
+      },
+      {
         name: "incidence_prevalence",
         align: "left",
         label: "Incidence or Prevalence",
@@ -175,7 +186,8 @@ export default defineComponent({
           store.commit("analysis/updateIncidence", {
             incidenceId: currentSelectedItem,
             incidenceName: name,
-          });        }
+          });
+        }
       }
     );
 
@@ -200,8 +212,8 @@ export default defineComponent({
       console.log(valuationFunctionsForEndpointGroupId);
       console.log("------------------");
 
-        console.log("*****")
-        console.log(row.health_function_id)
+      console.log("*****");
+      console.log(row.health_function_id);
       //  console.log(this.getValuationsForHealthFunctionId(row.health_function_id))
       //  var valuationsForHealthFunction = this.getValuationsForHealthFunctionId(row.health_function_id);
 
@@ -209,7 +221,7 @@ export default defineComponent({
         "analysis/getValuationsForHealthFunctionId"
       ](row.health_function_id);
 
-        console.log("*****")
+      console.log("*****");
 
       $q.dialog({
         component: ValueOfEffectsEditForm,
@@ -218,36 +230,39 @@ export default defineComponent({
         componentProps: {
           row: row,
           valuationFunctionsForEndpointGroupId: valuationFunctionsForEndpointGroupId,
-          valuationsSelected: valuationsForHealthFunction
+          valuationsSelected: valuationsForHealthFunction,
         },
       })
         .onOk((valuationFunctionsSelected) => {
           console.log("OK");
-          console.log(row)
+          console.log(row);
           console.log(valuationFunctionsSelected);
 
           var records = JSON.parse(JSON.stringify(valuationFunctionsSelected));
           var valuations = "";
           var valuationIds = [];
-          console.log(records.length)
+          console.log(records.length);
           var valuationDisplay = "";
-          for (var i = 0; i <records.length; i++) {
-            console.log(records[i].qualifier)
-            valuationDisplay = 
-              records[i].endpoint_name + " | " + 
-              records[i].start_age + " - " + 
-              records[i].end_age + " | " + 
-              records[i].qualifier 
+          for (var i = 0; i < records.length; i++) {
+            console.log(records[i].qualifier);
+            valuationDisplay =
+              records[i].endpoint_name +
+              " | " +
+              records[i].start_age +
+              " - " +
+              records[i].end_age +
+              " | " +
+              records[i].qualifier;
 
-            valuations = valuations + "<p>" + valuationDisplay + '</p>';
-            valuationIds.push(records[i].id)
+            valuations = valuations + "<p>" + valuationDisplay + "</p>";
+            valuationIds.push(records[i].id);
           }
-          console.log(valuationIds)
-          console.log(row)
+          console.log(valuationIds);
+          console.log(row);
 
           var payload = {};
-          payload.endpoint_group_id = row.endpoint_group_id
-          payload.health_function_id = row.health_function_id
+          payload.endpoint_group_id = row.endpoint_group_id;
+          payload.health_function_id = row.health_function_id;
           payload.valuation_ids = valuationIds;
 
           store.commit("analysis/updateValuationsForHealthImpactFunctionGroups", payload);
@@ -255,7 +270,7 @@ export default defineComponent({
           //updateValuationsForHealthImpactFunctionGroups(store, row.endpoint_group_id, valuationIds);
 
           row.valuation = valuations;
-          console.log(row.valuation)
+          console.log(row.valuation);
         })
         .onCancel(() => {
           // console.log('Cancel')
@@ -271,7 +286,11 @@ export default defineComponent({
         const response = await loadHealthImpactFunctionGroups().fetch();
         rows.value = response.data.value;
         console.log(rows.value);
-        rows.value = buildHealthImpactFunctionGroups(response.data.value, valuationFunctions, store);
+        rows.value = buildHealthImpactFunctionGroups(
+          response.data.value,
+          valuationFunctions,
+          store
+        );
       })();
 
       (async () => {

@@ -1,3 +1,7 @@
+export function locationId (state) {
+  return state.locationId
+}
+
 export function pollutantId (state) {
     return state.pollutantId
 }

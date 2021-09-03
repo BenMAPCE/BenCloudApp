@@ -12,7 +12,7 @@
           <PopulationYears></PopulationYears>
       </div>
       <div class="row">
-        Step 3. What is the baseline health of the poputaltion exposed?
+        Step 3. What is the baseline health of the population exposed?
       </div>
       <div class="row">
         <Suspense>

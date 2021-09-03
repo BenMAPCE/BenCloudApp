@@ -217,7 +217,7 @@ const columns = [
   {
     name: "grid_col",
     align: "left",
-    label: "Cell",
+    label: "Column",
     field: "grid_col",
     sortable: true,
   },

@@ -47,6 +47,15 @@ const routes = [
       { path: '', component: () => import('src/pages/datacenter/airquality/ManageAirQuality.vue') }
     ]
   },
+
+  {
+    path: '/datacenter/manage-tasks',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('src/pages/datacenter/tasks/ManageTasks.vue') }
+    ]
+  },
+
   // Always leave this as last one,
   // but you can also remove it
   {

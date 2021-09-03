@@ -11,14 +11,42 @@
     <p>Health Effects Ids: {{ this.healthEffectsIds }} </p>
     <p>Health Impact Functions: {{ this.healthImpactFunctions.value }} </p>
 
+   <q-card class="my-card">
+      <q-form @submit="submitTask()" class="q-gutter-md">
+ 
+        <q-input
+          filled
+          dense
+          v-model="taskName"
+          label="Task Name"
+          hint=""
+          lazy-rules
+          :rules="[(val) => (val && val.length > 0) || 'Please enter a Task Name']"
+        />
+
+        <div class="row justify-center">
+          <q-card-actions>
+            <q-btn :disabled="taskName.trim() == ''" color="primary" label="Submit Task" @click="submitTask()" />
+          </q-card-actions>
+        </div>
+      </q-form>
+
+      <q-card-section
+      class="error-card"
+      v-if="this.errorMessage != ''"
+      >
+      {{ this.errorMessage }}
+      </q-card-section>
+    </q-card>
 </template>
 
 <script>
 import { defineComponent } from "vue";
-import { ref, onBeforeMount } from "vue";
+import { ref, onBeforeMount, onMounted, watch } from "vue";
 import { useStore } from "vuex";
 
-import { buildHifTask } from "../../composables/hif-task";
+import { buildHifTaskJSON, submitHifTask } from "../../composables/hif-task";
+import { buildValuationTaskJSON } from "../../composables/valuation-task";
 
 export default defineComponent({
   model: ref(null),
@@ -42,17 +70,32 @@ export default defineComponent({
     const populationDatasetId = store.state.analysis.populationDatasetId
     const populationDatasetName = store.state.analysis.populationDatasetName
     const populationYear = store.state.analysis.populationYear
+    const valuationsForHealthImpactFunctionGroups = store.state.analysis.valuationsForHealthImpactFunctionGroups
+
+    const healthEffects = store.state.analysis.healthEffects
 
     const healthEffectsIds = ref([])
     const healthEffectsNames = ref("")
 
     const healthImpactFunctions = store.state.analysis.healthImpactFunctions
 
-    onBeforeMount(() => {
-      (async () => {
-        console.log("ready to submit");
-        
-        var heItems = JSON.parse(JSON.stringify(store.state.analysis.healthEffects))
+    const taskName = ref("");
+    const errorMessage = ref("");
+
+    var hifTaskId = null;
+
+    watch(
+      () => hifTaskId,
+      (currentHifTaskId, prevHifTaskId) => {
+        if (currentHifTaskId != prevHifTaskId) {v
+          console.log("yes... " + currentHifTaskId)
+        }
+      }
+    );
+
+    function submitTask() {
+
+       var heItems = JSON.parse(JSON.stringify(healthEffects))
         var heItemIds = ""
         var healthEffectsNamesList = ""
 
@@ -63,18 +106,34 @@ export default defineComponent({
         }
         
         healthEffectsIds.value = heItemIds.substring(0, heItemIds.length - 1);
-        console.log(healthEffectsIds.value)
-        //console.log(healthEffectsNamesList)
         healthEffectsNames.value = healthEffectsNamesList.substring(0, healthEffectsNamesList.length - 2)
-        console.log(healthEffectsNames)
+ 
+        var hifTaskJSON = buildHifTaskJSON(taskName.value, store);
+        console.log(JSON.stringify(hifTaskJSON));
+        hifTaskId = submitHifTask(hifTaskJSON, store).fetch();
 
-        console.log(store.state.analysis.healthImpactFunctions)
+    }
 
-        var xyz = await buildHifTask().fetch();
-        console.log("-------------------------------------")
-        console.log(xyz)
-        console.log("-------------------------------------")
+    onMounted(() => {
+      (async () => {
+        // console.log("ready to submit");
+        
+        // var heItems = JSON.parse(JSON.stringify(store.state.analysis.healthEffects))
+        // var heItemIds = ""
+        // var healthEffectsNamesList = ""
 
+        // for (var i = 0; i < heItems.length; i++) {
+        //     console.log(heItems[i].healthEffectId)
+        //     heItemIds = heItemIds + heItems[i].healthEffectId + ","
+        //     healthEffectsNamesList = healthEffectsNamesList + heItems[i].healthEffectName + ", "
+        // }
+        
+        // healthEffectsIds.value = heItemIds.substring(0, heItemIds.length - 1);
+        // healthEffectsNames.value = healthEffectsNamesList.substring(0, healthEffectsNamesList.length - 2)
+ 
+        // var hifTaskJSON = buildHifTaskJSON("Task 001 HIF");
+        // console.log(JSON.stringify(hifTaskJSON));
+        // //hifTaskId = await submitHifTask(hifTaskJSON).fetch();
         
       })();
     });
@@ -93,9 +152,19 @@ export default defineComponent({
       populationYear,
       healthEffectsIds,
       healthEffectsNames,
-      healthImpactFunctions
+      healthImpactFunctions,
+      submitTask,
+      taskName,
+      errorMessage
     }
   }
   
 });
 </script>
+
+<style>
+.my-card {
+  width: 500px;
+}
+
+</style>

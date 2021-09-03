@@ -1,7 +1,7 @@
 <template>
   <q-page>
-
-   <router-link to="/datacenter/manage-air-quality">Manage Air Quality</router-link>
+   <router-link to="/datacenter/manage-air-quality">Manage Air Quality</router-link> | 
+   <router-link to="/datacenter/manage-tasks">Manage Tasks</router-link>
   </q-page>
 </template>
 

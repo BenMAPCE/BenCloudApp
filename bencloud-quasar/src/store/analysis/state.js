@@ -15,6 +15,7 @@ export default function () {
     prePolicyAirQualityName: "",
     postPolicyAirQualityId: null,
     postPolicyAirQualityName: "",
-    valuationsForHealthImpactFunctionGroups: []
+    valuationsForHealthImpactFunctionGroups: [],
+    location
   }
 }

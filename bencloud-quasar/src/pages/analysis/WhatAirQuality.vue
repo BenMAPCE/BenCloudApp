@@ -2,12 +2,14 @@
   <div class="q-ma-md">
     <div class="row">
       <div class="col-4">
+        <p>Step 1. Select your pre-policy air quality data</p>
         <Suspense>
           <AirQualityPrePolicy></AirQualityPrePolicy>
         </Suspense>
       </div>
       <div class="col-4">
-        <Suspense>
+        <p>Step 2. Select your post-policy air quality data</p>
+       <Suspense>
           <AirQualityPostPolicy></AirQualityPostPolicy>
         </Suspense>
       </div>

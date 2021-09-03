@@ -1,3 +1,9 @@
+
+export function updateLocation(state, location) {
+    state.locationId = location.locationId;
+    state.locationName = location.locationName;
+}
+
 export function updatePollutantId (state, pollutantId ) {
     state.pollutantId = pollutantId;
 }
