@@ -7,6 +7,10 @@ public class DataUtil {
 
 	public static String getHumanReadableTime(LocalDateTime start, LocalDateTime end) {
 		
+		if (null == start || null == end) {
+			return "";
+		}
+		
 		long totalSeconds = ChronoUnit.SECONDS.between(start, end);
 		
 		StringBuilder humanReadableTime = new StringBuilder();

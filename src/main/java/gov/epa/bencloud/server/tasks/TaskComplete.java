@@ -111,12 +111,12 @@ public class TaskComplete {
 
         int records = 0;
         
-		if (null != userIdentifier) {
+//		if (null != userIdentifier) {
 
 			try {
 
 				Result<Record> result = DSL.using(JooqUtil.getJooqConfiguration()).select().from(TASK_COMPLETE)
-						.where(TASK_COMPLETE.TASK_USER_IDENTIFIER.eq(userIdentifier))
+						//.where(TASK_COMPLETE.TASK_USER_IDENTIFIER.eq(userIdentifier))
 						.orderBy(TASK_COMPLETE.TASK_COMPLETED_DATE.asc())
 						.fetch();
 
@@ -172,7 +172,7 @@ public class TaskComplete {
 				data.put("error_message", e.getMessage());
 				e.printStackTrace();
 			}
-		}
+//		}
 
 //		System.out.println("--------------------------------------------------");
 //		System.out.println(data.toPrettyString());

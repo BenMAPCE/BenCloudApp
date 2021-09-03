@@ -218,7 +218,7 @@ public class TaskQueue {
 
 	public static ObjectNode getPendingTasks(String userIdentifier, Map<String, String[]> postParameters) {
 
-//		System.out.println("getPendingTasks");
+		System.out.println("getPendingTasks");
 //		System.out.println("userIdentifier: " + userIdentifier);
 
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -232,86 +232,103 @@ public class TaskQueue {
 
 		int records = 0;
 
-		if (null != userIdentifier) {
+//		if (null != userIdentifier) {
 
-			LocalDateTime now = LocalDateTime.now();
 			try {
+				LocalDateTime now = LocalDateTime.now();
+				try {
 
-				Result<Record> result = DSL.using(JooqUtil.getJooqConfiguration()).select().from(TASK_QUEUE)
-						.where(TASK_QUEUE.TASK_USER_IDENTIFIER.eq(userIdentifier))
-						.orderBy(TASK_QUEUE.TASK_SUBMITTED_DATE.asc())
-						.fetch();
+					Result<Record> result = DSL.using(JooqUtil.getJooqConfiguration()).select().from(TASK_QUEUE)
+							//.where(TASK_QUEUE.TASK_USER_IDENTIFIER.eq(userIdentifier))
+							.orderBy(TASK_QUEUE.TASK_SUBMITTED_DATE.asc())
+							.fetch();
 
-				for (Record record : result) {
+					for (Record record : result) {
 
-					task = mapper.createObjectNode();
+						task = mapper.createObjectNode();
 
-					task.put("task_name", record.getValue(TASK_COMPLETE.TASK_NAME));
-					task.put("task_description", record.getValue(TASK_COMPLETE.TASK_DESCRIPTION));
-					task.put("task_uuid", record.getValue(TASK_COMPLETE.TASK_UUID));
-					task.put("task_submitted_date", record.getValue(TASK_COMPLETE.TASK_SUBMITTED_DATE).format(formatter));
-					task.put("task_type", record.getValue(TASK_COMPLETE.TASK_TYPE));
+						task.put("task_name", record.getValue(TASK_COMPLETE.TASK_NAME));
+						task.put("task_description", record.getValue(TASK_COMPLETE.TASK_DESCRIPTION));
+						task.put("task_uuid", record.getValue(TASK_COMPLETE.TASK_UUID));
+						task.put("task_submitted_date", record.getValue(TASK_COMPLETE.TASK_SUBMITTED_DATE).format(formatter));
+						task.put("task_type", record.getValue(TASK_COMPLETE.TASK_TYPE));
 
-					wrappedObject = mapper.createObjectNode();
-
-					if (record.getValue(TASK_QUEUE.TASK_IN_PROCESS)) {
-
-						wrappedObject.put("task_wait_time_display", DataUtil.getHumanReadableTime(
-								record.getValue(TASK_QUEUE.TASK_SUBMITTED_DATE), 
-								record.getValue(TASK_QUEUE.TASK_STARTED_DATE)));
-						wrappedObject.put("task_wait_time_seconds", 
-								ChronoUnit.SECONDS.between(record.getValue(TASK_QUEUE.TASK_SUBMITTED_DATE),
-										record.getValue(TASK_QUEUE.TASK_STARTED_DATE)));
-						task.set("task_wait_time", wrappedObject);
-						
 						wrappedObject = mapper.createObjectNode();
-						wrappedObject.put("task_active_time_display", DataUtil.getHumanReadableTime(
-								record.getValue(TASK_QUEUE.TASK_STARTED_DATE),
-								now));
 
-						wrappedObject.put("task_active_time_seconds", 
-								ChronoUnit.SECONDS.between(
-										record.getValue(TASK_QUEUE.TASK_STARTED_DATE), now));
-						task.set("task_active_time", wrappedObject);
-					} else {
-						wrappedObject.put("task_wait_time_display", DataUtil.getHumanReadableTime(
-								record.getValue(TASK_QUEUE.TASK_SUBMITTED_DATE), 
-								now));
-						wrappedObject.put("task_wait_time_seconds", 
-								ChronoUnit.SECONDS.between(
-										record.getValue(TASK_QUEUE.TASK_SUBMITTED_DATE), now));
-						task.set("task_wait_time", wrappedObject);
-						
-						wrappedObject = mapper.createObjectNode();
-						wrappedObject.put("task_active_time_display", "");
-						wrappedObject.put("task_active_time_seconds", 0);
-						task.set("task_active_time", wrappedObject);
+						if (record.getValue(TASK_QUEUE.TASK_IN_PROCESS)) {
+
+							wrappedObject.put("task_wait_time_display", DataUtil.getHumanReadableTime(
+									record.getValue(TASK_QUEUE.TASK_SUBMITTED_DATE), 
+									record.getValue(TASK_QUEUE.TASK_STARTED_DATE)));
+
+							if (null == record.getValue(TASK_QUEUE.TASK_SUBMITTED_DATE) || null == record.getValue(TASK_QUEUE.TASK_STARTED_DATE)) {
+								wrappedObject.put("task_wait_time_seconds", "");
+							} else {
+								wrappedObject.put("task_wait_time_seconds", 
+										ChronoUnit.SECONDS.between(record.getValue(TASK_QUEUE.TASK_SUBMITTED_DATE),
+												record.getValue(TASK_QUEUE.TASK_STARTED_DATE)));
+							}
+							
+							task.set("task_wait_time", wrappedObject);
+							
+							wrappedObject = mapper.createObjectNode();
+									
+							wrappedObject.put("task_active_time_display", DataUtil.getHumanReadableTime(
+									record.getValue(TASK_QUEUE.TASK_STARTED_DATE),
+									now));
+
+							if (null == record.getValue(TASK_QUEUE.TASK_STARTED_DATE)) {
+								wrappedObject.put("task_active_time_seconds", "");
+
+							} else {
+								wrappedObject.put("task_active_time_seconds", 
+										ChronoUnit.SECONDS.between(
+												record.getValue(TASK_QUEUE.TASK_STARTED_DATE), now));
+							}
+							task.set("task_active_time", wrappedObject);
+						} else {
+							wrappedObject.put("task_wait_time_display", DataUtil.getHumanReadableTime(
+									record.getValue(TASK_QUEUE.TASK_SUBMITTED_DATE), 
+									now));
+							wrappedObject.put("task_wait_time_seconds", 
+									ChronoUnit.SECONDS.between(
+											record.getValue(TASK_QUEUE.TASK_SUBMITTED_DATE), now));
+							task.set("task_wait_time", wrappedObject);
+							
+							wrappedObject = mapper.createObjectNode();
+							wrappedObject.put("task_active_time_display", "");
+							wrappedObject.put("task_active_time_seconds", 0);
+							task.set("task_active_time", wrappedObject);
+						}
+
+						task.put("task_status", record.getValue(TASK_QUEUE.TASK_IN_PROCESS));
+						task.put("task_percentage", record.getValue(TASK_QUEUE.TASK_PERCENTAGE));
+						task.put("task_message", record.getValue(TASK_QUEUE.TASK_MESSAGE));
+
+						tasks.add(task);
+						records++;
+
 					}
 
-					task.put("task_status", record.getValue(TASK_QUEUE.TASK_IN_PROCESS));
-					task.put("task_percentage", record.getValue(TASK_QUEUE.TASK_PERCENTAGE));
-					task.put("task_message", record.getValue(TASK_QUEUE.TASK_MESSAGE));
+					data.set("data", tasks);
+					data.put("success", true);
+					data.put("recordsFiltered", records);
+					data.put("recordsTotal", records);
 
-					tasks.add(task);
-					records++;
-
+				} catch (DataAccessException e) {
+					data.put("success", false);
+					data.put("error_message", e.getMessage());
+					e.printStackTrace();
+				} catch (IllegalArgumentException e) {
+					data.put("success", false);
+					data.put("error_message", e.getMessage());
+					e.printStackTrace();
 				}
-
-				data.set("data", tasks);
-				data.put("success", true);
-				data.put("recordsFiltered", records);
-				data.put("recordsTotal", records);
-
-			} catch (DataAccessException e) {
-				data.put("success", false);
-				data.put("error_message", e.getMessage());
-				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
-				data.put("success", false);
-				data.put("error_message", e.getMessage());
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}
+//		}
 
 //				System.out.println("--------------------------------------------------");
 //				System.out.println(data.toPrettyString());
