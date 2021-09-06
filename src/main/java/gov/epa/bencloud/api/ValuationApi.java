@@ -16,6 +16,8 @@ import org.jooq.Record12;
 import org.jooq.impl.DSL;
 
 import gov.epa.bencloud.server.database.JooqUtil;
+import gov.epa.bencloud.server.tasks.TaskComplete;
+import gov.epa.bencloud.server.util.ApplicationUtil;
 import spark.Request;
 import spark.Response;
 
@@ -56,7 +58,9 @@ public class ValuationApi {
 
 		if (request.headers("Accept").equalsIgnoreCase("text/csv")) {
 			response.type("text/csv");
-			response.header("Content-Disposition", "attachment; filename=ValuationEstimates.csv");
+			String taskFileName = ApplicationUtil.replaceNonValidCharacters(TaskComplete.getTaskFromCompleteRecord(uuid).getName()) + ".csv";
+			response.header("Content-Disposition", "attachment; filename=" + taskFileName);
+
 			try {
 				valuationRecords.formatCSV(response.raw().getWriter());
 			} catch (IOException e) {

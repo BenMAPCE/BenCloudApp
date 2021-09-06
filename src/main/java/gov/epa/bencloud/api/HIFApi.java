@@ -34,6 +34,8 @@ import gov.epa.bencloud.api.util.HIFUtil;
 import gov.epa.bencloud.server.database.JooqUtil;
 import gov.epa.bencloud.server.database.jooq.data.tables.records.HifResultDatasetRecord;
 import gov.epa.bencloud.server.database.jooq.data.tables.records.TaskCompleteRecord;
+import gov.epa.bencloud.server.tasks.TaskComplete;
+import gov.epa.bencloud.server.util.ApplicationUtil;
 import gov.epa.bencloud.server.util.ParameterUtil;
 import spark.Request;
 import spark.Response;
@@ -78,7 +80,8 @@ public class HIFApi {
 
 		if (request.headers("Accept").equalsIgnoreCase("text/csv")) {
 			response.type("text/csv");
-			response.header("Content-Disposition", "attachment; filename=HealthImpactEstimates.csv");
+			String taskFileName = ApplicationUtil.replaceNonValidCharacters(TaskComplete.getTaskFromCompleteRecord(uuid).getName()) + ".csv";
+			response.header("Content-Disposition", "attachment; filename=" + taskFileName);
 			try {
 				hifRecords.formatCSV(response.raw().getWriter());
 			} catch (IOException e) {
