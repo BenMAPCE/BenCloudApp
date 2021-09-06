@@ -149,6 +149,14 @@ public class TaskComplete {
 							ChronoUnit.SECONDS.between(record.getValue(TASK_COMPLETE.TASK_STARTED_DATE),
 									record.getValue(TASK_COMPLETE.TASK_COMPLETED_DATE)));
 					task.set("task_execution_time", wrappedObject);
+
+					task.put("task_elapsed_time", DataUtil.getHumanReadableTime(
+							record.getValue(TASK_COMPLETE.TASK_STARTED_DATE), 
+							record.getValue(TASK_COMPLETE.TASK_COMPLETED_DATE)));
+
+					System.out.println(DataUtil.getHumanReadableTime(
+							record.getValue(TASK_COMPLETE.TASK_STARTED_DATE), 
+							record.getValue(TASK_COMPLETE.TASK_COMPLETED_DATE)));
 					
 					task.put("task_successful", record.getValue(TASK_COMPLETE.TASK_SUCCESSFUL));
 					task.put("task_message", record.getValue(TASK_COMPLETE.TASK_COMPLETE_MESSAGE));

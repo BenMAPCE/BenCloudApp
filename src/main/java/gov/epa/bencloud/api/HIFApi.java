@@ -82,6 +82,7 @@ public class HIFApi {
 			response.type("text/csv");
 			String taskFileName = ApplicationUtil.replaceNonValidCharacters(TaskComplete.getTaskFromCompleteRecord(uuid).getName()) + ".csv";
 			response.header("Content-Disposition", "attachment; filename=" + taskFileName);
+			response.header("Access-Control-Expose-Headers", "Content-Disposition");
 			try {
 				hifRecords.formatCSV(response.raw().getWriter());
 			} catch (IOException e) {

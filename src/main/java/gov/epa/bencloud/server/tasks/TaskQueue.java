@@ -295,6 +295,10 @@ public class TaskQueue {
 											record.getValue(TASK_QUEUE.TASK_SUBMITTED_DATE), now));
 							task.set("task_wait_time", wrappedObject);
 							
+							task.put("task_elapsed_time", DataUtil.getHumanReadableTime(
+									record.getValue(TASK_QUEUE.TASK_SUBMITTED_DATE), 
+									now));
+							
 							wrappedObject = mapper.createObjectNode();
 							wrappedObject.put("task_active_time_display", "");
 							wrappedObject.put("task_active_time_seconds", 0);
