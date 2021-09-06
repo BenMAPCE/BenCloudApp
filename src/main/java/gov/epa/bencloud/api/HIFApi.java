@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import org.jooq.DSLContext;
 import org.jooq.JSONFormat;
 import org.jooq.Result;
+import org.jooq.exception.IOException;
 import org.jooq.JSONFormat.RecordFormat;
 import org.jooq.Record;
 import org.jooq.Record1;
@@ -18,6 +19,7 @@ import org.jooq.Record10;
 import org.jooq.Record12;
 import org.jooq.Record13;
 import org.jooq.Record16;
+import org.jooq.Record18;
 import org.jooq.Record3;
 import org.jooq.Record4;
 import org.jooq.impl.DSL;
@@ -27,6 +29,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import gov.epa.bencloud.api.model.HIFTaskConfig;
+import gov.epa.bencloud.api.util.AirQualityUtil;
 import gov.epa.bencloud.api.util.HIFUtil;
 import gov.epa.bencloud.server.database.JooqUtil;
 import gov.epa.bencloud.server.database.jooq.data.tables.records.HifResultDatasetRecord;
@@ -37,7 +40,7 @@ import spark.Response;
 
 public class HIFApi {
 	
-	public static Object getHifResultDetails(Request request, Response response) {
+	public static void getHifResultDetails(Request request, Response response) {
 		String uuid = request.params("uuid");
 		BigDecimal tmpZero = new BigDecimal(0);
 		
@@ -46,11 +49,13 @@ public class HIFApi {
 		Record1<Integer> id = create.select(HIF_RESULT_DATASET.ID).from(HIF_RESULT_DATASET)
 				.where(HIF_RESULT_DATASET.TASK_UUID.eq(uuid)).fetchOne();
 
-		Result<Record16<Integer, Integer, String, String, Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> hifRecords = create.select(
+		Result<Record18<Integer, Integer, String, String, Integer, String, Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> hifRecords = create.select(
 				HIF_RESULT.GRID_COL.as("column"),
 				HIF_RESULT.GRID_ROW.as("row"),
 				ENDPOINT.NAME.as("endpoint"),
 				HEALTH_IMPACT_FUNCTION.AUTHOR,
+				HEALTH_IMPACT_FUNCTION.FUNCTION_YEAR.as("year"),
+				HEALTH_IMPACT_FUNCTION.LOCATION,
 				HIF_RESULT_FUNCTION_CONFIG.START_AGE,
 				HIF_RESULT_FUNCTION_CONFIG.END_AGE,
 				HIF_RESULT.RESULT.as("point_estimate"),
@@ -73,10 +78,28 @@ public class HIFApi {
 
 		if (request.headers("Accept").equalsIgnoreCase("text/csv")) {
 			response.type("text/csv");
-			return hifRecords.formatCSV();
+			response.header("Content-Disposition", "attachment; filename=HealthImpactEstimates.csv");
+			try {
+				hifRecords.formatCSV(response.raw().getWriter());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (java.io.IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} else {
 			response.type("application/json");
-			return hifRecords.formatJSON(new JSONFormat().header(false).recordFormat(RecordFormat.OBJECT));
+			try {
+				hifRecords.formatJSON(response.raw().getWriter(), new JSONFormat().header(false).recordFormat(RecordFormat.OBJECT));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (java.io.IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
 		}
 	}
 
@@ -158,8 +181,17 @@ public class HIFApi {
 		int popYear = ParameterUtil.getParameterValueAsInteger(request.raw().getParameter("popYear"), 0);
 		int defaultIncidencePrevalenceDataset = ParameterUtil.getParameterValueAsInteger(request.raw().getParameter("incidencePrevalenceDataset"), 0);
 		int pollutantId = ParameterUtil.getParameterValueAsInteger(request.raw().getParameter("pollutantId"), 0);
+		int baselineId = ParameterUtil.getParameterValueAsInteger(request.raw().getParameter("baselineId"), 0);
+		int scenarioId = ParameterUtil.getParameterValueAsInteger(request.raw().getParameter("scenarioId"), 0);
 		
 		List<Integer> ids = Stream.of(idsParam.split(",")).mapToInt(Integer::parseInt).boxed().collect(Collectors.toList());
+		
+		List<Integer> supportedMetricIds = null; 
+		if(baselineId != 0 && scenarioId != 0) {
+			supportedMetricIds = AirQualityUtil.getSupportedMetricIds(baselineId, scenarioId);
+		}
+
+		
 		
 		Result<Record> hifGroupRecords = DSL.using(JooqUtil.getJooqConfiguration())
 				.select(HEALTH_IMPACT_FUNCTION_GROUP.NAME
@@ -181,7 +213,8 @@ public class HIFApi {
 				.join(GENDER).on(HEALTH_IMPACT_FUNCTION.GENDER_ID.eq(GENDER.ID))
 				.join(ETHNICITY).on(HEALTH_IMPACT_FUNCTION.ETHNICITY_ID.eq(ETHNICITY.ID))
 				.where(HEALTH_IMPACT_FUNCTION_GROUP.ID.in(ids)
-						.and(HEALTH_IMPACT_FUNCTION.POLLUTANT_ID.eq(pollutantId)))
+						.and(HEALTH_IMPACT_FUNCTION.POLLUTANT_ID.eq(pollutantId))
+						.and(supportedMetricIds == null ? DSL.noCondition() : HEALTH_IMPACT_FUNCTION.METRIC_ID.in(supportedMetricIds)))
 				.orderBy(HEALTH_IMPACT_FUNCTION_GROUP.NAME)
 				.fetch();
 		

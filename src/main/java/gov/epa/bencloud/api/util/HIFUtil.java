@@ -70,59 +70,79 @@ public class HIFUtil {
 		return record;
 	}
 	
+	/**
+	 * This method supports saving partial datasets to avoid a situation where 
+	 * the complete result set get so large it cannot be kept in memory
+	 * It will only create the dataset and function_config records on the first call
+	 * Subsequent calls will only write the results themselves
+	 * 
+	 * @param task
+	 * @param hifTaskConfig
+	 * @param hifResults
+	 */
 	public static void storeResults(Task task, HIFTaskConfig hifTaskConfig, Vector<HifResultRecord> hifResults) {
 		DSLContext create = DSL.using(JooqUtil.getJooqConfiguration());
 		
-		// HIF result dataset record links the result dataset id to the task uuid
-		HifResultDatasetRecord hifResultDatasetRecord = create.insertInto(
-				HIF_RESULT_DATASET
-				, HIF_RESULT_DATASET.TASK_UUID
-				, HIF_RESULT_DATASET.NAME
-				, HIF_RESULT_DATASET.POPULATION_DATASET_ID
-				, HIF_RESULT_DATASET.POPULATION_YEAR
-				, HIF_RESULT_DATASET.BASELINE_AQ_LAYER_ID
-				, HIF_RESULT_DATASET.SCENARIO_AQ_LAYER_ID
-				)
-		.values(
-				task.getUuid()
-				, hifTaskConfig.name
-				, hifTaskConfig.popId
-				, hifTaskConfig.popYear
-				, hifTaskConfig.aqBaselineId
-				, hifTaskConfig.aqScenarioId)
-		.returning(HIF_RESULT_DATASET.ID)
-		.fetchOne();
+		Integer hifResultDatasetId = create
+				.selectFrom(HIF_RESULT_DATASET)
+				.where(HIF_RESULT_DATASET.TASK_UUID.eq(task.getUuid()))
+				.fetchOne(HIF_RESULT_DATASET.ID);
 		
-		// Each HIF result function config contains the details of how the function was configured
-		for(HIFConfig hif : hifTaskConfig.hifs) {
-			create.insertInto(HIF_RESULT_FUNCTION_CONFIG
-					, HIF_RESULT_FUNCTION_CONFIG.HIF_RESULT_DATASET_ID
-					, HIF_RESULT_FUNCTION_CONFIG.HIF_ID
-					, HIF_RESULT_FUNCTION_CONFIG.START_AGE
-					, HIF_RESULT_FUNCTION_CONFIG.END_AGE
-					, HIF_RESULT_FUNCTION_CONFIG.RACE_ID
-					, HIF_RESULT_FUNCTION_CONFIG.GENDER_ID
-					, HIF_RESULT_FUNCTION_CONFIG.ETHNICITY_ID
-					, HIF_RESULT_FUNCTION_CONFIG.INCIDENCE_DATASET_ID
-					, HIF_RESULT_FUNCTION_CONFIG.PREVALENCE_DATASET_ID
-					, HIF_RESULT_FUNCTION_CONFIG.VARIABLE_DATASET_ID)
-			.values(hifResultDatasetRecord.getId()
-					, hif.hifId
-					, hif.startAge
-					, hif.endAge
-					, hif.race
-					, hif.gender
-					, hif.ethnicity
-					, hif.incidence
-					, hif.prevalence
-					, hif.variable)
-			.execute();
+		// If this is the first call, we need to store the dataset header record and the function_config records
+		if(hifResultDatasetId == null) {	
+			// HIF result dataset record links the result dataset id to the task uuid
+			HifResultDatasetRecord hifResultDatasetRecord = create.insertInto(
+					HIF_RESULT_DATASET
+					, HIF_RESULT_DATASET.TASK_UUID
+					, HIF_RESULT_DATASET.NAME
+					, HIF_RESULT_DATASET.POPULATION_DATASET_ID
+					, HIF_RESULT_DATASET.POPULATION_YEAR
+					, HIF_RESULT_DATASET.BASELINE_AQ_LAYER_ID
+					, HIF_RESULT_DATASET.SCENARIO_AQ_LAYER_ID
+					)
+			.values(
+					task.getUuid()
+					, hifTaskConfig.name
+					, hifTaskConfig.popId
+					, hifTaskConfig.popYear
+					, hifTaskConfig.aqBaselineId
+					, hifTaskConfig.aqScenarioId)
+			.returning(HIF_RESULT_DATASET.ID)
+			.fetchOne();
 			
+			hifResultDatasetId = hifResultDatasetRecord.getId();
+			
+			// Each HIF result function config contains the details of how the function was configured
+			for(HIFConfig hif : hifTaskConfig.hifs) {
+				create.insertInto(HIF_RESULT_FUNCTION_CONFIG
+						, HIF_RESULT_FUNCTION_CONFIG.HIF_RESULT_DATASET_ID
+						, HIF_RESULT_FUNCTION_CONFIG.HIF_ID
+						, HIF_RESULT_FUNCTION_CONFIG.START_AGE
+						, HIF_RESULT_FUNCTION_CONFIG.END_AGE
+						, HIF_RESULT_FUNCTION_CONFIG.RACE_ID
+						, HIF_RESULT_FUNCTION_CONFIG.GENDER_ID
+						, HIF_RESULT_FUNCTION_CONFIG.ETHNICITY_ID
+						, HIF_RESULT_FUNCTION_CONFIG.INCIDENCE_DATASET_ID
+						, HIF_RESULT_FUNCTION_CONFIG.PREVALENCE_DATASET_ID
+						, HIF_RESULT_FUNCTION_CONFIG.VARIABLE_DATASET_ID)
+				.values(hifResultDatasetId
+						, hif.hifId
+						, hif.startAge
+						, hif.endAge
+						, hif.race
+						, hif.gender
+						, hif.ethnicity
+						, hif.incidence
+						, hif.prevalence
+						, hif.variable)
+				.execute();
+				
+			}
 		}
 
 		// Finally, store the actual estimates
 		for(HifResultRecord hifResult : hifResults) {
-			hifResult.setHifResultDatasetId(hifResultDatasetRecord.getId());
+			hifResult.setHifResultDatasetId(hifResultDatasetId);
 		}
 		
 		create

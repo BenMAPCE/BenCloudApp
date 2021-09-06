@@ -79,8 +79,7 @@ public class ApiRoutes extends RoutesBase {
 		service.get("/api/health-impact-function-groups", (request, response) -> {
 			return HIFApi.getAllHifGroups(request, response);
 		});
-		
-		//Supports optional ?pollutantId=:id query string parameter		
+			
 		service.get("/api/health-impact-function-groups/:ids", (request, response) -> {
 			return HIFApi.getSelectedHifGroups(request, response);
 		});
@@ -446,7 +445,9 @@ public class ApiRoutes extends RoutesBase {
 			
 			String bcoUserIdentifier = getOrSetOrExtendCookie(req, res);
 			
-			return ApiUtil.getTaskResultDetails(req, res);
+			ApiUtil.getTaskResultDetails(req, res);
+			
+			return null;
 
 		});
 

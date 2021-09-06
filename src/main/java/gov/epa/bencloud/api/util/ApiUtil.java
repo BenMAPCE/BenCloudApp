@@ -71,20 +71,19 @@ public class ApiUtil {
 		return incomeGrowthFactorRecords;
 	}
 
-	public static Object getTaskResultDetails(Request req, Response res) {
+	public static void getTaskResultDetails(Request req, Response res) {
 		String uuid = req.params("uuid");
 
 		Task task = TaskComplete.getTaskFromCompleteRecord(uuid);
 		switch(task.getType()) {
 		case "HIF":
-			return HIFApi.getHifResultDetails(req, res);
+			HIFApi.getHifResultDetails(req, res);
+			break;
 		case "Valuation":
-			return ValuationApi.getValuationResultDetails(req, res);
-		default:
-				
+			ValuationApi.getValuationResultDetails(req, res);
+			break;
 		}
 		
-		return null;
 	}
 
 	public static Object deleteTaskResults(Request req, Response res) {

@@ -218,7 +218,7 @@ public class TaskQueue {
 
 	public static ObjectNode getPendingTasks(String userIdentifier, Map<String, String[]> postParameters) {
 
-		System.out.println("getPendingTasks");
+		//System.out.println("getPendingTasks");
 //		System.out.println("userIdentifier: " + userIdentifier);
 
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");

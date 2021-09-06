@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -377,9 +378,10 @@ public class AirQualityApi {
 				return "The following columns are missing: " + tmp;
 			}
 			
+			Map<String, Integer> pollutantMetricIdLookup = AirQualityUtil.getPollutantMetricIdLookup(pollutantId);
+			
 			//TODO: Finish creating lookups for these metrics so we can fill them in properly in the insert below
-			//HashMap<String, Integer> pollutantMetricIdLookup = AirQualityUtil.getPollutantMetricIdLookup(pollutantId);
-			//HashMap<String, Integer> seasonalMetricIdLookup = AirQualityUtil.getSeasonalMetricIdLookup(pollutantId);
+			Map<String, Integer> seasonalMetricIdLookup = AirQualityUtil.getSeasonalMetricIdLookup(pollutantId);
 			
 			
 			//TODO: Validate each record and abort before the batch.execute() if there's a problem.
@@ -407,13 +409,31 @@ public class AirQualityApi {
 							);
 			
 			while ((record = csvReader.readNext()) != null) {
+				//Make sure this metric exists in the db. If not, add it and update pollutantMetricIdLookup now 
+				String metricNameLowerCase = record[metricIdx].toLowerCase();
+				
+				if(!pollutantMetricIdLookup.containsKey(metricNameLowerCase ) ) {
+					pollutantMetricIdLookup.put(
+							metricNameLowerCase, 
+							AirQualityUtil.createNewPollutantMetric(pollutantId, record[metricIdx]));
+				}
+				
+				String seasonalMetricLowerCase = metricNameLowerCase + "~" + record[seasonalMetricIdx].toLowerCase();
+				
+				if(!seasonalMetricIdLookup.containsKey(seasonalMetricLowerCase)) {
+					seasonalMetricIdLookup.put(
+							seasonalMetricLowerCase,
+							AirQualityUtil.createNewSeasonalMetric(pollutantMetricIdLookup.get(metricNameLowerCase), record[seasonalMetricIdx]));
+				}
+				
+				// Add a record to the batch
 				batch.values(
 						aqRecord.value1(), 
 						Integer.valueOf(record[columnIdx]), 
 						Integer.valueOf(record[rowIdx]),
 						Long.valueOf(ApiUtil.getCellId(Integer.valueOf(record[columnIdx]), Integer.valueOf(record[rowIdx]))),
-						Integer.valueOf(11), //TODO
-						Integer.valueOf(3), //TODO
+						pollutantMetricIdLookup.get(metricNameLowerCase), 
+						seasonalMetricIdLookup.get(seasonalMetricLowerCase), 
 						record[annualMetricIdx],
 						BigDecimal.valueOf(Double.valueOf(record[valuesIdx]))
 					);

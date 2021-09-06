@@ -8,6 +8,7 @@ import org.jooq.DSLContext;
 import org.jooq.JSONFormat;
 import org.jooq.Result;
 import org.jooq.exception.DataAccessException;
+import org.jooq.exception.IOException;
 import org.jooq.JSONFormat.RecordFormat;
 import org.jooq.Record;
 import org.jooq.Record1;
@@ -20,7 +21,7 @@ import spark.Response;
 
 public class ValuationApi {
 	
-	public static Object getValuationResultDetails(Request request, Response response) {
+	public static void getValuationResultDetails(Request request, Response response) {
 		String uuid = request.params("uuid");
 
 		DSLContext create = DSL.using(JooqUtil.getJooqConfiguration());
@@ -55,10 +56,27 @@ public class ValuationApi {
 
 		if (request.headers("Accept").equalsIgnoreCase("text/csv")) {
 			response.type("text/csv");
-			return valuationRecords.formatCSV();
+			response.header("Content-Disposition", "attachment; filename=ValuationEstimates.csv");
+			try {
+				valuationRecords.formatCSV(response.raw().getWriter());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (java.io.IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} else {
 			response.type("application/json");
-			return valuationRecords.formatJSON(new JSONFormat().header(false).recordFormat(RecordFormat.OBJECT));
+			try {
+				valuationRecords.formatJSON(response.raw().getWriter(), new JSONFormat().header(false).recordFormat(RecordFormat.OBJECT));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (java.io.IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 

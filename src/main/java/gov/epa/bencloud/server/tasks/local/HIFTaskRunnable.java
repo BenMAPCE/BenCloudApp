@@ -53,7 +53,10 @@ public class HIFTaskRunnable implements Runnable {
 	public void run() {
 
 		Task task = TaskQueue.getTaskFromQueueRecord(taskUuid);
-
+		final int maxRowsInMemory = 100000;
+		
+		int rowsSaved = 0;
+		
 		try {
 			HIFTaskConfig hifTaskConfig = parseTaskParameters(task);
 
@@ -133,12 +136,10 @@ public class HIFTaskRunnable implements Runnable {
 			int currentCell = 0;
 			int prevPct = -999;
 			
-			//ArrayList<HifResultRecord> hifResults = new ArrayList<HifResultRecord>();
-			Vector<HifResultRecord> hifResults = new Vector<HifResultRecord>();
-			
+			Vector<HifResultRecord> hifResults = new Vector<HifResultRecord>(maxRowsInMemory);
+			System.out.println("hifResults initial capacity: " + hifResults.capacity());
 			mXparser.setToOverrideBuiltinTokens();
 			mXparser.disableUlpRounding();
-			
 
 			/*
 			 * FOR EACH CELL IN THE BASELINE AIR QUALITY SURFACE
@@ -246,9 +247,9 @@ public class HIFTaskRunnable implements Runnable {
 							hifBaselineEstimate += hifBaselineExpression.calculate() * seasonalScalar;
 						}
 					}
-					//This can happen if we're running multiple functions but we don't have any
-					//of the population ranges that this function wants
-					if(totalPop!=0.0) {
+					// This can happen if we're running multiple functions but we don't have any
+					// of the population ranges that this function wants
+					if (totalPop != 0.0) {
 						HifResultRecord rec = new HifResultRecord();
 						rec.setGridCellId(baselineEntry.getKey());
 						rec.setGridCol(baselineCell.getGridCol());
@@ -259,25 +260,36 @@ public class HIFTaskRunnable implements Runnable {
 						rec.setResult(BigDecimal.valueOf(hifFunctionEstimate));
 						rec.setPct_2_5(BigDecimal.valueOf(resultPercentiles[0]));
 						rec.setPct_97_5(BigDecimal.valueOf(resultPercentiles[19]));
-						
+
 						BigDecimal[] tmp = new BigDecimal[resultPercentiles.length];
-						for(int i=0; i < resultPercentiles.length; i++) {
+						for (int i = 0; i < resultPercentiles.length; i++) {
 							tmp[i] = BigDecimal.valueOf(resultPercentiles[i]);
 						}
 						rec.setPercentiles(tmp);
-						
+
 						DescriptiveStatistics stats = new DescriptiveStatistics();
-						for( int i = 0; i < resultPercentiles.length; i++) {
-					        stats.addValue(resultPercentiles[i]);
+						for (int i = 0; i < resultPercentiles.length; i++) {
+							stats.addValue(resultPercentiles[i]);
 						}
 						rec.setStandardDev(BigDecimal.valueOf(stats.getStandardDeviation()));
 						rec.setResultMean(BigDecimal.valueOf(stats.getMean()));
 						rec.setResultVariance(BigDecimal.valueOf(stats.getVariance()));
 						rec.setBaseline(BigDecimal.valueOf(hifBaselineEstimate));
 
-						hifResults.add(rec);					}
+						hifResults.add(rec);
+						
+					}
 
 				});
+				
+				// Control the size of the results vector by saving partial results along the way
+				if(hifResults.size() > maxRowsInMemory) {
+					rowsSaved += hifResults.size();
+					TaskQueue.updateTaskPercentage(taskUuid, currentPct, "Saving progress...");
+					HIFUtil.storeResults(task, hifTaskConfig, hifResults);
+					hifResults.clear();
+					System.out.println("hifResults capacity after clear: " + hifResults.capacity());
+				}
 				
 				/*
 				for (int hifIdx = 0; hifIdx < hifTaskConfig.hifs.size(); hifIdx++) {
@@ -388,8 +400,8 @@ public class HIFTaskRunnable implements Runnable {
 				}
 				*/
 			}
-			
-			TaskQueue.updateTaskPercentage(taskUuid, 100, "Saving your results");
+			rowsSaved += hifResults.size();
+			TaskQueue.updateTaskPercentage(taskUuid, 100, String.format("Saving %,d results", rowsSaved));
 			TaskWorker.updateTaskWorkerHeartbeat(taskWorkerUuid);
 			HIFUtil.storeResults(task, hifTaskConfig, hifResults);
 
