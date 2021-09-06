@@ -23,9 +23,9 @@ public class TaskManager {
 			TaskQueue.returnTaskToQueue(uuid);
 		} else {
 			
-			// Task task = TaskQueue.getTaskFromQueueRecord(uuid);
+			Task task = TaskQueue.getTaskFromQueueRecord(uuid);
 			
-			// TaskWorker.startTaskWorker(task);
+			TaskWorker.startTaskWorker(task);
 		}
 	}
 }
