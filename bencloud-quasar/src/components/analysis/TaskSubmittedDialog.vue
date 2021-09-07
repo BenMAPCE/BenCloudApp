@@ -8,11 +8,17 @@
           </div>
         </div>
 
+
         <div class="row justify-center">
           <q-card-actions>
             <q-btn color="primary" label="OK" @click="onOKClick()" />
           </q-card-actions>
+
+          <q-card-actions>
+            <q-btn color="primary" label="View your tasks" @click="onDismissClick()" />
+          </q-card-actions>
         </div>
+
       </q-form>
 
       <q-card-section class="error-card" v-if="this.errorMessage != ''">
@@ -40,6 +46,7 @@ export default {
     // REQUIRED
     "ok",
     "hide",
+    "dismiss",
   ],
 
   methods: {
@@ -73,7 +80,14 @@ export default {
       this.hide();
     },
 
-    onSave() {},
+    onDismissClick() {
+      console.log("clicked View Tasks")
+      // required to be emitted
+      // when QDialog emits "hide" event
+      this.$emit("dismiss");
+      this.hide();
+
+    },
 
     onCancelClick() {
       // we just need to hide the dialog

@@ -6,15 +6,15 @@
       <div>{{ this.pollutantFriendlyName }}</div>
     </div>
     <div class="row even choices">
-      <div class="title">PrePolicy</div>
+      <div class="title">Pre-Policy</div>
       <div>{{ this.prePolicyAirQualityName }}</div>
     </div>
     <div class="row odd choices">
-      <div class="title">PostPolicy</div>
+      <div class="title">Post-Policy</div>
       <div>{{ this.postPolicyAirQualityName }}</div>
     </div>
     <div class="row even choices">
-      <div class="title">Pouplation Dataset</div>
+      <div class="title">Population Dataset</div>
       <div>{{ this.populationDatasetName }}</div>
     </div>
     <div class="row odd choices">
@@ -32,7 +32,7 @@
     <div class="row even choices">
       <div class="title">Health Impact Functions</div>
       <div>{{ this.healthImpactFunctions.length }}</div>
-    </div>  
+    </div>
   </q-card>
 
   <div class="row">
@@ -57,15 +57,6 @@
                 label="Submit Task"
                 @click="submitTask()"
               />
-
-              <q-btn
-                :disabled="taskName.trim() != ''"
-                color="secondary"
-                label="View Your Tasks"
-                push
-                @click="$router.replace('/datacenter/manage-tasks')"
-              />
-
             </q-card-actions>
           </div>
         </q-form>
@@ -106,7 +97,6 @@
       </q-card>
     </div>
   </div>
-
 </template>
 
 <script>
@@ -125,7 +115,7 @@ export default defineComponent({
 
   setup(props) {
     const store = useStore();
-        
+
     const $q = useQuasar();
 
     const pollutantValue = ref(null);
@@ -169,8 +159,7 @@ export default defineComponent({
     );
 
     function saveTemplate() {
-      var templateName = ""
-
+      var templateName = "";
     }
 
     function submitTask() {
@@ -193,10 +182,10 @@ export default defineComponent({
 
       var hifTaskJSON = buildHifTaskJSON(taskName.value, store);
       console.log(JSON.stringify(hifTaskJSON));
-      
-    hifTaskId = submitHifTask(hifTaskJSON, store).fetch();
 
-     $q.dialog({
+      hifTaskId = submitHifTask(hifTaskJSON, store).fetch();
+
+      $q.dialog({
         component: TaskSubmittedDialog,
         parent: this,
         persistent: true,
@@ -204,17 +193,18 @@ export default defineComponent({
           taskName: taskName,
         },
       })
-        .onOk((valuationFunctionsSelected) => {
-          console.log("OK");          
-          taskName.value = ""
+        .onOk(() => {
+          console.log("OK");
+          //taskName.value = ""
         })
         .onCancel(() => {
           // console.log('Cancel')
         })
         .onDismiss(() => {
+          console.log("go to view tasks")
+          this.$router.replace('/datacenter/manage-tasks')
           // console.log('I am triggered on both OK and Cancel')
-        });    
-
+        })
     }
 
     onMounted(() => {
@@ -234,7 +224,6 @@ export default defineComponent({
           0,
           healthEffectsNamesList.length - 2
         );
-
       })();
     });
 

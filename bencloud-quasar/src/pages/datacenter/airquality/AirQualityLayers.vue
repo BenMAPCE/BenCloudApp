@@ -105,7 +105,7 @@ export default defineComponent({
       sortBy: "name",
       descending: false,
       page: 1,
-      rowsPerPage: 3,
+      rowsPerPage: 10,
       rowsNumber: 0,
     });
 
@@ -119,7 +119,7 @@ export default defineComponent({
         pagination.value.sortBy = "name";
         pagination.value.descending = false;
         pagination.value.page = 1;
-        pagination.value.rowsPerPage = 3;
+        pagination.value.rowsPerPage = 10;
         pagination.value.rowsNumber = 0;
         console.log("resetting table.....");
         onRequest({

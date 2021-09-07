@@ -28,7 +28,7 @@ export default defineComponent({
         },
       })
         .onOk(() => {
-          // console.log('OK')
+          console.log('Upload AQ OK')
         })
         .onCancel(() => {
           // console.log('Cancel')

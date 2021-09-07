@@ -116,20 +116,25 @@ export const buildHealthImpactFunctionGroups = (
         functions[f].ethnicity_name +
         " / " +
         functions[f].gender_name;
-      if (functions[f].prevalence_dataset_name === null) {
-        option.incidence_prevalence =
-          functions[f].incidence_dataset_name +
-          " (" +
-          functions[f].incidence_year +
-          ")";
+      if (functions[f].prevalence_dataset_name === null && functions[f].incidence_dataset_name === null) {
+        option.incidence_prevalence = ""
       } else {
-        option.incidence_prevalence =
-          functions[f].prevalence_dataset_name +
-          " (" +
-          functions[f].prevalence_year +
-          ")";
+        if (functions[f].prevalence_dataset_name === null) {
+          option.incidence_prevalence =
+            functions[f].incidence_dataset_name +
+            " (" +
+            functions[f].incidence_year +
+            ")";
+        } else {
+          option.incidence_prevalence =
+            functions[f].prevalence_dataset_name +
+            " (" +
+            functions[f].prevalence_year +
+            ")";
+        }
       }
 
+  
       // load valuations
 
       var valuationsForEndpointGroupId =

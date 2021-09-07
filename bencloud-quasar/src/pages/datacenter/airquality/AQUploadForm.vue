@@ -1,61 +1,69 @@
 <template>
-  <q-dialog ref="dialog" @hide="onDialogHide">
-    <q-card class="my-card">
-      <q-form @submit="onSubmit" class="q-gutter-md">
-        <div class="row justify-center">
-          <q-uploader
-            label="Upload your CSV"
-            color="purple"
-            accept=".csv"
-            :max-file-size="20000000"
-            square
-            flat
-            @added="file_selected"
-            bordered
-          />
-        </div>
+  <div class="upload-air-quality">
+    <q-dialog class="upload-air-quality-dialog" ref="dialog" @hide="onDialogHide">
+      <q-card class="upload-card">
+        <q-form @submit="onSubmit" class="q-gutter-md">
+          <div class="row">
+            <div class="col-12">
+              <q-uploader
+                label="Upload your CSV"
+                color="green"
+                accept=".csv"
+                :max-file-size="20000000"
+                square
+                flat
+                @added="file_selected"
+                bordered
+              />
+            </div>
+          </div>
 
-        <q-input
-          filled
-          dense
-          v-model="name"
-          label="Name"
-          hint=""
-          lazy-rules
-          :rules="[(val) => (val && val.length > 0) || 'Please enter a name']"
-        />
+          <div class="row">
+            <div class="col-12">
+              <q-input
+                filled
+                dense
+                v-model="name"
+                label="Name"
+                hint=""
+                lazy-rules
+                :rules="[(val) => (val && val.length > 0) || 'Please enter a name']"
+              />
+            </div>
+          </div>
 
-        <Pollutants @changePollutantValue="onChangePollutantValue">
-        </Pollutants>
+          <div class="row">
+            <div class="col-12">
+              <Pollutants @changePollutantValue="onChangePollutantValue"> </Pollutants>
+            </div>
+          </div>
 
-        <GridDefinitions @changeGridValue="onChangeGridValue"></GridDefinitions>
+          <div class="row">
+            <div class="col-12">
+              <GridDefinitions @changeGridValue="onChangeGridValue"></GridDefinitions>
+            </div>
+          </div>
 
-        <div class="row justify-center">
-          <q-card-actions>
-            <q-btn color="primary" label="Upload" @click="onSubmit" />
-            <q-btn color="primary" label="Cancel" @click="onCancelClick" />
-          </q-card-actions>
-        </div>
-      </q-form>
+          <div class="row justify-center">
+            <q-card-actions>
+              <q-btn color="primary" label="Upload" @click="onSubmit" />
+              <q-btn color="primary" label="Cancel" @click="onCancelClick" />
+            </q-card-actions>
+          </div>
+        </q-form>
 
-      <q-card-section
-      class="error-card"
-      v-if="this.errorMessage != ''"
-      >
-      {{ this.errorMessage }}
-
-
-      </q-card-section>
-    </q-card>
-
-    
-
-  </q-dialog>
+        <q-card-section class="error-card" v-if="this.errorMessage != ''">
+          {{ this.errorMessage }}
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+  </div>
 </template>
 
 <script>
 import Pollutants from "./Pollutants.vue";
 import GridDefinitions from "./GridDefinitions.vue";
+import { useQuasar } from "quasar";
 
 export default {
   data: () => ({
@@ -65,7 +73,7 @@ export default {
     gridValue: 0,
     errorMessage: "",
     name: "",
-    dashData: []
+    dashData: [],
   }),
 
   components: {
@@ -133,25 +141,27 @@ export default {
     },
 
     onSubmit() {
-
       console.log(this.pollutantValue);
       var hasErrors = false;
 
-      if (this.selected_file === '') {
-        this.errorMessage = "No file selected"
+      if (this.selected_file === "") {
+        this.errorMessage = "No file selected";
         hasErrors = true;
       }
-      if (this.name === '') {
-        this.errorMessage = this.errorMessage  + ((hasErrors) ? ', ' : '') + "Name is required"
+      if (this.name === "") {
+        this.errorMessage =
+          this.errorMessage + (hasErrors ? ", " : "") + "Name is required";
         hasErrors = true;
       }
       if (this.pollutantValue === 0) {
-        this.errorMessage = this.errorMessage  + ((hasErrors) ? ', ' : '') + "Pollutant is required"
+        this.errorMessage =
+          this.errorMessage + (hasErrors ? ", " : "") + "Pollutant is required";
         hasErrors = true;
       }
 
       if (this.gridValue === 0) {
-        this.errorMessage = this.errorMessage  + ((hasErrors) ? ', ' : '') + "Grid is required"
+        this.errorMessage =
+          this.errorMessage + (hasErrors ? ", " : "") + "Grid is required";
         hasErrors = true;
       }
 
@@ -165,6 +175,14 @@ export default {
       fileData.append("name", this.name);
       fileData.append("pollutantId", this.pollutantValue);
       fileData.append("gridId", this.gridValue);
+      var self = this;
+
+      this.$q.loading.show({
+        message: "Uploading Air Quality Layer. Please wait...",
+        boxClass: "bg-grey-2 text-grey-9",
+        spinnerColor: "primary",
+      });
+
       var self = this;
       this.$axios
         .post(url, fileData, {
@@ -193,6 +211,11 @@ export default {
             console.log("Error", error.message);
           }
           console.log("FAILURE!!");
+        })
+        .finally(function () {
+          self.$q.loading.hide();
+          self.hide()
+          self.$emit("ok");
         });
     },
 
@@ -225,3 +248,20 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.upload-air-quality {
+  .q-field {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .upload-card {
+    width: 500px;
+  }
+
+  .q-uploader {
+    width: 100%;
+  }
+}
+</style>
