@@ -61,6 +61,8 @@ public class HIFTaskRunnable implements Runnable {
 			HIFTaskConfig hifTaskConfig = parseTaskParameters(task);
 
 			TaskQueue.updateTaskPercentage(taskUuid, 1, "Loading air quality data");
+			//TODO: This will need to change as we start supporting more metrics within a single AQ layer.
+			// Right now, it's assuming one record per cell only. In the future, this should be a map keyed on metric for each cell.
 			Map<Long, AirQualityCellRecord> baseline = AirQualityApi.getAirQualityLayerMap(hifTaskConfig.aqBaselineId);
 			Map<Long, AirQualityCellRecord> scenario = AirQualityApi.getAirQualityLayerMap(hifTaskConfig.aqScenarioId);
 			
@@ -137,7 +139,7 @@ public class HIFTaskRunnable implements Runnable {
 			int prevPct = -999;
 			
 			Vector<HifResultRecord> hifResults = new Vector<HifResultRecord>(maxRowsInMemory);
-			System.out.println("hifResults initial capacity: " + hifResults.capacity());
+			//System.out.println("hifResults initial capacity: " + hifResults.capacity());
 			mXparser.setToOverrideBuiltinTokens();
 			mXparser.disableUlpRounding();
 
@@ -170,9 +172,7 @@ public class HIFTaskRunnable implements Runnable {
 				/*
 				 * FOR EACH FUNCTION THE USER SELECTED
 				 */
-				
-				//TODO: Convert this to a parallel loop. Make sure and tell mxparser how many functions we have (setThreadsNumber)
-				
+							
 				hifTaskConfig.hifs.parallelStream().forEach((hifConfig) -> {
 					Expression hifFunctionExpression = hifFunctionExpressionList.get(hifConfig.arrayIdx);
 					Expression hifBaselineExpression = hifBaselineExpressionList.get(hifConfig.arrayIdx);
@@ -283,12 +283,12 @@ public class HIFTaskRunnable implements Runnable {
 				});
 				
 				// Control the size of the results vector by saving partial results along the way
-				if(hifResults.size() > maxRowsInMemory) {
+				if(hifResults.size() >= maxRowsInMemory) {
 					rowsSaved += hifResults.size();
 					TaskQueue.updateTaskPercentage(taskUuid, currentPct, "Saving progress...");
 					HIFUtil.storeResults(task, hifTaskConfig, hifResults);
 					hifResults.clear();
-					System.out.println("hifResults capacity after clear: " + hifResults.capacity());
+					//System.out.println("hifResults capacity after clear: " + hifResults.capacity());
 				}
 				
 				/*
