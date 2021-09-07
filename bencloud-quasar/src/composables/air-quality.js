@@ -14,7 +14,7 @@ export const loadAirQualityLayers = (url) => {
         try {
 
             const result = await axios
-                .get(store.state.app.apiServerURL + "/api/air-quality-data", {
+                .get(process.env.API_SERVER + "/api/air-quality-data", {
             params: {
                 page: 1,
                 rowsPerPage: 9999999,

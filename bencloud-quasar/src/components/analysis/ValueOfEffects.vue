@@ -154,6 +154,7 @@ export default defineComponent({
         label: "Location",
         field: "location",
         sortable: true,
+        style: "max-width: 250px; white-space: normal;"
       },
       {
         name: "incidence_prevalence",
@@ -339,6 +340,11 @@ export default defineComponent({
 
 .valuation-column {
   width: 350px;
+  white-space: normal;
+}
+
+.location-column {
+  max-width: 250px;
   white-space: normal;
 }
 </style>

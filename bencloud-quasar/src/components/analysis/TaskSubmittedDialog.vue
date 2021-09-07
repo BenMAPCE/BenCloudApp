@@ -1,40 +1,40 @@
 <template>
   <q-dialog ref="dialog" @hide="onDialogHide">
-    <q-card class="q-dialog-plugin">
-      <!--
-        ...content
-        ... use q-card-section for it?
-      -->
-      <div class="q-pa-md" style="max-width: 300px">
-        <q-uploader url= process.env.API_SERVER +
-        "/api/air-quality-data" dark label="Restricted to CSV files" multiple
-        accept="text/csv" @rejected="onRejected" />
-      </div>
+    <q-card class="value-of-effects-edit-card">
+      <q-form class="q-gutter-md">
+        <div class="q-pa-md">
+          <div class="row">
+            <div class="col">Your task {{ taskName.value }} has been submitted</div>
+          </div>
+        </div>
 
-      <!-- buttons example -->
-      <q-card-actions align="right">
-        <q-btn color="primary" label="Done" @click="onCancelClick" />
-      </q-card-actions>
+        <div class="row justify-center">
+          <q-card-actions>
+            <q-btn color="primary" label="OK" @click="onOKClick()" />
+          </q-card-actions>
+        </div>
+      </q-form>
+
+      <q-card-section class="error-card" v-if="this.errorMessage != ''">
+        {{ this.errorMessage }}
+      </q-card-section>
     </q-card>
   </q-dialog>
 </template>
 
 <script>
-
-import { useStore } from "vuex";
-
 export default {
-  props: {
-    // ...your custom props
-    text: {
-      type: String,
-      default: "SSS",
+  data: () => ({
+    errorMessage: "",
+  }),
+
+ props: {
+    taskName: {
+      type: Object,
+      default: null,
     },
   },
-
-  setup(props, context) {
-    const store = useStore();
-  },
+  components: {},
 
   emits: [
     // REQUIRED
@@ -46,6 +46,7 @@ export default {
     // following method is REQUIRED
     // (don't change its name --> "show")
     show() {
+      console.log("^^^^^^^^^^^^^^");
       this.$refs.dialog.show();
     },
 
@@ -71,6 +72,8 @@ export default {
       // then hiding dialog
       this.hide();
     },
+
+    onSave() {},
 
     onCancelClick() {
       // we just need to hide the dialog

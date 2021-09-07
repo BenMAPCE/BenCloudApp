@@ -159,7 +159,7 @@ export default {
         return;
       }
 
-      const url = this.$store.state.app.apiServerURL + "/api/air-quality-data";
+      const url = process.env.API_SERVER + "/api/air-quality-data";
       const fileData = new FormData();
       fileData.append("file", this.selected_file);
       fileData.append("name", this.name);

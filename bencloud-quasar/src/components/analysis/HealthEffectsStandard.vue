@@ -3,8 +3,6 @@
   <div class="q-pa-md">
     <q-option-group :options="rows" type="checkbox" v-model="selectedItems" />
   </div>
-
-  {{ selectedItems }}
 </template>
 
 <script>

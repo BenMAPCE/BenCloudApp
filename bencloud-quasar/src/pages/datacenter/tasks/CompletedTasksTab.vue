@@ -1,45 +1,58 @@
 <template>
-  C
-  <q-table
-    :rows="rows"
-    :columns="columns"
-    row-key="name"
-    v-model:pagination="pagination"
-    :loading="loading"
-    :filter="filter"
-    @request="onRequest"
-    binary-state-sort
-    v-model:selected="selected"
-  >
-    <template v-slot:body="props">
-      <q-tr class="cursor-pointer" :props="props" @click.exact="rowClicked(props)">
-        <q-td v-for="col in props.cols" :key="col.name" :props="props">
-          {{ col.value }}
-        </q-td>
-      </q-tr>
-    </template>
+  <q-page-container>
+    <q-page class="completed-tasks">
+      <q-table
+        :rows="rows"
+        :columns="columns"
+        row-key="name"
+        :rows-per-page-options="[0]"
+        v-model:pagination="pagination"
+        :loading="loading"
+        :filter="filter"
+        @request="getCompletedTasks"
+        binary-state-sort
+        v-model:selected="selected"
+        :visible-columns="visibleColumns"
+      >
+        <template v-slot:top-right>
+          <q-btn
+            color="primary"
+            icon-right="mdi-reload"
+            class="reload-button"
+            label="Reload"
+            no-caps
+            @click="getCompletedTasks"
+          />
 
-    <template v-slot:top-right>
-      <q-input borderless dense debounce="300" v-model="filter" placeholder="Search">
-        <template v-slot:append>
-          <q-icon name="mdi-magnify" />
+          <q-input borderless dense debounce="300" v-model="filter" placeholder="Search">
+            <template v-slot:append>
+              <q-icon name="mdi-magnify" />
+            </template>
+          </q-input>
         </template>
-      </q-input>
-    </template>
 
-    <template v-slot:body-cell-actions="props">
-      <q-td :props="props">
-        <q-btn
-          dense
-          round
-          flat
-          color="grey"
-          @click="deleteRow(props)"
-          icon="mdi-dots-vertical"
-        ></q-btn>
-      </q-td>
-    </template>
-  </q-table>
+        <template v-slot:body-cell-download="props">
+          <q-td :props="props">
+            <q-btn
+              round
+              flat
+              color="grey"
+              @click="exportTaskResults(props)"
+              icon="mdi-table-arrow-down"
+            ></q-btn>
+          </q-td>
+        </template>
+
+        <template v-slot:body-cell-task_successful="props">
+          <q-td :props="props">
+            <div>
+              <q-badge color="green" :label="props.value ? 'Yes' : 'No'" />
+            </div>
+          </q-td>
+        </template>
+      </q-table>
+    </q-page>
+  </q-page-container>
 </template>
 
 <script>
@@ -47,132 +60,93 @@ import { defineComponent } from "vue";
 import { ref, unref, onMounted, watch, watchEffect } from "vue";
 import axios from "axios";
 import { useStore } from "vuex";
+import { useQuasar } from "quasar";
 
 export default defineComponent({
   model: ref(null),
   name: "CompletedTasksTab",
-  computed: {
-    pollutantId() {
-      return this.$store.state.airquality.pollutantId;
-    },
-  },
-
-  methods: {
-    deleteRow(props) {
-      this.noti();
-      // do something
-      this.noti = this.$q.notify({
-        type: "negative",
-        multiline: true,
-        message: `I'll delete row data => ${JSON.stringify(props.row)
-          .split(",")
-          .join(", ")}`,
-        timeout: 2000,
-      });
-    },
-    rowClicked(props) {
-      this.selected = [];
-      this.selected.push(props.row);
-      this.$store.commit("airquality/updateAirQualityLayerId", props.row.id);
-    },
-  },
-
-  data() {
-    return {
-      options: [],
-      value: "",
-      noti: () => {},
-    };
-  },
+  computed: {},
 
   setup(props, context) {
     const store = useStore();
+    const $q = useQuasar();
 
     const rows = ref([]);
     const filter = ref("");
     const loading = ref(false);
     const pagination = ref({
-      sortBy: "name",
-      descending: false,
       page: 1,
-      rowsPerPage: 3,
-      rowsNumber: 0,
+      rowsPerPage: 0,
     });
 
     let myFilter = unref(filter);
 
-    watch(
-      () => store.state.airquality.pollutantId,
-      (pollutantId, prevPollutantId) => {
-        pollutantId = pollutantId;
-        filter.value = "";
-        pagination.value.sortBy = "name";
-        pagination.value.descending = false;
-        pagination.value.page = 1;
-        pagination.value.rowsPerPage = 3;
-        pagination.value.rowsNumber = 0;
-        console.log("resetting table.....");
-        onRequest({
-          filter: "",
-          pagination: pagination.value,
-          rows: [],
-        });
-      }
-    );
-
-    function onRequest(props) {
-      console.log("on onRequest()");
-      loadAirQualityLayers(props);
-    }
-
-    function loadAirQualityLayers(props) {
-      console.log(props.pagination);
-      const { page, rowsPerPage, sortBy, descending } = props.pagination;
-      const filter = props.filter;
-
+    function getCompletedTasks() {
       //console.log("--------------------------------------------")
       //console.log(filter)
       //console.log("--------------------------------------------")
 
       loading.value = true;
 
+      axios.get(process.env.API_SERVER + "/api/tasks/completed", {}).then((response) => {
+        let records = response.data.data;
+        let data = response.data;
+
+        console.log("----- return -----");
+        console.log(records);
+
+        rows.value = records;
+
+        // ...and turn of loading indicator
+        loading.value = false;
+      });
+    }
+
+    function exportTaskResults(props) {
+      console.log("exportTaskResults");
+
+      console.log(props.row.task_uuid);
+
+      loading.value = true;
+
+      $q.loading.show({
+        message: "Downloading results. Please wait...",
+        boxClass: "bg-grey-2 text-grey-9",
+        spinnerColor: "primary",
+      });
+
       axios
-        .get(store.state.app.apiServerURL + "/api/tasks/completed", {
+        .get(process.env.API_SERVER + "/api/tasks/" + props.row.task_uuid + "/results", {
           params: {
-            page: page,
-            rowsPerPage: rowsPerPage,
-            sortBy: sortBy,
-            descending: descending,
-            filter: filter,
+            page: 1,
+            rowsPerPage: 9999999,
           },
+          headers: { Accept: "text/csv", "Content-Type": "text/csv" },
         })
         .then((response) => {
-          let records = response.data.data;
+          let records = response.data.records;
           let data = response.data;
+          //console.log(data);
 
-          console.log("----- return -----");
-          console.log(records);
+          var fileName = response.headers["content-disposition"]
+            .split("filename=")[1]
+            .split(";")[0];
 
-          rows.value = records;
+          var hiddenElement = document.createElement("a");
+          hiddenElement.href = "data:text/csv;charset=utf-8," + encodeURI(data);
+          hiddenElement.target = "_blank";
+          hiddenElement.download = fileName;
+          hiddenElement.click();
+          hiddenElement.remove();
 
-          // don't forget to update local pagination object
-          pagination.value.page = page;
-          pagination.value.rowsPerPage = rowsPerPage;
-          pagination.value.sortBy = sortBy;
-          pagination.value.descending = descending;
-          pagination.value.rowsNumber = data.filteredRecordsCount;
-
-          // ...and turn of loading indicator
           loading.value = false;
+          $q.loading.hide();
         });
     }
 
     onMounted(() => {
-      // get initial data from server (1st page)
-      onRequest({
-        pagination: pagination.value,
-        filter: undefined,
-      });
+      getCompletedTasks();
+      $q.loading.hide();
     });
 
     return {
@@ -182,14 +156,37 @@ export default defineComponent({
       pagination,
       rows,
       selected: ref([]),
-      onRequest,
+      visibleColumns,
+      getCompletedTasks,
+      exportTaskResults,
     };
   },
 });
 
 const rows = [];
 
+const visibleColumns = [
+  // "task_uuid",
+  "task_name",
+  "task_type",
+  //      "task_submitted_date",
+  //      "task_started_date",
+  //      "task_completed_date",
+  "task_elapsed_time",
+  "task_successful",
+  "task_message",
+  "download",
+];
+
 const columns = [
+  {
+    name: "task_uuid",
+    label: "Task UUID",
+    align: "left",
+    field: (row) => row.task_uuid,
+    format: (val) => `${val}`,
+    sortable: true,
+  },
   {
     name: "task_name",
     required: true,
@@ -225,6 +222,12 @@ const columns = [
     sortable: true,
   },
   {
+    name: "task_elapsed_time",
+    label: "Elapsed Time",
+    field: "task_elapsed_time",
+    sortable: true,
+  },
+  {
     name: "task_successful",
     label: "Successful",
     field: "task_successful",
@@ -237,6 +240,27 @@ const columns = [
     sortable: true,
   },
 
-  { name: "actions", label: "", field: "", align: "center" },
+  { name: "download", label: "Download", field: "", align: "center" },
 ];
 </script>
+
+<style lang="scss">
+.completed-tasks {
+  .reload-button {
+    margin-right: 25px;
+  }
+
+  .q-table th {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0px;
+    background-color: grey;
+    z-index: 2;
+    color: white;
+  }
+
+  .q-table__middle.scroll {
+    max-height: 500px;
+  }
+}
+</style>

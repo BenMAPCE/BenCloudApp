@@ -44,7 +44,7 @@ export default defineComponent({
   mounted() {
  
     axios
-      .get(this.$store.state.app.apiServerURL + "/api/grid-definitions")
+      .get(process.env.API_SERVER + "/api/grid-definitions")
       .then((response) => {
         this.options = response.data;
         console.log(response.data);

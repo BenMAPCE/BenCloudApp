@@ -104,7 +104,7 @@ export const submitHifTask = (hifTaskJSON, store) => {
     loading.value = true;
     try {
       const {data:response} = await axios
-        .post(store.state.app.apiServerURL + "/api/tasks", hifTaskJSON)
+        .post(process.env.API_SERVER + "/api/tasks", hifTaskJSON)
         .then((response) => {
           data.value = response.data;
 

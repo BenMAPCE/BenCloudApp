@@ -36,7 +36,7 @@ export const loadHealthImpactFunctionGroups = (url) => {
 
       const result = await axios
         .get(
-          store.state.app.apiServerURL +
+          process.env.API_SERVER +
             "/api/health-impact-function-groups/" +
             healthEffects +
             "?" +
@@ -45,7 +45,11 @@ export const loadHealthImpactFunctionGroups = (url) => {
             "&popYear=" +
             store.state.analysis.populationYear +
             "&pollutantId=" +
-            store.state.analysis.pollutantId,
+            store.state.analysis.pollutantId + 
+            "&baselineId=" +
+            store.state.analysis.prePolicyAirQualityId + 
+            "&scenarioId=" +
+            store.state.analysis.postPolicyAirQualityId,
 
           {
             params: {},

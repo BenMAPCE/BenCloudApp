@@ -25,6 +25,22 @@ const routes = [
   },
 
   {
+    path: '/language',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/Language.vue') }
+    ]
+  },
+  
+  {
+    path: '/feedback',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/Feedback.vue') }
+    ]
+  },
+
+  {
     path: '/analysis',
     component: () => import('layouts/MainLayout.vue'),
     children: [

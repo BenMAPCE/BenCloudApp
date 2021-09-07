@@ -82,7 +82,7 @@
 
 const linksList = [
   {
-    title: 'Home',
+    title: 'Home!',
     caption: 'quasar.dev',
     icon: 'school',
     link: 'https://quasar.dev'

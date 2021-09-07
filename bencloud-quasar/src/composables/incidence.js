@@ -14,7 +14,7 @@ export const loadIncidence = (url) => {
         try {
 
             const result = await axios
-                .get(store.state.app.apiServerURL + "/api/incidence", {
+                .get(process.env.API_SERVER + "/api/incidence", {
             params: {
                   
                 },

@@ -21,10 +21,6 @@
         </div>
       </div>
      </div>
-
-    <div class="q-px-sm">
-      Your selection is: <strong>{{ selectedItem }} / {{ selectedItemFriendlyName }}</strong>
-    </div>
   </div>
 </template>
 

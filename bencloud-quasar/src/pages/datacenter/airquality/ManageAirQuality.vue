@@ -1,7 +1,12 @@
 <template>
   <q-page>
-    <div class="q-pa-md">Manage Air Quality</div>
-
+    <div class="q-pa-md  q-gutter-sm">
+      
+    <div class="row">
+      <div class="col">      
+        Manage Air Quality
+      </div>
+    </div>
     <div class="row">
       <div class="col">
         <Suspense>
@@ -19,6 +24,8 @@
 
     <div class="q-pa-md">
       <AirQualityTabs></AirQualityTabs>
+    </div>
+
     </div>
   </q-page>
 </template>

@@ -10,7 +10,6 @@
           </div>
           
         </q-scroll-area>
-    {{ selectedItem }}
 </template>
 
 <script>

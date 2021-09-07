@@ -14,7 +14,7 @@ export const loadPopulationOptions = (url) => {
         try {
 
             const result = await axios
-                .get(store.state.app.apiServerURL + "/api/population", {
+                .get(process.env.API_SERVER + "/api/population", {
             params: {
                   
                 },

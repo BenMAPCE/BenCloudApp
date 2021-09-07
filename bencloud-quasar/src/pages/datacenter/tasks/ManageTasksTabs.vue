@@ -8,8 +8,8 @@
     align="justify"
     narrow-indicator
   >
-    <q-tab name="active" label="Active Tasks" />
-    <q-tab name="pending" label="Completed Tasks" />
+    <q-tab name="active" class="active" label="Active Tasks" />
+    <q-tab name="pending" class="pending" label="Completed Tasks" />
   </q-tabs>
 
   <q-tab-panels 
@@ -18,13 +18,11 @@
     >
     <q-tab-panel name="active">
       <div class="text-h6">Active Tasks</div>
-      Active View
       <ActiveTasksTab></ActiveTasksTab>
     </q-tab-panel>
 
     <q-tab-panel name="pending">
-      <div class="text-h6">Completed Tasks Go Here</div>
-      Completed View
+      <div class="text-h6">Completed Tasks</div>
       <CompletedTasksTab></CompletedTasksTab>
     </q-tab-panel>
   </q-tab-panels>
@@ -51,8 +49,17 @@ export default defineComponent({
   },
   setup() {
     return {
-      tab: ref("pending"),
+      tab: ref("active"),
     };
   },
 });
 </script>
+
+<style scoped>
+.active,
+.pending {
+  flex: 0 0 auto;
+  align-items: left;
+  align-self: left;
+}
+</style>

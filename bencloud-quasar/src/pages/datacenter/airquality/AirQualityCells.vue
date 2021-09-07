@@ -110,7 +110,7 @@ export default defineComponent({
 
       axios
         .get(
-          store.state.app.apiServerURL + "/api/air-quality-data/" +
+          process.env.API_SERVER + "/api/air-quality-data/" +
             store.state.airquality.airQualityLayerId +
             "/details",
           {
@@ -158,7 +158,7 @@ export default defineComponent({
 
       axios
         .get(
-          store.state.app.apiServerURL + "/api/air-quality-data/" +
+          process.env.API_SERVER + "/api/air-quality-data/" +
             store.state.airquality.airQualityLayerId +
             "/details",
           {

@@ -47,7 +47,7 @@ export const submitValuationTask = (valuationTaskJSON, store) => {
       loading.value = true;
       try {
         const {data:response} = await axios
-          .post(store.state.app.apiServerURL + "/api/tasks", valuationTaskJSON)
+          .post(process.env.API_SERVER + "/api/tasks", valuationTaskJSON)
           .then((response) => {
             data.value = response.data;
             console.log(data.value);

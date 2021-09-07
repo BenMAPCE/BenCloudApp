@@ -16,7 +16,7 @@ export const loadValuationFunctions = () => {
 
             console.log("002")
             const result = await axios
-                .get(store.state.app.apiServerURL + "/api/valuation-functions", {
+                .get(process.env.API_SERVER + "/api/valuation-functions", {
             params: {
                   
                 },

@@ -14,7 +14,7 @@ export const loadHealthEffects = () => {
         try {
 
             const result = await axios
-                .get(store.state.app.apiServerURL + "/api/health-impact-function-groups?pollutantId=" + store.state.analysis.pollutantId, {
+                .get(process.env.API_SERVER + "/api/health-impact-function-groups?pollutantId=" + store.state.analysis.pollutantId, {
             params: {
                   
                 },

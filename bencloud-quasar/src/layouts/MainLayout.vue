@@ -8,17 +8,17 @@
 
         <div>v{{ 0.01 }} beta ({{ environment }})</div>
       </q-toolbar>
-    </q-header>
 
-    <q-page-container>
-      <transition name="hmenu">
+      <transition name="hmenu" class="menu-bar">
         <slot name="h-links">
           <q-list dense padding class="h-nav">
             <AppNavLinks v-for="link in appNavLinks" :key="link.title" v-bind="link" />
           </q-list>
         </slot>
       </transition>
+    </q-header>
 
+    <q-page-container>
       <router-view />
     </q-page-container>
   </q-layout>
@@ -51,7 +51,7 @@ const linksList = [
     title: "Language",
     caption: "",
     icon: "mdi-web",
-    link: "https://quasar.dev",
+    link: "/#/language",
   },
   {
     title: "Help",
@@ -89,10 +89,18 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped>
-.h-nav {
+<style lang="scss">
+.menu-bar {
   display: flex;
   flex-direction: row;
   height: 40px;
+  background-color: black;
+  color: white;
+
+.q-icon {
+    color: #DDD;
+  }
 }
+
+  
 </style>

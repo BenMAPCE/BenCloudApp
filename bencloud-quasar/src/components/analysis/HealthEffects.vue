@@ -28,7 +28,7 @@
             self="center right"
             :offset="[60, 0]"
           >
-            HELP!
+            Some text goes here!
           </q-tooltip>
         </span>
       </div>

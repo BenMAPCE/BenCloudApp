@@ -1,85 +1,160 @@
 <template>
-	  <p>Review And Submit</p>
-    <p>----------------</p>
-    <p>{{ this.pollutantId}} -  {{ this.pollutantFriendlyName}} </p>
-    <p>PrePolicy: {{ this.prePolicyAirQualityId }} -  {{ this.prePolicyAirQualityName }} </p>
-    <p>PostPolicy: {{ this.postPolicyAirQualityId }} -  {{ this.postPolicyAirQualityName }} </p>
-    <p>Pouplation Dataset: {{ this.populationDatasetId}} -  {{ this.populationDatasetName }} </p>
-    <p>Year: {{ this.populationYear}} </p>
-    <p>Incidence: {{ this.incidenceId}} -  {{ this.incidenceName }} </p>
-    <p>Health Effects: {{ this.healthEffectsNames}} </p>
-    <p>Health Effects Ids: {{ this.healthEffectsIds }} </p>
-    <p>Health Impact Functions: {{ this.healthImpactFunctions.value }} </p>
+  <p>Review And Submit</p>
+  <q-card class="choices-card">
+    <div class="row odd choices">
+      <div class="title">Pollutant</div>
+      <div>{{ this.pollutantFriendlyName }}</div>
+    </div>
+    <div class="row even choices">
+      <div class="title">PrePolicy</div>
+      <div>{{ this.prePolicyAirQualityName }}</div>
+    </div>
+    <div class="row odd choices">
+      <div class="title">PostPolicy</div>
+      <div>{{ this.postPolicyAirQualityName }}</div>
+    </div>
+    <div class="row even choices">
+      <div class="title">Pouplation Dataset</div>
+      <div>{{ this.populationDatasetName }}</div>
+    </div>
+    <div class="row odd choices">
+      <div class="title">Year</div>
+      <div>{{ this.populationYear }}</div>
+    </div>
+    <div class="row even choices">
+      <div class="title">Incidence</div>
+      <div>{{ this.incidenceName }}</div>
+    </div>
+    <div class="row odd choices">
+      <div class="title">Health Effects</div>
+      <div>{{ this.healthEffectsNames }}</div>
+    </div>
+    <div class="row even choices">
+      <div class="title">Health Impact Functions</div>
+      <div>{{ this.healthImpactFunctions.length }}</div>
+    </div>  
+  </q-card>
 
-   <q-card class="my-card">
-      <q-form @submit="submitTask()" class="q-gutter-md">
- 
-        <q-input
-          filled
-          dense
-          v-model="taskName"
-          label="Task Name"
-          hint=""
-          lazy-rules
-          :rules="[(val) => (val && val.length > 0) || 'Please enter a Task Name']"
-        />
+  <div class="row">
+    <div class="col-3">
+      <q-card class="my-card">
+        <q-form @submit="submitTask()" class="q-gutter-md">
+          <q-input
+            filled
+            dense
+            v-model="taskName"
+            label="Task Name"
+            hint=""
+            lazy-rules
+            :rules="[(val) => (val && val.length > 0) || 'Please enter a Task Name']"
+          />
 
-        <div class="row justify-center">
-          <q-card-actions>
-            <q-btn :disabled="taskName.trim() == ''" color="primary" label="Submit Task" @click="submitTask()" />
-          </q-card-actions>
-        </div>
-      </q-form>
+          <div class="row justify-center">
+            <q-card-actions>
+              <q-btn
+                :disabled="taskName.trim() == ''"
+                color="primary"
+                label="Submit Task"
+                @click="submitTask()"
+              />
 
-      <q-card-section
-      class="error-card"
-      v-if="this.errorMessage != ''"
-      >
-      {{ this.errorMessage }}
-      </q-card-section>
-    </q-card>
+              <q-btn
+                :disabled="taskName.trim() != ''"
+                color="secondary"
+                label="View Your Tasks"
+                push
+                @click="$router.replace('/datacenter/manage-tasks')"
+              />
+
+            </q-card-actions>
+          </div>
+        </q-form>
+        <q-card-section class="error-card" v-if="this.errorMessage != ''">
+          {{ this.errorMessage }}
+        </q-card-section>
+      </q-card>
+    </div>
+
+    <div class="col-3">
+      <q-card class="save-template-card">
+        <q-form @submit="saveTemplate()" class="q-gutter-md">
+          <q-input
+            filled
+            dense
+            v-model="templateName"
+            label="Template Name"
+            hint=""
+            lazy-rules
+            :rules="[(val) => (val && val.length > 0) || 'Please enter a Template Name']"
+          />
+
+          <div class="row justify-center">
+            <q-card-actions>
+              <q-btn
+                :disabled="templateName.trim() == ''"
+                color="primary"
+                label="Save Template"
+                @click="saveTemplate()"
+              />
+            </q-card-actions>
+          </div>
+        </q-form>
+
+        <q-card-section class="error-card" v-if="this.errorMessage != ''">
+          {{ this.errorMessage }}
+        </q-card-section>
+      </q-card>
+    </div>
+  </div>
+
 </template>
 
 <script>
 import { defineComponent } from "vue";
 import { ref, onBeforeMount, onMounted, watch } from "vue";
 import { useStore } from "vuex";
+import { useQuasar } from "quasar";
 
 import { buildHifTaskJSON, submitHifTask } from "../../composables/hif-task";
 import { buildValuationTaskJSON } from "../../composables/valuation-task";
+import TaskSubmittedDialog from "./TaskSubmittedDialog.vue";
 
 export default defineComponent({
   model: ref(null),
   name: "ReadyToSubmit",
 
   setup(props) {
-    
     const store = useStore();
+        
+    const $q = useQuasar();
+
     const pollutantValue = ref(null);
     const options = ref([]);
 
     const pollutantId = store.state.analysis.pollutantId;
     const pollutantFriendlyName = store.state.analysis.pollutantFriendlyName;
-    const prePolicyAirQualityId = store.state.analysis.prePolicyAirQualityId
-    const prePolicyAirQualityName = store.state.analysis.prePolicyAirQualityName
-    const postPolicyAirQualityId = store.state.analysis.postPolicyAirQualityId
-    const postPolicyAirQualityName = store.state.analysis.postPolicyAirQualityName
+    const prePolicyAirQualityId = store.state.analysis.prePolicyAirQualityId;
+    const prePolicyAirQualityName = store.state.analysis.prePolicyAirQualityName;
+    const postPolicyAirQualityId = store.state.analysis.postPolicyAirQualityId;
+    const postPolicyAirQualityName = store.state.analysis.postPolicyAirQualityName;
 
-    const incidenceId = store.state.analysis.incidenceId
-    const incidenceName = store.state.analysis.incidenceName
-    const populationDatasetId = store.state.analysis.populationDatasetId
-    const populationDatasetName = store.state.analysis.populationDatasetName
-    const populationYear = store.state.analysis.populationYear
-    const valuationsForHealthImpactFunctionGroups = store.state.analysis.valuationsForHealthImpactFunctionGroups
+    const incidenceId = store.state.analysis.incidenceId;
+    const incidenceName = store.state.analysis.incidenceName;
+    const populationDatasetId = store.state.analysis.populationDatasetId;
+    const populationDatasetName = store.state.analysis.populationDatasetName;
+    const populationYear = store.state.analysis.populationYear;
+    const valuationsForHealthImpactFunctionGroups =
+      store.state.analysis.valuationsForHealthImpactFunctionGroups;
 
-    const healthEffects = store.state.analysis.healthEffects
+    const healthEffects = store.state.analysis.healthEffects;
 
-    const healthEffectsIds = ref([])
-    const healthEffectsNames = ref("")
+    const healthEffectsIds = ref([]);
+    const healthEffectsNames = ref("");
 
-    const healthImpactFunctions = store.state.analysis.healthImpactFunctions
+    const healthImpactFunctions = store.state.analysis.healthImpactFunctions;
 
     const taskName = ref("");
+    const templateName = ref("");
     const errorMessage = ref("");
 
     var hifTaskId = null;
@@ -87,54 +162,79 @@ export default defineComponent({
     watch(
       () => hifTaskId,
       (currentHifTaskId, prevHifTaskId) => {
-        if (currentHifTaskId != prevHifTaskId) {v
-          console.log("yes... " + currentHifTaskId)
+        if (currentHifTaskId != prevHifTaskId) {
+          console.log("yes... " + currentHifTaskId);
         }
       }
     );
 
+    function saveTemplate() {
+      var templateName = ""
+
+    }
+
     function submitTask() {
+      var heItems = JSON.parse(JSON.stringify(healthEffects));
+      var heItemIds = "";
+      var healthEffectsNamesList = "";
 
-       var heItems = JSON.parse(JSON.stringify(healthEffects))
-        var heItemIds = ""
-        var healthEffectsNamesList = ""
+      for (var i = 0; i < heItems.length; i++) {
+        console.log(heItems[i].healthEffectId);
+        heItemIds = heItemIds + heItems[i].healthEffectId + ",";
+        healthEffectsNamesList =
+          healthEffectsNamesList + heItems[i].healthEffectName + ", ";
+      }
 
-        for (var i = 0; i < heItems.length; i++) {
-            console.log(heItems[i].healthEffectId)
-            heItemIds = heItemIds + heItems[i].healthEffectId + ","
-            healthEffectsNamesList = healthEffectsNamesList + heItems[i].healthEffectName + ", "
-        }
-        
-        healthEffectsIds.value = heItemIds.substring(0, heItemIds.length - 1);
-        healthEffectsNames.value = healthEffectsNamesList.substring(0, healthEffectsNamesList.length - 2)
- 
-        var hifTaskJSON = buildHifTaskJSON(taskName.value, store);
-        console.log(JSON.stringify(hifTaskJSON));
-        hifTaskId = submitHifTask(hifTaskJSON, store).fetch();
+      healthEffectsIds.value = heItemIds.substring(0, heItemIds.length - 1);
+      healthEffectsNames.value = healthEffectsNamesList.substring(
+        0,
+        healthEffectsNamesList.length - 2
+      );
+
+      var hifTaskJSON = buildHifTaskJSON(taskName.value, store);
+      console.log(JSON.stringify(hifTaskJSON));
+      
+    hifTaskId = submitHifTask(hifTaskJSON, store).fetch();
+
+     $q.dialog({
+        component: TaskSubmittedDialog,
+        parent: this,
+        persistent: true,
+        componentProps: {
+          taskName: taskName,
+        },
+      })
+        .onOk((valuationFunctionsSelected) => {
+          console.log("OK");          
+          taskName.value = ""
+        })
+        .onCancel(() => {
+          // console.log('Cancel')
+        })
+        .onDismiss(() => {
+          // console.log('I am triggered on both OK and Cancel')
+        });    
 
     }
 
     onMounted(() => {
       (async () => {
-        // console.log("ready to submit");
-        
-        // var heItems = JSON.parse(JSON.stringify(store.state.analysis.healthEffects))
-        // var heItemIds = ""
-        // var healthEffectsNamesList = ""
+        var heItems = JSON.parse(JSON.stringify(store.state.analysis.healthEffects));
+        var heItemIds = "";
+        var healthEffectsNamesList = "";
 
-        // for (var i = 0; i < heItems.length; i++) {
-        //     console.log(heItems[i].healthEffectId)
-        //     heItemIds = heItemIds + heItems[i].healthEffectId + ","
-        //     healthEffectsNamesList = healthEffectsNamesList + heItems[i].healthEffectName + ", "
-        // }
-        
-        // healthEffectsIds.value = heItemIds.substring(0, heItemIds.length - 1);
-        // healthEffectsNames.value = healthEffectsNamesList.substring(0, healthEffectsNamesList.length - 2)
- 
-        // var hifTaskJSON = buildHifTaskJSON("Task 001 HIF");
-        // console.log(JSON.stringify(hifTaskJSON));
-        // //hifTaskId = await submitHifTask(hifTaskJSON).fetch();
-        
+        for (var i = 0; i < heItems.length; i++) {
+          console.log(heItems[i].healthEffectId);
+          heItemIds = heItemIds + heItems[i].healthEffectId + ",";
+          healthEffectsNamesList =
+            healthEffectsNamesList + heItems[i].healthEffectName + ", ";
+        }
+
+        healthEffectsNames.value = healthEffectsNamesList.substring(
+          0,
+          healthEffectsNamesList.length - 2
+        );
+
       })();
     });
 
@@ -153,18 +253,42 @@ export default defineComponent({
       healthEffectsIds,
       healthEffectsNames,
       healthImpactFunctions,
+      valuationsForHealthImpactFunctionGroups,
       submitTask,
+      saveTemplate,
       taskName,
-      errorMessage
-    }
-  }
-  
+      templateName,
+      errorMessage,
+    };
+  },
 });
 </script>
 
 <style>
-.my-card {
+.choices-card {
   width: 500px;
+  margin-bottom: 50px;
 }
 
+.save-template-card {
+  width: 500px;
+  margin-left: 25px;
+}
+
+.choices {
+  max-width: 600px;
+  padding: 5px;
+}
+
+.title {
+  width: 200px;
+}
+
+.value {
+  width: 250px;
+}
+
+.even {
+  background-color: #eee;
+}
 </style>

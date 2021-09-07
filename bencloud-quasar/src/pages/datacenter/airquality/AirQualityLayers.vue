@@ -149,7 +149,7 @@ export default defineComponent({
       loading.value = true;
 
       axios
-        .get(store.state.app.apiServerURL + "/api/air-quality-data", {
+        .get(process.env.API_SERVER + "/api/air-quality-data", {
           params: {
             page: page,
             rowsPerPage: rowsPerPage,
