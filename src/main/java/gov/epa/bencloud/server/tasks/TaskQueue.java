@@ -257,52 +257,22 @@ public class TaskQueue {
 
 						if (record.getValue(TASK_QUEUE.TASK_IN_PROCESS)) {
 
-							wrappedObject.put("task_wait_time_display", DataUtil.getHumanReadableTime(
+							task.put("task_wait_time", DataUtil.getHumanReadableTime(
 									record.getValue(TASK_QUEUE.TASK_SUBMITTED_DATE), 
 									record.getValue(TASK_QUEUE.TASK_STARTED_DATE)));
 
-							if (null == record.getValue(TASK_QUEUE.TASK_SUBMITTED_DATE) || null == record.getValue(TASK_QUEUE.TASK_STARTED_DATE)) {
-								wrappedObject.put("task_wait_time_seconds", "");
-							} else {
-								wrappedObject.put("task_wait_time_seconds", 
-										ChronoUnit.SECONDS.between(record.getValue(TASK_QUEUE.TASK_SUBMITTED_DATE),
-												record.getValue(TASK_QUEUE.TASK_STARTED_DATE)));
-							}
-							
-							task.set("task_wait_time", wrappedObject);
-							
-							wrappedObject = mapper.createObjectNode();
-									
-							wrappedObject.put("task_active_time_display", DataUtil.getHumanReadableTime(
-									record.getValue(TASK_QUEUE.TASK_STARTED_DATE),
+							task.put("task_active_time", DataUtil.getHumanReadableTime(
+									record.getValue(TASK_QUEUE.TASK_SUBMITTED_DATE), 
 									now));
 
-							if (null == record.getValue(TASK_QUEUE.TASK_STARTED_DATE)) {
-								wrappedObject.put("task_active_time_seconds", "");
-
-							} else {
-								wrappedObject.put("task_active_time_seconds", 
-										ChronoUnit.SECONDS.between(
-												record.getValue(TASK_QUEUE.TASK_STARTED_DATE), now));
-							}
-							task.set("task_active_time", wrappedObject);
+							task.put("task_started_date", record.getValue(TASK_QUEUE.TASK_SUBMITTED_DATE).format(formatter));
 						} else {
-							wrappedObject.put("task_wait_time_display", DataUtil.getHumanReadableTime(
-									record.getValue(TASK_QUEUE.TASK_SUBMITTED_DATE), 
-									now));
-							wrappedObject.put("task_wait_time_seconds", 
-									ChronoUnit.SECONDS.between(
-											record.getValue(TASK_QUEUE.TASK_SUBMITTED_DATE), now));
-							task.set("task_wait_time", wrappedObject);
-							
-							task.put("task_elapsed_time", DataUtil.getHumanReadableTime(
+							task.put("task_wait_time", DataUtil.getHumanReadableTime(
 									record.getValue(TASK_QUEUE.TASK_SUBMITTED_DATE), 
 									now));
 							
-							wrappedObject = mapper.createObjectNode();
-							wrappedObject.put("task_active_time_display", "");
-							wrappedObject.put("task_active_time_seconds", 0);
-							task.set("task_active_time", wrappedObject);
+							task.put("task_active_time", "");
+							task.put("task_started_date", "");
 						}
 
 						task.put("task_status", record.getValue(TASK_QUEUE.TASK_IN_PROCESS));

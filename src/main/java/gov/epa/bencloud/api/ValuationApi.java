@@ -60,7 +60,8 @@ public class ValuationApi {
 			response.type("text/csv");
 			String taskFileName = ApplicationUtil.replaceNonValidCharacters(TaskComplete.getTaskFromCompleteRecord(uuid).getName()) + ".csv";
 			response.header("Content-Disposition", "attachment; filename=" + taskFileName);
-
+			response.header("Access-Control-Expose-Headers", "Content-Disposition");
+			
 			try {
 				valuationRecords.formatCSV(response.raw().getWriter());
 			} catch (IOException e) {
