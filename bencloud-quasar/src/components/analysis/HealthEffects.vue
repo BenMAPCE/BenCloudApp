@@ -23,12 +23,13 @@
         <span>
           <q-icon name="mdi-information" />
           <q-tooltip
-            class="bg-grey-11 text-black"
+            class="bg-grey-11 text-black tooltip"
             anchor="center right"
             self="center right"
-            :offset="[60, 0]"
+            :offset="[310, 0]"
+            max-width = 300px
           >
-            Some text goes here!
+            {{ heTooltip }}
           </q-tooltip>
         </span>
       </div>
@@ -56,8 +57,11 @@ export default defineComponent({
   },
 
   setup(props, context) {
+
     return {
       tab: ref("standard"),
+      heTooltip: ref("In this mode, you can select health impact functions grouped by the impact type (mortality vs. morbidity) and time scale for impacts. If you wish to select studies either individually or by health endpoint, click on Estimate Individual Effects above.")
+
     };
   },
 });
@@ -80,6 +84,11 @@ export default defineComponent({
 .header-text {
   font-size: 16px;
   font-weight: 500;
+}
+
+.tooltip {
+  width: 300px;
+  max-width: 300px;
 }
 
 </style>

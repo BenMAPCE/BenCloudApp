@@ -1,101 +1,98 @@
 <template>
-  <p>Review And Submit</p>
-  <q-card class="choices-card">
-    <div class="row odd choices">
-      <div class="title">Pollutant</div>
-      <div>{{ this.pollutantFriendlyName }}</div>
+  <div class="review-and-submit">
+    <div class="row">
+      <p>Review And Submit</p>
     </div>
-    <div class="row even choices">
-      <div class="title">Pre-Policy</div>
-      <div>{{ this.prePolicyAirQualityName }}</div>
+    <div class="row">
+      <q-card class="choices-card">
+        <div class="row odd choices">
+          <div class="title">Pollutant</div>
+          <div>{{ this.pollutantFriendlyName }}</div>
+        </div>
+        <div class="row even choices">
+          <div class="title">Pre-Policy</div>
+          <div>{{ this.prePolicyAirQualityName }}</div>
+        </div>
+        <div class="row odd choices">
+          <div class="title">Post-Policy</div>
+          <div>{{ this.postPolicyAirQualityName }}</div>
+        </div>
+        <div class="row even choices">
+          <div class="title">Population Dataset</div>
+          <div>{{ this.populationDatasetName }}</div>
+        </div>
+        <div class="row odd choices">
+          <div class="title">Year</div>
+          <div>{{ this.populationYear }}</div>
+        </div>
+        <div class="row even choices">
+          <div class="title">Incidence</div>
+          <div>{{ this.incidenceName }}</div>
+        </div>
+        <div class="row odd choices">
+          <div class="title">Health Effects</div>
+          <div>{{ this.healthEffectsNames }}</div>
+        </div>
+        <div class="row even choices">
+          <div class="title">Health Impact Functions</div>
+          <div>{{ this.healthImpactFunctions.length }}</div>
+        </div>
+      </q-card>
     </div>
-    <div class="row odd choices">
-      <div class="title">Post-Policy</div>
-      <div>{{ this.postPolicyAirQualityName }}</div>
-    </div>
-    <div class="row even choices">
-      <div class="title">Population Dataset</div>
-      <div>{{ this.populationDatasetName }}</div>
-    </div>
-    <div class="row odd choices">
-      <div class="title">Year</div>
-      <div>{{ this.populationYear }}</div>
-    </div>
-    <div class="row even choices">
-      <div class="title">Incidence</div>
-      <div>{{ this.incidenceName }}</div>
-    </div>
-    <div class="row odd choices">
-      <div class="title">Health Effects</div>
-      <div>{{ this.healthEffectsNames }}</div>
-    </div>
-    <div class="row even choices">
-      <div class="title">Health Impact Functions</div>
-      <div>{{ this.healthImpactFunctions.length }}</div>
-    </div>
-  </q-card>
-
+  </div>
   <div class="row">
     <div class="col-3">
-      <q-card class="my-card">
-        <q-form @submit="submitTask()" class="q-gutter-md">
-          <q-input
-            filled
-            dense
-            v-model="taskName"
-            label="Task Name"
-            hint=""
-            lazy-rules
-            :rules="[(val) => (val && val.length > 0) || 'Please enter a Task Name']"
-          />
-
-          <div class="row justify-center">
-            <q-card-actions>
-              <q-btn
-                :disabled="taskName.trim() == ''"
-                color="primary"
-                label="Submit Task"
-                @click="submitTask()"
-              />
-            </q-card-actions>
-          </div>
-        </q-form>
-        <q-card-section class="error-card" v-if="this.errorMessage != ''">
-          {{ this.errorMessage }}
-        </q-card-section>
-      </q-card>
+      <q-form @submit="submitTask()" class="q-gutter-md">
+        <q-input
+          outlined
+          dense
+          v-model="taskName"
+          label="Enter Task Name"
+          hint=""
+          lazy-rules="ondemand"
+          :rules="[(val) => (val && val.length > 0) || 'Please enter a Task Name']"
+        />
+      </q-form>
     </div>
-
+    <div class="col-2">
+      <div class="save-template-button">
+        <q-btn
+          :disabled="taskName.trim() == ''"
+          color="primary"
+          label="Submit Task"
+          @click="submitTask()"
+        />
+      </div>
+    </div>
+  </div>
+  <div class="row enter-template-row">
     <div class="col-3">
-      <q-card class="save-template-card">
-        <q-form @submit="saveTemplate()" class="q-gutter-md">
-          <q-input
-            filled
-            dense
-            v-model="templateName"
-            label="Template Name"
-            hint=""
-            lazy-rules
-            :rules="[(val) => (val && val.length > 0) || 'Please enter a Template Name']"
-          />
-
-          <div class="row justify-center">
-            <q-card-actions>
-              <q-btn
-                :disabled="templateName.trim() == ''"
-                color="primary"
-                label="Save Template"
-                @click="saveTemplate()"
-              />
-            </q-card-actions>
-          </div>
-        </q-form>
-
-        <q-card-section class="error-card" v-if="this.errorMessage != ''">
-          {{ this.errorMessage }}
-        </q-card-section>
-      </q-card>
+      <q-form @submit="saveTemplate()" class="q-gutter-md">
+        <q-input
+          outlined
+          dense
+          v-model="templateName"
+          label="Enter Template Name"
+          hint=""
+          lazy-rules="ondemand"
+          :rules="[(val) => (val && val.length > 0) || 'Please enter a Template Name']"
+        />
+      </q-form>
     </div>
+    <div class="col-2">
+      <div class="save-template-button">
+        <q-btn
+          :disabled="templateName.trim() == ''"
+          color="primary"
+          label="Save Template"
+          @click="saveTemplate()"
+        />
+      </div>
+    </div>
+
+    <q-card-section class="error-card" v-if="this.errorMessage != ''">
+      {{ this.errorMessage }}
+    </q-card-section>
   </div>
 </template>
 
@@ -201,10 +198,10 @@ export default defineComponent({
           // console.log('Cancel')
         })
         .onDismiss(() => {
-          console.log("go to view tasks")
-          this.$router.replace('/datacenter/manage-tasks')
+          console.log("go to view tasks");
+          this.$router.replace("/datacenter/manage-tasks");
           // console.log('I am triggered on both OK and Cancel')
-        })
+        });
     }
 
     onMounted(() => {
@@ -253,15 +250,19 @@ export default defineComponent({
 });
 </script>
 
-<style>
+<style lang="scss">
+.save-template-button,
+.submit-task-button {
+  margin-left: 25px;
+  padding-top: 2px;
+}
+
+.enter-template-row {
+  margin-top: 10px;
+}
 .choices-card {
   width: 500px;
   margin-bottom: 50px;
-}
-
-.save-template-card {
-  width: 500px;
-  margin-left: 25px;
 }
 
 .choices {
