@@ -1,5 +1,9 @@
 package gov.epa.bencloud.server.tasks.local;
 
+import static gov.epa.bencloud.server.database.jooq.data.Tables.HEALTH_IMPACT_FUNCTION;
+import static gov.epa.bencloud.server.database.jooq.data.Tables.HIF_RESULT;
+import static gov.epa.bencloud.server.database.jooq.data.Tables.HIF_RESULT_FUNCTION_CONFIG;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,6 +20,7 @@ import org.apache.commons.math3.distribution.WeibullDistribution;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jooq.Record13;
 import org.jooq.Record2;
+import org.jooq.Record7;
 import org.jooq.Result;
 import org.mariuszgromada.math.mxparser.Expression;
 import org.mariuszgromada.math.mxparser.mXparser;
@@ -25,10 +30,12 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gov.epa.bencloud.api.HIFApi;
+import gov.epa.bencloud.api.model.HIFConfig;
 import gov.epa.bencloud.api.model.HIFTaskConfig;
 import gov.epa.bencloud.api.model.ValuationConfig;
 import gov.epa.bencloud.api.model.ValuationTaskConfig;
 import gov.epa.bencloud.api.util.ApiUtil;
+import gov.epa.bencloud.api.util.HIFUtil;
 import gov.epa.bencloud.api.util.ValuationUtil;
 import gov.epa.bencloud.server.database.jooq.data.tables.records.ValuationFunctionRecord;
 import gov.epa.bencloud.server.database.jooq.data.tables.records.ValuationResultRecord;
@@ -53,7 +60,10 @@ public class ValuationTaskRunnable implements Runnable {
 	public void run() {
 
 		Task task = TaskQueue.getTaskFromQueueRecord(taskUuid);
-
+		final int maxRowsInMemory = 100000;
+		
+		int rowsSaved = 0;
+		
 		try {
 			TaskQueue.updateTaskPercentage(taskUuid, 1, "Loading datasets");
 			TaskWorker.updateTaskWorkerHeartbeat(taskWorkerUuid);
@@ -95,9 +105,13 @@ public class ValuationTaskRunnable implements Runnable {
 
 			List<ValuationFunctionRecord> vfDefinitionList = new ArrayList<ValuationFunctionRecord>();
 			ArrayList<double[]> vfBetaDistributionLists = new ArrayList<double[]>();
+			ArrayList<Integer> hifIdList = new ArrayList<Integer>();
 			
-			// Inspect each selected valuation function and create parallel lists of math expressions and HIF config records
+			// Inspect each selected valuation function and create parallel lists of math expressions and valuation function config records
 			for (ValuationConfig vfConfig : valuationTaskConfig.valuationFunctions) {
+				if(!hifIdList.contains(vfConfig.hifId)) {
+					hifIdList.add(vfConfig.hifId);
+				}
 				valuationFunctionExpressionList.add(ValuationUtil.getFunctionExpression(vfConfig.vfId));
 				ValuationFunctionRecord vfDefinition = ValuationUtil.getFunctionDefinition(vfConfig.vfId);
 				vfDefinitionList.add(vfDefinition);
@@ -114,134 +128,155 @@ public class ValuationTaskRunnable implements Runnable {
 				vfBetaDistributionLists.add(distBetas);
 			}
 			
+			
 			HIFTaskConfig hifTaskConfig = HIFApi.getHifTaskConfigFromDb(valuationTaskConfig.hifResultDatasetId);
-			Result<Record13<Long, Integer, Integer, Integer, Integer, Integer, Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal[]>> hifResults = HIFApi.getHifResultsForValuation(valuationTaskConfig.hifResultDatasetId);
 
 			int inflationYear = hifTaskConfig.popYear > 2020 ? 2020 : hifTaskConfig.popYear;
-			
 			Map<String, Double> inflationIndices = ApiUtil.getInflationIndices(4, inflationYear);
 			Map<Short, Record2<Short, BigDecimal>> incomeGrowthFactors = ApiUtil.getIncomeGrowthFactors(2, hifTaskConfig.popYear);
 			
 			//<variableName, <gridCellId, value>>
 			Map<String, Map<Long, Double>> variables = ApiUtil.getVariableValues(valuationTaskConfig, vfDefinitionList);
 			
-			int totalCells = hifResults.size();
+			Result<Record7<Long, Integer, Integer, Integer, Integer, BigDecimal, BigDecimal[]>> hifResults = null; //HIFApi.getHifResultsForValuation(valuationTaskConfig.hifResultDatasetId);
+
+			ArrayList<ValuationResultRecord> valuationResults = new ArrayList<ValuationResultRecord>(maxRowsInMemory);
+			mXparser.setToOverrideBuiltinTokens();
+			
+			int totalCells = HIFApi.getHifResultsRecordCount(valuationTaskConfig.hifResultDatasetId, hifIdList);
+			
 			int currentCell = 0;
 			int prevPct = -999;
-
-			ArrayList<ValuationResultRecord> valuationResults = new ArrayList<ValuationResultRecord>();
-			mXparser.setToOverrideBuiltinTokens();
-
+			
 			/*
-			 * FOR EACH ROW IN THE HIF RESULTS
+			 * FOR EACH HEALTH IMPACT FUNCTION IN THE RUN
 			 */
-			for (Record13<Long, Integer, Integer, Integer, Integer, Integer, Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal[]> hifResult : hifResults) {
-				//<	HIF_RESULT.GRID_CELL_ID,HIF_RESULT.GRID_COL,HIF_RESULT.GRID_ROW,HIF_RESULT.HIF_ID,
-				//HEALTH_IMPACT_FUNCTION.ENDPOINT_GROUP_ID,HEALTH_IMPACT_FUNCTION.ENDPOINT_ID,
-				//HIF_RESULT_FUNCTION_CONFIG.START_AGE,HIF_RESULT_FUNCTION_CONFIG.END_AGE,HIF_RESULT.RESULT,HIF_RESULT.POPULATION>
-				// updating task percentage
-				int currentPct = Math.round(currentCell * 100 / totalCells);
-				currentCell++;
+			
+			for(Integer hifId : hifIdList) {
 
-				if (prevPct != currentPct) {
-					TaskQueue.updateTaskPercentage(taskUuid, currentPct, "Running valuation functions");
-					TaskWorker.updateTaskWorkerHeartbeat(taskWorkerUuid);
-					prevPct = currentPct;
-				}
+				hifResults = HIFApi.getHifResultsForValuation(valuationTaskConfig.hifResultDatasetId, hifId);					
 
 				/*
-				 * RUN THE APPROPRIATE VALUATION FUNCTION(S) AND CAPTURE RESULTS
+				 * FOR EACH ROW IN THE HIF RESULTS
 				 */
-				for (int vfIdx = 0; vfIdx < valuationTaskConfig.valuationFunctions.size(); vfIdx++) {
+				for (Record7<Long, Integer, Integer, Integer, Integer, BigDecimal, BigDecimal[]> hifResult : hifResults) {
+					
+					// updating task percentage
+					int currentPct = Math.round(currentCell * 100 / totalCells);
+					currentCell++;
 
-					ValuationConfig vfConfig = valuationTaskConfig.valuationFunctions.get(vfIdx);
-					if (vfConfig.hifId.equals(hifResult.value4())) {
-						Record2<Short, BigDecimal> tmp = incomeGrowthFactors.getOrDefault(hifResult.value5().shortValue(), null);
-						double incomeGrowthFactor = tmp == null ? 1.0 : tmp.value2().doubleValue();
-						
-						double hifEstimate = hifResult.value9().doubleValue();
-						
-						Expression valuationFunctionExpression = valuationFunctionExpressionList.get(vfIdx);
+					if (prevPct != currentPct) {
+						TaskQueue.updateTaskPercentage(taskUuid, currentPct, "Running valuation functions");
+						TaskWorker.updateTaskWorkerHeartbeat(taskWorkerUuid);
+						prevPct = currentPct;
+					}
 
-						ValuationFunctionRecord vfDefinition = vfDefinitionList.get(vfIdx);
-						double[] betaDist = vfBetaDistributionLists.get(vfIdx);
+					/*
+					 * RUN THE APPROPRIATE VALUATION FUNCTION(S) AND CAPTURE RESULTS
+					 */
+					for (int vfIdx = 0; vfIdx < valuationTaskConfig.valuationFunctions.size(); vfIdx++) {
 
-						//If the function uses a variable that was loaded, set the appropriate argument value for this cell
-						for(Entry<String, Map<Long, Double>> variable  : variables.entrySet()) {
-							if(valuationFunctionExpression.getArgument(variable.getKey()) != null) {
-								valuationFunctionExpression.setArgumentValue(variable.getKey(), variable.getValue().getOrDefault(hifResult.value1(), 0.0));		
+						ValuationConfig vfConfig = valuationTaskConfig.valuationFunctions.get(vfIdx);
+						if (vfConfig.hifId.equals(hifResult.get(HIF_RESULT.HIF_ID))) {
+							Record2<Short, BigDecimal> tmp = incomeGrowthFactors.getOrDefault(hifResult.get(HEALTH_IMPACT_FUNCTION.ENDPOINT_GROUP_ID).shortValue(), null);
+							double incomeGrowthFactor = tmp == null ? 1.0 : tmp.value2().doubleValue();
+							
+							double hifEstimate = hifResult.get(HIF_RESULT.RESULT).doubleValue();
+							
+							Expression valuationFunctionExpression = valuationFunctionExpressionList.get(vfIdx);
+
+							ValuationFunctionRecord vfDefinition = vfDefinitionList.get(vfIdx);
+							double[] betaDist = vfBetaDistributionLists.get(vfIdx);
+
+							//If the function uses a variable that was loaded, set the appropriate argument value for this cell
+							for(Entry<String, Map<Long, Double>> variable  : variables.entrySet()) {
+								if(valuationFunctionExpression.getArgument(variable.getKey()) != null) {
+									valuationFunctionExpression.setArgumentValue(variable.getKey(), variable.getValue().getOrDefault(hifResult.get(HIF_RESULT.GRID_CELL_ID), 0.0));		
+								}
 							}
-						}
-						valuationFunctionExpression.setArgumentValue("AllGoodsIndex", inflationIndices.get("AllGoodsIndex"));
-						valuationFunctionExpression.setArgumentValue("MedicalCostIndex", inflationIndices.get("MedicalCostIndex"));
-						valuationFunctionExpression.setArgumentValue("WageIndex", inflationIndices.get("WageIndex"));
+							valuationFunctionExpression.setArgumentValue("AllGoodsIndex", inflationIndices.get("AllGoodsIndex"));
+							valuationFunctionExpression.setArgumentValue("MedicalCostIndex", inflationIndices.get("MedicalCostIndex"));
+							valuationFunctionExpression.setArgumentValue("WageIndex", inflationIndices.get("WageIndex"));
 
-						double valuationFunctionEstimate = valuationFunctionExpression.calculate();
-						valuationFunctionEstimate = valuationFunctionEstimate * incomeGrowthFactor * hifEstimate;
-						
-						DescriptiveStatistics distStats = new DescriptiveStatistics();
-						BigDecimal[] hifPercentiles = hifResult.value13();
-						
-						for(int hifPctIdx=0; hifPctIdx < hifPercentiles.length; hifPctIdx++) {
-							for(int betaIdx=0; betaIdx < betaDist.length; betaIdx++) {
-								//valuation estimate * hif percentiles * betaDist / hif point estimate * A
-								if(vfDefinition.getValA() == null || vfDefinition.getValA().doubleValue() == 0.0) {
-									distStats.addValue(valuationFunctionEstimate * hifPercentiles[hifPctIdx].doubleValue() / hifEstimate);
-									
+							double valuationFunctionEstimate = valuationFunctionExpression.calculate();
+							valuationFunctionEstimate = valuationFunctionEstimate * incomeGrowthFactor * hifEstimate;
+							
+							DescriptiveStatistics distStats = new DescriptiveStatistics();
+							BigDecimal[] hifPercentiles = hifResult.get(HIF_RESULT.PERCENTILES);
+							
+							for(int hifPctIdx=0; hifPctIdx < hifPercentiles.length; hifPctIdx++) {
+								for(int betaIdx=0; betaIdx < betaDist.length; betaIdx++) {
+									//valuation estimate * hif percentiles * betaDist / hif point estimate * A
+									if(vfDefinition.getValA() == null || vfDefinition.getValA().doubleValue() == 0.0) {
+										distStats.addValue(valuationFunctionEstimate * hifPercentiles[hifPctIdx].doubleValue() / hifEstimate);
+										
+									} else {
+										distStats.addValue(valuationFunctionEstimate * hifPercentiles[hifPctIdx].doubleValue() * betaDist[betaIdx] / (hifEstimate * vfDefinition.getValA().doubleValue()));			
+									}
+								}
+							}
+							
+							ValuationResultRecord rec = new ValuationResultRecord();
+							rec.setGridCellId(hifResult.get(HIF_RESULT.GRID_CELL_ID));
+							rec.setGridCol(hifResult.get(HIF_RESULT.GRID_COL));
+							rec.setGridRow(hifResult.get(HIF_RESULT.GRID_ROW));
+							rec.setHifId(vfConfig.hifId);
+							rec.setVfId(vfConfig.vfId);
+
+							rec.setResult(BigDecimal.valueOf(valuationFunctionEstimate));
+							try {
+
+								if (valuationFunctionEstimate == 0.0) {
+
 								} else {
-									distStats.addValue(valuationFunctionEstimate * hifPercentiles[hifPctIdx].doubleValue() * betaDist[betaIdx] / (hifEstimate * vfDefinition.getValA().doubleValue()));			
+
+									double[] percentiles = new double[100];
+
+									double[] distValues = distStats.getSortedValues();
+									int idxMedian = distValues.length / percentiles.length / 2; // the median of the first segment
+									DescriptiveStatistics statsPercentiles = new DescriptiveStatistics();
+									for (int i = 0; i < percentiles.length; i++) {
+										// Grab the median from each of the 100 slices of distStats
+										percentiles[i] = (distValues[idxMedian] + distValues[idxMedian - 1]) / 2.0;
+										statsPercentiles.addValue(percentiles[i]);
+										idxMedian += distValues.length / percentiles.length;
+									}
+									rec.setPct_2_5(  BigDecimal.valueOf((percentiles[1] + percentiles[2]) / 2.0));
+									rec.setPct_97_5(BigDecimal.valueOf((percentiles[96] + percentiles[97]) / 2.0));
+									rec.setStandardDev(BigDecimal.valueOf(statsPercentiles.getStandardDeviation()));
+									rec.setResultMean(BigDecimal.valueOf(statsPercentiles.getMean()));
+									rec.setResultVariance(BigDecimal.valueOf(statsPercentiles.getVariance()));
 								}
+							} catch (Exception e) {
+								rec.setPct_2_5(BigDecimal.valueOf(0.0));
+								rec.setPct_97_5(BigDecimal.valueOf(0.0));
+								rec.setStandardDev(BigDecimal.valueOf(0.0));
+								rec.setResultMean(BigDecimal.valueOf(0.0));
+								rec.setResultVariance(BigDecimal.valueOf(0.0));
+								e.printStackTrace();
+							}
+
+
+							
+							valuationResults.add(rec);
+
+							// Control the size of the results vector by saving partial results along the way
+							if(valuationResults.size() >= maxRowsInMemory) {
+								rowsSaved += valuationResults.size();
+								TaskQueue.updateTaskPercentage(taskUuid, currentPct, "Saving progress...");
+								ValuationUtil.storeResults(task, valuationTaskConfig, valuationResults);
+								valuationResults.clear();
 							}
 						}
-						
-						ValuationResultRecord rec = new ValuationResultRecord();
-						rec.setGridCellId(hifResult.value1());
-						rec.setGridCol(hifResult.value2());
-						rec.setGridRow(hifResult.value3());
-						rec.setHifId(vfConfig.hifId);
-						rec.setVfId(vfConfig.vfId);
-
-						rec.setResult(BigDecimal.valueOf(valuationFunctionEstimate));
-						try {
-
-							if (valuationFunctionEstimate == 0.0) {
-
-							} else {
-
-								double[] percentiles = new double[100];
-
-								double[] distValues = distStats.getSortedValues();
-								int idxMedian = distValues.length / percentiles.length / 2; // the median of the first segment
-								DescriptiveStatistics statsPercentiles = new DescriptiveStatistics();
-								for (int i = 0; i < percentiles.length; i++) {
-									// Grab the median from each of the 100 slices of distStats
-									percentiles[i] = (distValues[idxMedian] + distValues[idxMedian - 1]) / 2.0;
-									statsPercentiles.addValue(percentiles[i]);
-									idxMedian += distValues.length / percentiles.length;
-								}
-								rec.setPct_2_5(  BigDecimal.valueOf((percentiles[1] + percentiles[2]) / 2.0));
-								rec.setPct_97_5(BigDecimal.valueOf((percentiles[96] + percentiles[97]) / 2.0));
-								rec.setStandardDev(BigDecimal.valueOf(statsPercentiles.getStandardDeviation()));
-								rec.setResultMean(BigDecimal.valueOf(statsPercentiles.getMean()));
-								rec.setResultVariance(BigDecimal.valueOf(statsPercentiles.getVariance()));
-							}
-						} catch (Exception e) {
-							rec.setPct_2_5(BigDecimal.valueOf(0.0));
-							rec.setPct_97_5(BigDecimal.valueOf(0.0));
-							rec.setStandardDev(BigDecimal.valueOf(0.0));
-							rec.setResultMean(BigDecimal.valueOf(0.0));
-							rec.setResultVariance(BigDecimal.valueOf(0.0));
-							e.printStackTrace();
-						}
-
-
-						
-						valuationResults.add(rec);
-
 					}
 				}
+			
 			}
-			TaskQueue.updateTaskPercentage(taskUuid, 100, "Saving your results");
+			
+			
+			
+			rowsSaved += valuationResults.size();
+			TaskQueue.updateTaskPercentage(taskUuid, 100, String.format("Saving %,d results", rowsSaved));
 			TaskWorker.updateTaskWorkerHeartbeat(taskWorkerUuid);
 			ValuationUtil.storeResults(task, valuationTaskConfig, valuationResults);
 

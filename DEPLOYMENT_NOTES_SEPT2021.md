@@ -61,7 +61,7 @@ Log location: ~/bencloud/logs/bencloud.log
 `truncate data.valuation_result;`  
 `vacuum analyze;`  
 
-**Remove an air quality layer**  
+**Remove a specific air quality layer**  
 `delete from data.air_quality_cell where air_quality_layer_id = :id;`  
 `delete from data.air_quality_layer where id = :id;`  
 

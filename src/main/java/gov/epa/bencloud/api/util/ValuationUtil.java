@@ -61,6 +61,12 @@ public class ValuationUtil {
 	public static void storeResults(Task task, ValuationTaskConfig valuationTaskConfig, ArrayList<ValuationResultRecord> valuationResults) {
 		DSLContext create = DSL.using(JooqUtil.getJooqConfiguration());
 		
+		Integer vfResultDatasetId = create
+				.selectFrom(VALUATION_RESULT_DATASET)
+				.where(VALUATION_RESULT_DATASET.TASK_UUID.eq(task.getUuid()))
+				.fetchOne(VALUATION_RESULT_DATASET.ID);
+		
+		if(vfResultDatasetId == null) {
 		// Valuation result dataset record links the result dataset id to the task uuid
 		ValuationResultDatasetRecord valuationResultDatasetRecord = create.insertInto(VALUATION_RESULT_DATASET
 				, VALUATION_RESULT_DATASET.TASK_UUID
@@ -71,6 +77,8 @@ public class ValuationUtil {
 				,valuationTaskConfig.variableDatasetId)
 		.returning(VALUATION_RESULT_DATASET.ID)
 		.fetchOne();
+
+		vfResultDatasetId = valuationResultDatasetRecord.getId();
 		
 		// Each HIF result function config contains the details of how the function was configured
 		for(ValuationConfig vf : valuationTaskConfig.valuationFunctions) {
@@ -78,16 +86,16 @@ public class ValuationUtil {
 					, VALUATION_RESULT_FUNCTION_CONFIG.VALUATION_RESULT_DATASET_ID
 					, VALUATION_RESULT_FUNCTION_CONFIG.VF_ID
 					, VALUATION_RESULT_FUNCTION_CONFIG.HIF_ID)
-			.values(valuationResultDatasetRecord.getId()
+			.values(vfResultDatasetId
 					, vf.vfId
 					, vf.hifId)
 			.execute();
 			
 		}
-
+		}
 		// Finally, store the actual estimates
 		for(ValuationResultRecord valuationResult : valuationResults) {
-			valuationResult.setValuationResultDatasetId(valuationResultDatasetRecord.getId());
+			valuationResult.setValuationResultDatasetId(vfResultDatasetId);
 		}
 		
 		create

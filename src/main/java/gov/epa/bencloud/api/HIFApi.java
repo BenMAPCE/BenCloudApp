@@ -3,6 +3,7 @@ package gov.epa.bencloud.api;
 import static gov.epa.bencloud.server.database.jooq.data.Tables.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
@@ -22,6 +23,7 @@ import org.jooq.Record16;
 import org.jooq.Record18;
 import org.jooq.Record3;
 import org.jooq.Record4;
+import org.jooq.Record7;
 import org.jooq.impl.DSL;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -107,27 +109,22 @@ public class HIFApi {
 		}
 	}
 
-	public static Result<Record13<Long, Integer, Integer, Integer, Integer, Integer, Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal[]>> getHifResultsForValuation(Integer id) {
+	public static Result<Record7<Long, Integer, Integer, Integer, Integer, BigDecimal, BigDecimal[]>> getHifResultsForValuation(Integer id, Integer hifId) {
 		DSLContext create = DSL.using(JooqUtil.getJooqConfiguration());
-		Result<Record13<Long, Integer, Integer, Integer, Integer, Integer, Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal[]>> hifRecords = create.select(
+		Result<Record7<Long, Integer, Integer, Integer, Integer, BigDecimal, BigDecimal[]>> hifRecords = create.select(
 				HIF_RESULT.GRID_CELL_ID,
 				HIF_RESULT.GRID_COL,
 				HIF_RESULT.GRID_ROW,
 				HIF_RESULT.HIF_ID,
 				HEALTH_IMPACT_FUNCTION.ENDPOINT_GROUP_ID,
-				HEALTH_IMPACT_FUNCTION.ENDPOINT_ID,
-				HIF_RESULT_FUNCTION_CONFIG.START_AGE,
-				HIF_RESULT_FUNCTION_CONFIG.END_AGE,
 				HIF_RESULT.RESULT,
-				HIF_RESULT.PCT_2_5,
-				HIF_RESULT.PCT_97_5,
-				HIF_RESULT.POPULATION,
 				HIF_RESULT.PERCENTILES
 				)
 				.from(HIF_RESULT)
 				.join(HIF_RESULT_FUNCTION_CONFIG).on(HIF_RESULT_FUNCTION_CONFIG.HIF_RESULT_DATASET_ID.eq(HIF_RESULT.HIF_RESULT_DATASET_ID).and(HIF_RESULT_FUNCTION_CONFIG.HIF_ID.eq(HIF_RESULT.HIF_ID)))
 				.join(HEALTH_IMPACT_FUNCTION).on(HEALTH_IMPACT_FUNCTION.ID.eq(HIF_RESULT.HIF_ID))
-				.where(HIF_RESULT.HIF_RESULT_DATASET_ID.eq(id))
+				.where(HIF_RESULT.HIF_RESULT_DATASET_ID.eq(id)
+						.and(HIF_RESULT.HIF_ID.eq(hifId)))
 				.orderBy(HIF_RESULT.GRID_COL, HIF_RESULT.GRID_ROW).fetch();
 
 		return hifRecords;
@@ -172,7 +169,7 @@ public class HIFApi {
 				.where(pollutantId == 0 ? DSL.noCondition() : HEALTH_IMPACT_FUNCTION.POLLUTANT_ID.eq(pollutantId))
 				.groupBy(HEALTH_IMPACT_FUNCTION_GROUP.NAME
 						, HEALTH_IMPACT_FUNCTION_GROUP.ID)
-				.orderBy(HEALTH_IMPACT_FUNCTION_GROUP.NAME)
+				.orderBy(HEALTH_IMPACT_FUNCTION_GROUP.NAME.desc())
 				.fetch();
 		
 		response.type("application/json");
@@ -366,6 +363,20 @@ public class HIFApi {
 			return null;
 		}
 		return hifResultDataset.getId();
+	}
+
+	public static int getHifResultsRecordCount(Integer hifResultDatasetId, ArrayList<Integer> hifIdList) {
+		Record1<Integer> hifResultCount = DSL.using(JooqUtil.getJooqConfiguration())
+		.select(DSL.count())
+		.from(HIF_RESULT)
+		.where(HIF_RESULT.HIF_RESULT_DATASET_ID.eq(hifResultDatasetId)
+				.and(HIF_RESULT.HIF_ID.in(hifIdList)))
+		.fetchOne();
+		
+		if(hifResultCount == null) {
+			return 0;
+		}
+		return hifResultCount.value1().intValue();
 	}
 
 }
