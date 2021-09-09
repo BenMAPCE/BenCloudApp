@@ -65,3 +65,19 @@ Log location: ~/bencloud/logs/bencloud.log
 `delete from data.air_quality_cell where air_quality_layer_id = :id;`  
 `delete from data.air_quality_layer where id = :id;`  
 
+**Dump a backup of the database**
+An example of backing up the local database on my mac  
+
+`cd /Applications/Postgres.app/Contents/Versions/11/bin;`
+
+`./pg_dump --file "/Users/jimanderton/Downloads/bencloud-20210909-11.11.sql" --host "localhost" --port "5432" --username "benmap_system" --no-owner --no-privileges --exclude-schema=stage --password --verbose --format=c --blobs "benmap"`
+
+**Restore a backup of the database**
+An example of restoring the database to the AWS RDS instance  
+
+`./dropdb benmap --host "database-1.c9mglzx6cyy8.us-east-2.rds.amazonaws.com" --port "5432" --username "benmap_system" --password `
+
+`./createdb -T template0 benmap --host "database-1.c9mglzx6cyy8.us-east-2.rds.amazonaws.com" --port "5432" --username "benmap_system" --password`
+
+`./pg_restore -d benmap --host "database-1.c9mglzx6cyy8.us-east-2.rds.amazonaws.com" --port "5432" --username "benmap_system" --password --verbose "/Users/jimanderton/Downloads/bencloud-20210909-11.11.sql"`
+
