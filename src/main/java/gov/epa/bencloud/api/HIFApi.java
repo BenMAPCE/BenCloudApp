@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.stream.Stream;
 import java.util.stream.Collectors;
 
+import org.jooq.Cursor;
 import org.jooq.DSLContext;
 import org.jooq.JSONFormat;
 import org.jooq.Result;
@@ -53,7 +54,7 @@ public class HIFApi {
 		Record1<Integer> id = create.select(HIF_RESULT_DATASET.ID).from(HIF_RESULT_DATASET)
 				.where(HIF_RESULT_DATASET.TASK_UUID.eq(uuid)).fetchOne();
 
-		Result<Record18<Integer, Integer, String, String, Integer, String, Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> hifRecords = create.select(
+		Cursor<Record18<Integer, Integer, String, String, Integer, String, Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> hifRecords = create.select(
 				HIF_RESULT.GRID_COL.as("column"),
 				HIF_RESULT.GRID_ROW.as("row"),
 				ENDPOINT.NAME.as("endpoint"),
@@ -78,34 +79,43 @@ public class HIFApi {
 				.join(HEALTH_IMPACT_FUNCTION).on(HEALTH_IMPACT_FUNCTION.ID.eq(HIF_RESULT.HIF_ID))
 				.join(ENDPOINT).on(ENDPOINT.ID.eq(HEALTH_IMPACT_FUNCTION.ENDPOINT_ID))
 				.where(HIF_RESULT.HIF_RESULT_DATASET_ID.eq(id.value1()))
-				.orderBy(HIF_RESULT.GRID_COL, HIF_RESULT.GRID_ROW).fetch();
+				.orderBy(HIF_RESULT.GRID_COL, HIF_RESULT.GRID_ROW)
+				.fetchSize(100000).fetchLazy();
 
-		if (request.headers("Accept").equalsIgnoreCase("text/csv")) {
-			response.type("text/csv");
-			String taskFileName = ApplicationUtil.replaceNonValidCharacters(TaskComplete.getTaskFromCompleteRecord(uuid).getName()) + ".csv";
-			response.header("Content-Disposition", "attachment; filename=" + taskFileName);
-			response.header("Access-Control-Expose-Headers", "Content-Disposition");
-			try {
-				hifRecords.formatCSV(response.raw().getWriter());
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (java.io.IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		} else {
-			response.type("application/json");
-			try {
-				hifRecords.formatJSON(response.raw().getWriter(), new JSONFormat().header(false).recordFormat(RecordFormat.OBJECT));
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (java.io.IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		try {
+			if (request.headers("Accept").equalsIgnoreCase("text/csv")) {
+				response.type("text/csv");
+				String taskFileName = ApplicationUtil.replaceNonValidCharacters(TaskComplete.getTaskFromCompleteRecord(uuid).getName()) + ".csv";
+				response.header("Content-Disposition", "attachment; filename=" + taskFileName);
+				response.header("Access-Control-Expose-Headers", "Content-Disposition");
+				try {
+					hifRecords.formatCSV(response.raw().getWriter());
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (java.io.IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} else {
+				response.type("application/json");
+				try {
+					hifRecords.formatJSON(response.raw().getWriter(), new JSONFormat().header(false).recordFormat(RecordFormat.OBJECT));
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (java.io.IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if(hifRecords != null && !hifRecords.isClosed()) {
+				hifRecords.close();
+			}
 		}
 	}
 

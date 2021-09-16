@@ -4,6 +4,7 @@ import static gov.epa.bencloud.server.database.jooq.data.Tables.*;
 
 import java.math.BigDecimal;
 
+import org.jooq.Cursor;
 import org.jooq.DSLContext;
 import org.jooq.JSONFormat;
 import org.jooq.Result;
@@ -32,7 +33,7 @@ public class ValuationApi {
 				.where(VALUATION_RESULT_DATASET.TASK_UUID.eq(uuid)).fetchOne();
 
 
-		Result<Record12<Integer, Integer, String, String, Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> valuationRecords = create.select(
+		Cursor<Record12<Integer, Integer, String, String, Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> valuationRecords = create.select(
 				VALUATION_RESULT.GRID_COL.as("column"),
 				VALUATION_RESULT.GRID_ROW.as("row"),
 				ENDPOINT.NAME.as("endpoint"),
@@ -54,33 +55,42 @@ public class ValuationApi {
 				.join(VALUATION_FUNCTION).on(VALUATION_FUNCTION.ID.eq(VALUATION_RESULT.VF_ID))
 				.join(ENDPOINT).on(ENDPOINT.ID.eq(VALUATION_FUNCTION.ENDPOINT_ID))
 				.where(VALUATION_RESULT.VALUATION_RESULT_DATASET_ID.eq(id.value1()))
-				.orderBy(VALUATION_RESULT.GRID_COL, VALUATION_RESULT.GRID_ROW).fetch();
+				.orderBy(VALUATION_RESULT.GRID_COL, VALUATION_RESULT.GRID_ROW)
+				.fetchSize(100000).fetchLazy();
 
-		if (request.headers("Accept").equalsIgnoreCase("text/csv")) {
-			response.type("text/csv");
-			String taskFileName = ApplicationUtil.replaceNonValidCharacters(TaskComplete.getTaskFromCompleteRecord(uuid).getName()) + ".csv";
-			response.header("Content-Disposition", "attachment; filename=" + taskFileName);
-			response.header("Access-Control-Expose-Headers", "Content-Disposition");
-			
-			try {
-				valuationRecords.formatCSV(response.raw().getWriter());
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (java.io.IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+		try {
+			if (request.headers("Accept").equalsIgnoreCase("text/csv")) {
+				response.type("text/csv");
+				String taskFileName = ApplicationUtil.replaceNonValidCharacters(TaskComplete.getTaskFromCompleteRecord(uuid).getName()) + ".csv";
+				response.header("Content-Disposition", "attachment; filename=" + taskFileName);
+				response.header("Access-Control-Expose-Headers", "Content-Disposition");
+				
+				try {
+					valuationRecords.formatCSV(response.raw().getWriter());
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (java.io.IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} else {
+				response.type("application/json");
+				try {
+					valuationRecords.formatJSON(response.raw().getWriter(), new JSONFormat().header(false).recordFormat(RecordFormat.OBJECT));
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (java.io.IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
-		} else {
-			response.type("application/json");
-			try {
-				valuationRecords.formatJSON(response.raw().getWriter(), new JSONFormat().header(false).recordFormat(RecordFormat.OBJECT));
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (java.io.IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if(valuationRecords != null && !valuationRecords.isClosed()) {
+				valuationRecords.close();
 			}
 		}
 	}
