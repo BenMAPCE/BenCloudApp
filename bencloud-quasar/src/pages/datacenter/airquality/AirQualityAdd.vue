@@ -1,21 +1,36 @@
 <template>
   <q-btn push color="primary" ref="btn" @click="alert">
-    Add an Air Quality Layer</q-btn
+    Add {{ pollutantFriendlyName }} {{ pollutantId }} Air Quality Layer</q-btn
   >
 </template>
 
 <script>
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, reactive } from "vue";
 import { useQuasar } from "quasar";
 import AirQualityUploadForm from "./AQUploadForm.vue";
+import { onMounted } from "vue";
+import { useStore } from "vuex";
 
 export default defineComponent({
   model: ref(null),
   name: "AirQualityAdd",
   components: {},
 
-  setup() {
+  props: {
+    pollutantId: {
+      type: Number,
+      default: 0,
+    },
+    pollutantFriendlyName: {
+      type: String,
+      default: "None",
+    },
+
+  },
+
+  setup(props) {
     const $q = useQuasar();
+    const store = useStore();
 
     function alert() {
       $q.dialog({
@@ -23,12 +38,12 @@ export default defineComponent({
         parent: this,
         persistent: true,
         componentProps: {
-          text: "something",
-          // ...more..props...
+          pollutantFriendlyName: props.pollutantFriendlyName,
+          pollutantId: props.pollutantId,
         },
       })
         .onOk(() => {
-          console.log('Upload AQ OK')
+          console.log("Upload AQ OK");
         })
         .onCancel(() => {
           // console.log('Cancel')
@@ -38,8 +53,11 @@ export default defineComponent({
         });
     }
 
+    onMounted(() => {
+    });
+
     return {
-      alert,
+      alert
     };
   },
 });

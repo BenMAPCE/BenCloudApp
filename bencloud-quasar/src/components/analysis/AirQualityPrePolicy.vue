@@ -10,6 +10,12 @@
           </div>
           
         </q-scroll-area>
+        
+       <AirQualityAdd 
+            :pollutantId=selectedPollutantId
+            :pollutantFriendlyName=selectedPollutantFriendlyName >
+        </AirQualityAdd>
+
 </template>
 
 <script>
@@ -19,15 +25,22 @@ import { ref, watch, onBeforeMount } from "vue";
 import { useStore } from "vuex";
 import { loadAirQualityLayers } from '../../composables/air-quality';
 import { convertAirQualityLayers } from '../../composables/air-quality';
+import AirQualityAdd from "../../pages/datacenter/airquality/AirQualityAdd.vue"
 
 export default defineComponent({
   model: ref(null),
   name: "AirQualityPrePolicy",
 
-async setup(props, context) {
+  components: {
+    AirQualityAdd
+  },
+
+  async setup(props, context) {
     const store = useStore();
     const rows = ref([]);
     const selectedItem  = ref(0);
+    const selectedPollutantId = ref(0)
+    const selectedPollutantFriendlyName = ref("OOPS")
 
     watch(
       () => selectedItem.value,
@@ -54,12 +67,22 @@ async setup(props, context) {
           selectedItem.value = store.state.analysis.prePolicyAirQualityId;
         }
 
+        selectedPollutantId.value = store.state.analysis.pollutantId
+        selectedPollutantFriendlyName.value = store.state.analysis.pollutantFriendlyName
+
+        // console.log("*********************")
+        // console.log("pollutantId.value: " + selectedPollutantId.value)
+        // console.log("pollutantFriendlyName.value: " + selectedPollutantFriendlyName.value)
+        // console.log("*********************")
+
         })()
     })
 
     return {
       rows,
       selectedItem,
+      selectedPollutantId,
+      selectedPollutantFriendlyName
     };
 }
 });

@@ -9,7 +9,7 @@
       </div>
       <div class="col-4">
         <p>Step 2. Select your post-policy air quality data</p>
-       <Suspense>
+        <Suspense>
           <AirQualityPostPolicy></AirQualityPostPolicy>
         </Suspense>
       </div>
@@ -30,8 +30,11 @@ export default defineComponent({
     AirQualityPostPolicy,
   },
   setup() {
+
     return {
       group: ref(null),
+      pollutantId: ref(0),
+      pollutantFriendlyName: ref(""),
     };
   },
 });

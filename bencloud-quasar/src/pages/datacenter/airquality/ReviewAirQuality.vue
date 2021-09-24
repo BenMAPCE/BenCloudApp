@@ -1,0 +1,94 @@
+<template>
+  <q-page>
+    <div class="q-pa-md q-gutter-sm">
+      <div class="row">
+        <div class="col">Review Air Quality</div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <Suspense>
+            <Pollutants updateState></Pollutants>
+          </Suspense>
+        </div>
+
+        <div class="col" v-if="currentPollutantId">
+          <AirQualityAdd
+            :pollutantId=selectedPollutantId 
+            :pollutantFriendlyName=selectedPollutantFriendlyName
+          >
+            ></AirQualityAdd
+          >
+        </div>
+      </div>
+
+      <div class="q-pa-md">
+        <AirQualityLayers></AirQualityLayers>
+      </div>
+
+      <div class="q-pa-md">
+        <AirQualityTabs></AirQualityTabs>
+      </div>
+    </div>
+  </q-page>
+</template>
+
+<script>
+import { defineComponent } from "vue";
+import { ref, reactive } from "vue";
+import { watch, onBeforeMount } from "vue";
+
+import AirQualityTabs from "./AirQualityTabs.vue";
+
+import AirQualityLayers from "./AirQualityLayers.vue";
+import Pollutants from "./Pollutants.vue";
+import AirQualityAdd from "./AirQualityAdd.vue";
+import { useStore } from "vuex";
+
+export default defineComponent({
+  model: ref(null),
+  name: "ManageAirQuality",
+  components: {
+    AirQualityTabs,
+    AirQualityLayers,
+    AirQualityAdd,
+    Pollutants,
+  },
+  setup(props, context) {
+    const store = useStore();
+    const currentPollutantId = ref(0);
+    const selectedPollutantId = reactive(ref(0))
+    const selectedPollutantFriendlyName = ref("OOPS")
+
+    watch(
+      () => store.state.airquality.pollutantId,
+      (pollutantId, prevPollutantId) => {
+        currentPollutantId.value = pollutantId;
+        console.log("------- currentPollutantId: " + currentPollutantId.value);
+        selectedPollutantId.value = store.state.airquality.pollutantId
+        selectedPollutantFriendlyName.value = store.state.airquality.pollutantFriendlyName
+        console.log("------- pollutantId: " + store.state.airquality.pollutantId);
+        console.log("------- pollutantId: " + pollutantId);
+        console.log("------- pollutantFriendlyName: " + store.state.airquality.pollutantFriendlyName);
+      }
+    );
+
+    function onChangePollutantValue(value) {
+      console.log("!!!!!!!!!!!!!!!!!!");
+    }
+
+    onBeforeMount(() => {});
+    return {
+      currentPollutantId,
+      selectedPollutantId,
+      selectedPollutantFriendlyName,
+      onChangePollutantValue,
+    };
+  },
+});
+</script>
+
+<style lang="scss" scoped>
+.pollutant-options {
+  width: 250px;
+}
+</style>

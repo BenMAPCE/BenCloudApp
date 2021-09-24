@@ -8,7 +8,7 @@
     option-value="id"
     option-label="friendly_name"
     class="pollutant-options"
-    emit-value
+    emit
     map-options
     label="Pollutant"
   />
@@ -16,7 +16,7 @@
 
 <script>
 import { defineComponent } from "vue";
-import { ref } from "vue";
+import { ref, provide } from "vue";
 import { useStore } from "vuex";
 import { loadPollutants } from "../../../composables/pollutants";
 
@@ -26,12 +26,21 @@ export default defineComponent({
   model: ref(null),
   name: "Pollutants",
 
-props: {
+  props: {
     updateState: {
       type: Boolean,
       default: false,
     },
   },
+
+    // setup (props, context) {
+    //     const customChange = (event) => {
+    //         context.emit("customChange", event.target.value)
+    //     }
+    //     return {
+    //         customChange
+    //     }
+    // }
 
   setup(props, { emit }) {
     const store = useStore();
@@ -49,7 +58,8 @@ props: {
 
     function changePollutantValue(value) {
       if (props.updateState) {
-        store.commit("airquality/updatePollutantId", pollutantValue.value);
+        store.commit("airquality/updatePollutantId", value.id);
+        store.commit("airquality/updatePollutantFriendlyName", value.friendly_name);
       }
       emit("changePollutantValue", value);
     }

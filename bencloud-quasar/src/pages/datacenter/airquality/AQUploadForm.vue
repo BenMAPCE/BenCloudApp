@@ -7,14 +7,21 @@
             <div class="col-12">
               <q-uploader
                 label="Upload your CSV"
-                color="green"
                 accept=".csv"
                 :max-file-size="20000000"
                 square
                 flat
                 @added="file_selected"
+                @removed="file_removed"
                 bordered
+                hide-upload-btn
               />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-12 air-quality-name">
+              Add {{ pollutantFriendlyName }} {{ pollutantId }} Air Quality Layer
             </div>
           </div>
 
@@ -29,12 +36,6 @@
                 lazy-rules
                 :rules="[(val) => (val && val.length > 0) || 'Please enter a name']"
               />
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-12">
-              <Pollutants @changePollutantValue="onChangePollutantValue"> </Pollutants>
             </div>
           </div>
 
@@ -61,9 +62,9 @@
 </template>
 
 <script>
-import Pollutants from "./Pollutants.vue";
 import GridDefinitions from "./GridDefinitions.vue";
 import { useQuasar } from "quasar";
+import { useStore } from "vuex";
 
 export default {
   data: () => ({
@@ -77,14 +78,17 @@ export default {
   }),
 
   components: {
-    Pollutants,
     GridDefinitions,
   },
 
   props: {
-    text: {
+    pollutantId: {
+      type: Number,
+      default: 0,
+    },
+    pollutantFriendlyName: {
       type: String,
-      default: "SSS",
+      default: "None",
     },
   },
 
@@ -143,17 +147,16 @@ export default {
     onSubmit() {
       console.log(this.pollutantValue);
       var hasErrors = false;
+      this.errorMessage = ""
 
-      if (this.selected_file === "") {
-        this.errorMessage = "No file selected";
-        hasErrors = true;
-      }
+      console.log(this.selected_file)
+
       if (this.name === "") {
         this.errorMessage =
           this.errorMessage + (hasErrors ? ", " : "") + "Name is required";
         hasErrors = true;
       }
-      if (this.pollutantValue === 0) {
+      if (this.pollutantId === 0) {
         this.errorMessage =
           this.errorMessage + (hasErrors ? ", " : "") + "Pollutant is required";
         hasErrors = true;
@@ -162,6 +165,12 @@ export default {
       if (this.gridValue === 0) {
         this.errorMessage =
           this.errorMessage + (hasErrors ? ", " : "") + "Grid is required";
+        hasErrors = true;
+      }
+
+      if (this.selected_file === "") {
+        this.errorMessage =
+          this.errorMessage + (hasErrors ? ", " : "") + "File is required";
         hasErrors = true;
       }
 
@@ -192,6 +201,9 @@ export default {
         })
         .then(function () {
           console.log("SUCCESS!!");
+          self.$q.loading.hide();
+          self.hide();
+          self.$emit("ok");
         })
         .catch(function (error) {
           if (error.response) {
@@ -211,11 +223,9 @@ export default {
             console.log("Error", error.message);
           }
           console.log("FAILURE!!");
+          self.$q.loading.hide();
         })
         .finally(function () {
-          self.$q.loading.hide();
-          self.hide()
-          self.$emit("ok");
         });
     },
 
@@ -223,6 +233,12 @@ export default {
       console.log(file);
       this.selected_file = file[0];
       this.check_if_document_upload = true;
+    },
+
+    file_removed: function (file) {
+      console.log(file);
+      this.selected_file = "";
+      this.check_if_document_upload = false;
     },
 
     onCancelClick() {
@@ -256,12 +272,18 @@ export default {
     padding-right: 10px;
   }
 
+  .air-quality-name {
+    padding-left: 15px;
+  }
   .upload-card {
     width: 500px;
   }
 
   .q-uploader {
     width: 100%;
+    a.q-btn-item:first-child {
+      display: none;
+    }
   }
 }
 </style>

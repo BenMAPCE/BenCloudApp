@@ -57,10 +57,18 @@ const routes = [
   },
 
   {
-    path: '/datacenter/manage-air-quality',
+    path: '/datacenter/review-air-quality',
     component: () => import('layouts/MainLayout.vue'),
     children: [
-      { path: '', component: () => import('src/pages/datacenter/airquality/ManageAirQuality.vue') }
+      { path: '', component: () => import('src/pages/datacenter/airquality/ReviewAirQuality.vue') }
+    ]
+  },
+
+  {
+    path: '/datacenter/upload-air-quality',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('src/pages/datacenter/airquality/UploadAirQuality.vue') }
     ]
   },
 

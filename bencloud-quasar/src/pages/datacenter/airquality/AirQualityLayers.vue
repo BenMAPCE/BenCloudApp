@@ -10,13 +10,10 @@
     binary-state-sort
     v-if="pollutantId != 0"
     v-model:selected="selected"
+    :visible-columns="visibleColumns"
   >
     <template v-slot:body="props">
-      <q-tr
-        class="cursor-pointer"
-        :props="props"
-        @click.exact="rowClicked(props)"
-      >
+      <q-tr class="cursor-pointer" :props="props" @click.exact="rowClicked(props)">
         <q-td v-for="col in props.cols" :key="col.name" :props="props">
           {{ col.value }}
         </q-td>
@@ -24,13 +21,7 @@
     </template>
 
     <template v-slot:top-right>
-      <q-input
-        borderless
-        dense
-        debounce="300"
-        v-model="filter"
-        placeholder="Search"
-      >
+      <q-input borderless dense debounce="300" v-model="filter" placeholder="Search">
         <template v-slot:append>
           <q-icon name="mdi-magnify" />
         </template>
@@ -54,7 +45,7 @@
 
 <script>
 import { defineComponent } from "vue";
-import { ref, unref, onMounted, watch, watchEffect } from "vue";
+import { ref, unref, onMounted, onBeforeMount, watch, watchEffect } from "vue";
 import axios from "axios";
 import { useStore } from "vuex";
 
@@ -64,6 +55,13 @@ export default defineComponent({
   computed: {
     pollutantId() {
       return this.$store.state.airquality.pollutantId;
+    },
+  },
+
+  props: {
+    includeLayerName: {
+      type: Boolean,
+      default: false,
     },
   },
 
@@ -182,7 +180,28 @@ export default defineComponent({
         });
     }
 
+    onBeforeMount(() => {
+    
+      visibleColumns.value = [];
+      visibleColumns.push("name");
+      visibleColumns.push("grid_definition_name");
+      visibleColumns.push("cell_count");
+      visibleColumns.push("mean_value");
+      visibleColumns.push("actions");
+
+      console.log("includeLayerName: " + props.includeLayerName);
+
+      if (props.includeLayerName) {
+        visibleColumns.push("id");
+      }
+
+    })
+
+
+
     onMounted(() => {
+      
+    
       // get initial data from server (1st page)
       onRequest({
         pagination: pagination.value,
@@ -196,6 +215,7 @@ export default defineComponent({
       loading,
       pagination,
       rows,
+      visibleColumns,
       selected: ref([]),
       onRequest,
     };
@@ -204,7 +224,17 @@ export default defineComponent({
 
 const rows = [];
 
+const visibleColumns = [];
+
 const columns = [
+  {
+    name: "id",
+    label: "ID",
+    align: "left",
+    field: (row) => row.id,
+    format: (val) => `${val}`,
+    sortable: true,
+  },
   {
     name: "name",
     required: true,
