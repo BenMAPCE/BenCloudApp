@@ -28,18 +28,6 @@
         </q-card-section>
       </q-card>
 
-      <q-card class="my-card">
-        <q-card-section> Upload your own Air Quality Layers </q-card-section>
-        <q-card-section>
-          <q-btn
-            color="secondary"
-            icon-right="mdi-cloud-upload-outline"
-            push
-            @click="$router.replace('/datacenter/upload-air-quality')"
-            label="Upload Air Quality Layers"
-          />
-        </q-card-section>
-      </q-card>
     </div>
     <div class="q-pa-md q-gutter-sm">
       <p class="description"></p>

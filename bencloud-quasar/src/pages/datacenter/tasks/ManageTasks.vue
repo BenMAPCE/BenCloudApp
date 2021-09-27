@@ -6,7 +6,7 @@
 import { defineComponent } from "vue";
 import { ref } from "vue";
 
-import ManageTasksTabs from "./ManageTasksTabs.vue";
+import ManageTasksTabs from "../../../components/datacenter/tasks/ManageTasksTabs.vue";
 
 //import AirQualityLayers from "./AirQualityLayers.vue";
 //import Pollutants from "./Pollutants.vue";

@@ -62,7 +62,7 @@
 </template>
 
 <script>
-import GridDefinitions from "./GridDefinitions.vue";
+import GridDefinitions from "../datacenter/airquality/GridDefinitions.vue";
 import { useQuasar } from "quasar";
 import { useStore } from "vuex";
 

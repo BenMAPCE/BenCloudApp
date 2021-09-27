@@ -20,7 +20,7 @@
 import { defineComponent } from "vue";
 import { ref, watch, onBeforeMount, onMounted } from "vue";
 import { useStore } from "vuex";
-import { loadIncidence } from "../../composables/incidence";
+import { loadIncidence } from "../../composables/analysis/incidence";
 
 export default defineComponent({
   model: ref(null),

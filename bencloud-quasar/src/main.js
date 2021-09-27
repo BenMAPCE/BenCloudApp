@@ -27,7 +27,7 @@ import { FontAwesomeLayersText } from '@fortawesome/vue-fontawesome'
 library.add(fas)
 library.add(far)
 
-import AppTopNavigation from './components/AppTopNavigation.vue'
+import AppTopNavigation from './components/navigation/AppTopNavigation.vue'
 
 const app = createApp(App)
     .use(store)

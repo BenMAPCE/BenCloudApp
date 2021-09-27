@@ -8,7 +8,7 @@
 
 <script>
 import { defineComponent } from 'vue';
-import ProgressStepper from 'components/ProgressStepper.vue'
+import ProgressStepper from 'src/components/navigation/ProgressStepper.vue'
 
 export default defineComponent({
   name: 'HelpPage',

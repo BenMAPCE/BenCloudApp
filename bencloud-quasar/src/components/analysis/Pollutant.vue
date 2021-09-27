@@ -28,7 +28,7 @@
 import { defineComponent } from "vue";
 import { ref, watch, onBeforeMount, onMounted } from "vue";
 import { useStore } from "vuex";
-import { loadPollutants } from "../../composables/pollutants";
+import { loadPollutants } from "../../composables/common/pollutants";
 
 export default defineComponent({
   model: ref(null),

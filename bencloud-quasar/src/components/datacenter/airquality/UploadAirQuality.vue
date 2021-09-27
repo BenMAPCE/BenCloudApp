@@ -29,7 +29,7 @@ import { ref } from "vue";
 import AirQualityTabs from "./AirQualityTabs.vue";
 
 import AirQualityLayers from "./AirQualityLayers.vue";
-import AirQualityAdd from "./AirQualityAdd.vue";
+import AirQualityAdd from "../../../components/common/AirQualityAdd.vue";
 
 import { watch, onBeforeMount } from "vue";
 import { useStore } from "vuex";

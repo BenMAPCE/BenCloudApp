@@ -18,7 +18,7 @@
 import { defineComponent } from "vue";
 import { ref, provide } from "vue";
 import { useStore } from "vuex";
-import { loadPollutants } from "../../../composables/pollutants";
+import { loadPollutants } from "../../composables/common/pollutants";
 
 import { watch, onBeforeMount } from "vue";
 

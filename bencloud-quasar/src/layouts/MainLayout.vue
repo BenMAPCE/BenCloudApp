@@ -26,7 +26,7 @@
 
 <script>
 import { defineComponent, onBeforeMount, ref } from "vue";
-import AppNavLinks from "components/AppNavLinks.vue";
+import AppNavLinks from "src/components/navigation/AppNavLinks.vue";
 
 const linksList = [
   {

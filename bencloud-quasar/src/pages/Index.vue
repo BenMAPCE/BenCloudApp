@@ -49,7 +49,7 @@
 
 <script>
 import { defineComponent, ref } from "vue";
-import AppTopNavigation from "../components/AppTopNavigation.vue";
+import AppTopNavigation from "../components/navigation/AppTopNavigation.vue";
 
 export default defineComponent({
   name: "PageIndex",

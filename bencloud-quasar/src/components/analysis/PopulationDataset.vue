@@ -20,7 +20,7 @@
 import { defineComponent } from "vue";
 import { ref, watch, onBeforeMount, onMounted } from "vue";
 import { useStore } from "vuex";
-import { loadPopulationOptions } from "../../composables/population";
+import { loadPopulationOptions } from "../../composables/analysis/population";
 
 export default defineComponent({
   model: ref(null),

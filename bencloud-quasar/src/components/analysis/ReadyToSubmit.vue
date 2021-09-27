@@ -102,8 +102,8 @@ import { ref, onBeforeMount, onMounted, watch } from "vue";
 import { useStore } from "vuex";
 import { useQuasar } from "quasar";
 
-import { buildHifTaskJSON, submitHifTask } from "../../composables/hif-task";
-import { buildValuationTaskJSON } from "../../composables/valuation-task";
+import { buildHifTaskJSON, submitHifTask } from "../../composables/analysis/hif-task";
+import { buildValuationTaskJSON } from "../../composables/analysis/valuation-task";
 import TaskSubmittedDialog from "./TaskSubmittedDialog.vue";
 
 export default defineComponent({

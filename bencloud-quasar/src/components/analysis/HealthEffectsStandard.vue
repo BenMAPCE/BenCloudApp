@@ -9,8 +9,8 @@
 import { defineComponent } from "vue";
 import { ref, watch, onBeforeMount, onMounted } from "vue";
 import { useStore } from "vuex";
-import { loadHealthEffects } from "../../composables/health-effects";
-import { convertHealthEffects } from "../../composables/health-effects";
+import { loadHealthEffects } from "../../composables/analysis/health-effects";
+import { convertHealthEffects } from "../../composables/analysis/health-effects";
 
 export default defineComponent({
   model: ref(null),

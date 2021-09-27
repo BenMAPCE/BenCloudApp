@@ -45,13 +45,13 @@ import { ref, watch, onBeforeMount, onMounted } from "vue";
 import { useStore } from "vuex";
 import { useQuasar } from "quasar";
 
-import { loadHealthImpactFunctionGroups } from "../../composables/health-impact-function-groups";
-import { buildHealthImpactFunctionGroups } from "../../composables/health-impact-function-groups";
-import { updateValuationsForHealthImpactFunctionGroups } from "../../composables/valuations";
+import { loadHealthImpactFunctionGroups } from "../../composables/analysis/health-impact-function-groups";
+import { buildHealthImpactFunctionGroups } from "../../composables/analysis/health-impact-function-groups";
+import { updateValuationsForHealthImpactFunctionGroups } from "../../composables/analysis/valuations";
 import {
   getValuationFunctionsForEndpointGroupId,
   loadValuationFunctions,
-} from "../../composables/valuation-functions";
+} from "../../composables/analysis/valuation-functions";
 import ValueOfEffectsEditForm from "./ValueOfEffectsEditForm.vue";
 
 export default defineComponent({

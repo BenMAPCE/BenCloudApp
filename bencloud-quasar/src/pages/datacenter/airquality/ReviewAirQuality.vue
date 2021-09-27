@@ -37,16 +37,16 @@ import { defineComponent } from "vue";
 import { ref, reactive } from "vue";
 import { watch, onBeforeMount } from "vue";
 
-import AirQualityTabs from "./AirQualityTabs.vue";
+import AirQualityTabs from "../../../components/datacenter/airquality/AirQualityTabs.vue";
 
-import AirQualityLayers from "./AirQualityLayers.vue";
-import Pollutants from "./Pollutants.vue";
-import AirQualityAdd from "./AirQualityAdd.vue";
+import AirQualityLayers from "../../../components/datacenter/airquality/AirQualityLayers.vue";
+import Pollutants from "../../../components/common/Pollutants.vue";
+import AirQualityAdd from "../../../components/common/AirQualityAdd.vue";
 import { useStore } from "vuex";
 
 export default defineComponent({
   model: ref(null),
-  name: "ManageAirQuality",
+  name: "ReviewAirQuality",
   components: {
     AirQualityTabs,
     AirQualityLayers,

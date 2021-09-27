@@ -7,7 +7,7 @@
 <script>
 import { defineComponent, ref, reactive } from "vue";
 import { useQuasar } from "quasar";
-import AirQualityUploadForm from "./AQUploadForm.vue";
+import AirQualityUploadForm from "./AirQualityUploadForm.vue";
 import { onMounted } from "vue";
 import { useStore } from "vuex";
 
