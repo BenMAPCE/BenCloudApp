@@ -30,6 +30,14 @@ import { ref, watch, onBeforeMount, onMounted } from "vue";
 import { useStore } from "vuex";
 import { loadPollutants } from "../../composables/common/pollutants";
 
+import { getHifResultsDatasets } from "../../composables/results/hif/hif-results-datasets";
+import { getHifResultDatasetFunctions } from "../../composables/results/hif/hif-result-dataset-functions";
+import { getHifResultDatasetDetails } from "../../composables/results/hif/hif-result-dataset-details";
+
+import { getValuationResultsDatasets } from "../../composables/results/valuation/valuation-results-datasets";
+import { getValuationResultDatasetFunctions } from "../../composables/results/valuation/valuation-result-dataset-functions";
+import { getValuationResultDatasetDetails } from "../../composables/results/valuation/valuation-result-dataset-details";
+
 export default defineComponent({
   model: ref(null),
   name: "Pollutant",
@@ -76,6 +84,41 @@ export default defineComponent({
         const response = await loadPollutants().fetch();
         rows.value = response.data.value;
       })();
+
+    (async () => {
+        console.log("getHifResultDatasets");
+        const response = await getHifResultsDatasets().fetch();
+        //rows.value = response.data.value;
+      })();
+      (async () => {
+        console.log("getHifResultDatasetFunctions");
+        const response = await getHifResultDatasetFunctions(32).fetch();
+        //rows.value = response.data.value;
+      })();
+      (async () => {
+        console.log("getHifResultDatasetDetails");
+        const response = await getHifResultDatasetDetails(32).fetch();
+        //rows.value = response.data.value;
+      })();
+
+/*
+      (async () => {
+        console.log("getValuationResultsDatasets");
+        const response = await getValuationResultsDatasets().fetch();
+        //rows.value = response.data.value;
+      })();
+      (async () => {
+        console.log("getValuationResultDatasetFunctions");
+        const response = await getValuationResultDatasetFunctions(12).fetch();
+        //rows.value = response.data.value;
+      })();
+      
+      (async () => {
+        console.log("getValuationResultDatasetDetails");
+        const response = await getValuationResultDatasetDetails(12).fetch();
+        //rows.value = response.data.value;
+      })();
+*/
     });
 
     onMounted(() => {

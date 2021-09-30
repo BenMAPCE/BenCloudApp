@@ -31,17 +31,50 @@
           </q-input>
         </template>
 
-        <template v-slot:body-cell-download="props">
+        <template v-slot:body-cell-downloadz="props">
           <q-td :props="props">
             <q-btn
               round
               flat
               color="grey"
-              @click="exportTaskResults(props)"
-              icon="mdi-table-arrow-down"
+              @click="showOptions(props)"
+              icon="mdi-dots-vertical"
             ></q-btn>
           </q-td>
         </template>
+
+        <template v-slot:body-cell-download="props">
+           <q-td :props="props">
+           <q-btn-dropdown color="primary" label="" dense>
+              <q-list>
+                <q-item dense clickable v-close-popup @click="onClick(props)">
+                  <q-item-section>
+                    <q-item-label>View/Export Results</q-item-label>
+                  </q-item-section>
+                </q-item>
+
+                <q-item dense clickable v-close-popup @click="onClick(props)">
+                  <q-item-section>
+                    <q-item-label>View Configuration Details</q-item-label>
+                  </q-item-section>
+                </q-item>
+
+                <q-item dense clickable v-close-popup @click="onClick(props)">
+                  <q-item-section>
+                    <q-item-label>Use as a template for new analysys</q-item-label>
+                  </q-item-section>
+                </q-item>
+                <q-separator light style="color: red"></q-separator>
+
+                <q-item dense clickable v-close-popup @click="onClick(props)">
+                  <q-item-section>
+                    <q-item-label dense>Delete</q-item-label>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </q-btn-dropdown>
+           </q-td>
+       </template>
 
         <template v-slot:body-cell-task_successful="props">
           <q-td :props="props">
@@ -57,13 +90,16 @@
 
 <script>
 import { defineComponent } from "vue";
-import { ref, unref, onMounted, watch, watchEffect } from "vue";
+import { ref, unref, onMounted, onBeforeMount, watch, watchEffect } from "vue";
 import axios from "axios";
 import { useStore } from "vuex";
 import { useQuasar } from "quasar";
 
+import { getCompletedTasks } from "../../../composables/tasks/completed-tasks";
+
 export default defineComponent({
   model: ref(null),
+
   name: "CompletedTasksTab",
   computed: {},
 
@@ -79,27 +115,32 @@ export default defineComponent({
       rowsPerPage: 0,
     });
 
-    let myFilter = unref(filter);
+    const optionSelected = ref(null);
+    const fab1 = ref(true);
+    const fab2 = ref(true);
 
-    function getCompletedTasks() {
-      //console.log("--------------------------------------------")
-      //console.log(filter)
-      //console.log("--------------------------------------------")
+    const stringOptions = [
+      "View/Export Results",
+      "View Configuration Details",
+      "Use as a template for new analysis",
+      "Delete",
+    ];
+    //    let myFilter = unref(filter);
 
-      loading.value = true;
+    function onValueChange(props, val) {
+      console.log("SELECT value changed: ");
+      console.log(optionSelected.value);
+      console.log(props);
+    }
+    function showOptions(props) {
+      console.log("showOptions");
+      console.log(props);
+    }
 
-      axios.get(process.env.API_SERVER + "/api/tasks/completed", {}).then((response) => {
-        let records = response.data.data;
-        let data = response.data;
-
-        console.log("----- return -----");
-        console.log(records);
-
-        rows.value = records;
-
-        // ...and turn of loading indicator
-        loading.value = false;
-      });
+    function onClick(props, item) {
+      console.log("onClick");
+      console.log(props);
+      console.log(item);
     }
 
     function exportTaskResults(props) {
@@ -145,8 +186,13 @@ export default defineComponent({
     }
 
     onMounted(() => {
-      getCompletedTasks();
-      $q.loading.hide();
+      loading.value = true;
+
+      (async () => {
+        const response = await getCompletedTasks().fetch();
+        rows.value = unref(response.data).data;
+        loading.value = false;
+      })();
     });
 
     return {
@@ -157,8 +203,15 @@ export default defineComponent({
       rows,
       selected: ref([]),
       visibleColumns,
+      optionSelected,
+      stringOptions,
       getCompletedTasks,
       exportTaskResults,
+      onClick,
+      fab1,
+      fab2,
+      showOptions,
+      onValueChange,
     };
   },
 });
@@ -239,8 +292,14 @@ const columns = [
     field: "task_message",
     sortable: true,
   },
-
-  { name: "download", label: "Download", field: "", align: "center" },
+  {
+    name: "download",
+    label: "Action",
+    field: "",
+    align: "center",
+    sortable: false,
+    style: "width: 200px",
+  },
 ];
 </script>
 
@@ -248,6 +307,10 @@ const columns = [
 .completed-tasks {
   .reload-button {
     margin-right: 25px;
+  }
+
+  .options-column {
+    width: 200px;
   }
 
   .q-table th {

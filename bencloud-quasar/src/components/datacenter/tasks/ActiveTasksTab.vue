@@ -43,9 +43,11 @@
 
 <script>
 import { defineComponent } from "vue";
-import { ref, unref, onMounted, watch, watchEffect } from "vue";
+import { ref, unref, onMounted, onBeforeMount, watch, watchEffect } from "vue";
 import axios from "axios";
 import { useStore } from "vuex";
+
+import { getActiveTasks } from "../../../composables/tasks/active-tasks";
 
 export default defineComponent({
   model: ref(null),
@@ -63,30 +65,21 @@ export default defineComponent({
       rowsPerPage: 0,
     });
 
-    const timer = ref(null)
+    const timer = ref(null);
 
     let myFilter = unref(filter);
 
-    function getActiveTasks(props) {
+    onMounted(() => {
       loading.value = true;
 
-      axios.get(process.env.API_SERVER + "/api/tasks/pending", {}).then((response) => {
-        let records = response.data.data;
-        let data = response.data;
-
-        console.log("----- return -----");
-        console.log(records);
-
-        rows.value = records;
-
-        // ...and turn of loading indicator
+      (async () => {
+        const response = await getActiveTasks().fetch();
+        rows.value = unref(response.data).data;
         loading.value = false;
-      });
-    }
-
-    onMounted(() => {
-      getActiveTasks(props);
+      })();
     });
+
+    onBeforeMount(() => {});
 
     return {
       columns,
