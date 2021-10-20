@@ -108,6 +108,8 @@ export const submitHifTask = (hifTaskJSON, store) => {
         .then((response) => {
           data.value = response.data;
 
+          console.log(data.value);
+
           if (valuationsForHealthImpactFunctionGroups.length > 0) {
             var valuationTaskJSON = buildValuationTaskJSON(hifTaskJSON.name + " - Valuation", data.value.task_uuid, valuationsForHealthImpactFunctionGroups)
             console.log(valuationTaskJSON)

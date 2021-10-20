@@ -1,6 +1,5 @@
 <template>
-  <q-page-container>
-    <q-page class="active-tasks">
+
       <q-table
         :rows="rows"
         :columns="columns"
@@ -15,14 +14,14 @@
         class="active-tasks"
       >
         <template v-slot:top-right>
-          <q-btn
+          <!-- <q-btn
             color="primary"
             icon-right="mdi-reload"
             class="reload-button"
             label="Reload"
             no-caps
             @click="getActiveTasks"
-          />
+          /> -->
 
           <q-input borderless dense debounce="300" v-model="filter" placeholder="Search">
             <template v-slot:append>
@@ -31,28 +30,54 @@
           </q-input>
         </template>
 
+
+        <template v-slot:body-cell-task_progress_message="props">
+          <q-td :props="props">
+            <q-linear-progress size="25px" :value="props.row.task_percentage/100" color="accent" v-if="props.row.task_status_message != 'Pending'">
+              <div class="absolute-full flex flex-center">
+                <q-badge color="white" text-color="accent" :label="props.row.task_percentage" />
+              </div>
+            </q-linear-progress>
+
+            <ActiveTaskStatus :status = props.row.task_progress_message>
+
+            </ActiveTaskStatus>
+
+
+          </q-td>
+        </template>
+
         <template v-slot:body-cell-task_status="props">
           <q-td :props="props">
             <div>{{ props.value ? "Active" : "Pending" }}</div>
           </q-td>
         </template>
       </q-table>
-    </q-page>
-  </q-page-container>
+
 </template>
 
 <script>
 import { defineComponent } from "vue";
-import { ref, unref, onMounted, onBeforeMount, watch, watchEffect } from "vue";
+import { ref, unref, onMounted, onBeforeMount, onBeforeUnmount, watch, watchEffect } from "vue";
 import axios from "axios";
 import { useStore } from "vuex";
 
 import { getActiveTasks } from "../../../composables/tasks/active-tasks";
+import ActiveTaskStatus from "./ActiveTaskStatus.vue";
 
 export default defineComponent({
   model: ref(null),
   name: "ActiveTasksTab",
   computed: {},
+  components: {
+    ActiveTaskStatus
+  },
+  props: {
+    autoRefresh: {
+      type: Boolean,
+      default: false,
+    },
+  },
 
   setup(props, context) {
     const store = useStore();
@@ -63,23 +88,55 @@ export default defineComponent({
     const pagination = ref({
       page: 1,
       rowsPerPage: 0,
+      sortBy: 'task_name',
+      descending: false,
     });
+    const progress1 = ref(0);
 
     const timer = ref(null);
 
     let myFilter = unref(filter);
+    let activeTasksRefreshInterval = null;
 
-    onMounted(() => {
+    function loadActiveTasks() {
+
       loading.value = true;
 
       (async () => {
         const response = await getActiveTasks().fetch();
         rows.value = unref(response.data).data;
+        console.log(rows.value)
         loading.value = false;
       })();
+
+    }
+
+    function enableAutoRefresh() {
+    
+      activeTasksRefreshInterval = setInterval(function () {
+        loadActiveTasks()   
+      }.bind(this), 5000); 
+
+    }
+
+    function disableAutoRefresh() {
+      clearInterval(activeTasksRefreshInterval);
+    }
+
+    onMounted(() => {
+      console.log(props.autoRefresh)
+      loadActiveTasks();
+      enableAutoRefresh()
+
     });
 
     onBeforeMount(() => {});
+
+    onBeforeUnmount(() => {
+      //console.log("before unmount")
+      disableAutoRefresh()
+      //clearInterval(activeTasksRefreshInterval);
+    })
 
     return {
       columns,
@@ -89,6 +146,9 @@ export default defineComponent({
       rows,
       selected: ref([]),
       getActiveTasks,
+      loadActiveTasks,
+      activeTasksRefreshInterval,
+      progress1
     };
   },
 });
@@ -99,67 +159,32 @@ const columns = [
   {
     name: "task_name",
     required: true,
-    label: "Task Name",
+    label: "Task",
     align: "left",
     field: (row) => row.task_name,
     format: (val) => `${val}`,
     sortable: true,
   },
   {
-    name: "task_type",
-    align: "left",
-    label: "Type",
-    field: "task_type",
-    sortable: true,
-  },
-  {
-    name: "task_submitted_date",
-    label: "Submitted",
-    field: "task_submitted_date",
-    sortable: true,
-  },
-  {
-    name: "task_wait_time",
-    label: "Wait Time",
-    field: "task_wait_time",
-    sortable: true,
-  },
-  {
-    name: "task_started_date",
-    label: "Started",
-    field: "task_started_date",
-    sortable: true,
-  },
-  {
-    name: "task_status",
+    name: "task_status_message",
     label: "Status",
-    field: "task_status",
+    field: "task_status_message",
     sortable: true,
   },
   {
-    name: "task_active_time",
-    label: "Elapsed Time",
-    field: "task_active_time",
+    name: "task_progress_message",
+    label: "Progress",
+    field: "task_progress_message",
     sortable: true,
-  },
-  {
-    name: "task_percentage",
-    label: "% Complete",
-    field: "task_percentage",
-    sortable: true,
-  },
-  {
-    name: "task_message",
-    label: "Message",
-    field: "task_message",
-    sortable: true,
+    style: "width: 300px"
   },
 
   { name: "actions", label: "", field: "", align: "center" },
 ];
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+
 .active-tasks {
   .reload-button {
     margin-right: 25px;
@@ -176,6 +201,10 @@ const columns = [
 
   .q-table__middle.scroll {
     max-height: 500px;
+  }
+
+  .column-task-progress {
+    width: 250px;
   }
 }
 </style>

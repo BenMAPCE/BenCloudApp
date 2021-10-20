@@ -17,6 +17,7 @@ export const buildValuationTaskJSON = (taskName, hifTaskUuid, valuationsForHealt
   valuationInfo["type"] = "Valuation";
   valuationInfo["hif_result_dataset_id"] = null;
   valuationInfo["hif_task_uuid"] = hifTaskUuid;
+  valuationInfo["parent_task_uuid"] = hifTaskUuid;
 
   var valuationFunctions = [];
   var valuationFunction = {};
@@ -32,6 +33,8 @@ export const buildValuationTaskJSON = (taskName, hifTaskUuid, valuationsForHealt
 
   valuationInfo["functions"] = valuationFunctions;
 
+  console.log(valuationInfo)
+  
   return valuationInfo;
 };
 

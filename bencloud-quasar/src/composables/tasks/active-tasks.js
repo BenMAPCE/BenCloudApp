@@ -1,4 +1,4 @@
-import { useStore } from 'vuex';
+
 import axios from "axios";
 import { ref } from "vue";
 
@@ -9,7 +9,6 @@ export const getActiveTasks = (userIdentifier) => {
     const error = ref(null)
     const response = ref(null)
     const loading = ref(false)
-    const store = useStore()
 
     const fetch = async() => {
         loading.value = true;

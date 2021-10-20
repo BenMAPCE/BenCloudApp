@@ -1,31 +1,19 @@
 <template>
-  <q-tabs
-    v-model="tab"
-    dense
-    class="text-grey"
-    active-color="primary"
-    indicator-color="primary"
-    align="justify"
-    narrow-indicator
-  >
-    <q-tab name="active" class="active" label="Active Tasks" />
-    <q-tab name="pending" class="pending" label="Completed Tasks" />
-  </q-tabs>
+      <div class="refresh-message">
+        Tasks are auto-refreshed every 5 seconds
+      </div>
 
-  <q-tab-panels 
-    v-model="tab" 
-    animated
-    >
-    <q-tab-panel name="active">
-      <div class="text-h6">Active Tasks</div>
-      <ActiveTasksTab></ActiveTasksTab>
-    </q-tab-panel>
+      <q-page class="tasks">
+        <div name="active" class="active-tasks-wrapper">
+          <div class="text-h6">Active/Pending Tasks</div>
+          <ActiveTasksTab></ActiveTasksTab>
+        </div>
 
-    <q-tab-panel name="pending">
-      <div class="text-h6">Completed Tasks</div>
-      <CompletedTasksTab></CompletedTasksTab>
-    </q-tab-panel>
-  </q-tab-panels>
+        <div name="completed"  class="completed-tasks-wrapper">
+          <div class="text-h6">Completed Tasks</div>
+          <CompletedTasksTab></CompletedTasksTab>
+        </div>
+      </q-page>
 </template>
 
 <script>
@@ -42,11 +30,6 @@ export default defineComponent({
     CompletedTasksTab,
     ActiveTasksTab
   },
-  computed: {
-//    airQualityLayerId() {
-//      return this.$store.state.airquality.airQualityLayerId;
-//    },
-  },
   setup() {
     return {
       tab: ref("active"),
@@ -55,11 +38,18 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
-.active,
-.pending {
-  flex: 0 0 auto;
-  align-items: left;
-  align-self: left;
-}
+<style lang="scss" scoped>
+
+  .active-tasks-wrapper,
+  .completed-tasks-wrapper {
+    flex: 0 0 auto;
+    align-items: left;
+    align-self: left;
+    padding: 10px 20px 20px 20px;
+  }
+
+  .refresh-message {
+    padding: 25px 20px 10px 20px;
+    font-size: 18px;
+  }
 </style>

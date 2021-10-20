@@ -1,6 +1,5 @@
 <template>
-  <q-page-container>
-    <q-page class="completed-tasks">
+
       <q-table
         :rows="rows"
         :columns="columns"
@@ -13,16 +12,17 @@
         binary-state-sort
         v-model:selected="selected"
         :visible-columns="visibleColumns"
+        class="completed-tasks"
       >
         <template v-slot:top-right>
-          <q-btn
+          <!-- <q-btn
             color="primary"
             icon-right="mdi-reload"
             class="reload-button"
             label="Reload"
             no-caps
             @click="getCompletedTasks"
-          />
+          /> -->
 
           <q-input borderless dense debounce="300" v-model="filter" placeholder="Search">
             <template v-slot:append>
@@ -53,7 +53,7 @@
                   </q-item-section>
                 </q-item>
 
-                <q-item dense clickable v-close-popup @click="onClick(props)">
+                <!-- <q-item dense clickable v-close-popup @click="onClick(props)">
                   <q-item-section>
                     <q-item-label>View Configuration Details</q-item-label>
                   </q-item-section>
@@ -63,7 +63,8 @@
                   <q-item-section>
                     <q-item-label>Use as a template for new analysys</q-item-label>
                   </q-item-section>
-                </q-item>
+                </q-item> -->
+
                 <q-separator light style="color: red"></q-separator>
 
                 <q-item dense clickable v-close-popup @click="onClick(props)">
@@ -84,16 +85,15 @@
           </q-td>
         </template>
       </q-table>
-    </q-page>
-  </q-page-container>
+
 </template>
 
 <script>
 import { defineComponent } from "vue";
-import { ref, unref, onMounted, onBeforeMount, watch, watchEffect } from "vue";
+import { ref, unref, onMounted, onBeforeMount, onBeforeUnmount, watch, watchEffect } from "vue";
 import axios from "axios";
 import { useStore } from "vuex";
-import { useQuasar } from "quasar";
+import { useQuasar, date } from "quasar";
 
 import { getCompletedTasks } from "../../../composables/tasks/completed-tasks";
 
@@ -113,6 +113,8 @@ export default defineComponent({
     const pagination = ref({
       page: 1,
       rowsPerPage: 0,
+      sortBy: 'task_submitted_date',
+      descending: true,
     });
 
     const optionSelected = ref(null);
@@ -125,7 +127,34 @@ export default defineComponent({
       "Use as a template for new analysis",
       "Delete",
     ];
-    //    let myFilter = unref(filter);
+
+    let completedTasksRefreshInterval = null;
+
+    function loadCompletedTasks() {
+
+      loading.value = true;
+
+      (async () => {
+        const response = await getCompletedTasks().fetch();
+        //console.log(unref(response.data).data)
+        rows.value = unref(response.data).data;
+        //console.log(rows.value)
+        loading.value = false;
+      })();
+
+    }
+
+    function enableAutoRefresh() {
+    
+      completedTasksRefreshInterval = setInterval(function () {
+        loadCompletedTasks()   
+      }.bind(this), 5000); 
+
+    }
+
+    function disableAutoRefresh() {
+      clearInterval(completedTasksRefreshInterval);
+    }
 
     function onValueChange(props, val) {
       console.log("SELECT value changed: ");
@@ -186,14 +215,14 @@ export default defineComponent({
     }
 
     onMounted(() => {
-      loading.value = true;
-
-      (async () => {
-        const response = await getCompletedTasks().fetch();
-        rows.value = unref(response.data).data;
-        loading.value = false;
-      })();
+      loadCompletedTasks()
+      enableAutoRefresh()
     });
+
+    onBeforeUnmount(() => {
+      //console.log("before unmount")
+      disableAutoRefresh()
+    })
 
     return {
       columns,
@@ -212,6 +241,8 @@ export default defineComponent({
       fab2,
       showOptions,
       onValueChange,
+      loadCompletedTasks,
+      completedTasksRefreshInterval
     };
   },
 });
@@ -222,9 +253,9 @@ const visibleColumns = [
   // "task_uuid",
   "task_name",
   "task_type",
-  //      "task_submitted_date",
+        "task_submitted_date",
   //      "task_started_date",
-  //      "task_completed_date",
+        "task_completed_date",
   "task_elapsed_time",
   "task_successful",
   "task_message",
@@ -243,29 +274,10 @@ const columns = [
   {
     name: "task_name",
     required: true,
-    label: "Task Name",
+    label: "Task",
     align: "left",
     field: (row) => row.task_name,
     format: (val) => `${val}`,
-    sortable: true,
-  },
-  {
-    name: "task_type",
-    align: "left",
-    label: "Type",
-    field: "task_type",
-    sortable: true,
-  },
-  {
-    name: "task_submitted_date",
-    label: "Submitted",
-    field: "task_submitted_date",
-    sortable: true,
-  },
-  {
-    name: "task_started_date",
-    label: "Started",
-    field: "task_started_date",
     sortable: true,
   },
   {
@@ -276,7 +288,7 @@ const columns = [
   },
   {
     name: "task_elapsed_time",
-    label: "Elapsed Time",
+    label: "Run Time",
     field: "task_elapsed_time",
     sortable: true,
   },
@@ -303,7 +315,8 @@ const columns = [
 ];
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+
 .completed-tasks {
   .reload-button {
     margin-right: 25px;
