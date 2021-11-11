@@ -13,9 +13,12 @@ export default function () {
     healthImpactFunctions: [],
     prePolicyAirQualityId: null,
     prePolicyAirQualityName: "",
+    prePolicyAirQualityMetricId: null,
     postPolicyAirQualityId: null,
     postPolicyAirQualityName: "",
+    postPolicyAirQualityMetricId: null,
     valuationsForHealthImpactFunctionGroups: [],
-    location
+    location,
+    airQualityLayers : null
   }
 }

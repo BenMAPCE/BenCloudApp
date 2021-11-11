@@ -47,9 +47,33 @@ export function updatePrePolicyAirQuality(state, prePolicyAirQuality) {
     state.prePolicyAirQualityName = prePolicyAirQuality.prePolicyAirQualityName;
 }
 
+export function updatePrePolicyAirQualityId(state, prePolicyAirQualityId) {
+    state.prePolicyAirQualityId = prePolicyAirQualityId;
+}
+
+export function updatePrePolicyAirQualityName(state, prePolicyAirQualityName) {
+    state.prePolicyAirQualityName = prePolicyAirQualityName;
+}
+
+export function updatePrePolicyAirQualityMetricId(state, metricId) {
+    state.prePolicyAirQualityMetricId = metricId;
+}
+
 export function updatePostPolicyAirQuality(state, postPolicyAirQuality) {
     state.postPolicyAirQualityId = postPolicyAirQuality.postPolicyAirQualityId;
     state.postPolicyAirQualityName = postPolicyAirQuality.postPolicyAirQualityName;
+}
+
+export function updatePostPolicyAirQualityId(state, postPolicyAirQualityId) {
+    state.postPolicyAirQualityId = postPolicyAirQualityId;
+}
+
+export function updatePostPolicyAirQualityName(state, postPolicyAirQualityName) {
+    state.postPolicyAirQualityName = postPolicyAirQualityName;
+}
+
+export function updatePostPolicyAirQualityMetricId(state, metricId) {
+    state.postPolicyAirQualityMetricId = metricId;
 }
 
 export function updateValuationsForHealthImpactFunctionGroups(state, payload) {
@@ -90,3 +114,6 @@ export function updateValuationsForHealthImpactFunctionGroups(state, payload) {
     //state.valuationsForHealthImpactFunctionGroups = valuationsForHealthImpactFunctionGroups;
 }
 
+export function updateAirQualityLayers (state, airQualityLayers) {
+    state.airQualityLayers = airQualityLayers;
+}

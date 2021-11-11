@@ -112,7 +112,7 @@ export default defineComponent({
         .get(
           process.env.API_SERVER + "/api/air-quality-data/" +
             store.state.airquality.airQualityLayerId +
-            "/details",
+            "/contents",
           {
             params: {
               page: 1,
@@ -160,7 +160,7 @@ export default defineComponent({
         .get(
           process.env.API_SERVER + "/api/air-quality-data/" +
             store.state.airquality.airQualityLayerId +
-            "/details",
+            "/contents",
           {
             params: {
               page: page,
@@ -245,7 +245,7 @@ const columns = [
     name: "annual_metric",
     align: "left",
     label: "Annual Metric",
-    field: "annual_metric",
+    field: "metric",
     sortable: true,
   },
   {

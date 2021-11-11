@@ -56,12 +56,20 @@ export function prePolicyAirQualityName (state) {
   return state.prePolicyAirQualityName
 }
 
+export function prePolicyAirQualityMetricId (state) {
+  return state.prePolicyAirQualityMetricId
+}
+
 export function postPolicyAirQualityId (state) {
   return state.postPolicyAirQualityId
 }
 
 export function postPolicyAirQualityName (state) {
   return state.postPolicyAirQualityName
+}
+
+export function postPolicyAirQualityMetricId (state) {
+  return state.postPolicyAirQualityMetricId
 }
 
 export function valuationsForHealthImpactFunctionGroups (state) {
@@ -91,5 +99,7 @@ export const getValuationsForHealthFunctionId = (state) => (healthFunctionId) =>
   return {};
 }
 
-
+export function airQualityLayers (state) {
+  return state.airQualityLayers
+}
 

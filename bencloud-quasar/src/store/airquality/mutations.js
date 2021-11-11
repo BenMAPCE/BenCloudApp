@@ -11,3 +11,7 @@ export function updatePollutantFriendlyName (state, pollutantFriendlyName ) {
     state.pollutantFriendlyName = pollutantFriendlyName;
 }
 
+export function updateAirQualityLayerAddedDate (state, newDate) {
+    state.airQualityLayerAddedDate = newDate;
+}
+

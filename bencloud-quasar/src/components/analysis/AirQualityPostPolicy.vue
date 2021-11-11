@@ -1,15 +1,13 @@
 <template>
 
-        <q-scroll-area class="aq-post-policy-scroll-area" visible: true>
-          <div class="q-py-xs">
+       <q-scroll-area class="aq-post-policy-scroll-area" visible: true>
             <q-option-group
               v-model="selectedItem"
               :options="rows"
               color="primary"
             ></q-option-group>
-          </div>
-          
         </q-scroll-area>
+
 </template>
 
 <script>
@@ -71,7 +69,7 @@ async setup(props, context) {
 .aq-post-policy-scroll-area {
   border: 1px solid black;
   height: 200px; 
-  max-width: 300px;
+  max-width: 90%;
 }
 
 </style>

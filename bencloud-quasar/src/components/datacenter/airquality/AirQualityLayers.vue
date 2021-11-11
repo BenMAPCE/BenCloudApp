@@ -109,9 +109,20 @@ export default defineComponent({
 
     let myFilter = unref(filter);
 
+   watch(
+      () => store.state.airquality.airQualityLayerAddedDate,
+      (airQualityLayerAddedDate, prevAirQualityLayerAddedDate) => {
+          console.log("--- updated Air Quality Layer")
+          onRequest({
+            pagination: pagination.value,
+            filter: undefined,
+         });
+    })
+
     watch(
       () => store.state.airquality.pollutantId,
       (pollutantId, prevPollutantId) => {
+        console.log("--- changed Air Quality Layer")
         pollutantId = pollutantId;
         filter.value = "";
         pagination.value.sortBy = "name";
@@ -125,9 +136,8 @@ export default defineComponent({
           pagination: pagination.value,
           rows: [],
         });
-      }
-    );
-
+    })
+      
     function onRequest(props) {
       console.log("on onRequest()");
       if (store.state.airquality.pollutantId != 0) {
@@ -197,11 +207,7 @@ export default defineComponent({
 
     })
 
-
-
     onMounted(() => {
-      
-    
       // get initial data from server (1st page)
       onRequest({
         pagination: pagination.value,
@@ -254,7 +260,7 @@ const columns = [
   {
     name: "cell_count",
     label: "Cell Count",
-    field: "cell_count",
+    field: "metric_statistics.cell_count",
     sortable: true,
   },
   {

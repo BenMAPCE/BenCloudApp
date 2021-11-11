@@ -21,7 +21,7 @@
 
           <div class="row">
             <div class="col-12 air-quality-name">
-              Add {{ pollutantFriendlyName }} {{ pollutantId }} Air Quality Layer
+              Add {{ pollutantFriendlyName }} Air Quality Layer
             </div>
           </div>
 
@@ -44,6 +44,8 @@
               <GridDefinitions @changeGridValue="onChangeGridValue"></GridDefinitions>
             </div>
           </div>
+
+          <input type="hidden" name="pollutantId" :value="pollutantId" >
 
           <div class="row justify-center">
             <q-card-actions>
@@ -182,7 +184,7 @@ export default {
       const fileData = new FormData();
       fileData.append("file", this.selected_file);
       fileData.append("name", this.name);
-      fileData.append("pollutantId", this.pollutantValue);
+      fileData.append("pollutantId", this.pollutantId);
       fileData.append("gridId", this.gridValue);
       var self = this;
 

@@ -10,3 +10,8 @@ export function pollutantFriendlyName (state) {
 export function airQualityLayerId (state) {
   return state.airQualityLayerId
 }
+
+export function airQualityLayerAddedDate (state) {
+  return state.airQualityLayerAddedDate
+}
+

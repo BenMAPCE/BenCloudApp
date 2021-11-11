@@ -1,14 +1,14 @@
 <template>
   <q-btn push color="primary" ref="btn" @click="alert">
-    Add {{ pollutantFriendlyName }} {{ pollutantId }} Air Quality Layer</q-btn
+    Add {{ pollutantFriendlyName }} Air Quality Layer</q-btn
   >
 </template>
 
 <script>
 import { defineComponent, ref, reactive } from "vue";
-import { useQuasar } from "quasar";
+import { useQuasar, date } from "quasar";
 import AirQualityUploadForm from "./AirQualityUploadForm.vue";
-import { onMounted } from "vue";
+import { onMounted, watch } from "vue";
 import { useStore } from "vuex";
 
 export default defineComponent({
@@ -44,6 +44,7 @@ export default defineComponent({
       })
         .onOk(() => {
           console.log("Upload AQ OK");
+          store.commit("airquality/updateAirQualityLayerAddedDate", new Date());
         })
         .onCancel(() => {
           // console.log('Cancel')
@@ -52,6 +53,8 @@ export default defineComponent({
           // console.log('I am triggered on both OK and Cancel')
         });
     }
+
+  
 
     onMounted(() => {
     });
