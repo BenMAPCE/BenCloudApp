@@ -47,7 +47,7 @@
            <q-td :props="props">
            <q-btn-dropdown color="primary" label="" dense>
               <q-list>
-                <q-item dense clickable v-close-popup @click="onClick(props)">
+                <q-item dense clickable v-close-popup @click="onClickViewExport(props)">
                   <q-item-section>
                     <q-item-label>View/Export Results</q-item-label>
                   </q-item-section>
@@ -128,6 +128,8 @@ export default defineComponent({
       "Delete",
     ];
 
+    const task_uuid = ref(0)
+
     let completedTasksRefreshInterval = null;
 
     function loadCompletedTasks() {
@@ -170,6 +172,15 @@ export default defineComponent({
       console.log("onClick");
       console.log(props);
       console.log(item);
+    }
+
+    function onClickViewExport(props) {
+      console.log("onClickViewExport");
+      console.log(props);
+      var row = JSON.parse(JSON.stringify(props.row))
+      task_uuid.value = row.task_uuid;
+      console.log(task_uuid);
+      this.$router.push({ path: `/datacenter/view-export-task/${task_uuid.value}` })
     }
 
     function exportTaskResults(props) {
@@ -237,6 +248,7 @@ export default defineComponent({
       getCompletedTasks,
       exportTaskResults,
       onClick,
+      onClickViewExport,
       fab1,
       fab2,
       showOptions,

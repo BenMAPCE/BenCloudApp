@@ -48,7 +48,7 @@ export const getValuationFunctionsForEndpointGroupId = (records, endpointGroupId
 
     for (var i = 0; i < records.length; i++){
         if (records[i].endpoint_group_id === endpointGroupId) {
-            records[i].['label'] = 
+            records[i]['label'] = 
                 records[i].endpoint_name + " | " + 
                 records[i].start_age + " - " + 
                 records[i].end_age + " | " + 
