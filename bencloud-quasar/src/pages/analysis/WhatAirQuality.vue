@@ -7,6 +7,10 @@
     </div>
 </div>
 
+<div v-if="stepHasError && atStep.value == 3">
+    Please select a pre and post Air Quality dataset
+</div>
+
 <div class="row">
     <div class="col-6">
         <div>
@@ -41,6 +45,8 @@ import {
     defineComponent,
     onBeforeMount,
     watch,
+    reactive,
+    inject,
     ref
 } from "vue";
 import {
@@ -68,6 +74,9 @@ export default defineComponent({
         const selectedPollutantId = ref(0)
         const selectedPollutantFriendlyName = ref("OOPS")
 
+        const stepHasError = reactive(inject("stepHasError"));
+        const atStep = reactive(inject("atStep"));
+
         onBeforeMount(() => {
 
             selectedPollutantId.value = store.state.analysis.pollutantId
@@ -88,7 +97,10 @@ export default defineComponent({
             pollutantFriendlyName: ref(""),
             onChangeAirQualityPrePolicy,
             selectedPollutantId,
-            selectedPollutantFriendlyName
+            selectedPollutantFriendlyName,
+            stepHasError,
+            atStep
+
         };
     },
 });

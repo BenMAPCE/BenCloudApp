@@ -228,7 +228,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .air-quality-pre-policy {
   .metric-characteristics {
     margin-top: 25px;

@@ -6,6 +6,7 @@ import { createStore } from 'vuex'
 import airquality from './airquality'
 import app from './app'
 import analysis from './analysis'
+import auth from './auth'
 
 /*
  * If not building with SSR mode, you can
@@ -21,7 +22,8 @@ export default store(function (/* { ssrContext } */) {
     modules: {
       airquality,
       app,
-      analysis
+      analysis,
+      auth
     },
 
     // enable strict mode (adds overhead!)

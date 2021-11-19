@@ -48,7 +48,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .q-tab.national-results {
   flex: 0 0 auto;
   align-items: left;

@@ -40,12 +40,12 @@
         <q-btn
           v-if="step > 1"
           color="black"
-          @click="$refs.stepper.previous()"
+          @click="validatePreviousStep(this.$refs.stepper, step)"
           label="Back"
           class="q-ml-sm back-button"
         />
         <q-btn
-          @click="validateStep(); $refs.stepper.next()"
+          @click="validateStep(this.$refs.stepper, step)"
           v-if="step < 7"
           color="primary"
           label="Continue"
@@ -56,7 +56,8 @@
 </template>
 
 <script>
-import { ref } from "vue";
+import { ref, reactive, provide, computed } from "vue";
+import { useStore } from "vuex";
 
 import Where from "src/pages/analysis/Where.vue";
 import WhatPollutants from "src/pages/analysis/WhatPollutants.vue";
@@ -65,6 +66,14 @@ import WhoWillBeExposed from "src/pages/analysis/WhoWillBeExposed.vue";
 import WhatHealthEffects from "src/pages/analysis/WhatHealthEffects.vue";
 import ValueOfEffects from "src/pages/analysis/WhatValueOfEffects.vue";
 import ReviewAndSubmit from "src/pages/analysis/ReviewAndSubmit.vue";
+
+import { pollutantIdHasValue } from "../../composables/validation/analysis-validations";
+import { prePolicyAirQualityIdHasValue } from "../../composables/validation/analysis-validations";
+import { postPolicyAirQualityIdHasValue } from "../../composables/validation/analysis-validations";
+import { populationDatasetIdHasValue } from "../../composables/validation/analysis-validations";
+import { populationYearHasValue } from "../../composables/validation/analysis-validations";
+import { incidenceIdHasValue } from "../../composables/validation/analysis-validations";
+import { healthEffectsHasValue } from "../../composables/validation/analysis-validations";
 
 export default {
   components: {
@@ -77,12 +86,96 @@ export default {
     ReviewAndSubmit,
   },
   setup() {
-    function validateStep() {
-      console.log("*** validating step " + this.step);
+    const store = useStore();
+
+    const stepHasError = reactive(ref(false));
+    const atStep = reactive(ref(null));
+
+    provide(
+      "stepHasError",
+      computed(() => stepHasError.value)
+    );
+    provide(
+      "atStep",
+      computed(() => atStep)
+    );
+
+    function validatePreviousStep(thisStepper, step) {
+      validateStep(thisStepper, step - 1);
+      thisStepper.previous();
     }
+
+    function validateStep(thisStepper, step) {
+      console.log(thisStepper);
+      console.log("*** validating step " + step);
+      if (step == 1) {
+        thisStepper.next();
+      }
+
+      if (step == 2) {
+        if (pollutantIdHasValue(store)) {
+          stepHasError.value = false;
+          thisStepper.next();
+        } else {
+          stepHasError.value = true;
+          atStep.value = 2;
+        }
+      }
+
+      if (step == 3) {
+        if (
+          prePolicyAirQualityIdHasValue(store) &&
+          postPolicyAirQualityIdHasValue(store)
+        ) {
+          stepHasError.value = false;
+          thisStepper.next();
+        } else {
+          stepHasError.value = true;
+          atStep.value = 3;
+        }
+      }
+
+      if (step == 4) {
+        if (
+          populationDatasetIdHasValue(store) &&
+          populationYearHasValue(store) &&
+          incidenceIdHasValue(store)
+        ) {
+          stepHasError.value = false;
+          thisStepper.next();
+        } else {
+          stepHasError.value = true;
+          atStep.value = 4;
+        }
+      }
+
+      if (step == 5) {
+        if (
+          healthEffectsHasValue(store) 
+        ) {
+          stepHasError.value = false;
+          thisStepper.next();
+        } else {
+          stepHasError.value = true;
+          atStep.value = 5;
+        }
+      }
+
+     if (step == 6) {
+          stepHasError.value = false;
+          thisStepper.next();
+      }
+
+     if (step == 7) {
+          stepHasError.value = false;
+          thisStepper.next();
+      }
+}
     return {
       step: ref(1),
-      validateStep
+      stepHasError,
+      validateStep,
+      validatePreviousStep,
     };
   },
 };

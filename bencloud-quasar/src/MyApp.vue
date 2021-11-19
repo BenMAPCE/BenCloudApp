@@ -15,7 +15,7 @@ export default {
 }
 </script>
 
-<style lang="css">
+<style lang="scss">
 
 .app-header {
   font-size: 20px;

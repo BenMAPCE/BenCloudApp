@@ -30,7 +30,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 #vue-example {
   width: 100%;
   margin-top: 15px;

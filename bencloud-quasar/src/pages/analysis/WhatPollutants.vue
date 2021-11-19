@@ -1,12 +1,18 @@
 <template>
-    <p class="pollutant-header">What pollutant do you want to assess?</p>
+  <div class="pollutant-header">What pollutant do you want to assess?</div>
+
+  <div v-if="stepHasError && atStep.value == 2">
+    Please select an Air Quality
+  </div>
+
+  |{{ stepHasError }}|{{ atStep.value }}|
   <Suspense>
     <Pollutant></Pollutant>
   </Suspense>
 </template>
 
 <script>
-import { defineComponent } from "vue";
+import { defineComponent, ref, reactive, watch, inject, onMounted } from "vue";
 import { useStore } from "vuex";
 import Pollutant from "../../components/analysis/Pollutant.vue";
 
@@ -15,29 +21,22 @@ export default defineComponent({
   components: {
     Pollutant,
   },
-  setup(props, context) {},
-  /*
-  methods: {
-    updatePollutant(value, event) {
-      console.log(value);
-      this.$store.commit("analysis/updatePollutant", 9999, value);
-      this.pollutantName = this.$store.state.analysis.pollutantName;
-    },
-  },
-  data() {
+  setup(props, context) {
+
+    const stepHasError = reactive(inject("stepHasError"));
+    const atStep = reactive(inject("atStep"));
+
     return {
-      pollutant: "",
-      pollutantName: "",
+      stepHasError,
+      atStep
     };
   },
-  */
-  //
 });
 </script>
 
 <style scoped>
-  .pollutant-header {
-    font-size: 16px;
-    font-weight: 500
-  }
+.pollutant-header {
+  font-size: 16px;
+  font-weight: 500;
+}
 </style>

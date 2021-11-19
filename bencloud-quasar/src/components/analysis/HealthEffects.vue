@@ -1,4 +1,9 @@
 <template>
+
+  <div v-if="stepHasError && atStep.value == 5">
+    Please select at least one Health Effect
+  </div>
+
   <q-tabs
     v-model="tab"
     dense
@@ -44,8 +49,7 @@
   </q-tab-panels>
 </template>
 <script>
-import { defineComponent } from "vue";
-import { ref } from "vue";
+import { defineComponent, ref, reactive, inject } from "vue";
 import HealthEffectsStandard from "./HealthEffectsStandard.vue";
 
 export default defineComponent({
@@ -58,10 +62,14 @@ export default defineComponent({
 
   setup(props, context) {
 
+    const stepHasError = reactive(inject("stepHasError"));
+    const atStep = reactive(inject("atStep"));
+
     return {
       tab: ref("standard"),
-      heTooltip: ref("In this mode, you can select health impact functions grouped by the impact type (mortality vs. morbidity) and time scale for impacts. If you wish to select studies either individually or by health endpoint, click on Estimate Individual Effects above.")
-
+      heTooltip: ref("In this mode, you can select health impact functions grouped by the impact type (mortality vs. morbidity) and time scale for impacts. If you wish to select studies either individually or by health endpoint, click on Estimate Individual Effects above."),
+      stepHasError,
+      atStep
     };
   },
 });

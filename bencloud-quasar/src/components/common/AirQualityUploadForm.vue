@@ -267,7 +267,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .upload-air-quality {
   .q-field {
     padding-left: 10px;

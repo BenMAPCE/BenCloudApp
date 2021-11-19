@@ -1,6 +1,7 @@
 <template>
   <div class="q-pa-md">
-    <q-table
+    
+     <q-table
       :rows="rows"
       :columns="columns"
       row-key="name"
@@ -41,6 +42,7 @@
         />
       </template>
     </q-table>
+
   </div>
 </template>
 
@@ -60,7 +62,7 @@ export default defineComponent({
     const pagination = ref({
       page: 1,
       rowsPerPage: 0,
-      sortBy: "task_uuid",
+      sortBy: "task_health_effect",
       descending: true,
     });
     const $q = useQuasar();
@@ -94,9 +96,21 @@ const rows = [
     task_baseline_incidence: 140000,
     task_xyz: "XYZ",
   },
+  {
+    task_uuid: "202020202",
+    task_health_effect: "Mortallity",
+    task_ages: "50-64",
+    task_study: "study 2",
+    task_completed_date: new Date(),
+    task_change_in_aq: 33.2,
+    task_change_in_incidence: 5.0,
+    task_population_exposed: 78000,
+    task_baseline_incidence: 150000,
+    task_xyz: "ZYX",
+  },
 ];
 
-const visibleColumns = [
+const visibleColumns = ref([
   //  "task_uuid",
   "task_health_effect",
   "task_ages",
@@ -106,7 +120,7 @@ const visibleColumns = [
   "task_baseline_incidence",
   "task_change_in_incidence",
   //"task_xyz",
-];
+])
 
 const columns = [
   {
@@ -181,4 +195,6 @@ const columns = [
 ];
 </script>
 
-<style lang="scss"></style>
+<style lang="scss">
+
+</style>

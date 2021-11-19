@@ -250,7 +250,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .save-template-button,
 .submit-task-button {
   margin-left: 25px;

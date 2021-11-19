@@ -62,7 +62,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .task-results-page {
   padding: 10px;
   .task-name, .task-completed-date {

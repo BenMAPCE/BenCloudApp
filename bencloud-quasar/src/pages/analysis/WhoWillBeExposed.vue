@@ -1,4 +1,7 @@
 <template>
+  <div v-if="stepHasError && atStep.value == 4">
+    Please make all selections
+  </div>
   <div class="q-pa-md">
     <div class="q-gutter-sm">
       <div class="row">Step 1. Select the population dataset.</div>
@@ -24,7 +27,7 @@
 </template>
 
 <script>
-import { defineComponent } from "vue";
+import { defineComponent, reactive, inject } from "vue";
 import PopulationDataset from "../../components/analysis/PopulationDataset.vue";
 import PopulationYears from "../../components/analysis/PopulationYears.vue";
 import Incidence from "../../components/analysis/Incidence.vue";
@@ -37,7 +40,12 @@ export default defineComponent({
   setup() {
     const store = useStore();
 
+    const stepHasError = reactive(inject("stepHasError"));
+    const atStep = reactive(inject("atStep"));
+
     return {
+      stepHasError,
+      atStep
     };
   },
 });

@@ -257,7 +257,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .review-and-submit {
 
   .save-template-card {
