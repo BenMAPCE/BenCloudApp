@@ -104,7 +104,6 @@ export default defineComponent({
 });
 
 const visibleColumns = ref([
-  //  "task_uuid",
   "endpoint",
   "name",
   "study",
@@ -118,18 +117,9 @@ const visibleColumns = ref([
   //"metric",
   //"seasonal_metric",
   //"metric_statistic",
-  "action",
 ]);
 
 const columns = [
-  {
-    name: "task_uuid",
-    label: "Task UUID",
-    align: "left",
-    field: (row) => row.task_uuid,
-    format: (val) => `${val}`,
-    sortable: true,
-  },
   {
     name: "endpoint",
     label: "Health Effect",
@@ -210,15 +200,6 @@ const columns = [
     label: "Annual Statistic",
     field: "metric_statistic",
     sortable: true,
-  },
-
-  {
-    name: "action",
-    label: "Action",
-    field: "",
-    align: "center",
-    sortable: false,
-    style: "width: 200px",
   },
 ];
 </script>

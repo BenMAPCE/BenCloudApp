@@ -11,7 +11,7 @@ export const getHIFTaskResults = (task_uuid) => {
 
         try {
             const result = await axios
-                .get(process.env.API_SERVER + "/api/health-impact-result-datasets/" + task_uuid + "/contents?gridId=20 ", {
+                .get(process.env.API_SERVER + "/api/health-impact-result-datasets/" + task_uuid + "/contents?gridId=20", {
             params: {
                 page: 1,
                 rowsPerPage: 9999999,
@@ -44,7 +44,7 @@ export const getValuationTaskResults = (task_uuid) => {
 
         try {
             const result = await axios
-                .get(process.env.API_SERVER + "/api/valuation-result-datasets/" + task_uuid + "/contents?gridId=20 ", {
+                .get(process.env.API_SERVER + "/api/valuation-result-datasets/" + task_uuid + "/contents?gridId=20", {
             params: {
                 page: 1,
                 rowsPerPage: 9999999,
