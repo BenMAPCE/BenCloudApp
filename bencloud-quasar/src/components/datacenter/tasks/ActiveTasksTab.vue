@@ -35,7 +35,7 @@
           <q-td :props="props">
             <q-linear-progress size="25px" :value="props.row.task_percentage/100" color="accent" v-if="props.row.task_status_message != 'Pending'">
               <div class="absolute-full flex flex-center">
-                <q-badge color="white" text-color="accent" :label="props.row.task_percentage" />
+                <q-badge color="white" text-color="accent" :label="props.row.task_percentage + ' %'" />
               </div>
             </q-linear-progress>
 

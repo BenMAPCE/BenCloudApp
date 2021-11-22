@@ -5,15 +5,17 @@
     </div>
     <div class="task-name">{{ task_name }}</div>
     <div class="task-completed-date">{{ task_completed_date }}</div>
+
     <div class="task-results">
-      <TaskResultsTabs v-bind:task_uuid="task_uuid"></TaskResultsTabs>
+      <TaskResultsTabs v-bind:task_uuid_with_type="task_uuid_with_type"></TaskResultsTabs>
     </div>
+
   </div>
 </template>
 
 <script>
 import { defineComponent } from "vue";
-import { ref, unref, onBeforeMount } from "vue";
+import { ref, unref, reactive, onBeforeMount } from "vue";
 import { useRoute } from "vue-router";
 
 import TaskResultsTabs from "../../../components/datacenter/tasks/TaskResultsTabs.vue";
@@ -29,32 +31,47 @@ export default defineComponent({
   setup() {
     const route = useRoute();
     console.log(route.params.task_uuid);
-    const task_uuid = route.params.task_uuid;
+    const task_uuid_with_type = route.params.task_uuid;
     const task_name = ref("NO TASK NAME")
     const task_completed_date = ref(null)
+    const task_type = ref("");
+    const task_uuid = ref(null)
 
     const rows = ref([]);
 
     onBeforeMount(() => {
       (async () => {
+
+        // console.log("--------------------------------")
+        // console.log("ViewTaskResults: " + task_uuid_with_type)
+        // console.log("--------------------------------")
+        task_type.value = task_uuid_with_type.substring(0,1)
+        task_uuid.value = task_uuid_with_type.substring(2)
+        // console.log("--------------------------------")
+        // console.log("task_type: " + task_type.value)
+        // console.log("task_uuid: " + task_uuid.value)
+        // console.log("--------------------------------")
+
+
         const response = await getCompletedTasks().fetch();
         //console.log(unref(response.data).data)
         rows.value = unref(response.data).data;
         var tasks = JSON.parse(JSON.stringify(rows.value));
         for (var i = 0; i < tasks.length; i++) {
-          if (tasks[i].task_uuid === task_uuid) {
+          if (tasks[i].task_uuid === task_uuid.value) {
             task_name.value = tasks[i].task_name
             task_completed_date.value = tasks[i].task_completed_date
             break
           }
         }
 
-        console.log(tasks);
+//        console.log(tasks);
+
       })();
     });
 
     return {
-      task_uuid,
+      task_uuid_with_type,
       task_name,
       task_completed_date,
     };

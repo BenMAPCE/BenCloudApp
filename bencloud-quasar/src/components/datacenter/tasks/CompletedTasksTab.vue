@@ -178,9 +178,12 @@ export default defineComponent({
       console.log("onClickViewExport");
       console.log(props);
       var row = JSON.parse(JSON.stringify(props.row))
-      task_uuid.value = row.task_uuid;
-      console.log(task_uuid);
-      this.$router.push({ path: `/datacenter/view-export-task/${task_uuid.value}` })
+      //if (row.task_type === "HIF") {
+        var task_type = (row.task_type).substring(0,1)
+        this.$router.push({ path: `/datacenter/view-export-task/${task_type}-${row.task_uuid}` })
+      //} else {
+        
+      //}
     }
 
     function exportTaskResults(props) {
@@ -264,7 +267,7 @@ const rows = [];
 const visibleColumns = [
   // "task_uuid",
   "task_name",
-  "task_type",
+  //"task_type",
         "task_submitted_date",
   //      "task_started_date",
         "task_completed_date",
@@ -284,15 +287,21 @@ const columns = [
     sortable: true,
   },
   {
-    name: "task_name",
-    required: true,
-    label: "Task",
+    name: "task_type",
+    label: "Task Type",
     align: "left",
-    field: (row) => row.task_name,
+    field: (row) => row.task_type,
     format: (val) => `${val}`,
     sortable: true,
   },
   {
+    name: "task_name",
+    label: "Task Name",
+    align: "left",
+    field: (row) => row.task_name,
+    format: (val) => `${val}`,
+    sortable: true,
+  },  {
     name: "task_completed_date",
     label: "Completed",
     field: "task_completed_date",
