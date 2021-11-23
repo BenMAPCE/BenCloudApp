@@ -1,46 +1,52 @@
 <template>
-  <div class="q-pa-md">
-    <q-table
-      :rows="rows"
-      :columns="columns"
-      row-key="name"
-      :rows-per-page-options="[0]"
-      v-model:pagination="pagination"
-      :loading="loading"
-      @request="loadHIFResults"
-      :filter="filter"
-      binary-state-sort
-      :visible-columns="visibleColumns"
-      class="task-results"
-    >
-      <template v-slot:top="props">
-        <q-space></q-space>
+  <div class="hif-task-results">
+    <div class="q-pa-md download-button">
+      <q-btn color="primary" label="Download" @click="showDownloadDialog()" />
+    </div>
 
-        <q-select
-          v-model="visibleColumns"
-          multiple
-          outlined
-          dense
-          options-dense
-          :display-value="$q.lang.table.columns"
-          emit-value
-          map-options
-          :options="columns"
-          option-value="name"
-          options-cover
-          style="min-width: 150px"
-        ></q-select>
+    <div class="q-pa-md">
+      <q-table
+        :rows="rows"
+        :columns="columns"
+        row-key="name"
+        :rows-per-page-options="[0]"
+        v-model:pagination="pagination"
+        :loading="loading"
+        @request="loadHIFResults"
+        :filter="filter"
+        binary-state-sort
+        :visible-columns="visibleColumns"
+        class="task-results"
+      >
+        <template v-slot:top="props">
+          <q-space></q-space>
 
-        <q-btn
-          flat
-          round
-          dense
-          :icon="props.inFullscreen ? 'mdi-fullscreen-exit' : 'mdi-fullscreen'"
-          @click="props.toggleFullscreen"
-          class="q-ml-md"
-        />
-      </template>
-    </q-table>
+          <q-select
+            v-model="visibleColumns"
+            multiple
+            outlined
+            dense
+            options-dense
+            :display-value="$q.lang.table.columns"
+            emit-value
+            map-options
+            :options="columns"
+            option-value="name"
+            options-cover
+            style="min-width: 150px"
+          ></q-select>
+
+          <q-btn
+            flat
+            round
+            dense
+            :icon="props.inFullscreen ? 'mdi-fullscreen-exit' : 'mdi-fullscreen'"
+            @click="props.toggleFullscreen"
+            class="q-ml-md"
+          />
+        </template>
+      </q-table>
+    </div>
   </div>
 </template>
 
@@ -49,6 +55,7 @@ import { defineComponent } from "vue";
 import { ref, unref, watch, onBeforeMount, onUpdated, onMounted } from "vue";
 import { useQuasar, date } from "quasar";
 import { getHIFTaskResults } from "../../../../composables/tasks/task-results";
+import DownloadTaskResultsDialog from "../DownloadTaskResultsDialog.vue";
 
 export default defineComponent({
   model: ref(null),
@@ -57,7 +64,6 @@ export default defineComponent({
   props: ["task_uuid"],
 
   setup(props, context) {
-
     const task_type = ref("");
     const task_uuid = ref(null);
 
@@ -66,7 +72,7 @@ export default defineComponent({
     const pagination = ref({
       page: 1,
       rowsPerPage: 0,
-      sortBy: "task_health_effect",
+      sortBy: "endpoint",
       descending: true,
     });
     const $q = useQuasar();
@@ -74,17 +80,37 @@ export default defineComponent({
     const rows = ref([]);
 
     function loadHIFResults() {
-
       loading.value = true;
 
       (async () => {
         const response = await getHIFTaskResults(props.task_uuid).fetch();
-        console.log(unref(response.data))
+        console.log(unref(response.data));
         console.log(JSON.parse(JSON.stringify(unref(response.data))));
-        rows.value = JSON.parse(JSON.stringify(unref(response.data)))
+        rows.value = JSON.parse(JSON.stringify(unref(response.data)));
         //console.log(rows.value)
         loading.value = false;
       })();
+    }
+
+    function showDownloadDialog() {
+      $q.dialog({
+        component: DownloadTaskResultsDialog,
+        parent: this,
+        persistent: true,
+        componentProps: {
+          pollutantFriendlyName: props.pollutantFriendlyName,
+          pollutantId: props.pollutantId,
+        },
+      })
+        .onOk(() => {
+          console.log("Export OK");
+        })
+        .onCancel(() => {
+          // console.log('Cancel')
+        })
+        .onDismiss(() => {
+          // console.log('I am triggered on both OK and Cancel')
+        });
     }
 
     onMounted(() => {
@@ -99,6 +125,7 @@ export default defineComponent({
       pagination,
       visibleColumns,
       loadHIFResults,
+      showDownloadDialog,
     };
   },
 });
@@ -125,7 +152,6 @@ const visibleColumns = ref([
   "baseline",
   //"percent_of_baseline",
 ]);
-
 
 const columns = [
   {
@@ -166,7 +192,8 @@ const columns = [
     label: "Qualifier",
     field: (row) => row.qualifier,
     align: "left",
-    style: "inline-size: 150px; min-width: 400px; max-width: 400px; overflow-wrap: break-word; word-break: break-word; white-space: pre-wrap;",
+    style:
+      "inline-size: 150px; min-width: 400px; max-width: 400px; overflow-wrap: break-word; word-break: break-word; white-space: pre-wrap;",
     sortable: true,
   },
   {
@@ -215,7 +242,7 @@ const columns = [
   {
     name: "delta_aq",
     label: "Change in AQ",
-    field: (row) => row.delta_aq.toFixed(4),
+    field: (row) => row.delta_aq.toLocaleString('en-US', {maximumFractionDigits:4}),
     sortable: true,
   },
   {
@@ -233,32 +260,32 @@ const columns = [
   {
     name: "standard_deviation",
     label: "Standard Deviation",
-    field: (row) => row.standard_deviation.toFixed(4),
+    field: (row) => row.standard_deviation.toLocaleString('en-US', {maximumFractionDigits:4}),
     sortable: true,
   },
   {
     name: "point_estimate",
     label: "Change in Incidence (Cases)",
-    field: (row) => row.point_estimate.toFixed(4),
+    field: (row) => row.point_estimate.toLocaleString('en-US', {maximumFractionDigits:4}),
     sortable: true,
   },
   {
     name: "population",
     label: "Population Exposed",
-    field: (row) => row.population.toFixed(4),
+    field: (row) => row.population.toLocaleString('en-US', {maximumFractionDigits:4}),
     sortable: true,
   },
   {
     name: "baseline",
     label: "Baseline Incidence",
-    field: (row) => row.baseline.toFixed(4),
+    field: (row) => row.baseline.toLocaleString('en-US', {maximumFractionDigits:4}),
     sortable: true,
   },
   {
     name: "percent_of_baseline",
     label: "Percent of Baseline",
-    field: (row) => row.percent_of_baseline.toFixed(4),
-  sortable: true,
+    field: (row) => row.percent_of_baseline.toLocaleString('en-US', {maximumFractionDigits:4}),
+    sortable: true,
   },
 
   {
@@ -272,4 +299,10 @@ const columns = [
 ];
 </script>
 
-<style lang="scss"></style>
+<style lang="scss">
+.hif-task-results {
+  .download-button {
+    text-align: right;
+  }
+}
+</style>

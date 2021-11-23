@@ -163,12 +163,12 @@ const columns = [
   {
     name: "point_estimate",
     label: "Valuation Point Estimate",
-    field: (row) => row.point_estimate.toFixed(4),
+    field: (row) => row.point_estimate.toLocaleString('en-US', {maximumFractionDigits:4}),
     sortable: true,
   },{
     name: "standard_deviation",
     label: "Standard Deviation",
-    field: (row) => row.standard_deviation.toFixed(4),
+    field: (row) => row.standard_deviation.toLocaleString('en-US', {maximumFractionDigits:4}),
     sortable: true,
   },
  {
