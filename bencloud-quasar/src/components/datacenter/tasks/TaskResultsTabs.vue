@@ -1,5 +1,4 @@
 <template>
-
   <q-tabs
     v-model="tab"
     dense
@@ -16,10 +15,10 @@
   <q-tab-panels v-model="tab" animated>
     <q-tab-panel name="national-results"> 
       <div v-if="task_type === 'H'">
-        <HIFTaskResults  v-bind:task_uuid="task_uuid"></HIFTaskResults>
+        <HIFTaskResults  v-bind:task_uuid="task_uuid" v-bind:task_name="task_name" v-bind:task_type="task_type"></HIFTaskResults>
       </div>
       <div v-if="task_type === 'V'">
-        <ValuationTaskResults  v-bind:task_uuid="task_uuid"></ValuationTaskResults>
+        <ValuationTaskResults  v-bind:task_uuid="task_uuid" v-bind:task_name="task_name" v-bind:task_type="task_type"></ValuationTaskResults>
       </div>
     </q-tab-panel>
 
@@ -39,7 +38,7 @@ import ValuationTaskResults from "./Valuation/ValuationTaskResults.vue";
 export default defineComponent({
   model: ref(null),
   name: "TaskResultsTab",
-  props: ["task_uuid_with_type"],
+  props: ["task_uuid_with_type", "task_name"],
 
   components: {
     HIFTaskResults,
@@ -48,6 +47,7 @@ export default defineComponent({
   setup(props) {
 
     const task_type = ref("");
+    const task_name = ref("");
     const task_uuid = ref(null)
 
     onBeforeMount(() => {
@@ -58,6 +58,7 @@ export default defineComponent({
         // console.log("--------------------------------")
         task_type.value = props.task_uuid_with_type.substring(0,1)
         task_uuid.value = props.task_uuid_with_type.substring(2)
+        task_name.value = props.task_name
         // console.log("--------------------------------")
         // console.log("task_type: " + task_type.value)
         // console.log("task_uuid: " + task_uuid.value)

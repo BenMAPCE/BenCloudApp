@@ -7,7 +7,7 @@
     <div class="task-completed-date">{{ task_completed_date }}</div>
 
     <div class="task-results">
-      <TaskResultsTabs v-bind:task_uuid_with_type="task_uuid_with_type"></TaskResultsTabs>
+      <TaskResultsTabs v-bind:task_uuid_with_type="task_uuid_with_type" v-bind:task_name="task_name"></TaskResultsTabs>
     </div>
 
   </div>

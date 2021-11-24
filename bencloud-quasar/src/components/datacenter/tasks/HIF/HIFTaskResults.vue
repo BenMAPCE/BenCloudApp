@@ -61,11 +61,11 @@ export default defineComponent({
   model: ref(null),
   name: "HIFTaskResults",
 
-  props: ["task_uuid"],
+  props: ["task_uuid", "task_name", "task_type"],
 
   setup(props, context) {
-    const task_type = ref("");
-    const task_uuid = ref(null);
+    //const task_type = ref("");
+    //const task_uuid = ref(null);
 
     const filter = ref("");
     const loading = ref(false);
@@ -84,10 +84,7 @@ export default defineComponent({
 
       (async () => {
         const response = await getHIFTaskResults(props.task_uuid).fetch();
-        console.log(unref(response.data));
-        console.log(JSON.parse(JSON.stringify(unref(response.data))));
         rows.value = JSON.parse(JSON.stringify(unref(response.data)));
-        //console.log(rows.value)
         loading.value = false;
       })();
     }
@@ -98,8 +95,9 @@ export default defineComponent({
         parent: this,
         persistent: true,
         componentProps: {
-          pollutantFriendlyName: props.pollutantFriendlyName,
-          pollutantId: props.pollutantId,
+          task_uuid: props.task_uuid,
+          task_name: props.task_name,
+          task_type: props.task_type,
         },
       })
         .onOk(() => {
@@ -114,6 +112,16 @@ export default defineComponent({
     }
 
     onMounted(() => {
+      visibleColumns.value = [
+        "endpoint",
+        "ages",
+        "study",
+        "delta_aq",
+        "point_estimate",
+        "population",
+        "baseline",
+      ];
+
       loadHIFResults(props.task_uuid);
     });
 
@@ -242,7 +250,7 @@ const columns = [
   {
     name: "delta_aq",
     label: "Change in AQ",
-    field: (row) => row.delta_aq.toLocaleString('en-US', {maximumFractionDigits:4}),
+    field: (row) => row.delta_aq.toLocaleString("en-US", { maximumFractionDigits: 4 }),
     sortable: true,
   },
   {
@@ -260,31 +268,34 @@ const columns = [
   {
     name: "standard_deviation",
     label: "Standard Deviation",
-    field: (row) => row.standard_deviation.toLocaleString('en-US', {maximumFractionDigits:4}),
+    field: (row) =>
+      row.standard_deviation.toLocaleString("en-US", { maximumFractionDigits: 4 }),
     sortable: true,
   },
   {
     name: "point_estimate",
     label: "Change in Incidence (Cases)",
-    field: (row) => row.point_estimate.toLocaleString('en-US', {maximumFractionDigits:4}),
+    field: (row) =>
+      row.point_estimate.toLocaleString("en-US", { maximumFractionDigits: 4 }),
     sortable: true,
   },
   {
     name: "population",
     label: "Population Exposed",
-    field: (row) => row.population.toLocaleString('en-US', {maximumFractionDigits:4}),
+    field: (row) => row.population.toLocaleString("en-US", { maximumFractionDigits: 4 }),
     sortable: true,
   },
   {
     name: "baseline",
     label: "Baseline Incidence",
-    field: (row) => row.baseline.toLocaleString('en-US', {maximumFractionDigits:4}),
+    field: (row) => row.baseline.toLocaleString("en-US", { maximumFractionDigits: 4 }),
     sortable: true,
   },
   {
     name: "percent_of_baseline",
     label: "Percent of Baseline",
-    field: (row) => row.percent_of_baseline.toLocaleString('en-US', {maximumFractionDigits:4}),
+    field: (row) =>
+      row.percent_of_baseline.toLocaleString("en-US", { maximumFractionDigits: 4 }),
     sortable: true,
   },
 

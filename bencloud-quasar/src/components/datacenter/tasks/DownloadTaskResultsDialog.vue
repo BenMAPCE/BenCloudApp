@@ -25,23 +25,13 @@
             <div class="col-6 grid-selections">
               <div class="select-grid-levels">Select Grid Levels</div>
               <q-option-group
-                v-model="gridGroup"
+                v-model="grid"
                 :options="gridOptions"
                 dense
                 type="checkbox"
               />
             </div>
-            <div class="col-6 export-format">
-              <div class="select-export-formats">Select Export Format</div>
-              <q-option-group
-                v-model="exportFormatGroup"
-                :options="exportFormatOptions"
-                dense
-              />
-            </div>
           </div>
-
-          <input type="hidden" name="pollutantId" :value="pollutantId" />
 
           <div class="row justify-center">
             <q-card-actions>
@@ -60,39 +50,61 @@
 </template>
 
 <script>
-import { ref } from "vue";
+import { ref, unref, onMounted, onBeforeMount } from "vue";
 import { useQuasar } from "quasar";
 import { useStore } from "vuex";
+import axios from "axios";
+import { getGridDefinitions, buildGridDefinitionOptions } from "../../../composables/tasks/grid-definitions";
 
 export default {
   data: () => ({
-    selected_file: "",
-    pollutantValue: 0,
-    gridValue: 0,
     errorMessage: "",
-    name: "",
+    //name: "",
     dashData: [],
   }),
 
   props: {
-    pollutantId: {
-      type: Number,
-      default: 0,
-    },
-    pollutantFriendlyName: {
+    task_uuid: {
       type: String,
-      default: "None",
+      default: "",
+    },
+    task_name: {
+      type: String,
+      default: "",
+    },
+    task_type: {
+      type: String,
+      default: "",
     },
   },
 
   setup(props) {
-    const gridGroup = ref(["12k"]);
-    const exportFormatGroup = ref("zip");
+    const name = ref("");
+    const task_uuid = ref("");
+    const task_type = ref("");
+
+    const gridOptions = ref([]);
+    const grid = ref([]);
+
+    const $q = useQuasar();
+
+    onBeforeMount(() => {
+
+      task_uuid.value = props.task_uuid;
+      task_type.value = props.task_type;
+      name.value = props.task_name;
+
+      (async () => {
+          const response = await getGridDefinitions().fetch();
+          gridOptions.value = buildGridDefinitionOptions(unref(response.data))
+        })()
+    });
 
     return {
-      gridGroup,
-
-      gridOptions: [
+      grid,
+      name,
+      gridOptions,
+      xgridOptions: [
         {
           label: "US Nation",
           value: "usn",
@@ -111,18 +123,6 @@ export default {
         },
       ],
 
-      exportFormatGroup,
-
-      exportFormatOptions: [
-        {
-          label: "CSV",
-          value: "csv",
-        },
-        {
-          label: "Zip",
-          value: "zip",
-        },
-      ],
     };
   },
 
@@ -151,49 +151,23 @@ export default {
       this.$emit("hide");
     },
 
-    onExportClick() {
-      console.log("onUploadClick");
-      console.log(this.name);
-      console.log("pollutantValue: " + this.pollutantValue);
-      console.log("gridValue: " + this.gridValue);
-
-      // on OK, it is REQUIRED to
-      // emit "ok" event (with optional payload)
-      // before hiding the QDialog
-      this.$emit("ok");
-      // or with payload: this.$emit('ok', { ... })
-
-      // then hiding dialog
-      this.hide();
-    },
-
-    onOKClick() {
-      // on OK, it is REQUIRED to
-      // emit "ok" event (with optional payload)
-      // before hiding the QDialog
-      this.$emit("ok");
-      // or with payload: this.$emit('ok', { ... })
-
-      // then hiding dialog
-      this.hide();
-    },
-
     onSubmit() {
       var hasErrors = false;
       this.errorMessage = "";
+      //var task_uuid = this.props.task_uuid;
 
-      console.log(this.selected_file);
+      console.log("grid: |" + this.grid + "|");
+      console.log("grid: |" + this.grid.length + "|");
 
-      console.log("grid: |" + this.gridGroup + "|");
-      console.log("grid: |" + this.gridGroup.length + "|");
-
+      console.log("NAME: |" + this.name + "|");
+      console.log("UUID: |" + this.task_uuid + "|");
       if (this.name === "") {
         this.errorMessage =
           this.errorMessage + (hasErrors ? ", " : "") + "Name is required";
         hasErrors = true;
       }
 
-      if (this.gridGroup.length === 0) {
+      if (this.grid.length === 0) {
         this.errorMessage =
           this.errorMessage + (hasErrors ? ", " : "") + "Grid is required";
         hasErrors = true;
@@ -203,58 +177,57 @@ export default {
         return;
       }
 
-      /*
-      const url = process.env.API_SERVER + "/api/air-quality-data";
-      const fileData = new FormData();
-      fileData.append("file", this.selected_file);
-      fileData.append("name", this.name);
-      fileData.append("pollutantId", this.pollutantId);
-      fileData.append("gridId", this.gridValue);
       var self = this;
 
-      this.$q.loading.show({
-        message: "Uploading Air Quality Layer. Please wait...",
+      self.$q.loading.show({
+        message: "Downloading results. Please wait...",
         boxClass: "bg-grey-2 text-grey-9",
         spinnerColor: "primary",
       });
 
-      var self = this;
-      this.$axios
-        .post(url, fileData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+      var downloadUrl = "";
+      var gridList = "";
+
+      for (var i = 0; i < this.grid.length; i++){
+        gridList = gridList + this.grid[i] + ","
+      }
+      gridList = gridList.substring(0, gridList.length - 1)
+
+      if (this.task_type === "H") {
+        downloadUrl =
+          process.env.API_SERVER +
+          "/api/health-impact-result-datasets/" +
+          this.task_uuid +
+          "/contents?gridId=" + gridList;
+      } else if (this.task_type === "V") {
+        downloadUrl =
+          process.env.API_SERVER +
+          "/api/valuation-result-datasets/" +
+          this.task_uuid +
+          "/contents?gridId=" + gridList;
+      }
+
+      axios
+        .get(downloadUrl, {
+          headers: { Accept: "application/zip", "Content-Type": "application/zip" },
+          responseType: "blob",
         })
-        .then(function () {
-          console.log("SUCCESS!!");
+        .then((response) => {
+          var fileName = response.headers["content-disposition"]
+            .split("filename=")[1]
+            .split(";")[0];
+
+          const url = window.URL.createObjectURL(new Blob([response.data]));
+          const link = document.createElement("a");
+          link.href = url;
+          link.setAttribute("download", this.name + ".zip"); //or any other extension
+          document.body.appendChild(link);
+          link.click();
+        })
+        .finally(function () {
           self.$q.loading.hide();
           self.hide();
-          self.$emit("ok");
-        })
-        .catch(function (error) {
-          if (error.response) {
-            // The request was made and the server responded with a status code
-            // that falls out of the range of 2xx
-            console.log(error.response.data);
-            self.errorMessage = error.response.data;
-            console.log(error.response.status);
-            console.log(error.response.headers);
-          } else if (error.request) {
-            // The request was made but no response was received
-            // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-            // http.ClientRequest in node.js
-            console.log(error.request);
-          } else {
-            // Something happened in setting up the request that triggered an Error
-            console.log("Error", error.message);
-          }
-          console.log("FAILURE!!");
-          self.$q.loading.hide();
-        })
-        .finally(function () {});
-    */
-      this.hide();
-      this.$emit("ok");
+        });
     },
 
     onCancelClick() {
@@ -272,10 +245,6 @@ export default {
     padding-right: 10px;
   }
 
-  .air-quality-name {
-    padding-left: 15px;
-  }
-
   .export-results-header {
     padding-top: 10px;
     padding-left: 15px;
@@ -283,11 +252,6 @@ export default {
   .grid-selections {
     padding-left: 15px;
   }
-
-  .select-export-formats {
-    padding-bottom: 10px;
-  }
-
   .select-grid-levels {
     padding-bottom: 10px;
   }
