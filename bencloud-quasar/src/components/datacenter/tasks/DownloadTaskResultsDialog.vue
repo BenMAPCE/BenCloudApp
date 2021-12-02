@@ -198,13 +198,13 @@ export default {
           process.env.API_SERVER +
           "/api/health-impact-result-datasets/" +
           this.task_uuid +
-          "/contents?gridId=" + gridList;
+          "/export?gridId=" + gridList;
       } else if (this.task_type === "V") {
         downloadUrl =
           process.env.API_SERVER +
           "/api/valuation-result-datasets/" +
           this.task_uuid +
-          "/contents?gridId=" + gridList;
+          "/export?gridId=" + gridList;
       }
 
       axios
