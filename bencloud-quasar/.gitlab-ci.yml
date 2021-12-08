@@ -1,16 +1,15 @@
-Copied from Quasar Discord
-gitlab CI for deploying a quasar app to gitlab
+# Copied from Quasar Discord
+# gitlab CI for deploying a quasar app to gitlab
 
 # Modified from https://knasmueller.net/vue-js-on-gitlab-pages
+#tags:
+#  - quasar
 pages:
- #image: node:latest
-tags:
-  - quasar
  stage: deploy
  script:
   - npm install -g @quasar/cli
   - npm install --progress=false
-  - quasar build
+  - QENV=production quasar build
   # GitLab requires all the static page files to be in /public
   # Because Quasar uses /public for files, they will be deleted after
   # "compilation" and the compiled files will be moved to public.
@@ -21,8 +20,10 @@ tags:
   expire_in: 1 day
   paths:
   - public
- only:
-  - master
+# only:
+#  - master
 
-the quasar.conf.js also needs 
-publicPath: process.env.NODE_ENV === 'production' ? '/repositoryPath/' : '/',
+#he quasar.conf.js also needs
+# comment for now     publicPath: process.env.NODE_ENV === 'production' ? '/rep$
+
+#change for forcing pipeline 002
