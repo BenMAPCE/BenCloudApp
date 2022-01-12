@@ -12,7 +12,7 @@ stages:
 
 build app:
  stage: Build
- image: node:7
+ image: node:16
  tags:
   - benmapdevgitlab
  script:
