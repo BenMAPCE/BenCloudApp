@@ -43,7 +43,7 @@ build image:
   - mkdir -p /kaniko/.docker
   - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
   - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/docker/bencloudapp/Dockerfile --destination $CI_REGISTRY_IMAGE/bencloudapp:$CI_COMMIT_SHORT_SHA
-  dependencies:
+ dependencies:
   - build app
 
 deploy development:
@@ -60,11 +60,11 @@ deploy development:
   - kubectl config set-context default --cluster=benmap-shared-dev00 --user=gitlab --namespace="benmap-dev"
   - kubectl config use-context default
   - envsubst < k8s/bencloud-app.yml | kubectl apply -f -
-  environment:
-   name: testdev
-   url: http://bencloud-dev.devsecops-eval.epa.gov
-   kubernetes:
-    namespace: bencloud-testdev
+ environment:
+  name: testdev
+  url: http://bencloud-dev.devsecops-eval.epa.gov
+  kubernetes:
+   namespace: bencloud-testdev
 #he quasar.conf.js also needs
 # comment for now     publicPath: process.env.NODE_ENV === 'production' ? '/rep$
 
