@@ -4,8 +4,17 @@
 # Modified from https://knasmueller.net/vue-js-on-gitlab-pages
 #tags:
 #  - quasar
-pages:
- stage: deploy
+
+stages:
+  - Build
+  - Image
+  - Non-prod deployment
+
+build app:
+ stage: Build
+ image: node:7
+ tags:
+  - benmapdevgitlab
  script:
   - npm install -g @quasar/cli
   - npm install --progress=false
@@ -23,6 +32,39 @@ pages:
 # only:
 #  - master
 
+build image:
+ stage: Image
+  tags:
+    - benmapdevgitlab
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  script:
+    - mkdir -p /kaniko/.docker
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/docker/bencloudapp/Dockerfile --destination $CI_REGISTRY_IMAGE/bencloudapp:$CI_COMMIT_SHORT_SHA
+  dependencies:
+    - build app
+
+deploy development:
+  stage: non-prod deployment
+tags:
+    - benmapdevgitlab
+  when: manual
+  image: dtzar/helm-kubectl
+  script:
+    - apk add gettext
+    - kubectl config set-cluster benmap-shared-dev00 --server="$KUBE_URL"
+    - kubectl config set-cluster benmap-shared-dev00 --certificate-authority=$KUBE_CA_PEM_FILE --embed-certs=true
+    - kubectl config set-credentials gitlab --token="$KUBE_TOKEN"
+    - kubectl config set-context default --cluster=benmap-shared-dev00 --user=gitlab --namespace="benmap-dev"
+    - kubectl config use-context default
+    - envsubst < k8s/bencloud-app.yml | kubectl apply -f -
+  environment:
+    name: testdev
+    url: http://bencloud-dev.devsecops-eval.epa.gov
+    kubernetes:
+      namespace: bencloud-testdev
 #he quasar.conf.js also needs
 # comment for now     publicPath: process.env.NODE_ENV === 'production' ? '/rep$
 

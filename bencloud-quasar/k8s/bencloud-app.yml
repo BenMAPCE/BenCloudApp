@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bencloud-app
+  namespace: benmap-dev
+  annotations:
+    app.gitlab.com/app: ${CI_PROJECT_PATH_SLUG}
+    app.gitlab.com/env: ${CI_ENVIRONMENT_SLUG}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bencloud-app
+
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+
+  template:
+    metadata:
+      labels:
+        app: bencloud-app
+      annotations:
+        app.gitlab.com/app: ${CI_PROJECT_PATH_SLUG}
+        app.gitlab.com/env: ${CI_ENVIRONMENT_SLUG}
+    spec:
+      securityContext:
+        runAsUser: 555
+        runAsGroup: 555
+        fsGroup: 555
+      containers:
+      - name: api
+        image:  registry.epa.gov/benmap/bencloudapp/bencloudapp:$CI_COMMIT_SHORT_SHA
+        imagePullPolicy: Always
+        livenessProbe:
+         tcpSocket:
+            port: 8080
+         initialDelaySeconds: 10
+         periodSeconds: 15
+        startupProbe:
+          tcpSocket:
+            port: 8080
+          failureThreshold: 30
+          periodSeconds: 10
+        env:
+          - name: REDEPLOY_META
+            value: $CI_JOB_ID-$CI_COMMIT_SHA
+        ports:
+        - containerPort: 8080
+      imagePullSecrets:
+      - name: glcr-auth
+
