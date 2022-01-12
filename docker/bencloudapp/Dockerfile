@@ -1,4 +1,4 @@
-FROM node:7
+FROM alpine
 
 WORKDIR /public
 
