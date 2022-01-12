@@ -47,7 +47,7 @@ build image:
   - build app
 
 deploy development:
- stage: non-prod deployment
+ stage: Non-prod deployment
  tags:
   - benmapdevgitlab
  when: manual
