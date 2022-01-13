@@ -22,13 +22,14 @@ build app:
   # GitLab requires all the static page files to be in /public
   # Because Quasar uses /public for files, they will be deleted after
   # "compilation" and the compiled files will be moved to public.
-  - rm -rf public
-  - mkdir public
-  - cp -r dist/spa/* public
+  #- rm -rf public
+  #- mkdir public
+  #- cp -r dist/spa/* public
  artifacts:
   expire_in: 1 day
   paths:
-  - public
+   - dist
+  #- public
 # only:
 #  - master
 
