@@ -36,19 +36,19 @@ spec:
         imagePullPolicy: Always
         livenessProbe:
          tcpSocket:
-            port: 8080
+            port: 80
          initialDelaySeconds: 10
          periodSeconds: 15
         startupProbe:
           tcpSocket:
-            port: 8080
+            port: 80
           failureThreshold: 30
           periodSeconds: 10
         env:
           - name: REDEPLOY_META
             value: $CI_JOB_ID-$CI_COMMIT_SHA
         ports:
-        - containerPort: 8080
+        - containerPort: 80
       imagePullSecrets:
       - name: glcr-auth
 
