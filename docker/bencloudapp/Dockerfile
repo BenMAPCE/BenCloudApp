@@ -1,6 +1,6 @@
-FROM alpine
+FROM nginx:alpine
 
-WORKDIR /public
+WORKDIR /bencloud-quasar/dist/spa
 
 
 

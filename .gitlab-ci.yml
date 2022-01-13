@@ -16,7 +16,6 @@ build app:
  tags:
   - benmapdevgitlab
  script:
-  - pwd
   - cd bencloud-quasar
   - npm install -g @quasar/cli
   - npm install --progress=false
