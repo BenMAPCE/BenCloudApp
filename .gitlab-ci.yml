@@ -30,7 +30,7 @@ build app:
  artifacts:
   expire_in: 1 day
   paths:
-   - dist
+   - dist/spa
   #- public
 # only:
 #  - master
