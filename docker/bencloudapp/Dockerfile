@@ -3,7 +3,7 @@ FROM nginx:alpine
 WORKDIR /bencloud-quasar/dist/spa
 
 RUN mkdir -p /var/www
-# RUN cp -R /builds/devsecops/laravel-reference-example /var/www
+RUN cp -R /bencloud-quasar/dist/spa /var/www
 
 COPY ./docker/bencloudapp/nginx.conf /etc/nginx/
 
