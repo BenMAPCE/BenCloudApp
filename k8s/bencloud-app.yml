@@ -26,12 +26,8 @@ spec:
         app.gitlab.com/app: ${CI_PROJECT_PATH_SLUG}
         app.gitlab.com/env: ${CI_ENVIRONMENT_SLUG}
     spec:
-      securityContext:
-        runAsUser: 555
-        runAsGroup: 555
-        fsGroup: 555
       containers:
-      - name: api
+      - name: ui
         image:  registry.epa.gov/benmap/bencloudapp/bencloudapp:$CI_COMMIT_SHORT_SHA
         imagePullPolicy: Always
         livenessProbe:
@@ -52,3 +48,37 @@ spec:
       imagePullSecrets:
       - name: glcr-auth
 
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: bencloud-app-service
+  annotations:
+    app.gitlab.com/app: ${CI_PROJECT_PATH_SLUG}
+    app.gitlab.com/env: ${CI_ENVIRONMENT_SLUG}
+spec:
+  ports:
+  - port: 80
+  selector:
+    app: bencloud-app
+
+---
+
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: bencloudapp-ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    app.gitlab.com/app: ${CI_PROJECT_PATH_SLUG}
+    app.gitlab.com/env: ${CI_ENVIRONMENT_SLUG}
+#   nginx.ingress.kubernetes.io/from-to-www-redirect: "true"
+spec:
+  rules:
+    - host: benmap.aws.epa.gov
+      http:
+        paths:
+          - backend:
+              serviceName: bencloud-app-service
+              servicePort: 80
