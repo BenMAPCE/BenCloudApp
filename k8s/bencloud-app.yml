@@ -76,7 +76,7 @@ metadata:
 #   nginx.ingress.kubernetes.io/from-to-www-redirect: "true"
 spec:
   rules:
-    - host: benmap.aws.epa.gov
+    - host: dev.bencloud-dev.aws.epa.gov
       http:
         paths:
           - backend:
