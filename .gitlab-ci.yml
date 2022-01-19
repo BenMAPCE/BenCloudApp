@@ -55,7 +55,7 @@ deploy development:
   - envsubst < k8s/bencloud-app.yml | kubectl apply -f -
  environment:
   name: testdev
-  url: http://dev.bencloud-dev.aws.epa.gov
+  url: https://dev.bencloud-dev.aws.epa.gov
   kubernetes:
    namespace: benmap-dev
 #he quasar.conf.js also needs
