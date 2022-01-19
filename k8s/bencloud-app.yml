@@ -59,7 +59,8 @@ metadata:
     app.gitlab.com/env: ${CI_ENVIRONMENT_SLUG}
 spec:
   ports:
-  - port: 80
+  - port: 443
+    targetPort: 80
   selector:
     app: bencloud-app
 
