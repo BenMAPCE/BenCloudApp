@@ -66,7 +66,7 @@ spec:
 
 ---
 
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: bencloudapp-ingress
@@ -80,6 +80,8 @@ spec:
     - host: dev.bencloud-dev.aws.epa.gov
       http:
         paths:
-          - backend:
-              serviceName: bencloud-app-service
-              servicePort: 80
+          backend:
+            service:
+             name: bencloud-app-service
+              port:
+               number: 443
