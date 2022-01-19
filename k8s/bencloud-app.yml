@@ -80,8 +80,10 @@ spec:
     - host: dev.bencloud-dev.aws.epa.gov
       http:
         paths:
+        - path: /
+          pathType: Prefix
           backend:
-            service:
-             name: bencloud-app-service
-             port:
-              number: 443
+           service:
+            name: bencloud-app-service
+            port: 
+             number: 443
