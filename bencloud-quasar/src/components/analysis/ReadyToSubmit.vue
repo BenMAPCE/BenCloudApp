@@ -102,6 +102,7 @@ import { ref, onBeforeMount, onMounted, watch } from "vue";
 import { useStore } from "vuex";
 import { useQuasar } from "quasar";
 
+import { createTemplate, saveTemplate } from "../../composables/templates/templates";
 import { buildHifTaskJSON, submitHifTask } from "../../composables/analysis/hif-task";
 import { buildValuationTaskJSON } from "../../composables/analysis/valuation-task";
 import TaskSubmittedDialog from "./TaskSubmittedDialog.vue";
@@ -150,7 +151,7 @@ export default defineComponent({
       () => hifTaskId,
       (currentHifTaskId, prevHifTaskId) => {
         if (currentHifTaskId != prevHifTaskId) {
-          console.log("yes... " + currentHifTaskId);
+          // console.log("yes... " + currentHifTaskId);
         }
       }
     );
@@ -159,13 +160,16 @@ export default defineComponent({
       var templateName = "";
     }
 
+    console.log("----- healthImpactFunctions -----")
+    console.log(healthImpactFunctions)
+
     function submitTask() {
       var heItems = JSON.parse(JSON.stringify(healthEffects));
       var heItemIds = "";
       var healthEffectsNamesList = "";
 
       for (var i = 0; i < heItems.length; i++) {
-        console.log(heItems[i].healthEffectId);
+        // console.log(heItems[i].healthEffectId);
         heItemIds = heItemIds + heItems[i].healthEffectId + ",";
         healthEffectsNamesList =
           healthEffectsNamesList + heItems[i].healthEffectName + ", ";
@@ -180,7 +184,12 @@ export default defineComponent({
       var hifTaskJSON = buildHifTaskJSON(taskName.value, store);
       console.log(JSON.stringify(hifTaskJSON));
 
-      hifTaskId = submitHifTask(hifTaskJSON, store).fetch();
+      var template = createTemplate(taskName.value, store);
+      console.log("----- template -----")
+      console.log(template)
+      console.log("--------------------")
+
+      //// hifTaskId = submitHifTask(hifTaskJSON, store).fetch();
 
       $q.dialog({
         component: TaskSubmittedDialog,
@@ -198,20 +207,24 @@ export default defineComponent({
           // console.log('Cancel')
         })
         .onDismiss(() => {
-          console.log("go to view tasks");
           this.$router.replace("/datacenter/manage-tasks");
           // console.log('I am triggered on both OK and Cancel')
         });
     }
 
     onMounted(() => {
+      
       (async () => {
         var heItems = JSON.parse(JSON.stringify(store.state.analysis.healthEffects));
         var heItemIds = "";
         var healthEffectsNamesList = "";
 
+        console.log("----------")
+        console.log(heItems)
+        console.log("----------")
+
         for (var i = 0; i < heItems.length; i++) {
-          console.log(heItems[i].healthEffectId);
+          //console.log(heItems[i].healthEffectId);
           heItemIds = heItemIds + heItems[i].healthEffectId + ",";
           healthEffectsNamesList =
             healthEffectsNamesList + heItems[i].healthEffectName + ", ";
@@ -222,6 +235,7 @@ export default defineComponent({
           healthEffectsNamesList.length - 2
         );
       })();
+      
     });
 
     return {

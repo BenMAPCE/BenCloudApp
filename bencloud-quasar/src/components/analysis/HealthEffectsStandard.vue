@@ -1,4 +1,3 @@
-
 <template>
   <div class="q-pa-md">
     <q-option-group :options="rows" type="checkbox" v-model="selectedItems" />
@@ -24,30 +23,30 @@ export default defineComponent({
     watch(
       () => selectedItems.value,
       (currentSelectedItems, prevSelectedItems) => {
-
         console.log("watch: " + currentSelectedItems + " |" + prevSelectedItems);
         if (currentSelectedItems != prevSelectedItems) {
           console.log("selectedItems: " + currentSelectedItems);
 
-          var heItems = []
-          var heItem = {}
+          var heItems = [];
+          var heItem = {};
           for (var i = 0; i < currentSelectedItems.length; i++) {
-            console.log(currentSelectedItems)
-            var name = rows.value.find((opt) => opt.value === currentSelectedItems[i]).label;
-            console.log(name)
-            heItem = { healthEffectId: currentSelectedItems[i], healthEffectName: name }
-            heItems.push(heItem)
-              //var name = currentSelectedItems[i].find((opt) => opt.value === currentSelectedItems[i]).label;
+            console.log("____________");
+            console.log(currentSelectedItems);
+            var name = rows.value.find((opt) => opt.value === currentSelectedItems[i])
+              .label;
+            console.log(name);
+            heItem = { healthEffectId: currentSelectedItems[i], healthEffectName: name };
+            heItems.push(heItem);
+            //var name = currentSelectedItems[i].find((opt) => opt.value === currentSelectedItems[i]).label;
           }
-          console.log(heItems)
-  
+          console.log(heItems);
+
           store.commit("analysis/updateHealthEffects", heItems);
-       }
+        }
       }
     );
 
-    onMounted(() => {
-    });
+    onMounted(() => {});
 
     onBeforeMount(() => {
       (async () => {
@@ -55,15 +54,15 @@ export default defineComponent({
         console.log(response.data.value);
         rows.value = convertHealthEffects(response.data.value);
 
-        var heItems = store.state.analysis.healthEffects
-        var heItemIds = []
-        for (var i = 0; i < heItems.length; i++) {
-            console.log(heItems[i].healthEffectId)
-            heItemIds.push(heItems[i].healthEffectId)
+        var healthEffects = store.state.analysis.healthEffects;
+
+        if (healthEffects) {
+          var selectedHealthEffectsIds = [];
+          for (var i = 0; i < healthEffects.length; i++) {
+            selectedHealthEffectsIds.push(healthEffects[i].healthEffectId);
+          }
+          selectedItems.value = selectedHealthEffectsIds;
         }
-
-        selectedItems.value = heItemIds
-
       })();
     });
 

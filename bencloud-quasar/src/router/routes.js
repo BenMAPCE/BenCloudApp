@@ -83,6 +83,18 @@ const routes = [
   },
 
   {
+    path: "/analysis/review",
+    component: () => import("layouts/MainLayout.vue"),
+    children: [
+      {
+        path: "",
+        component: () => import("src/pages/analysis/ReviewAndSubmit.vue"),
+        meta: { requiresAuth: true, requiresAdmin: false },
+      },
+    ],
+  },
+
+  {
     path: "/datacenter",
     component: () => import("layouts/MainLayout.vue"),
     children: [
@@ -119,6 +131,17 @@ const routes = [
     ],
   },
 
+   {
+    path: "/datacenter/manage-tasks",
+    component: () => import("layouts/MainLayout.vue"),
+    children: [
+      {
+        path: "",
+        component: () => import("src/pages/datacenter/tasks/ManageTasks.vue"),
+        meta: { requiresAuth: true, requiresAdmin: false },
+      },
+    ],
+  },
   {
     path: "/datacenter/view-export-task/:task_uuid",
     props: true,

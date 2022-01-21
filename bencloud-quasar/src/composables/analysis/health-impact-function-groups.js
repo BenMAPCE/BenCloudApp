@@ -4,24 +4,25 @@ import { ref } from "vue";
 import { healthEffects } from "src/store/analysis/getters";
 import { getValuationFunctionsForEndpointGroupId } from "./valuation-functions";
 
-export const loadHealthImpactFunctionGroups = (url) => {
+export const loadHealthImpactFunctionGroups = (store) => {
   const data = ref(null);
   const error = ref(null);
   const response = ref(null);
   const loading = ref(false);
-  const store = useStore();
+  //const store = useStore();
 
-  const fetch = async () => {
+  const fetch = async (store) => {
     loading.value = true;
     try {
-      console.log(store.state.analysis.healthEffects);
+      // console.log(store.state.analysis.healthEffects);
       //var selectedHealthEffects = store.state.analysis.healthEffects;
       //console.log(selectedHealthEffects.length);
 
       var heItems = store.state.analysis.healthEffects;
+
       var healthEffects = "";
       for (var i = 0; i < heItems.length; i++) {
-        console.log(heItems[i].healthEffectId);
+        //console.log(heItems[i].healthEffectId);
         healthEffects = healthEffects + heItems[i].healthEffectId + ",";
       }
       /*
@@ -30,7 +31,7 @@ export const loadHealthImpactFunctionGroups = (url) => {
         healthEffects = healthEffects + selectedHealthEffects[he] + ",";
       }
  */
-      console.log("healthEffects: " + healthEffects);
+      //console.log("healthEffects: " + healthEffects);
 
       // /health-impact-function-groups/{ids}?incidencePrevalenceDataset=39&popYear=2020&pollutantId=6
 
@@ -80,7 +81,7 @@ export const buildHealthImpactFunctionGroups = (
   console.log("*******");
 
   var records = JSON.parse(JSON.stringify(data));
-  console.log(records);
+  //console.log(records);
   var options = [];
   var option = {};
   var functions = {};
@@ -90,7 +91,7 @@ export const buildHealthImpactFunctionGroups = (
   for (var i = 0; i < records.length; i++) {
     option = {};
     functions = records[i].functions;
-    console.log(functions.length);
+    //console.log(functions.length);
 
     for (var f = 0; f < functions.length; f++) {
       healthImpactFunctions.push(functions[f]);
@@ -99,7 +100,7 @@ export const buildHealthImpactFunctionGroups = (
       option.value = records[i].id;
       option.group_name = records[i].name;
 
-      console.log(functions[f].id);
+      //console.log(functions[f].id);
       option.health_function_id = functions[f].id;
 
       option.endpoint_group_id = functions[f].endpoint_group_id;
@@ -136,7 +137,7 @@ export const buildHealthImpactFunctionGroups = (
 
   
       // load valuations
-
+      //console.log("--- 001")
       var valuationsForEndpointGroupId =
         getValuationFunctionsForEndpointGroupId(
           valuationFunctions.value,
@@ -177,7 +178,7 @@ export const buildHealthImpactFunctionGroups = (
       option.valuation = valuations;
 
       options.push(option);
-      console.log(option);
+      //console.log(option);
 
       store.commit(
         "analysis/updateHealthImpactFunctions",

@@ -266,6 +266,7 @@ export default defineComponent({
           payload.health_function_id = row.health_function_id;
           payload.valuation_ids = valuationIds;
 
+          console.log("... updateValuationsForHealthImpactFunctionGroups")
           store.commit("analysis/updateValuationsForHealthImpactFunctionGroups", payload);
 
           //updateValuationsForHealthImpactFunctionGroups(store, row.endpoint_group_id, valuationIds);
@@ -282,9 +283,17 @@ export default defineComponent({
     }
 
     onBeforeMount(() => {
+
+      console.log("!#!#!#!#!#!#!#")
+      if (!store.state.analysis.valuationsForHealthImpactFunctionGroups) {
+        console.log("NOT YET")
+      } else {
+        console.log(store.state.analysis.valuationsForHealthImpactFunctionGroups)
+      }
+
       (async () => {
         console.log("loadHealthImpactFunctionGroups");
-        const response = await loadHealthImpactFunctionGroups().fetch();
+        const response = await loadHealthImpactFunctionGroups(store).fetch(store);
         rows.value = response.data.value;
         console.log(rows.value);
         rows.value = buildHealthImpactFunctionGroups(
@@ -296,7 +305,7 @@ export default defineComponent({
 
       (async () => {
         console.log("loadValuationFunctions");
-        const valuationsResponse = await loadValuationFunctions().fetch();
+        const valuationsResponse = await loadValuationFunctions(store).fetch(store);
         console.log("....");
         valuationFunctions.value = valuationsResponse.data.value;
         console.log(valuationFunctions.value);

@@ -90,7 +90,7 @@ export const getValuationsForHealthFunctionId = (state) => (healthFunctionId) =>
       "health_function_id" in state.valuationsForHealthImpactFunctionGroups[v]
      ) {
          if (state.valuationsForHealthImpactFunctionGroups[v].health_function_id === healthFunctionId) {
-          console.log("... found health_function_id: " + healthFunctionId);
+          //console.log("... found health_function_id: " + healthFunctionId);
           return state.valuationsForHealthImpactFunctionGroups[v];
       }
     }

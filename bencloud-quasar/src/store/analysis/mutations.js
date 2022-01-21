@@ -76,9 +76,13 @@ export function updatePostPolicyAirQualityMetricId(state, metricId) {
     state.postPolicyAirQualityMetricId = metricId;
 }
 
+export function setValuationsForHealthImpactFunctionGroups(state, payload) {
+    state.valuationsForHealthImpactFunctionGroups = payload;
+}
+
 export function updateValuationsForHealthImpactFunctionGroups(state, payload) {
     console.log("--------------------------------------------");
-    console.log(payload)
+    //console.log(payload)
 
     var healthFunctionIdFound = false;
 
@@ -102,7 +106,7 @@ export function updateValuationsForHealthImpactFunctionGroups(state, payload) {
       vfhifg.valuation_ids = payload.valuation_ids;
       vfhifg.health_function_id = payload.health_function_id;
       
-      console.log("@@@")
+      //console.log("@@@")
       state.valuationsForHealthImpactFunctionGroups.push(vfhifg);
     }
 

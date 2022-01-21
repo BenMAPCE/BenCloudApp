@@ -1,20 +1,20 @@
-import { useStore } from 'vuex';
+//import { useStore } from 'vuex';
 import axios from "axios";
 import { ref } from "vue";
 
-export const loadValuationFunctions = () => {
+export const loadValuationFunctions = (store) => {
     const data = ref(null)
     const error = ref(null)
     const response = ref(null)
     const loading = ref(false)
-    const store = useStore()
+    //const store = useStore()
 
     const fetch = async() => {
-        console.log("001")
+        //console.log("001")
         loading.value = true;
         try {
 
-            console.log("002")
+            //console.log("002")
             const result = await axios
                 .get(process.env.API_SERVER + "/api/valuation-functions", {
             params: {
@@ -22,18 +22,18 @@ export const loadValuationFunctions = () => {
                 },
             })
             .then((response) => {
-                console.log("003")
+                //console.log("003")
 
                 data.value = response.data
-                console.log(data.value)
+                //console.log(data.value)
             })
         } catch (ex) {
             error.value = ex;
-            console.log("004")
+            //console.log("004")
 
         } finally {
             loading.value = false;
-            console.log("005")
+            //console.log("005")
 
             return {response, error, data, loading }
         }
