@@ -35,25 +35,24 @@ export default defineComponent({
       () => selectedItem.value,
       (currentSelectedItem, prevSelectedItem) => {
         if (currentSelectedItem != prevSelectedItem) {
-          console.log("selectedItem: " + currentSelectedItem);
-          console.log(rows);
-          console.log(rows.value.find((opt) => opt.id === currentSelectedItem).name);
+          //console.log("selectedItem: " + currentSelectedItem);
+          //console.log(rows);
+          //console.log(rows.value.find((opt) => opt.id === currentSelectedItem).name);
           var name = rows.value.find((opt) => opt.id === currentSelectedItem).name;
           var years = rows.value.find((opt) => opt.id === currentSelectedItem).years;
-          console.log(years);
+          //console.log(years);
           store.commit("analysis/updatePopulationDataset", {
             populationDatasetId: currentSelectedItem,
             populationDatasetName: name,
           });
           store.commit("analysis/updatePopulationYears", years);
-          console.log(store.state.analysis.populationYears);
+          //console.log(store.state.analysis.populationYears);
         }
       }
     );
 
     onBeforeMount(() => {
       (async () => {
-        console.log("loadPopulationOptions");
         const response = await loadPopulationOptions().fetch();
         rows.value = response.data.value;
         if (store.state.analysis.populationDatasetId) {
@@ -64,10 +63,8 @@ export default defineComponent({
     });
 
     onMounted(() => {
-      console.log("... " + store.state.analysis.populationDatasetId);
       if (store.state.analysis.populationDatasetId != null) {
         selectedItem.value = store.state.analysis.populationDatasetId;
-        console.log("- selectedItem: " + selectedItem.value);
       }
     })();
 

@@ -94,9 +94,6 @@ export const healthEffectsHasValue = (store) => {
 
     var isValid = true;
 
-    console.log("***")
-    console.log((store.state.analysis.healthEffects).length)
-
     if (store.state.analysis.healthEffects) {
         if ((store.state.analysis.healthEffects).length === 0) {
             isValid = false;

@@ -282,6 +282,12 @@ export const loadTemplate = (model, store) => {
 
   var population = parameters.population;
 
+  console.log("**** " + population.populationYear)
+  console.log("**** " + population.populationDatasetId)
+  console.log("**** " + population.populationDatasetName)
+  console.log("**** " + population.incidenceId)
+  console.log("**** " + population.incidenceName)
+
   store.commit("analysis/updatePopulationYear", population.populationYear);
   store.commit("analysis/updatePopulationDataset", {
     populationDatasetId: population.populationDatasetId,
