@@ -41,9 +41,22 @@
             color="secondary"
             icon-right="mdi-home"
             push
-            @click="loadSelectedTemplate()"
+            :disabled="model === null"
+            @click="startAnalysisFromTemplate()"
             label="Analysis From Template"
           />
+
+          <p></p>        
+
+          <q-btn
+            color="secondary"
+            icon-right="mdi-home"
+            push
+            :disabled="model === null"
+            @click="goToReviewAnalysisFromTemplate()"
+            label="Review From Template"
+          />
+  
         </q-card-section>
       </q-card>
     </div>
@@ -71,40 +84,42 @@ export default defineComponent({
         const response = await getTemplates().fetch();
         console.log(JSON.parse(JSON.stringify(response.data.value)));
         options.value = JSON.parse(JSON.stringify(response.data.value));
+        store.commit("analysis/updateStepNumber", 1);
       })();
     });
 
-    function loadSelectedTemplate() {
+    function startAnalysisFromTemplate() {
+     (async () => {
+        loadTemplate(model, store);
 
+        while (store.state.analysis.healthImpactFunctions.length === 0) {
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
+
+        this.$router.replace('/analysis')
+      })();
+
+    }      
+
+    function goToReviewAnalysisFromTemplate() {
       (async () => {
         loadTemplate(model, store);
 
-        //console.log("waiting for healthImpactFunctions");
-        //console.log("-----")
-        //console.log(store.state.analysis.healthImpactFunctions)
-        //console.log("-----")
         while (store.state.analysis.healthImpactFunctions.length === 0) {
-          //console.log("...");
           await new Promise((resolve) => setTimeout(resolve, 1000));
         }
-        //this.$router.replace("/analysis/review");
-        this.$router.replace('analysis')
+        store.commit("analysis/updateStepNumber", 7);
+
+        this.$router.replace("/analysis");
       })();
 
-      //var parameters = model.value.parameters;
-      //console.log(parameters)
-      //console.log(parameters.air_quality_data)
-      //store.commit("analysis/updatePollutantId", parameters.pollutantId);
-
-      //  this.$router.replace("/analysis/review");
-
-      //this.$router.replace('analysis')
     }
 
     return {
       model,
       options,
-      loadSelectedTemplate,
+      startAnalysisFromTemplate,
+      goToReviewAnalysisFromTemplate
     };
   },
 });

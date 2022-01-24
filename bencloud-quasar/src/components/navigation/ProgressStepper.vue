@@ -56,7 +56,7 @@
 </template>
 
 <script>
-import { ref, reactive, provide, computed } from "vue";
+import { ref, reactive, provide, computed, onMounted } from "vue";
 import { useStore } from "vuex";
 
 import Where from "src/pages/analysis/Where.vue";
@@ -90,6 +90,7 @@ export default {
 
     const stepHasError = reactive(ref(false));
     const atStep = reactive(ref(null));
+    const step = ref(1);
 
     provide(
       "stepHasError",
@@ -99,6 +100,11 @@ export default {
       "atStep",
       computed(() => atStep)
     );
+
+    onMounted(() => {
+      console.log("****** step: " + store.state.analysis.stepNumber)
+      step.value = store.state.analysis.stepNumber;
+    });
 
     function validatePreviousStep(thisStepper, step) {
       validateStep(thisStepper, step - 1);
@@ -172,7 +178,7 @@ export default {
       }
 }
     return {
-      step: ref(1),
+      step,
       stepHasError,
       validateStep,
       validatePreviousStep,

@@ -56,6 +56,10 @@ export default defineComponent({
         console.log("loadPopulationOptions");
         const response = await loadPopulationOptions().fetch();
         rows.value = response.data.value;
+        if (store.state.analysis.populationDatasetId) {
+          var years = rows.value.find((opt) => opt.id === store.state.analysis.populationDatasetId).years;
+          store.commit("analysis/updatePopulationYears", years);
+        }
       })();
     });
 

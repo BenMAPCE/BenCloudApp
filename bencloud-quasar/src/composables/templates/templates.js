@@ -38,30 +38,33 @@ export const getTemplates = () => {
   return { fetch };
 };
 
-export const saveTemplate = (url) => {
+export const saveTemplate = (name, type, template, store) => {
   const data = ref(null);
   const error = ref(null);
   const response = ref(null);
   const loading = ref(false);
-  const store = useStore();
+
+  console.log("SUBMITTING TEMPLATE...")
+
+  var taskConfig = {};
+  taskConfig["name"] = name; 
+  taskConfig["type"] = type; 
+  taskConfig["parameters"] = template; 
+
+  console.log(taskConfig);
 
   const fetch = async () => {
     loading.value = true;
     try {
       const result = await axios
-        .get(process.env.API_SERVER + "/api/pollutants", {
-          params: {
-            page: 1,
-            rowsPerPage: 9999999,
-            pollutantId: 0,
-          },
-        })
+        .post(process.env.API_SERVER + "/api/task-configs", taskConfig)
         .then((response) => {
           data.value = response.data;
           console.log(data.value);
         });
     } catch (ex) {
       error.value = ex;
+      console.log(ex)
     } finally {
       loading.value = false;
 
@@ -223,6 +226,7 @@ export const createTemplate = (taskName, store) => {
 
   return template;
 };
+
 
 export const loadTemplate = (model, store) => {
   var parameters = model.value.parameters;

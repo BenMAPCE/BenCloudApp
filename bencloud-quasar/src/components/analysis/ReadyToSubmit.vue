@@ -40,6 +40,7 @@
       </q-card>
     </div>
   </div>
+
   <div class="row">
     <div class="col-3">
       <q-form @submit="submitTask()" class="q-gutter-md">
@@ -85,7 +86,7 @@
           :disabled="templateName.trim() == ''"
           color="primary"
           label="Save Template"
-          @click="saveTemplate()"
+          @click="submitTemplate()"
         />
       </div>
     </div>
@@ -94,6 +95,7 @@
       {{ this.errorMessage }}
     </q-card-section>
   </div>
+
 </template>
 
 <script>
@@ -156,12 +158,39 @@ export default defineComponent({
       }
     );
 
-    function saveTemplate() {
-      var templateName = "";
+    function submitTemplate() {
+
+      var template = createTemplate(taskName.value, store);
+
+      const templateNotification = $q.notify({
+        group: false, // required to be updatable
+        timeout: 0, // we want to be in control when it gets dismissed
+        spinner: true,
+        position: "top",
+        message: "Saving Template...",
+      });
+
+      (async () => {
+        const response = await saveTemplate(
+          templateName.value,
+          "v1",
+          template,
+          store
+        ).fetch();
+
+        templateName.value = "";
+
+        templateNotification({
+          spinner: false, // we reset the spinner setting so the icon can be displayed
+          message: "Template Saved!",
+          color: "green",
+          timeout: 2000, // we will timeout it in 2 seconds
+        });
+      })();
     }
 
-    console.log("----- healthImpactFunctions -----")
-    console.log(healthImpactFunctions)
+    //console.log("----- healthImpactFunctions -----");
+    //console.log(healthImpactFunctions);
 
     function submitTask() {
       var heItems = JSON.parse(JSON.stringify(healthEffects));
@@ -185,9 +214,9 @@ export default defineComponent({
       console.log(JSON.stringify(hifTaskJSON));
 
       var template = createTemplate(taskName.value, store);
-      console.log("----- template -----")
-      console.log(template)
-      console.log("--------------------")
+      console.log("----- template -----");
+      console.log(template);
+      console.log("--------------------");
 
       //// hifTaskId = submitHifTask(hifTaskJSON, store).fetch();
 
@@ -213,15 +242,14 @@ export default defineComponent({
     }
 
     onMounted(() => {
-      
       (async () => {
         var heItems = JSON.parse(JSON.stringify(store.state.analysis.healthEffects));
         var heItemIds = "";
         var healthEffectsNamesList = "";
 
-        console.log("----------")
-        console.log(heItems)
-        console.log("----------")
+        console.log("----------");
+        console.log(heItems);
+        console.log("----------");
 
         for (var i = 0; i < heItems.length; i++) {
           //console.log(heItems[i].healthEffectId);
@@ -235,7 +263,6 @@ export default defineComponent({
           healthEffectsNamesList.length - 2
         );
       })();
-      
     });
 
     return {
@@ -255,6 +282,7 @@ export default defineComponent({
       healthImpactFunctions,
       valuationsForHealthImpactFunctionGroups,
       submitTask,
+      submitTemplate,
       saveTemplate,
       taskName,
       templateName,
@@ -269,6 +297,12 @@ export default defineComponent({
 .submit-task-button {
   margin-left: 25px;
   padding-top: 2px;
+}
+
+.back-to-analysis-button {
+  margin-left: 0px;
+  padding-top: 0px;
+  padding-bottom: 25px;
 }
 
 .enter-template-row {

@@ -19,6 +19,7 @@ export default function () {
     postPolicyAirQualityMetricId: null,
     valuationsForHealthImpactFunctionGroups: [],
     location,
-    airQualityLayers : null
+    airQualityLayers : null,
+    stepNumber: 1
   }
 }
