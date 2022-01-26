@@ -47,7 +47,9 @@ export default defineComponent({
         rows.value = years;
 
         if (currentSelectedItem != prevSelectedItem) {
-          store.commit("analysis/updatePopulationYear", null);
+          if (!store.state.analysis.populationYear) {
+            store.commit("analysis/updatePopulationYear", null);
+          }
         }
       }
     );
@@ -63,7 +65,7 @@ export default defineComponent({
         rows.value = years;
       }
 
-      if (store.state.analysis.populationYear != null) {
+      if (store.state.analysis.populationYear) {
         selectedItem.value = store.state.analysis.populationYear;
       }
     })();

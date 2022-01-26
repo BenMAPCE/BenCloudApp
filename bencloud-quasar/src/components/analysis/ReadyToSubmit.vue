@@ -40,6 +40,7 @@
       </q-card>
     </div>
   </div>
+
   <div class="row">
     <div class="col-3">
       <q-form @submit="submitTask()" class="q-gutter-md">
@@ -85,7 +86,7 @@
           :disabled="templateName.trim() == ''"
           color="primary"
           label="Save Template"
-          @click="saveTemplate()"
+          @click="submitTemplate()"
         />
       </div>
     </div>
@@ -94,6 +95,7 @@
       {{ this.errorMessage }}
     </q-card-section>
   </div>
+
 </template>
 
 <script>
@@ -102,6 +104,7 @@ import { ref, onBeforeMount, onMounted, watch } from "vue";
 import { useStore } from "vuex";
 import { useQuasar } from "quasar";
 
+import { createTemplate, saveTemplate } from "../../composables/templates/templates";
 import { buildHifTaskJSON, submitHifTask } from "../../composables/analysis/hif-task";
 import { buildValuationTaskJSON } from "../../composables/analysis/valuation-task";
 import TaskSubmittedDialog from "./TaskSubmittedDialog.vue";
@@ -150,14 +153,44 @@ export default defineComponent({
       () => hifTaskId,
       (currentHifTaskId, prevHifTaskId) => {
         if (currentHifTaskId != prevHifTaskId) {
-          console.log("yes... " + currentHifTaskId);
+          // console.log("yes... " + currentHifTaskId);
         }
       }
     );
 
-    function saveTemplate() {
-      var templateName = "";
+    function submitTemplate() {
+
+      var template = createTemplate(taskName.value, store);
+
+      const templateNotification = $q.notify({
+        group: false, // required to be updatable
+        timeout: 0, // we want to be in control when it gets dismissed
+        spinner: true,
+        position: "top",
+        message: "Saving Template...",
+      });
+
+      (async () => {
+        const response = await saveTemplate(
+          templateName.value,
+          "v1",
+          template,
+          store
+        ).fetch();
+
+        templateName.value = "";
+
+        templateNotification({
+          spinner: false, // we reset the spinner setting so the icon can be displayed
+          message: "Template Saved!",
+          color: "green",
+          timeout: 2000, // we will timeout it in 2 seconds
+        });
+      })();
     }
+
+    //console.log("----- healthImpactFunctions -----");
+    //console.log(healthImpactFunctions);
 
     function submitTask() {
       var heItems = JSON.parse(JSON.stringify(healthEffects));
@@ -165,7 +198,7 @@ export default defineComponent({
       var healthEffectsNamesList = "";
 
       for (var i = 0; i < heItems.length; i++) {
-        console.log(heItems[i].healthEffectId);
+        // console.log(heItems[i].healthEffectId);
         heItemIds = heItemIds + heItems[i].healthEffectId + ",";
         healthEffectsNamesList =
           healthEffectsNamesList + heItems[i].healthEffectName + ", ";
@@ -180,7 +213,12 @@ export default defineComponent({
       var hifTaskJSON = buildHifTaskJSON(taskName.value, store);
       console.log(JSON.stringify(hifTaskJSON));
 
-      hifTaskId = submitHifTask(hifTaskJSON, store).fetch();
+      var template = createTemplate(taskName.value, store);
+      console.log("----- template -----");
+      console.log(template);
+      console.log("--------------------");
+
+      //// hifTaskId = submitHifTask(hifTaskJSON, store).fetch();
 
       $q.dialog({
         component: TaskSubmittedDialog,
@@ -198,7 +236,6 @@ export default defineComponent({
           // console.log('Cancel')
         })
         .onDismiss(() => {
-          console.log("go to view tasks");
           this.$router.replace("/datacenter/manage-tasks");
           // console.log('I am triggered on both OK and Cancel')
         });
@@ -210,8 +247,12 @@ export default defineComponent({
         var heItemIds = "";
         var healthEffectsNamesList = "";
 
+        console.log("----------");
+        console.log(heItems);
+        console.log("----------");
+
         for (var i = 0; i < heItems.length; i++) {
-          console.log(heItems[i].healthEffectId);
+          //console.log(heItems[i].healthEffectId);
           heItemIds = heItemIds + heItems[i].healthEffectId + ",";
           healthEffectsNamesList =
             healthEffectsNamesList + heItems[i].healthEffectName + ", ";
@@ -241,6 +282,7 @@ export default defineComponent({
       healthImpactFunctions,
       valuationsForHealthImpactFunctionGroups,
       submitTask,
+      submitTemplate,
       saveTemplate,
       taskName,
       templateName,
@@ -255,6 +297,12 @@ export default defineComponent({
 .submit-task-button {
   margin-left: 25px;
   padding-top: 2px;
+}
+
+.back-to-analysis-button {
+  margin-left: 0px;
+  padding-top: 0px;
+  padding-bottom: 25px;
 }
 
 .enter-template-row {

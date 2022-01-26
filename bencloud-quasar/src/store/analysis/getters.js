@@ -1,3 +1,6 @@
+export function stepNumber (state) {
+  return state.stepNumber
+}
 export function locationId (state) {
   return state.locationId
 }
@@ -90,7 +93,7 @@ export const getValuationsForHealthFunctionId = (state) => (healthFunctionId) =>
       "health_function_id" in state.valuationsForHealthImpactFunctionGroups[v]
      ) {
          if (state.valuationsForHealthImpactFunctionGroups[v].health_function_id === healthFunctionId) {
-          console.log("... found health_function_id: " + healthFunctionId);
+          //console.log("... found health_function_id: " + healthFunctionId);
           return state.valuationsForHealthImpactFunctionGroups[v];
       }
     }

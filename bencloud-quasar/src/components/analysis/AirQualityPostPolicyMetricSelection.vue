@@ -52,7 +52,7 @@ export default defineComponent({
             " | " +
             prevSelectedItem
         );
-        loadAirQualityMetrics();
+        loadAirQualityMetricsWhenReady(true);
       }
     );
 
@@ -69,14 +69,32 @@ export default defineComponent({
           console.log(
             "postPolicyAirQualityId currentSelectedItem: " + currentSelectedItem
           );
-          loadMetricDetails(currentSelectedItem);
+          loadMetricDetailsWhenReady(currentSelectedItem);
         } else {
           console.log("*** SAME VALUE");
         }
       }
     );
 
-    function loadAirQualityMetrics() {
+    function loadAirQualityMetricsWhenReady(stateChange) {
+      (async () => {
+        console.log("waiting for airQualityLayers");
+        while (!store.state.analysis.airQualityLayers)
+          // define the condition as you like
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+        console.log("airQualityLayers is defined");
+        loadAirQualityMetrics(stateChange);
+      })();
+    }
+
+    function loadAirQualityMetrics(stateChange) {
+      if (!store.state.analysis.airQualityLayers) {
+        console.log("-- POST airQualityLayers is null");
+        setTimeout(() => {
+          console.log("waiting...");
+        }, 5000);
+      }
+
       var airQualityLayers = JSON.parse(
         JSON.stringify(store.state.analysis.airQualityLayers.records)
       );
@@ -85,6 +103,7 @@ export default defineComponent({
       console.log("-----");
 
       selectedItem.value = "99999-99999";
+
       console.log("selectedItem.value = " + selectedItem.value);
       options.value = [];
       var selectedMetrics = "";
@@ -122,12 +141,32 @@ export default defineComponent({
                 metric_statistics[m].seasonal_metric_id;
             }
           }
-          selectedItem.value = selectedMetrics;
+
+          if (stateChange) {
+            selectedItem.value = selectedMetrics;
+          } else if (store.state.analysis.postPolicyAirQualityMetricId) {
+            selectedItem.value = store.state.analysis.postPolicyAirQualityMetricId;
+          }
+
           console.log("*** " + selectedItem.value);
 
           //console.log(options)
         }
       }
+    }
+
+    function loadMetricDetailsWhenReady(currentSelectedItem) {
+      (async () => {
+        console.log("waiting for airQualityLayers");
+        while (!store.state.analysis.airQualityLayers)
+          // define the condition as you like
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+        console.log("airQualityLayers is defined");
+        if (store.state.analysis.postPolicyAirQualityMetricId) {
+          selectedItem.value = store.state.analysis.postPolicyAirQualityMetricId;
+        }
+        loadMetricDetails(currentSelectedItem);
+      })();
     }
 
     function loadMetricDetails(metric_statistic_ids) {
@@ -190,13 +229,12 @@ export default defineComponent({
     }
 
     onMounted(() => {
-      var postPolicyAirQualityId = store.state.analysis.postPolicyAirQualityId;
-      var postPolicyAirQualityName = store.state.analysis.postPolicyAirQualityName;
+      //var postPolicyAirQualityId = store.state.analysis.postPolicyAirQualityId;
 
-      if (null != postPolicyAirQualityId) {
+      if (store.state.analysis.postPolicyAirQualityId) {
         console.log(" ### updating postPolicyAirQualityId");
 
-        loadAirQualityMetrics();
+        loadAirQualityMetricsWhenReady(false);
 
         console.log(options.value);
 
@@ -228,6 +266,8 @@ export default defineComponent({
       rows,
       columns,
       loadMetricDetails,
+      loadAirQualityMetricsWhenReady,
+      loadMetricDetailsWhenReady,
       // selectedPollutantId,
       // selectedPollutantFriendlyName
     };

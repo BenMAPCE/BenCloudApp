@@ -26,6 +26,9 @@
           <q-select
             v-model="model"
             :options="options"
+            option-value="id"
+            option-label="name"
+            map-options
             label="Select a template"
             class="template-select"
           >
@@ -38,9 +41,22 @@
             color="secondary"
             icon-right="mdi-home"
             push
-            @click="$router.replace('analysis')"
+            :disabled="model === null"
+            @click="startAnalysisFromTemplate()"
             label="Analysis From Template"
           />
+
+          <p></p>        
+
+          <q-btn
+            color="secondary"
+            icon-right="mdi-home"
+            push
+            :disabled="model === null"
+            @click="goToReviewAnalysisFromTemplate()"
+            label="Review From Template"
+          />
+  
         </q-card-section>
       </q-card>
     </div>
@@ -48,24 +64,62 @@
 </template>
 
 <script>
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, onMounted } from "vue";
 import AppTopNavigation from "../components/navigation/AppTopNavigation.vue";
+import { getTemplates, loadTemplate } from "../composables/templates/templates";
+import { useStore } from "vuex";
 
 export default defineComponent({
   name: "PageIndex",
   components: {},
 
-  setup() {
-    return {
-      model: ref(null),
+  setup(props, context) {
+    const store = useStore();
+    const options = ref([]);
+    const model = ref(null);
 
-      options: [
-        "Template 01",
-        "Template 02",
-        "Template 03",
-        "Template 04",
-        "Template 05",
-      ],
+    onMounted(() => {
+      (async () => {
+        console.log("loadTemplates");
+        const response = await getTemplates().fetch();
+        console.log(JSON.parse(JSON.stringify(response.data.value)));
+        options.value = JSON.parse(JSON.stringify(response.data.value));
+        store.commit("analysis/updateStepNumber", 1);
+      })();
+    });
+
+    function startAnalysisFromTemplate() {
+     (async () => {
+        loadTemplate(model, store);
+
+        while (store.state.analysis.healthImpactFunctions.length === 0) {
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
+
+        this.$router.replace('/analysis')
+      })();
+
+    }      
+
+    function goToReviewAnalysisFromTemplate() {
+      (async () => {
+        loadTemplate(model, store);
+
+        while (store.state.analysis.healthImpactFunctions.length === 0) {
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
+        store.commit("analysis/updateStepNumber", 7);
+
+        this.$router.replace("/analysis");
+      })();
+
+    }
+
+    return {
+      model,
+      options,
+      startAnalysisFromTemplate,
+      goToReviewAnalysisFromTemplate
     };
   },
 });
