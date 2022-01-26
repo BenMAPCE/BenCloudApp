@@ -218,7 +218,7 @@ export default defineComponent({
       console.log(template);
       console.log("--------------------");
 
-      //// hifTaskId = submitHifTask(hifTaskJSON, store).fetch();
+      hifTaskId = submitHifTask(hifTaskJSON, store).fetch();
 
       $q.dialog({
         component: TaskSubmittedDialog,
