@@ -195,16 +195,16 @@ export const createTemplate = (taskName, store) => {
       hifFunction["vfIds"] = valuationFunctions;
     }
 
-    hifFunction["start_age"] = functions[i]["start_age"];
-    hifFunction["end_age"] = functions[i]["end_age"];
-    hifFunction["race_id"] = functions[i]["race_id"];
-    hifFunction["gender_id"] = functions[i]["gender_id"];
-    hifFunction["ethnicity_id"] = functions[i]["ethnicity_id"];
-    hifFunction["incidence_dataset_id"] = functions[i]["incidence_dataset_id"];
-    hifFunction["incidence_year"] = functions[i]["incidence_year"];
+    hifFunction["start_age"] = functions[hf]["start_age"];
+    hifFunction["end_age"] = functions[hf]["end_age"];
+    hifFunction["race_id"] = functions[hf]["race_id"];
+    hifFunction["gender_id"] = functions[hf]["gender_id"];
+    hifFunction["ethnicity_id"] = functions[hf]["ethnicity_id"];
+    hifFunction["incidence_dataset_id"] = functions[hf]["incidence_dataset_id"];
+    hifFunction["incidence_year"] = functions[hf]["incidence_year"];
     hifFunction["prevalence_dataset_id"] =
-      functions[i]["prevalence_dataset_id"];
-    hifFunction["prevalence_year"] = functions[i]["prevalence_year"];
+      functions[hf]["prevalence_dataset_id"];
+    hifFunction["prevalence_year"] = functions[hf]["prevalence_year"];
 
     functionsArray.push(hifFunction);
   }
