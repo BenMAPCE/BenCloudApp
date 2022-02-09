@@ -45,7 +45,7 @@
             </div>
           </div>
 
-          <input type="hidden" name="pollutantId" :value="pollutantId" >
+          <input type="hidden" name="pollutantId" :value="pollutantId" />
 
           <div class="row justify-center">
             <q-card-actions>
@@ -65,6 +65,8 @@
 
 <script>
 import GridDefinitions from "../datacenter/airquality/GridDefinitions.vue";
+import AirQualityUploadErrorsDialog from "./AirQualityUploadErrorsDialog.vue";
+
 import { useQuasar } from "quasar";
 import { useStore } from "vuex";
 
@@ -149,9 +151,9 @@ export default {
     onSubmit() {
       console.log(this.pollutantValue);
       var hasErrors = false;
-      this.errorMessage = ""
+      this.errorMessage = "";
 
-      console.log(this.selected_file)
+      console.log(this.selected_file);
 
       if (this.name === "") {
         this.errorMessage =
@@ -201,11 +203,49 @@ export default {
             "Content-Type": "multipart/form-data",
           },
         })
-        .then(function () {
-          console.log("SUCCESS!!");
+        .then((response) => {
+          //data.value = response.data;
+
+          console.log(response.status);
+          console.log(response.statusText);
+          console.log(response.data.success);
+          console.log(response.data.messages);
+
+          if (response.data.success === false) {
+            console.log("BAD NEWS");
+            if (response.data.messages.length > 0) {
+              console.log("Show Errors");
+
+              this.$q
+                .dialog({
+                  component: AirQualityUploadErrorsDialog,
+                  parent: this,
+                  persistent: true,
+                  componentProps: {
+                    errorList: response.data.messages,
+                    fileName: this.selected_file.name
+                  },
+                })
+                .onOk(() => {
+                  console.log("OK");
+                  //taskName.value = ""
+                })
+                .onCancel(() => {
+                  // console.log('Cancel')
+                })
+                .onDismiss(() => {
+                  //console.log("go to view tasks");
+                  //this.$router.replace("/datacenter/manage-tasks");
+                  // console.log('I am triggered on both OK and Cancel')
+                });
+            }
+          }
+
           self.$q.loading.hide();
-          self.hide();
-          self.$emit("ok");
+          //self.hide();
+          //self.$emit("ok");
+
+          return response.status;
         })
         .catch(function (error) {
           if (error.response) {
@@ -227,8 +267,7 @@ export default {
           console.log("FAILURE!!");
           self.$q.loading.hide();
         })
-        .finally(function () {
-        });
+        .finally(function () {});
     },
 
     file_selected: function (file) {

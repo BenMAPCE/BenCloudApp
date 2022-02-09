@@ -19,6 +19,7 @@
     "@toast-ui/vue-chart": "^4.4.1",
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
+    "print-js": "^1.6.0",
     "quasar": "^2.3.1",
     "uuid": "^8.3.2",
     "vue": "^3.0.4",
