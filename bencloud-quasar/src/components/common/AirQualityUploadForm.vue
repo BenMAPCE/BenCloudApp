@@ -66,6 +66,7 @@
 <script>
 import GridDefinitions from "../datacenter/airquality/GridDefinitions.vue";
 import AirQualityUploadErrorsDialog from "./AirQualityUploadErrorsDialog.vue";
+import AirQualityUploadSuccessDialog from "./AirQualityUploadSuccessDialog.vue";
 
 import { useQuasar } from "quasar";
 import { useStore } from "vuex";
@@ -223,22 +224,36 @@ export default {
                   persistent: true,
                   componentProps: {
                     errorList: response.data.messages,
-                    fileName: this.selected_file.name
+                    fileName: this.selected_file.name,
                   },
                 })
                 .onOk(() => {
                   console.log("OK");
-                  //taskName.value = ""
+                  this.$refs.dialog.hide()
                 })
                 .onCancel(() => {
-                  // console.log('Cancel')
                 })
                 .onDismiss(() => {
-                  //console.log("go to view tasks");
-                  //this.$router.replace("/datacenter/manage-tasks");
-                  // console.log('I am triggered on both OK and Cancel')
-                });
+               });
             }
+          } else {
+            this.$q
+              .dialog({
+                component: AirQualityUploadSuccessDialog,
+                parent: this,
+                persistent: true,
+                componentProps: {
+                  fileName: this.selected_file.name,
+                  parentDialog: this.$refs.dialog,
+                },
+              })
+              .onOk(() => {
+                console.log("OK");
+              })
+              .onCancel(() => {
+              })
+              .onDismiss(() => {
+              });
           }
 
           self.$q.loading.hide();
@@ -271,13 +286,11 @@ export default {
     },
 
     file_selected: function (file) {
-      console.log(file);
       this.selected_file = file[0];
       this.check_if_document_upload = true;
     },
 
     file_removed: function (file) {
-      console.log(file);
       this.selected_file = "";
       this.check_if_document_upload = false;
     },
@@ -288,12 +301,6 @@ export default {
     },
 
     onRejected(rejectedEntries) {
-      // Notify plugin needs to be installed
-      // https://quasar.dev/quasar-plugins/notify#Installation
-      $q.notify({
-        type: "negative",
-        message: `${rejectedEntries.length} file(s) did not pass validation constraints`,
-      });
     },
 
     onChangePollutantValue(value) {
