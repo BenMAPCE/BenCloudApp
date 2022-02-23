@@ -1,8 +1,8 @@
 {
   "name": "bencloud-quasar",
   "version": "0.0.1",
-  "description": "BenCloud",
-  "productName": "BenCloud",
+  "description": "BenMAP",
+  "productName": "BenMAP",
   "author": "Barrie Selack <bselack@indecon.com>",
   "private": true,
   "scripts": {

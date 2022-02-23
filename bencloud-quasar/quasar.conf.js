@@ -146,9 +146,9 @@ module.exports = configure(function (ctx) {
       },
 
       manifest: {
-        name: `BenCloud`,
-        short_name: `BenCloud`,
-        description: `BenCloud`,
+        name: `BenMAP`,
+        short_name: `BenMAP`,
+        description: `BenMAP`,
         display: 'standalone',
         orientation: 'portrait',
         background_color: '#ffffff',

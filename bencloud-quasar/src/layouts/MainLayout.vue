@@ -5,7 +5,7 @@
       <div class="benmap-header">
         <q-toolbar>
           <q-toolbar-title>
-            BenCLOUD - Environmental Benefits &amp; Mapping Tool
+            BenMAP - Benefits Mapping and Analysis Program
           </q-toolbar-title>
 
           <div>v{{ 0.01 }} beta ({{ environment }})</div>

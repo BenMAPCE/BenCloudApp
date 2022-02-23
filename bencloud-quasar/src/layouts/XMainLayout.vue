@@ -12,7 +12,7 @@
         />
 
         <q-toolbar-title>
-          BenCLOUD - Environmental Benefits &amp; Mapping Tool
+          BenMAP - Benefits Mapping and Analysis Program
         </q-toolbar-title>
 
         <div> v{{ .01 }} beta</div>

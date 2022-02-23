@@ -1,0 +1,1 @@
+QENV=development quasar dev
