@@ -65,6 +65,7 @@ export default defineComponent({
     var users = [
       { userName: "Barrie", password: "bencloud" },
       { userName: "Jim", password: "bencloud" },
+      { userName: "benmap", password: "benmap" }
     ];
 
     const userName = ref("");
