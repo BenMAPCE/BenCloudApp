@@ -71,6 +71,7 @@ import AirQualityUploadSuccessDialog from "./AirQualityUploadSuccessDialog.vue";
 import { useQuasar } from "quasar";
 import { useStore } from "vuex";
 
+
 export default {
   data: () => ({
     selected_file: "",
@@ -257,6 +258,13 @@ export default {
           }
 
           self.$q.loading.hide();
+
+          var oldValue =  this.$store.state.airquality.airQualityForceReloadValue
+          console.log("oldValue: " + oldValue);
+          var newValue = oldValue + 1;
+          console.log("newValue: " + newValue);
+          this.$store.commit("airquality/updateAirQualityForceReloadValue", newValue)
+
           //self.hide();
           //self.$emit("ok");
 

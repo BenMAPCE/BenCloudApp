@@ -4,5 +4,6 @@ export default function () {
     pollutantFriendlyName: "",
     airQualityLayerId : 0,
     airQualityLayerAddedDate : null,
+    airQualityForceReloadValue: 1
   }
 }

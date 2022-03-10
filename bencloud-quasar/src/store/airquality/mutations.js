@@ -15,3 +15,6 @@ export function updateAirQualityLayerAddedDate (state, newDate) {
     state.airQualityLayerAddedDate = newDate;
 }
 
+export function updateAirQualityForceReloadValue (state, newValue) {
+    state.airQualityForceReloadValue = newValue;
+}

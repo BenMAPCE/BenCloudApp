@@ -119,6 +119,22 @@ export default defineComponent({
          });
     })
 
+  watch(
+      () => store.state.airquality.airQualityForceReloadValue,
+      (newValue, oldValue) => {
+        console.log("--- added Air Quality Layer")
+        filter.value = "";
+        pagination.value.sortBy = "name";
+        pagination.value.descending = false;
+        pagination.value.page = 1;
+        pagination.value.rowsPerPage = 10;
+        pagination.value.rowsNumber = 0;
+        onRequest({
+            pagination: pagination.value,
+            filter: undefined,
+         });    
+      })
+
     watch(
       () => store.state.airquality.pollutantId,
       (pollutantId, prevPollutantId) => {

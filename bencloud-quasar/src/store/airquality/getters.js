@@ -15,3 +15,6 @@ export function airQualityLayerAddedDate (state) {
   return state.airQualityLayerAddedDate
 }
 
+export function airQualityForceReloadValue (state) {
+  return state.airQualityForceReloadValue
+}
