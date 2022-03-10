@@ -4,7 +4,7 @@
   </div>
   <div class="q-pa-md">
     <div class="q-gutter-sm">
-      <div class="row">Step 1. What population dataset do you want to use?.</div>
+      <div class="row">Step 1. What population dataset do you want to use?</div>
       <div class="row">
         <Suspense>
           <PopulationDataset></PopulationDataset>
