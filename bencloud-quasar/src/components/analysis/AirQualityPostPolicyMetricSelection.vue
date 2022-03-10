@@ -205,13 +205,13 @@ export default defineComponent({
               rows.value.push(row);
 
               row = {};
-              row.input_file_characteristic = "Mean value (ug/m3)";
+              row.input_file_characteristic = "Mean value";
               row.value = Math.round(metric_statistics[m].mean_value * 100) / 100;
 
               rows.value.push(row);
 
               row = {};
-              row.input_file_characteristic = "2.5th and 97.5th value (ug/m3)";
+              row.input_file_characteristic = "2.5th and 97.5th value";
               row.value =
                 Math.round(metric_statistics[m].pct_2_5 * 100) / 100 +
                 " - " +
