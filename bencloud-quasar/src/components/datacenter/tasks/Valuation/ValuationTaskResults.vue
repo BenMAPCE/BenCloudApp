@@ -8,7 +8,7 @@
       <q-table
         :rows="rows"
         :columns="columns"
-        row-key="point_estimate"
+        row-key="unique_id"
         :rows-per-page-options="[0]"
         v-model:pagination="pagination"
         :loading="loading"
@@ -84,8 +84,14 @@ export default defineComponent({
 
       (async () => {
         const response = await getValuationTaskResults(props.task_uuid).fetch();
-        rows.value = JSON.parse(JSON.stringify(unref(response.data)));
-        console.log("**************************")
+
+        // create a unique if for the table key - will later come from the back end
+        var valuationResults = JSON.parse(JSON.stringify(unref(response.data)));
+        for (var i = 0; i < valuationResults.length; i++){
+          valuationResults[i].unique_id = i;
+        }
+
+        rows.value = valuationResults;
         console.log(rows.value)
         loading.value = false;
       })();
