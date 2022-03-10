@@ -5,7 +5,6 @@
     Please select an Air Quality
   </div>
 
-  |{{ stepHasError }}|{{ atStep.value }}|
   <Suspense>
     <Pollutant></Pollutant>
   </Suspense>

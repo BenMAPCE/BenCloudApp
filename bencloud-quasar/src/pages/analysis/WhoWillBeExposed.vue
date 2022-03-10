@@ -4,7 +4,7 @@
   </div>
   <div class="q-pa-md">
     <div class="q-gutter-sm">
-      <div class="row">Step 1. Select the population dataset.</div>
+      <div class="row">Step 1. What population dataset do you want to use?.</div>
       <div class="row">
         <Suspense>
           <PopulationDataset></PopulationDataset>
@@ -15,7 +15,7 @@
           <PopulationYears></PopulationYears>
       </div>
       <div class="row">
-        Step 3. What is the baseline health of the population exposed?
+        Step 3. What baseline health dataset do you want to use?
       </div>
       <div class="row">
         <Suspense>
