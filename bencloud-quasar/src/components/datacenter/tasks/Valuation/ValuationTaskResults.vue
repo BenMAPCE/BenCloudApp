@@ -8,7 +8,7 @@
       <q-table
         :rows="rows"
         :columns="columns"
-        row-key="name"
+        row-key="point_estimate"
         :rows-per-page-options="[0]"
         v-model:pagination="pagination"
         :loading="loading"
@@ -85,7 +85,8 @@ export default defineComponent({
       (async () => {
         const response = await getValuationTaskResults(props.task_uuid).fetch();
         rows.value = JSON.parse(JSON.stringify(unref(response.data)));
-        //console.log(rows.value)
+        console.log("**************************")
+        console.log(rows.value)
         loading.value = false;
       })();
     }
