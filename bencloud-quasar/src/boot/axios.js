@@ -19,6 +19,9 @@ export default boot(({ app }) => {
   app.config.globalProperties.$api = api
   // ^ ^ ^ this will allow you to use this.$api (for Vue Options API form)
   //       so you can easily perform requests against your app's API
+
+  axios.defaults.headers.common['uid'] = 'test@test.com';
+  axios.defaults.headers.common['ismemberof'] = 'BenMAP_Users';
 })
 
 export { api }

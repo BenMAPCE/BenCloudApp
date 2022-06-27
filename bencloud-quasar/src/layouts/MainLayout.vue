@@ -47,18 +47,18 @@ const linksList = [
     icon: "mdi-chart-box-outline",
     link: "/#/datacenter",
   },
-  {
-    title: "Settings",
-    caption: "",
-    icon: "mdi-cog",
-    link: "/#/settings",
-  },
-  {
-    title: "Language",
-    caption: "",
-    icon: "mdi-web",
-    link: "/#/language",
-  },
+  // {
+  //   title: "Settings",
+  //   caption: "",
+  //   icon: "mdi-cog",
+  //   link: "/#/settings",
+  // },
+  // {
+  //   title: "Language",
+  //   caption: "",
+  //   icon: "mdi-web",
+  //   link: "/#/language",
+  // },
   {
     title: "Help",
     caption: "",
@@ -69,7 +69,7 @@ const linksList = [
     title: "Feedback",
     caption: "",
     icon: "mdi-comment-text-outline",
-    link: "/#/feedback",
+    link: "https://www.epa.gov/benmap/forms/contact-us-about-benmap",
   },
 ];
 
