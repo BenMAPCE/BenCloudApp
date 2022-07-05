@@ -4,12 +4,18 @@ BenCloud
 
 ## Install the dependencies
 ```bash
+Change to the bencloud-quasar folder and execute the following command
+
 npm install
 ```
 
 ### Start the app in development mode (hot-code reloading, error reporting, etc.)
 ```bash
-quasar dev
+# For Linux and Mac
+QENV=development quasar dev
+
+# For Windows
+set QENV='development' & quasar dev
 ```
 
 ### Lint the files
