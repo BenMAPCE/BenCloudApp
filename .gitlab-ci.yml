@@ -39,7 +39,7 @@ build image:
  dependencies:
   - build app
 
-deploy development:
+deploy testdev:
  stage: Non-prod deployment
  tags:
   - benmapdevgitlab
