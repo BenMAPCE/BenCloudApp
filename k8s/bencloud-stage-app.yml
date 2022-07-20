@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bencloud-app
+  namespace: benmap-stg
+  annotations:
+    app.gitlab.com/app: ${CI_PROJECT_PATH_SLUG}
+    app.gitlab.com/env: ${CI_ENVIRONMENT_SLUG}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bencloud-app
+
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+
+  template:
+    metadata:
+      labels:
+        app: bencloud-app
+      annotations:
+        app.gitlab.com/app: ${CI_PROJECT_PATH_SLUG}
+        app.gitlab.com/env: ${CI_ENVIRONMENT_SLUG}
+    spec:
+      containers:
+      - name: ui
+        image:  registry.epa.gov/benmap/bencloudapp/bencloudapp:$CI_COMMIT_SHORT_SHA
+        imagePullPolicy: Always
+        livenessProbe:
+         tcpSocket:
+            port: 80
+         initialDelaySeconds: 10
+         periodSeconds: 15
+        startupProbe:
+          tcpSocket:
+            port: 80
+          failureThreshold: 30
+          periodSeconds: 10
+        env:
+          - name: REDEPLOY_META
+            value: $CI_JOB_ID-$CI_COMMIT_SHA
+        ports:
+        - containerPort: 80
+      imagePullSecrets:
+      - name: glcr-auth
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: bencloud-app-service
+  annotations:
+    app.gitlab.com/app: ${CI_PROJECT_PATH_SLUG}
+    app.gitlab.com/env: ${CI_ENVIRONMENT_SLUG}
+spec:
+  ports:
+  - port: 443
+    targetPort: 80
+  selector:
+    app: bencloud-app
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: bencloudapp-ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    app.gitlab.com/app: ${CI_PROJECT_PATH_SLUG}
+    app.gitlab.com/env: ${CI_ENVIRONMENT_SLUG}
+#   nginx.ingress.kubernetes.io/from-to-www-redirect: "true"
+spec:
+  tls:
+    - hosts:
+        - stg.bencloud-stg.aws.epa.gov
+      secretName: bencloud-tls-secret
+  rules:
+    - host: stg.bencloud-stg.aws.epa.gov
+      http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+           service:
+            name: bencloud-app-service
+            port: 
+             number: 443

@@ -6,12 +6,13 @@
 #  - quasar
 
 stages:
-  - Build
-  - Image
-  - Non-prod deployment
+  - code_build
+  - image_build
+  - deploy_nonprod
+  - deploy_prod
 
-build app:
- stage: Build
+build_dev_app:
+ stage: code_build
  image: node:16
  tags:
   - benmapdevgitlab
@@ -25,8 +26,23 @@ build app:
   paths:
    - bencloud-quasar/dist/spa
 
-build image:
- stage: Image
+build_stage_app:
+ stage: code_build
+ image: node:16
+ tags:
+  - benmapstagegitlab
+ script:
+  - cd bencloud-quasar
+  - npm install -g @quasar/cli
+  - npm install --progress=false
+  - QENV=production quasar build
+ artifacts:
+  expire_in: 1 day
+  paths:
+   - bencloud-quasar/dist/spa
+
+build_dev_image:
+ stage: image_build
  tags:
   - benmapdevgitlab
  image:
@@ -35,12 +51,26 @@ build image:
  script:
   - mkdir -p /kaniko/.docker
   - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
-  - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/docker/bencloudapp/Dockerfile --destination $CI_REGISTRY_IMAGE/bencloudapp:$CI_COMMIT_SHORT_SHA
+  - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/docker/bencloudapp/Dockerfile-dev --destination $CI_REGISTRY_IMAGE/bencloudapp:$CI_COMMIT_SHORT_SHA
  dependencies:
-  - build app
+  - build_dev_app
 
-deploy testdev:
- stage: Non-prod deployment
+build_stage_image:
+ stage: image_build
+ tags:
+  - benmapstagegitlab
+ image:
+  name: gcr.io/kaniko-project/executor:debug
+  entrypoint: [""]
+ script:
+  - mkdir -p /kaniko/.docker
+  - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+  - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/docker/bencloudapp/Dockerfile-stage --destination $CI_REGISTRY_IMAGE/bencloudapp:$CI_COMMIT_SHORT_SHA
+ dependencies:
+  - build_stage_app
+
+deploy_testdev:
+ stage: deploy_nonprod
  tags:
   - benmapdevgitlab
  when: manual
@@ -52,12 +82,32 @@ deploy testdev:
   - kubectl config set-credentials gitlab --token="$KUBE_TOKEN"
   - kubectl config set-context default --cluster=benmap-shared-dev00 --user=gitlab --namespace="benmap-dev"
   - kubectl config use-context default
-  - envsubst < k8s/bencloud-app.yml | kubectl apply -f -
+  - envsubst < k8s/bencloud-dev-app.yml | kubectl apply -f -
  environment:
   name: testdev
   url: https://dev.bencloud-dev.aws.epa.gov
   kubernetes:
    namespace: benmap-dev
+
+deploy_staging:
+ stage: deploy_nonprod
+ tags:
+  - benmapstagegitlab
+ when: manual
+ image: dtzar/helm-kubectl
+ script:
+  - apk add gettext
+  - kubectl config set-cluster benmap-shared-stg00 --server="$KUBE_URL"
+  - kubectl config set-cluster benmap-shared-stg00 --certificate-authority=$KUBE_CA_PEM_FILE --embed-certs=true
+  - kubectl config set-credentials gitlab --token="$KUBE_TOKEN"
+  - kubectl config set-context default --cluster=benmap-shared-stg00 --user=gitlab --namespace="benmap-stg"
+  - kubectl config use-context default
+  - envsubst < k8s/bencloud-stage-app.yml | kubectl apply -f -
+ environment:
+  name: staging
+  url: https://stg.bencloud-stg.aws.epa.gov
+  kubernetes:
+   namespace: benmap-stg
 #he quasar.conf.js also needs
 # comment for now     publicPath: process.env.NODE_ENV === 'production' ? '/rep$
 

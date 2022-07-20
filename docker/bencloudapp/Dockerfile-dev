@@ -10,7 +10,7 @@ RUN apk update \
     && apk upgrade \
     && adduser -D -H -u 1000 -s /bin/bash www-data -G www-data
 
-COPY ./docker/bencloudapp/sites/ /etc/nginx/sites-available/
+COPY ./docker/bencloudapp/sites/default-dev.conf /etc/nginx/sites-available/default.conf
 
 CMD nginx
 
