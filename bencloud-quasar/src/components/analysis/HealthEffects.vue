@@ -4,24 +4,24 @@
     Please select at least one Health Effect
   </div>
 
-  <q-tabs
-    v-model="tab"
-    dense
-    class="text-grey"
-    active-color="primary"
-    indicator-color="primary"
-    align="justify"
-    narrow-indicator
-  >
-    <q-tab
-      name="standard"
-      class="standard"
-      label="Estimate a standard set of health effects"
-    />
-    <q-tab name="individual" class="individual" label="Estimate individual effects" />
-  </q-tabs>
+<!--  <q-tabs-->
+<!--    v-model="tab"-->
+<!--    dense-->
+<!--    class="text-grey"-->
+<!--    active-color="primary"-->
+<!--    indicator-color="primary"-->
+<!--    align="justify"-->
+<!--    narrow-indicator-->
+<!--  >-->
+<!--    <q-tab-->
+<!--      name="standard"-->
+<!--      class="standard"-->
+<!--      label="Estimate a standard set of health effects"-->
+<!--    />-->
+<!--    <q-tab name="individual" class="individual" label="Estimate individual effects" />-->
+<!--  </q-tabs>-->
 
-  <q-tab-panels v-model="tab" animated>
+<!--  <q-tab-panels v-model="tab" animated>-->
     <q-tab-panel name="standard">
       <div class="header-text">
         Estimate a standard set of health effects
@@ -43,10 +43,10 @@
       </Suspense>
     </q-tab-panel>
 
-    <q-tab-panel name="individual">
-      <div class="text-h6">Estimate individual effects</div>
-    </q-tab-panel>
-  </q-tab-panels>
+<!--    <q-tab-panel name="individual">-->
+<!--      <div class="text-h6">Estimate individual effects</div>-->
+<!--    </q-tab-panel>-->
+<!--  </q-tab-panels>-->
 </template>
 <script>
 import { defineComponent, ref, reactive, inject } from "vue";
