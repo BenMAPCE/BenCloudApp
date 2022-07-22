@@ -7,9 +7,9 @@
     </div>
 
     <div class="q-pa-md row items-start q-gutter-md">
-      <q-card class="start-tasks">
+      <q-card class="start-tasks task-card">
         <q-card-section> Start a new analysis </q-card-section>
-        <q-card-section>
+        <q-card-actions vertical>
           <q-btn
             color="secondary"
             icon-right="mdi-home"
@@ -17,11 +17,10 @@
             @click="$router.replace('analysis')"
             label="New Analysis"
           />
-        </q-card-section>
+        </q-card-actions>
       </q-card>
 
-      <q-card class="manage-tasks">
-        <q-card-section> Start a new analysis from a template </q-card-section>
+      <q-card class="manage-tasks task-card">
         <q-card-section>
           <q-select
             v-model="model"
@@ -36,7 +35,8 @@
               <q-icon name="mdi-file-cabinet" />
             </template>
           </q-select>
-
+        </q-card-section>
+        <q-card-actions vertical>
           <q-btn
             color="secondary"
             icon-right="mdi-home"
@@ -46,18 +46,15 @@
             label="Analysis From Template"
           />
 
-          <p></p>        
-
-          <q-btn
-            color="secondary"
-            icon-right="mdi-home"
-            push
-            :disabled="model === null"
-            @click="goToReviewAnalysisFromTemplate()"
-            label="Review From Template"
-          />
-  
-        </q-card-section>
+<!--          <q-btn-->
+<!--            color="secondary"-->
+<!--            icon-right="mdi-home"-->
+<!--            push-->
+<!--            :disabled="model === null"-->
+<!--            @click="goToReviewAnalysisFromTemplate()"-->
+<!--            label="Review From Template"-->
+<!--          />-->
+        </q-card-actions>
       </q-card>
     </div>
   </q-page>
@@ -99,7 +96,7 @@ export default defineComponent({
         this.$router.replace('/analysis')
       })();
 
-    }      
+    }
 
     function goToReviewAnalysisFromTemplate() {
       (async () => {
@@ -126,12 +123,23 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.description {
-  font-size: 18px;
-  font-weight: 400;
-}
+  .description {
+    font-size: 18px;
+    font-weight: 400;
+  }
 
-.template-select {
-  padding-bottom: 25px;
-}
+  .template-select {
+    padding-bottom: 25px;
+  }
+
+  .task-card {
+    height: 170px;
+    width: 280px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .task-card .q-card__section {
+    flex-grow: 1;
+  }
 </style>

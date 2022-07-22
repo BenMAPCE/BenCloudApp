@@ -6,6 +6,7 @@
     color="primary"
     animated
     width="100%"
+    @transition="scrollToTop()"
   >
     <q-step :name="1" title="Where?" :done="step > 1" prefix="1">
       <Where></Where>
@@ -106,6 +107,10 @@ export default {
       step.value = store.state.analysis.stepNumber;
     });
 
+    function scrollToTop() {
+      window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
     function validatePreviousStep(thisStepper, step) {
       validateStep(thisStepper, step - 1);
       thisStepper.previous();
@@ -157,7 +162,7 @@ export default {
 
       if (step == 5) {
         if (
-          healthEffectsHasValue(store) 
+          healthEffectsHasValue(store)
         ) {
           stepHasError.value = false;
           thisStepper.next();
@@ -182,13 +187,14 @@ export default {
       stepHasError,
       validateStep,
       validatePreviousStep,
+      scrollToTop
     };
   },
 };
 </script>
 
 <style scoped>
-.back-button {
-  margin-right: 15px;
-}
+  .back-button {
+    margin-right: 15px;
+  }
 </style>

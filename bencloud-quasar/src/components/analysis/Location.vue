@@ -9,11 +9,11 @@
     narrow-indicator
   >
     <q-tab name="defaults" class="defaults" label="Select from a list of defaults" />
-    <q-tab
-      name="individual"
-      class="individual"
-      label="Search for one or more locations"
-    />
+<!--    <q-tab-->
+<!--      name="individual"-->
+<!--      class="individual"-->
+<!--      label="Search for one or more locations"-->
+<!--    />-->
   </q-tabs>
 
   <q-tab-panels v-model="tab" animated>
@@ -26,12 +26,12 @@
           color="primary"
         ></q-option-group>
       </div>
-      
+
     </q-tab-panel>
 
-    <q-tab-panel name="individual">
-      <div class="header-text">Not available at this time.</div>
-    </q-tab-panel>
+<!--    <q-tab-panel name="individual">-->
+<!--      <div class="header-text">Not available at this time.</div>-->
+<!--    </q-tab-panel>-->
   </q-tab-panels>
 </template>
 <script>
@@ -46,7 +46,7 @@ export default defineComponent({
 
   setup(props, context) {
     const rows = ref([]);
-    const selectedItem = ref(0);
+    const selectedItem = ref('1');
     const store = useStore();
 
     watch(
@@ -56,12 +56,12 @@ export default defineComponent({
         if (currentSelectedItem != prevSelectedItem) {
           console.log("selectedItem: " + currentSelectedItem)
           //console.log("options: " + options)
-          
+
           //var name = options.find((opt) => opt.value === currentSelectedItem).label;
 
-          store.commit("analysis/updateLocation", 
-          { 
-            locationId: currentSelectedItem,  
+          store.commit("analysis/updateLocation",
+          {
+            locationId: currentSelectedItem,
             plocationName: ""
           });
         }
@@ -79,9 +79,9 @@ export default defineComponent({
       tab: ref("defaults"),
       options: [
         { label: 'U.S. National', value: '1' },
-        { label: 'Eastern U.S.', value: '2' },
-        { label: 'Western U.S.', value: '3'  },
-        { label: 'Global (everywhere)', value: '4' }
+        { label: 'Eastern U.S.', value: '2', disable: true },
+        { label: 'Western U.S.', value: '3', disable: true  },
+        { label: 'Global (everywhere)', value: '4', disable: true }
       ],
       selectedItem,
       rows
