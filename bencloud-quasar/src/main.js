@@ -28,9 +28,8 @@ library.add(fas)
 library.add(far)
 
 import AppTopNavigation from './components/navigation/AppTopNavigation.vue'
-
 const app = createApp(App)
-    .use(store)
+    // .use(store)
     .use(bencloud)
     .use(router)
     .mount('#app');

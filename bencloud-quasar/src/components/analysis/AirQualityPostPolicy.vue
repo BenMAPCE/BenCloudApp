@@ -32,27 +32,39 @@ async setup(props, context) {
         console.log("watch: " + currentSelectedItem + " |" + prevSelectedItem)
         if (currentSelectedItem != prevSelectedItem) {
           console.log("selectedItem: " + currentSelectedItem)
-          
+
           var name = rows.value.find((opt) => opt.value === currentSelectedItem).label;
 
-          store.commit("analysis/updatePostPolicyAirQuality", 
-          { 
-            postPolicyAirQualityId: currentSelectedItem,  
+          store.commit("analysis/updatePostPolicyAirQuality",
+          {
+            postPolicyAirQualityId: currentSelectedItem,
             postPolicyAirQualityName: name
           });
         }
       });
 
+  // The airQualityLayers property is set when the AirQualityPrePolicy.vue component pulls a new list of layers
+  // We monitor the change so we don't have to make a duplicate api call.  Instead we pull the data fro the store.
+  watch(
+    () => store.state.analysis.airQualityLayers,
+    (newData, oldData) => {
+      rows.value = convertAirQualityLayers(newData);
+      if (store.state.analysis.postPolicyAirQualityId != null) {
+        selectedItem.value = store.state.analysis.postPolicyAirQualityId;
+      }
+    }
+  );
+
   onBeforeMount(() => {
-        (async () => {
-          const response = await loadAirQualityLayers().fetch();
-          rows.value = convertAirQualityLayers(response.data.value);
-
-        if (store.state.analysis.postPolicyAirQualityId != null) {
-          selectedItem.value = store.state.analysis.postPolicyAirQualityId;
-        }
-
-        })()
+        // (async () => {
+        //   const response = await loadAirQualityLayers().fetch();
+        //   rows.value = convertAirQualityLayers(response.data.value);
+        //
+        // if (store.state.analysis.postPolicyAirQualityId != null) {
+        //   selectedItem.value = store.state.analysis.postPolicyAirQualityId;
+        // }
+        //
+        // })()
     })
 
     return {
@@ -68,7 +80,7 @@ async setup(props, context) {
 
 .aq-post-policy-scroll-area {
   border: 1px solid black;
-  height: 200px; 
+  height: 200px;
   max-width: 90%;
 }
 
