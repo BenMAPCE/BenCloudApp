@@ -13,6 +13,8 @@ stages:
 
 build_dev_app:
  stage: code_build
+ only: 
+  - develop
  image: node:16
  tags:
   - benmapdevgitlab
@@ -28,6 +30,8 @@ build_dev_app:
 
 build_stage_app:
  stage: code_build
+ only: 
+  - main
  image: node:16
  tags:
   - benmapstagegitlab
@@ -43,6 +47,8 @@ build_stage_app:
 
 build_dev_image:
  stage: image_build
+ only:
+  - develop
  tags:
   - benmapdevgitlab
  image:
@@ -57,6 +63,8 @@ build_dev_image:
 
 build_stage_image:
  stage: image_build
+ only:
+  - main
  tags:
   - benmapstagegitlab
  image:
@@ -71,6 +79,8 @@ build_stage_image:
 
 deploy_testdev:
  stage: deploy_nonprod
+ only:
+  - develop
  tags:
   - benmapdevgitlab
  when: manual
@@ -91,6 +101,8 @@ deploy_testdev:
 
 deploy_staging:
  stage: deploy_nonprod
+ only:
+  - main
  tags:
   - benmapstagegitlab
  when: manual
