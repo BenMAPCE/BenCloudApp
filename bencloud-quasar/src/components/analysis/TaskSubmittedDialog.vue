@@ -11,11 +11,11 @@
 
         <div class="row justify-center">
           <q-card-actions>
-            <q-btn color="primary" label="OK" @click="onOKClick()" />
+            <q-btn color="primary" label="OK" @click="onCancelClick()" />
           </q-card-actions>
 
           <q-card-actions>
-            <q-btn color="primary" label="View your tasks" @click="onDismissClick()" />
+            <q-btn color="primary" label="View your tasks" @click="onOKClick()" />
           </q-card-actions>
         </div>
 
@@ -40,58 +40,45 @@ export default {
       default: null,
     },
   },
-  components: {},
 
   emits: [
     // REQUIRED
-    "ok",
-    "hide",
-    "dismiss",
+    "ok", "hide"
   ],
 
   methods: {
     // following method is REQUIRED
     // (don't change its name --> "show")
-    show() {
-      console.log("^^^^^^^^^^^^^^");
-      this.$refs.dialog.show();
+    show () {
+      this.$refs.dialog.show()
     },
 
     // following method is REQUIRED
     // (don't change its name --> "hide")
-    hide() {
-      this.$refs.dialog.hide();
+    hide () {
+      this.$refs.dialog.hide()
     },
 
-    onDialogHide() {
+    onDialogHide () {
       // required to be emitted
       // when QDialog emits "hide" event
-      this.$emit("hide");
+      this.$emit('hide')
     },
 
-    onOKClick() {
+    onOKClick () {
       // on OK, it is REQUIRED to
       // emit "ok" event (with optional payload)
       // before hiding the QDialog
-      this.$emit("ok");
+      this.$emit('ok')
       // or with payload: this.$emit('ok', { ... })
 
       // then hiding dialog
-      this.hide();
+      this.hide()
     },
 
-    onDismissClick() {
-      console.log("clicked View Tasks")
-      // required to be emitted
-      // when QDialog emits "hide" event
-      this.$emit("dismiss");
-      this.hide();
-
-    },
-
-    onCancelClick() {
+    onCancelClick () {
       // we just need to hide the dialog
-      this.hide();
+      this.hide()
     },
 
     onRejected(rejectedEntries) {
