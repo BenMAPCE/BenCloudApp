@@ -25,7 +25,7 @@
 
 <!--    <q-tab-panel -->
 <!--        name="table">-->
-      <div class="text-h6">Air Quality Cells</div>
+      <div class="text-h6" v-if="airQualityLayerId != 0">Air Quality Cells</div>
       <AirQualityCells></AirQualityCells>
 <!--    </q-tab-panel>-->
 <!--  </q-tab-panels>-->

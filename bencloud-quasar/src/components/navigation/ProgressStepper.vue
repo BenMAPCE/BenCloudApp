@@ -6,6 +6,7 @@
     color="primary"
     animated
     width="100%"
+    @transition="scrollToTop()"
   >
     <q-step :name="1" title="Where?" :done="step > 1" prefix="1">
       <Where></Where>
@@ -106,6 +107,10 @@ export default {
       step.value = store.state.analysis.stepNumber;
     });
 
+    function scrollToTop() {
+      window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
     function validatePreviousStep(thisStepper, step) {
       validateStep(thisStepper, step - 1);
       thisStepper.previous();
@@ -182,6 +187,7 @@ export default {
       stepHasError,
       validateStep,
       validatePreviousStep,
+      scrollToTop
     };
   },
 };
