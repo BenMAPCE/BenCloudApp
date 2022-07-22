@@ -9,7 +9,7 @@
           </q-toolbar-title>
 
           <div>
-            <div>{{username}}</div>
+<!--            <div>{{username}}</div>-->
             <div>v{{ 0.01 }} beta ({{ environment }})</div>
           </div>
         </q-toolbar>
