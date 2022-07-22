@@ -105,7 +105,7 @@ deploy_staging:
   - envsubst < k8s/bencloud-stage-app.yml | kubectl apply -f -
  environment:
   name: staging
-  url: https://stg.bencloud-stg.aws.epa.gov
+  url: https://stg.bencloud-stage.aws.epa.gov
   kubernetes:
    namespace: benmap-stg
 #he quasar.conf.js also needs
