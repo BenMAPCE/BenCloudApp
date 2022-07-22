@@ -132,7 +132,7 @@ export default defineComponent({
         onRequest({
             pagination: pagination.value,
             filter: undefined,
-         });    
+         });
       })
 
     watch(
@@ -153,7 +153,7 @@ export default defineComponent({
           rows: [],
         });
     })
-      
+
     function onRequest(props) {
       console.log("on onRequest()");
       if (store.state.airquality.pollutantId != 0) {
@@ -207,12 +207,12 @@ export default defineComponent({
     }
 
     onBeforeMount(() => {
-    
+
       visibleColumns.value = [];
       visibleColumns.push("name");
       visibleColumns.push("grid_definition_name");
-      visibleColumns.push("cell_count");
-      visibleColumns.push("mean_value");
+      // visibleColumns.push("cell_count");
+      // visibleColumns.push("mean_value");
       visibleColumns.push("actions");
 
       console.log("includeLayerName: " + props.includeLayerName);

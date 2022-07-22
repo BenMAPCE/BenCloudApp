@@ -157,7 +157,7 @@ export default {
 
       if (step == 5) {
         if (
-          healthEffectsHasValue(store) 
+          healthEffectsHasValue(store)
         ) {
           stepHasError.value = false;
           thisStepper.next();
@@ -188,7 +188,7 @@ export default {
 </script>
 
 <style scoped>
-.back-button {
-  margin-right: 15px;
-}
+  .back-button {
+    margin-right: 15px;
+  }
 </style>

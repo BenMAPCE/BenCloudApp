@@ -8,7 +8,10 @@
             BenMAP - Benefits Mapping and Analysis Program
           </q-toolbar-title>
 
-          <div>v{{ 0.01 }} beta ({{ environment }})</div>
+          <div>
+            <div>{{username}}</div>
+            <div>v{{ 0.01 }} beta ({{ environment }})</div>
+          </div>
         </q-toolbar>
       </div>
       <transition name="hmenu" class="menu-bar">
@@ -33,6 +36,7 @@ import { defineComponent, onBeforeMount, ref } from "vue";
 import AppNavLinks from "src/components/navigation/AppNavLinks.vue";
 import EPAHeader from "src/components/epa/EPAHeader.vue";
 import EPAFooter from "src/components/epa/EPAFooter.vue";
+import store from "src/store";
 
 const linksList = [
   {
@@ -85,18 +89,22 @@ export default defineComponent({
   setup() {
     const environment = ref("DDDDD");
     const showEpaHeaderFooter = ref(true);
+    const username = ref("");
 
     onBeforeMount(() => {
       environment.value = process.env.ENV_TYPE;
       if (environment.value === "Development") {
         showEpaHeaderFooter.value = true;
       }
+      // username.value = store.auth.username;
+      username.value = "Jerry test";
     })();
 
     return {
       appNavLinks: linksList,
       environment,
-      showEpaHeaderFooter
+      showEpaHeaderFooter,
+      username
     };
   },
 });
