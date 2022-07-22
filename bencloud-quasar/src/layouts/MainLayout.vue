@@ -9,7 +9,7 @@
           </q-toolbar-title>
 
           <div>
-<!--            <div>{{username}}</div>-->
+            <div style="text-align: right;"><q-icon :name="'mdi-account-circle'" size="20px" /> {{username}}</div>
             <div>v{{ 0.01 }} beta ({{ environment }})</div>
           </div>
         </q-toolbar>
@@ -36,7 +36,7 @@ import { defineComponent, onBeforeMount, ref } from "vue";
 import AppNavLinks from "src/components/navigation/AppNavLinks.vue";
 import EPAHeader from "src/components/epa/EPAHeader.vue";
 import EPAFooter from "src/components/epa/EPAFooter.vue";
-import store from "src/store";
+import axios from "axios";
 
 const linksList = [
   {
@@ -96,9 +96,17 @@ export default defineComponent({
       if (environment.value === "Development") {
         showEpaHeaderFooter.value = true;
       }
-      // username.value = store.auth.username;
-      username.value = "Jerry test";
-    })();
+      (async () => {
+        try {
+          const result = await axios
+            .get(process.env.API_SERVER + "/api/user")
+            .then((response) => {
+              username.value = response.data.displayname
+            })
+        } catch (ex) {}
+        finally { }
+      })();
+    })
 
     return {
       appNavLinks: linksList,
@@ -106,7 +114,7 @@ export default defineComponent({
       showEpaHeaderFooter,
       username
     };
-  },
+  }
 });
 </script>
 

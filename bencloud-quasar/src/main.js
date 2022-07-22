@@ -1,7 +1,7 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import './index.css'
-import bencloud from './store/bencloud'
+// import bencloud from './store/bencloud'
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 
@@ -30,7 +30,7 @@ library.add(far)
 import AppTopNavigation from './components/navigation/AppTopNavigation.vue'
 const app = createApp(App)
     // .use(store)
-    .use(bencloud)
+    // .use(bencloud)
     .use(router)
     .mount('#app');
 
