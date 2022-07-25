@@ -8,10 +8,10 @@
               color="primary"
               emit
             ></q-option-group>
-          
+
         </q-scroll-area>
 
-        
+
 </template>
 
 <script>
@@ -46,43 +46,44 @@ export default defineComponent({
         if (currentSelectedItem != prevSelectedItem) {
           console.log("currentSelectedItem: " + currentSelectedItem)
           var name = rows.value.find((opt) => opt.value === currentSelectedItem).label;
-                    
-          store.commit("analysis/updatePrePolicyAirQuality", 
-          { 
-            prePolicyAirQualityId: currentSelectedItem,  
+
+          store.commit("analysis/updatePrePolicyAirQuality",
+          {
+            prePolicyAirQualityId: currentSelectedItem,
             prePolicyAirQualityName: name
           });
         }
       });
 
+    // The airQualityForceReloadValue value is updated when a new file is uploaded
+    // SO we want to watch it and when it changes we know we need to update our list of files
+    watch(
+      () => store.state.airquality.airQualityForceReloadValue,
+      (newCount, oldCount) => {
+        getRows();
+      }
+    );
+
+
    function updateMetric(value) {
       console.log("AQ Pre Selected... " + value);
     }
 
-  onBeforeMount(() => {
-        (async () => {
-          const response = await loadAirQualityLayers().fetch();
-          rows.value = convertAirQualityLayers(response.data.value);
-          store.commit("analysis/updateAirQualityLayers", response.data.value)
-          
-          airQualityLayers = JSON.parse(JSON.stringify(response.data.value.records))
-
-          console.log(airQualityLayers)
-
+    function getRows() {
+      (async () => {
+        const response = await loadAirQualityLayers(store).fetch();
+        rows.value = convertAirQualityLayers(response.data.value);
+        // Setting this value will allow the AirQualityPostPolicy.vue component to pull the new list without making an api call
+        store.commit("analysis/updateAirQualityLayers", response.data.value);
 
         if (store.state.analysis.prePolicyAirQualityId != null) {
           selectedItem.value = store.state.analysis.prePolicyAirQualityId;
         }
+      })()
+    }
 
-        // selectedPollutantId.value = store.state.analysis.pollutantId
-        // selectedPollutantFriendlyName.value = store.state.analysis.pollutantFriendlyName
-
-        // console.log("*********************")
-        // console.log("pollutantId.value: " + selectedPollutantId.value)
-        // console.log("pollutantFriendlyName.value: " + selectedPollutantFriendlyName.value)
-        // console.log("*********************")
-
-        })()
+    onBeforeMount(() => {
+        getRows();
     })
 
 
@@ -102,7 +103,7 @@ export default defineComponent({
 
 .aq-pre-policy-scroll-area {
   border: 1px solid black;
-  height: 200px; 
+  height: 200px;
   max-width: 90%;
 }
 

@@ -229,15 +229,14 @@ export default defineComponent({
         },
       })
         .onOk(() => {
-          console.log("OK");
           //taskName.value = ""
+          this.$router.replace("/datacenter/manage-tasks");
         })
         .onCancel(() => {
-          // console.log('Cancel')
-        })
-        .onDismiss(() => {
-          this.$router.replace("/datacenter/manage-tasks");
-          // console.log('I am triggered on both OK and Cancel')
+          // Sounds backwards, but clicking on the 'OK' button is actually a Cancel since we don't
+          // want the user to go anywhere (we're cancelling out of the dialog)
+          // Clear the task name field
+          taskName.value = "";
         });
     }
 
