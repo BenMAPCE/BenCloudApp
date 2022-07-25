@@ -1,13 +1,13 @@
-import { useStore } from 'vuex';
 import axios from "axios";
 import { ref } from "vue";
 
-export const loadAirQualityLayers = (url) => {
+// Pass the store
+// If we try to create it in this composable we'll get an injection error when running it from a watch()
+export const loadAirQualityLayers = (store) => {
     const data = ref(null)
     const error = ref(null)
     const response = ref(null)
     const loading = ref(false)
-    const store = useStore()
 
     const fetch = async() => {
         loading.value = true;
@@ -18,7 +18,7 @@ export const loadAirQualityLayers = (url) => {
             params: {
                 page: 1,
                 rowsPerPage: 9999999,
-                pollutantId: store.state.analysis.pollutantId              
+                pollutantId: store.state.analysis.pollutantId
                 },
             })
             .then((response) => {
@@ -28,7 +28,7 @@ export const loadAirQualityLayers = (url) => {
             error.value = ex;
         } finally {
             loading.value = false;
-            
+
             return {response, error, data, loading }
         }
     }
