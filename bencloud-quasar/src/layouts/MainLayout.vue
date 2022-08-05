@@ -10,7 +10,7 @@
 
           <div>
             <div style="text-align: right;"><q-icon :name="'mdi-account-circle'" size="20px" /> {{username}}</div>
-            <div>v{{ 0.01 }} beta ({{ environment }})</div>
+            <div>v{{ 0.01 }} beta {{ environment === 'Production' ? '' : '(' + environment + ')' }}</div>
           </div>
         </q-toolbar>
       </div>
@@ -101,7 +101,7 @@ export default defineComponent({
           const result = await axios
             .get(process.env.API_SERVER + "/api/user")
             .then((response) => {
-              username.value = response.data.displayname
+              username.value = response.data.displayname;
             })
         } catch (ex) {}
         finally { }
