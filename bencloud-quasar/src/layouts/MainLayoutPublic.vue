@@ -8,7 +8,7 @@
             BenMAP - Benefits Mapping and Analysis Program
           </q-toolbar-title>
 
-          <div>v{{ 0.01 }} beta ({{ environment }})</div>
+          <div>v{{ 0.01 }} beta {{ environment === 'Production' ? '' : '(' + environment + ')' }}</div>
         </q-toolbar>
       </div>    </q-header>
 

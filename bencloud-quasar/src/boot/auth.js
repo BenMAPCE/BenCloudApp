@@ -1,10 +1,41 @@
 import { boot } from "quasar/wrappers";
 import { LocalStorage, Notify } from "quasar";
 import { ref } from "vue";
+import axios from 'axios'
 
 export default boot(async ({ router, store }) => {
   console.log("----- in auth.js -----");
   console.log(store);
+
+  // Before routing to each path
+  router.beforeEach(async (to, from) => {
+  try {
+    // If the requested page requires the user to be a BenMAP user
+    if (to.meta.requiresUser) {
+      var isUser = false;
+      // Check if they are a BenMAP user
+      try {
+        const result = await axios
+          .get(process.env.API_SERVER + "/api/user")
+          .then((response) => {
+            isUser = response.data.isUser;
+          })
+      } catch(ex) {
+        console.log(ex)
+      }
+      // If they are not a BenMAP user, route them to the request access page
+      if(!isUser) {
+        console.log("Current user is not a BenMAP user.");
+        return '/requestaccess';
+      }
+    }
+  } catch(ex) {
+    console.log(ex)
+  }
+  });
+
+
+
 
   router.beforeEach((to, from, next) => {
 
