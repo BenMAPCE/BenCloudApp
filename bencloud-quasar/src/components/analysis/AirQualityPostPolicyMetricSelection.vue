@@ -60,10 +60,12 @@ export default defineComponent({
       () => selectedItem.value,
       (currentSelectedItem, prevSelectedItem) => {
         console.log("watch: " + currentSelectedItem + " | " + prevSelectedItem);
+        // remove the air quality layer id from the metrics
+        var metrics = currentSelectedItem.split("-");
         if (currentSelectedItem != prevSelectedItem) {
           store.commit(
             "analysis/updatePostPolicyAirQualityMetricId",
-            currentSelectedItem
+            metrics[0] + "-" + metrics[1]
           );
 
           console.log(
@@ -133,12 +135,14 @@ export default defineComponent({
             console.log(option);
 
             options.value.push(option);
-
             if (m === 0) {
               selectedMetrics =
                 metric_statistics[m].metric_id +
                 "-" +
-                metric_statistics[m].seasonal_metric_id;
+                metric_statistics[m].seasonal_metric_id + 
+                "-" + 
+                // add air quality layer id to metrics to ensure that the file characteristics table is updated
+                airQualityLayers[i].id;
             }
           }
 
@@ -157,6 +161,7 @@ export default defineComponent({
 
     function loadMetricDetailsWhenReady(currentSelectedItem) {
       (async () => {
+
         console.log("waiting for airQualityLayers");
         while (!store.state.analysis.airQualityLayers)
           // define the condition as you like
