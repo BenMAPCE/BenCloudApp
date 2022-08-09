@@ -98,6 +98,19 @@ export default defineComponent({
       }
       (async () => {
         try {
+          axios.interceptors.response.use(
+            (response) => {
+              if(response.status === 302) {
+                window.location.reload;
+              }
+              return response;
+            },
+            (error) => {
+              if(error.response.status === 302) {
+                window.location.reload();
+              }  
+            }
+          )
           const result = await axios
             .get(process.env.API_SERVER + "/api/user")
             .then((response) => {
