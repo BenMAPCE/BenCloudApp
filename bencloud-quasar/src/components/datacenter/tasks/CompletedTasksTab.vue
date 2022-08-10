@@ -195,14 +195,14 @@ export default defineComponent({
 
     function deleteTask(props) {
       console.log( "deleting " + process.env.API_SERVER + "/api/tasks/" + props.row.task_uuid);   
-      // Delete task, reload the page if successful, alert the user if unsuccessful
+      // Delete task, reload the task list if successful, alert the user if unsuccessful
       axios
       .delete(process.env.API_SERVER + "/api/tasks/" + props.row.task_uuid)
       .then((response) => {
         console.log("res: " + response);
         if(response.status === 204) {
           console.log("Successfully deleted task: " + props.row.task_uuid);
-          window.location.reload();
+          loadCompletedTasks();
         } else {
           alert("An error occurred, task was not deleted.")
         }
