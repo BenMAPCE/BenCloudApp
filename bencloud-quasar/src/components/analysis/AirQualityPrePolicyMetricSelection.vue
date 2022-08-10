@@ -212,11 +212,6 @@ export default defineComponent({
                 " - " +
                 Math.round(metric_statistics[m].pct_97_5 * 100) / 100;
               rows.value.push(row);
-
-              row = {};
-              row.input_file_characteristic = "Number of grid cells above LRL";
-              row.value = metric_statistics[m].cell_count_above_lrl;
-              rows.value.push(row);
             }
           }
         }

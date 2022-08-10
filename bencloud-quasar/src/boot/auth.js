@@ -1,6 +1,5 @@
 import { boot } from "quasar/wrappers";
 import { LocalStorage, Notify } from "quasar";
-import { ref } from "vue";
 import axios from 'axios'
 
 export default boot(async ({ router, store }) => {
@@ -27,6 +26,24 @@ export default boot(async ({ router, store }) => {
       if(!isUser) {
         console.log("Current user is not a BenMAP user.");
         return '/requestaccess';
+      }
+    }
+    if(to.path == '/requestaccess') {
+      var isUser = false;
+      // If the current user is a BenMAP user, we don't want them to get stuck on the request access page
+      try {
+        const result = await axios
+          .get(process.env.API_SERVER + "/api/user")
+          .then((response) => {
+            isUser = response.data.isUser;
+          })
+      } catch(ex) {
+        console.log(ex)
+      }
+      // If they are a BenMAP user, route them to the main BenMAP page
+      if(isUser) {
+        console.log("Current user is a BenMAP user, routing away from /requestaccess.");
+        return '/';
       }
     }
   } catch(ex) {
