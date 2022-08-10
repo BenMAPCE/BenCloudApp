@@ -67,7 +67,7 @@
 
                 <q-separator light style="color: red"></q-separator>
 
-                <q-item dense clickable v-close-popup @click="onClick(props)">
+                <q-item dense clickable v-close-popup @click="onClickPromptDelete(props)">
                   <q-item-section>
                     <q-item-label dense>Delete</q-item-label>
                   </q-item-section>
@@ -186,6 +186,30 @@ export default defineComponent({
       //}
     }
 
+    function onClickPromptDelete(props) {
+      // Prompt user to confirm task deletion
+      if(confirm("Are you sure you wish to permanently delete " + props.row.task_name + "?")){
+        deleteTask(props);
+      }
+    }
+
+    function deleteTask(props) {
+      console.log( "deleting " + process.env.API_SERVER + "/api/tasks/" + props.row.task_uuid);   
+      // Delete task, reload the page if successful, alert the user if unsuccessful
+      axios
+      .delete(process.env.API_SERVER + "/api/tasks/" + props.row.task_uuid)
+      .then((response) => {
+        console.log("res: " + response);
+        if(response.status === 204) {
+          console.log("Successfully deleted task: " + props.row.task_uuid);
+          window.location.reload();
+        } else {
+          alert("An error occurred, task was not deleted.")
+        }
+        return response;
+      });
+    }
+
     function exportTaskResults(props) {
       console.log("exportTaskResults");
 
@@ -252,6 +276,7 @@ export default defineComponent({
       exportTaskResults,
       onClick,
       onClickViewExport,
+      onClickPromptDelete,
       fab1,
       fab2,
       showOptions,
