@@ -77,9 +77,8 @@ export default defineComponent({
             },
           })
           .then((response) => {
-            console.log(response);
             if(response.status === 204) {
-              console.log("Successfully deleted " + props.row.name);
+              console.log("Successfully deleted AQ layer: " + props.row.name);
 
               // Reload list
               var oldValue =  this.$store.state.airquality.airQualityForceReloadValue

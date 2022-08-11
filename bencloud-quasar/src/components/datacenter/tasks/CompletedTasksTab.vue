@@ -199,7 +199,6 @@ export default defineComponent({
       axios
       .delete(process.env.API_SERVER + "/api/tasks/" + props.row.task_uuid)
       .then((response) => {
-        console.log("res: " + response);
         if(response.status === 204) {
           console.log("Successfully deleted task: " + props.row.task_uuid);
           loadCompletedTasks();
