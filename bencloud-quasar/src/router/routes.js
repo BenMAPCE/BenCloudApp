@@ -33,6 +33,17 @@ const routes = [
     ],
   },
   {
+    path: "/error",
+    component: () => import("layouts/MainLayoutPublic.vue"),
+    children: [
+      {
+        path: "",
+        component: () => import("pages/Error.vue"),
+        meta: { requiresUser: false, requiresAdmin: false },
+      },
+    ],
+  },
+  {
     path: "/help",
     component: () => import("layouts/MainLayout.vue"),
     children: [
