@@ -91,6 +91,31 @@ export default defineComponent({
     const showEpaHeaderFooter = ref(true);
     const username = ref("");
 
+    // Intercept all HTTP responses
+    axios.interceptors.response.use(
+      (response) => {
+        // If the session has timed out, reload the page
+        if(!!response && response.status === 302) {
+          window.location.reload;
+        }
+        return response;
+      },
+      (error) => {
+        if(!!error.response) {
+          // If the error is due to session timing out, reload the page
+          if(error.response.status === 302) {
+            console.log("302 error");
+            window.location.reload;
+            // If there is a message in the error response, display it in a pop up
+          } 
+          else if(!!error.response.data.message && error.response.status === 401) {
+            alert(error.response.data.message);
+            // For non-302 errors with no message, display a generic error pop up 
+          }
+        }     
+      }
+    )
+
     onBeforeMount(() => {
       environment.value = process.env.ENV_TYPE;
       if (environment.value === "Development") {
@@ -98,25 +123,14 @@ export default defineComponent({
       }
       (async () => {
         try {
-          axios.interceptors.response.use(
-            (response) => {
-              if(response.status === 302) {
-                window.location.reload;
-              }
-              return response;
-            },
-            (error) => {
-              if(error.response.status === 302) {
-                window.location.reload();
-              }  
-            }
-          )
           const result = await axios
             .get(process.env.API_SERVER + "/api/user")
             .then((response) => {
               username.value = response.data.displayname;
             })
-        } catch (ex) {}
+        } catch (ex) {
+          console.log(ex)
+        }
         finally { }
       })();
     })

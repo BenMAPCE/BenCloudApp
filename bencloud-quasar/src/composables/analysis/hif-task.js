@@ -91,7 +91,6 @@ export const buildHifTaskJSON = (taskName, store) => {
 export const submitHifTask = (hifTaskJSON, store) => {
   const data = ref(null);
   const error = ref(null);
-  const response = ref(null);
   const loading = ref(false);
 
   const valuationsForHealthImpactFunctionGroups =
@@ -102,30 +101,29 @@ export const submitHifTask = (hifTaskJSON, store) => {
     console.log(hifTaskJSON)
     console.log(valuationsForHealthImpactFunctionGroups.length)
     loading.value = true;
+
     try {
       const {data:response} = await axios
-        .post(process.env.API_SERVER + "/api/tasks", hifTaskJSON)
-        .then((response) => {
-          data.value = response.data;
+      .post(process.env.API_SERVER + "/api/tasks", hifTaskJSON)
+      .then((response) => {
+        data.value = response.data;
+        console.log(data.value);
 
-          console.log(data.value);
-
-          if (valuationsForHealthImpactFunctionGroups.length > 0) {
-            var valuationTaskJSON = buildValuationTaskJSON(hifTaskJSON.name + " - Valuation", data.value.task_uuid, valuationsForHealthImpactFunctionGroups)
-            console.log(valuationTaskJSON)
-            submitValuationTask(valuationTaskJSON, store).fetch()
-          } else {
-            console.log("No valuations....")
-          }
-
-          return data.value;
-        });
+        if (valuationsForHealthImpactFunctionGroups.length > 0) {
+          var valuationTaskJSON = buildValuationTaskJSON(hifTaskJSON.name + " - Valuation", data.value.task_uuid, valuationsForHealthImpactFunctionGroups);
+          console.log(valuationTaskJSON);
+          submitValuationTask(valuationTaskJSON, store).fetch();
+        } else {
+          console.log("No valuations....");
+        }
+        return data.value;
+      });
     } catch (ex) {
-      error.value = ex;
-      console.log(error.value)
-      return error.value;
-    }
+        error.value = ex;
+        if(!!error.value.response) {
+          console.log(error.value.response.status + " error occured");
+        }
+    } 
   };
-
   return { fetch };
-};
+}
