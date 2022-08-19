@@ -16,7 +16,7 @@
     <template v-slot:body="props">
       <q-tr class="cursor-pointer" :props="props" @click.exact="rowClicked(props)">
         <q-td v-for="col in props.cols" :key="col.name" :props="props">
-          <template v-if="col.name === 'actions'">
+          <template v-if="col.name === 'actions' & props.row.share_scope != 1">
             <q-btn
               dense
               round
