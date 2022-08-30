@@ -67,7 +67,7 @@ const linksList = [
     title: "Help",
     caption: "",
     icon: "mdi-help",
-    link: "/#/help",
+    link: "https://www.epa.gov/benmap/benmap-cloud",
   },
   {
     title: "Feedback",
