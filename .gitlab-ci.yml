@@ -22,7 +22,7 @@ build_dev_app:
   - cd bencloud-quasar
   - npm install -g @quasar/cli
   - npm install --progress=false
-  - QENV=production quasar build
+  - QENV=test quasar build
  artifacts:
   expire_in: 1 day
   paths:

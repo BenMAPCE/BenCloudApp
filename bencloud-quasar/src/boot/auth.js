@@ -1,10 +1,69 @@
 import { boot } from "quasar/wrappers";
 import { LocalStorage, Notify } from "quasar";
-import { ref } from "vue";
+import axios from 'axios'
 
 export default boot(async ({ router, store }) => {
   console.log("----- in auth.js -----");
   console.log(store);
+
+  // Before routing to each path
+  router.beforeEach(async (to, from) => {
+  try {
+    var isUser = false;
+    var status = null;
+    // Check if the current user is a BenMAP user, store the response status
+    try {
+      const result = await axios
+        .get(process.env.API_SERVER + "/api/user")
+        .then((response) => {
+          isUser = response.data.isUser;
+          if(!!response) {
+            status = response.status;
+          } else if (!!error) {
+            status = error.status;
+          }
+        })
+    } catch(ex) {
+      console.log(ex)
+    }
+    // Non-200 status means BenMAP is down, route the user to the error page
+    // Don't include /error to avoid an endless loop
+    if(to.path != '/error' && status != 200) {
+      return '/error';
+    } else if (to.path === '/error' && status === 200) { 
+      return '/';
+    } else if (to.meta.requiresUser) {
+      // If the requested page requires the user to be a BenMAP user and they are not a BenMAP user, route them to the request access page
+      if(!isUser) {
+        console.log("Current user is not a BenMAP user.");
+        return '/requestaccess';
+      } 
+    }
+    if(to.path === '/requestaccess') {
+      var isUser = false;
+      // If the current user is a BenMAP user, we don't want them to get stuck on the request access page
+      try {
+        const result = await axios
+          .get(process.env.API_SERVER + "/api/user")
+          .then((response) => {
+            isUser = response.data.isUser;
+          })
+      } catch(ex) {
+        console.log(ex)
+      }
+      // If they are a BenMAP user, route them to the main BenMAP page
+      if(isUser) {
+        console.log("Current user is a BenMAP user, routing away from /requestaccess.");
+        return '/';
+      }
+    }
+  } catch(ex) {
+    console.log(ex)
+  }
+  });
+
+
+
 
   router.beforeEach((to, from, next) => {
 

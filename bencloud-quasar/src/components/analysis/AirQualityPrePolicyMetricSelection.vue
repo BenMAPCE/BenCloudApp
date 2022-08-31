@@ -56,8 +56,13 @@ export default defineComponent({
       () => selectedItem.value,
       (currentSelectedItem, prevSelectedItem) => {
         console.log("watch: " + currentSelectedItem + " | " + prevSelectedItem);
+        // remove the air quality layer id from the metrics
+        var metrics = currentSelectedItem.split("-");
         if (currentSelectedItem != prevSelectedItem) {
-          store.commit("analysis/updatePrePolicyAirQualityMetricId", currentSelectedItem);
+          store.commit(
+            "analysis/updatePrePolicyAirQualityMetricId",
+            metrics[0] + "-" + metrics[1]
+          );
 
           console.log(
             "prePolicyAirQualityId currentSelectedItem: " + currentSelectedItem
@@ -124,7 +129,10 @@ export default defineComponent({
               selectedMetrics =
                 metric_statistics[m].metric_id +
                 "-" +
-                metric_statistics[m].seasonal_metric_id;
+                metric_statistics[m].seasonal_metric_id + 
+                "-" + 
+                // add air quality layer id to metrics to ensure that the file characteristics table is updated
+                airQualityLayers[i].id;
             }
           }
 
@@ -148,6 +156,9 @@ export default defineComponent({
           // define the condition as you like
           await new Promise((resolve) => setTimeout(resolve, 1000));
         console.log("airQualityLayers is defined");
+        if (store.state.analysis.prePolicyAirQualityMetricId) {
+          selectedItem.value = store.state.analysis.prePolicyAirQualityMetricId;
+        }
         loadMetricDetails(currentSelectedItem);
       })();
     }
@@ -200,11 +211,6 @@ export default defineComponent({
                 Math.round(metric_statistics[m].pct_2_5 * 100) / 100 +
                 " - " +
                 Math.round(metric_statistics[m].pct_97_5 * 100) / 100;
-              rows.value.push(row);
-
-              row = {};
-              row.input_file_characteristic = "Number of grid cells above LRL";
-              row.value = metric_statistics[m].cell_count_above_lrl;
               rows.value.push(row);
             }
           }

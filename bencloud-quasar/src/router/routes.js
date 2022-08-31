@@ -6,7 +6,7 @@ const routes = [
       {
         path: "",
         component: () => import("pages/public/Login.vue"),
-        meta: { requiresAuth: false, requiresAdmin: false },
+        meta: { requiresUser: false, requiresAdmin: false },
       },
     ],
   },
@@ -17,11 +17,32 @@ const routes = [
       {
         path: "",
         component: () => import("pages/Index.vue"),
-        meta: { requiresAuth: true, requiresAdmin: false },
+        meta: { requiresUser: true, requiresAdmin: false },
       },
     ],
   },
-
+  {
+    path: "/requestaccess",
+    component: () => import("layouts/MainLayoutPublic.vue"),
+    children: [
+      {
+        path: "",
+        component: () => import("pages/RequestAccess.vue"),
+        meta: { requiresUser: false, requiresAdmin: false },
+      },
+    ],
+  },
+  {
+    path: "/error",
+    component: () => import("layouts/MainLayoutPublic.vue"),
+    children: [
+      {
+        path: "",
+        component: () => import("pages/Error.vue"),
+        meta: { requiresUser: false, requiresAdmin: false },
+      },
+    ],
+  },
   {
     path: "/help",
     component: () => import("layouts/MainLayout.vue"),
@@ -29,7 +50,7 @@ const routes = [
       {
         path: "",
         component: () => import("pages/Help.vue"),
-        meta: { requiresAuth: true, requiresAdmin: false },
+        meta: { requiresUser: true, requiresAdmin: false },
       },
     ],
   },
@@ -41,7 +62,7 @@ const routes = [
       {
         path: "",
         component: () => import("pages/Settings.vue"),
-        meta: { requiresAuth: true, requiresAdmin: false },
+        meta: { requiresUser: true, requiresAdmin: false },
       },
     ],
   },
@@ -53,7 +74,7 @@ const routes = [
       {
         path: "",
         component: () => import("pages/Language.vue"),
-        meta: { requiresAuth: true, requiresAdmin: false },
+        meta: { requiresUser: true, requiresAdmin: false },
       },
     ],
   },
@@ -65,7 +86,7 @@ const routes = [
       {
         path: "",
         component: () => import("pages/Feedback.vue"),
-        meta: { requiresAuth: true, requiresAdmin: false },
+        meta: { requiresUser: true, requiresAdmin: false },
       },
     ],
   },
@@ -77,7 +98,7 @@ const routes = [
       {
         path: "",
         component: () => import("pages/Analysis.vue"),
-        meta: { requiresAuth: true, requiresAdmin: false },
+        meta: { requiresUser: true, requiresAdmin: false },
       },
     ],
   },
@@ -89,7 +110,7 @@ const routes = [
       {
         path: "",
         component: () => import("src/pages/analysis/ReviewAndSubmit.vue"),
-        meta: { requiresAuth: true, requiresAdmin: false },
+        meta: { requiresUser: true, requiresAdmin: false },
       },
     ],
   },
@@ -101,7 +122,7 @@ const routes = [
       {
         path: "",
         component: () => import("pages/datacenter/DataCenter.vue"),
-        meta: { requiresAuth: true, requiresAdmin: false },
+        meta: { requiresUser: true, requiresAdmin: false },
       },
     ],
   },
@@ -114,7 +135,7 @@ const routes = [
         path: "",
         component: () =>
           import("src/pages/datacenter/airquality/ReviewAirQuality.vue"),
-        meta: { requiresAuth: true, requiresAdmin: false },
+        meta: { requiresUser: true, requiresAdmin: false },
       },
     ],
   },
@@ -126,7 +147,7 @@ const routes = [
       {
         path: "",
         component: () => import("src/pages/datacenter/tasks/ManageTasks.vue"),
-        meta: { requiresAuth: true, requiresAdmin: false },
+        meta: { requiresUser: true, requiresAdmin: false },
       },
     ],
   },
@@ -138,7 +159,7 @@ const routes = [
       {
         path: "",
         component: () => import("src/pages/datacenter/tasks/ManageTasks.vue"),
-        meta: { requiresAuth: true, requiresAdmin: false },
+        meta: { requiresUser: true, requiresAdmin: false },
       },
     ],
   },
@@ -152,7 +173,7 @@ const routes = [
         path: "",
         component: () =>
           import("src/pages/datacenter/tasks/ViewTaskResults.vue"),
-        meta: { requiresAuth: true, requiresAdmin: false },
+        meta: { requiresUser: true, requiresAdmin: false },
       },
     ],
   },

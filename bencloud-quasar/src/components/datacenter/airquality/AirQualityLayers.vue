@@ -12,33 +12,33 @@
     v-model:selected="selected"
     :visible-columns="visibleColumns"
   >
+    
     <template v-slot:body="props">
       <q-tr class="cursor-pointer" :props="props" @click.exact="rowClicked(props)">
         <q-td v-for="col in props.cols" :key="col.name" :props="props">
-          {{ col.value }}
+          <template v-if="col.name === 'actions' & props.row.share_scope != 1">
+            <q-btn
+              dense
+              round
+              flat
+              color="grey"
+              @click="deleteRow(props)"
+              icon="mdi-delete"
+            ></q-btn>
+          </template>
+          <template v-else>
+            {{col.value}}
+          </template>
         </q-td>
       </q-tr>
-    </template>
-
+    </template>  
+    
     <template v-slot:top-right>
       <q-input borderless dense debounce="300" v-model="filter" placeholder="Search">
         <template v-slot:append>
           <q-icon name="mdi-magnify" />
         </template>
       </q-input>
-    </template>
-
-    <template v-slot:body-cell-actions="props">
-      <q-td :props="props">
-        <q-btn
-          dense
-          round
-          flat
-          color="grey"
-          @click="deleteRow(props)"
-          icon="mdi-dots-vertical"
-        ></q-btn>
-      </q-td>
     </template>
   </q-table>
 </template>
@@ -67,17 +67,32 @@ export default defineComponent({
 
   methods: {
     deleteRow(props) {
-      this.noti();
-      // do something
-      this.noti = this.$q.notify({
-        type: "negative",
-        multiline: true,
-        message: `I'll delete row data => ${JSON.stringify(props.row)
-          .split(",")
-          .join(", ")}`,
-        timeout: 2000,
-      });
+      // Prompt user to confirm AQ layer deletion
+      if(confirm("Are you sure you wish to permanently delete " + props.row.name + "?")){
+        // Delete AQ layer, reload the AQ layer list if successful, alert the user if unsuccessful       
+        axios
+          .delete(process.env.API_SERVER + "/api/air-quality-data/" + props.row.id, {
+            params: {
+              id: props.row.id,
+            },
+          })
+          .then((response) => {
+            if(response.status === 204) {
+              console.log("Successfully deleted AQ layer: " + props.row.name);
+
+              // Reload list
+              var oldValue =  this.$store.state.airquality.airQualityForceReloadValue
+              console.log("oldValue: " + oldValue);
+              var newValue = oldValue - 1;
+              console.log("newValue: " + newValue);
+              this.$store.commit("airquality/updateAirQualityForceReloadValue", newValue)
+            } else {
+              alert("An error occurred, air quality layer was not deleted.")
+            }
+          });
+      }
     },
+    
     rowClicked(props) {
       this.selected = [];
       this.selected.push(props.row);
@@ -285,6 +300,11 @@ const columns = [
     field: "mean_value",
     sortable: true,
   },
-  { name: "actions", label: "", field: "", align: "center" },
+  { 
+    name: "actions", 
+    label: "", 
+    field: "", 
+    align: "center" 
+  },
 ];
 </script>
