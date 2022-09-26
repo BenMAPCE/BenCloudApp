@@ -72,8 +72,8 @@ export default defineComponent({
     const pagination = ref({
       page: 1,
       rowsPerPage: 0,
-      sortBy: "endpoint",
-      descending: true,
+      sortBy: "column",
+      descending: false,
     });
     const $q = useQuasar();
 
@@ -113,6 +113,8 @@ export default defineComponent({
 
     onMounted(() => {
       visibleColumns.value = [
+        "column",
+        "row",
         "endpoint",
         "ages",
         "study",
@@ -140,6 +142,8 @@ export default defineComponent({
 
 const visibleColumns = ref([
   //  "task_uuid",
+  "column",
+  "row",
   "endpoint",
   "ages",
   "study",
@@ -168,6 +172,24 @@ const columns = [
     align: "left",
     field: (row) => row.task_uuid,
     format: (val) => `${val}`,
+    sortable: true,
+  },
+  {
+    name: "column",
+    label: "Column",
+    align: "left",
+    field: (row) => row.column,
+    format: (val) => `${val}`,
+    align: "left",
+    sortable: true,
+  },
+  {
+    name: "row",
+    label: "Row",
+    align: "left",
+    field: (row) => row.row,
+    format: (val) => `${val}`,
+    align: "left",
     sortable: true,
   },
   {
