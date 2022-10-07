@@ -113,8 +113,7 @@ export default defineComponent({
 
     onMounted(() => {
       visibleColumns.value = [
-        "column",
-        "row",
+        "cell_identifier",
         "endpoint",
         "ages",
         "study",
@@ -142,8 +141,7 @@ export default defineComponent({
 
 const visibleColumns = ref([
   //  "task_uuid",
-  "column",
-  "row",
+  "cell_identifier",
   "endpoint",
   "ages",
   "study",
@@ -175,19 +173,10 @@ const columns = [
     sortable: true,
   },
   {
-    name: "column",
-    label: "Column",
+    name: "cell_identifier",
+    label: "Country",
     align: "left",
-    field: (row) => row.column,
-    format: (val) => `${val}`,
-    align: "left",
-    sortable: true,
-  },
-  {
-    name: "row",
-    label: "Row",
-    align: "left",
-    field: (row) => row.row,
+    field: (row) => row.cell_identifier,
     format: (val) => `${val}`,
     align: "left",
     sortable: true,
@@ -273,18 +262,21 @@ const columns = [
     name: "delta_aq",
     label: "Change in AQ",
     field: (row) => row.delta_aq.toLocaleString("en-US", { maximumFractionDigits: 4 }),
+    sort: (a, b, rowA, rowB) => parseFloat(rowA.delta_aq) - parseFloat(rowB.delta_aq), 
     sortable: true,
   },
   {
     name: "baseline_aq",
     label: "Pre-policy AQ",
     field: "baseline_aq",
+    sort: (a, b, rowA, rowB) => parseFloat(rowA.baseline_aq) - parseFloat(rowB.baseline_aq), 
     sortable: true,
   },
   {
     name: "scenario_aq",
     label: "Post-policy AQ",
     field: "scenario_aq",
+    sort: (a, b, rowA, rowB) => parseFloat(rowA.scenario_aq) - parseFloat(rowB.scenario_aq), 
     sortable: true,
   },
   {
@@ -292,6 +284,7 @@ const columns = [
     label: "Standard Deviation",
     field: (row) =>
       row.standard_deviation.toLocaleString("en-US", { maximumFractionDigits: 4 }),
+    sort: (a, b, rowA, rowB) => parseFloat(rowA.standard_deviation) - parseFloat(rowB.standard_deviation), 
     sortable: true,
   },
   {
@@ -299,18 +292,21 @@ const columns = [
     label: "Change in Incidence (Cases)",
     field: (row) =>
       row.point_estimate.toLocaleString("en-US", { maximumFractionDigits: 4 }),
+    sort: (a, b, rowA, rowB) => parseFloat(rowA.point_estimate) - parseFloat(rowB.point_estimate),    
     sortable: true,
   },
   {
     name: "population",
     label: "Population Exposed",
     field: (row) => row.population.toLocaleString("en-US", { maximumFractionDigits: 4 }),
+    sort: (a, b, rowA, rowB) => parseFloat(rowA.population) - parseFloat(rowB.population),
     sortable: true,
   },
   {
     name: "baseline",
     label: "Baseline Incidence",
     field: (row) => row.baseline.toLocaleString("en-US", { maximumFractionDigits: 4 }),
+    sort: (a, b, rowA, rowB) => parseFloat(rowA.baseline) - parseFloat(rowB.baseline),
     sortable: true,
   },
   {
@@ -318,6 +314,7 @@ const columns = [
     label: "Percent of Baseline",
     field: (row) =>
       row.percent_of_baseline.toLocaleString("en-US", { maximumFractionDigits: 4 }),
+    sort: (a, b, rowA, rowB) => parseFloat(rowA.percent_of_baseline) - parseFloat(rowB.percent_of_baseline),
     sortable: true,
   },
 
