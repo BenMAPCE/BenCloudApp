@@ -39,7 +39,7 @@ export default boot(async ({ router, store }) => {
         return '/requestaccess';
       } 
     }
-    if(to.path === '/requestaccess') {
+    if(to.path === '/requestaccess' || to.path === '/requestaccess/') {
       var isUser = false;
       // If the current user is a BenMAP user, we don't want them to get stuck on the request access page
       try {
