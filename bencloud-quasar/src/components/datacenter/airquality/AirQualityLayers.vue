@@ -22,7 +22,7 @@
               round
               flat
               color="grey"
-              @click="deleteRow(props)"
+              @click.stop="deleteRow(props)"
               icon="mdi-delete"
             ></q-btn>
           </template>
@@ -48,6 +48,10 @@ import { defineComponent } from "vue";
 import { ref, unref, onMounted, onBeforeMount, watch, watchEffect } from "vue";
 import axios from "axios";
 import { useStore } from "vuex";
+import { layerName } from '../../common/AirQualityUploadForm.vue';
+
+var trackCurrentPage = null;
+var numLayers = null;
 
 export default defineComponent({
   model: ref(null),
@@ -78,6 +82,7 @@ export default defineComponent({
           })
           .then((response) => {
             if(response.status === 204) {
+              trackCurrentPage = this.pagination.page;
               console.log("Successfully deleted AQ layer: " + props.row.name);
 
               // Reload list
@@ -92,7 +97,7 @@ export default defineComponent({
           });
       }
     },
-    
+
     rowClicked(props) {
       this.selected = [];
       this.selected.push(props.row);
@@ -137,11 +142,14 @@ export default defineComponent({
   watch(
       () => store.state.airquality.airQualityForceReloadValue,
       (newValue, oldValue) => {
-        console.log("--- added Air Quality Layer")
+        if(newValue > oldValue) {
+          console.log("--- added Air Quality Layer");
+        } else if(newValue < oldValue) {
+          console.log("--- deleted Air Quality Layer");
+        }
         filter.value = "";
         pagination.value.sortBy = "name";
-        pagination.value.descending = false;
-        pagination.value.page = 1;
+        pagination.value.descending = pagination.value.descending;
         pagination.value.rowsNumber = 0;
         onRequest({
             pagination: pagination.value,
@@ -158,7 +166,6 @@ export default defineComponent({
         pagination.value.sortBy = "name";
         pagination.value.descending = false;
         pagination.value.page = 1;
-        pagination.value.rowsPerPage = 25;
         pagination.value.rowsNumber = 0;
         console.log("resetting table.....");
         onRequest({
@@ -177,47 +184,103 @@ export default defineComponent({
 
     function loadAirQualityLayers(props) {
       console.log(props.pagination);
+      if(!!trackCurrentPage) {
+        props.pagination.page = trackCurrentPage;
+      }
+      let layer = layerName;
       const { page, rowsPerPage, sortBy, descending } = props.pagination;
       const filter = props.filter;
 
       //console.log("--------------------------------------------")
       //console.log(filter)
       //console.log("--------------------------------------------")
-
       loading.value = true;
 
-      axios
-        .get(process.env.API_SERVER + "/api/air-quality-data", {
-          params: {
-            page: page,
-            rowsPerPage: rowsPerPage,
-            sortBy: sortBy,
-            descending: descending,
-            filter: filter,
-            pollutantId: store.state.airquality.pollutantId,
-          },
-        })
-        .then((response) => {
-          let records = response.data.records;
-          let data = response.data;
+      if(layer === null) {
+        axios
+          .get(process.env.API_SERVER + "/api/air-quality-data", {
+            params: {
+              page: page,
+              rowsPerPage: rowsPerPage,
+              sortBy: sortBy,
+              descending: descending,
+              filter: filter,
+              pollutantId: store.state.airquality.pollutantId,
+            },
+          })
+          .then((response) => {
+            let records = response.data.records;
+            let data = response.data;
 
-          console.log("----- return -----");
-          console.log(records);
+            console.log("----- return -----");
+            console.log(records);
 
-          rows.value = records;
+            rows.value = records;
 
-          store.commit("airquality/updateAirQualityLayerId", 0);
+            store.commit("airquality/updateAirQualityLayerId", 0);
 
-          // don't forget to update local pagination object
-          pagination.value.page = page;
-          pagination.value.rowsPerPage = rowsPerPage;
-          pagination.value.sortBy = sortBy;
-          pagination.value.descending = descending;
-          pagination.value.rowsNumber = data.filteredRecordsCount;
+            // don't forget to update local pagination object
+            pagination.value.page = page;
+            pagination.value.rowsPerPage = rowsPerPage;
+            pagination.value.sortBy = sortBy;
+            pagination.value.descending = descending;
+            pagination.value.rowsNumber = data.filteredRecordsCount;
+            numLayers = data.filteredRecordsCount;
 
-          // ...and turn of loading indicator
-          loading.value = false;
-        });
+            // ...and turn of loading indicator
+            loading.value = false;
+            trackCurrentPage = null;
+          });
+      } else {
+        axios
+          .get(process.env.API_SERVER + "/api/air-quality-data", {
+            params: {
+              page: page,
+              rowsPerPage: ++numLayers,
+              sortBy: sortBy,
+              descending: descending,
+              filter: filter,
+              pollutantId: store.state.airquality.pollutantId,
+            },
+          })
+          .then((response) => {
+            let records = response.data.records;
+            let data = response.data;
+
+            console.log("----- return -----");
+            console.log(records);
+
+            store.commit("airquality/updateAirQualityLayerId", 0);
+
+            let loadPage = 1;
+            for(let i = 0; i < records.length; i++) {
+              if(records[i].name === layer) {
+                loadPage = Math.floor((i/rowsPerPage) + 1);
+                break;
+              }
+            }
+
+            rows.value = [];
+            let rowCount = 0;
+            for(let i = 1; i <= records.length; i++) {
+              if((i <= (loadPage * rowsPerPage)) && (i > ((loadPage - 1) * rowsPerPage))) {
+                rows.value[rowCount] = records[i-1];
+                rowCount++;
+              }
+            }
+
+            // don't forget to update local pagination object
+            pagination.value.page = loadPage;
+            pagination.value.rowsPerPage = rowsPerPage;
+            pagination.value.sortBy = sortBy;
+            pagination.value.descending = descending;
+            pagination.value.rowsNumber = data.filteredRecordsCount;
+
+            // ...and turn of loading indicator
+            loading.value = false;
+            trackCurrentPage = null;
+          });
+      }
     }
 
     onBeforeMount(() => {
