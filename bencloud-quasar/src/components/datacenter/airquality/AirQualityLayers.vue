@@ -252,26 +252,25 @@ export default defineComponent({
 
             store.commit("airquality/updateAirQualityLayerId", 0);
 
-            var recordNumber = 0;
+            let loadPage = 1;
             for(let i = 0; i < records.length; i++) {
               if(records[i].name === layer) {
-                recordNumber = i;
+                loadPage = Math.floor((i/rowsPerPage) + 1);
                 break;
               }
             }
 
             rows.value = [];
-            let newPage = Math.floor((recordNumber/rowsPerPage) + 1);
             let rowCount = 0;
             for(let i = 1; i <= records.length; i++) {
-              if((i <= (newPage * rowsPerPage)) && (i > ((newPage - 1) * rowsPerPage))) {
+              if((i <= (loadPage * rowsPerPage)) && (i > ((loadPage - 1) * rowsPerPage))) {
                 rows.value[rowCount] = records[i-1];
                 rowCount++;
               }
             }
 
             // don't forget to update local pagination object
-            pagination.value.page = newPage;
+            pagination.value.page = loadPage;
             pagination.value.rowsPerPage = rowsPerPage;
             pagination.value.sortBy = sortBy;
             pagination.value.descending = descending;
