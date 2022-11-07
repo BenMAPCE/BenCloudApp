@@ -71,6 +71,7 @@ import AirQualityUploadSuccessDialog from "./AirQualityUploadSuccessDialog.vue";
 import { useQuasar } from "quasar";
 import { useStore } from "vuex";
 
+export var layerName = null;
 
 export default {
   data: () => ({
@@ -263,6 +264,7 @@ export default {
           console.log("oldValue: " + oldValue);
           var newValue = oldValue + 1;
           console.log("newValue: " + newValue);
+          layerName = this.name;
           this.$store.commit("airquality/updateAirQualityForceReloadValue", newValue)
 
           //self.hide();
@@ -290,7 +292,11 @@ export default {
           console.log("FAILURE!!");
           self.$q.loading.hide();
         })
-        .finally(function () {});
+        .finally(function () 
+          { 
+            layerName = null;
+          }
+        );
     },
 
     file_selected: function (file) {
