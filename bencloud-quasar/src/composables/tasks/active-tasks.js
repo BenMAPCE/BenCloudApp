@@ -1,6 +1,7 @@
 
 import axios from "axios";
 import { ref } from "vue";
+import { showAllTasks } from "../../components/datacenter/tasks/ManageTasksTabs.vue";
 
 // GET array of all health impact function result datasets
 
@@ -19,6 +20,7 @@ export const getActiveTasks = (userIdentifier) => {
             params: {
                 page: 1,
                 rowsPerPage: 9999999,
+                showAll: showAllTasks.value,
                 },
             })
             .then((response) => {
