@@ -64,6 +64,7 @@ import { useStore } from "vuex";
 
 import { getActiveTasks } from "../../../composables/tasks/active-tasks";
 import ActiveTaskStatus from "./ActiveTaskStatus.vue";
+import { showAllTasks } from "../tasks/ManageTasksTabs.vue";
 
 export default defineComponent({
   model: ref(null),
@@ -169,6 +170,13 @@ const columns = [
     name: "task_status_message",
     label: "Status",
     field: "task_status_message",
+    sortable: true,
+  },
+  {
+    name: "user_id",
+    label: "User",
+    field: (row) => row.task_user_id,
+    format: (val) => `${val}`,
     sortable: true,
   },
   {

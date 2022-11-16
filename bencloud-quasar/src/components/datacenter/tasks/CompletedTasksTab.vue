@@ -96,6 +96,7 @@ import { useStore } from "vuex";
 import { useQuasar, date } from "quasar";
 
 import { getCompletedTasks } from "../../../composables/tasks/completed-tasks";
+import { showAllTasks } from "../tasks/ManageTasksTabs.vue";
 
 export default defineComponent({
   model: ref(null),
@@ -299,6 +300,7 @@ const visibleColumns = [
   "task_successful",
   "task_message",
   "download",
+  "user_id",
 ];
 
 const columns = [
@@ -341,6 +343,13 @@ const columns = [
     name: "task_successful",
     label: "Successful",
     field: "task_successful",
+    sortable: true,
+  },
+  {
+    name: "user_id",
+    label: "User",
+    field: (row) => row.task_user_id,
+    format: (val) => `${val}`,
     sortable: true,
   },
   {

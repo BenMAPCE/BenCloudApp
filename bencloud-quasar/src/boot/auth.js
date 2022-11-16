@@ -1,6 +1,9 @@
 import { boot } from "quasar/wrappers";
 import { LocalStorage, Notify } from "quasar";
-import axios from 'axios'
+import axios from 'axios';
+import { ref } from "vue";
+
+export var isAdmin = ref(false);
 
 export default boot(async ({ router, store }) => {
   console.log("----- in auth.js -----");
@@ -17,6 +20,7 @@ export default boot(async ({ router, store }) => {
         .get(process.env.API_SERVER + "/api/user")
         .then((response) => {
           isUser = response.data.isUser;
+          isAdmin = response.data.isAdmin;
           if(!!response) {
             status = response.status;
           } else if (!!error) {
@@ -47,6 +51,7 @@ export default boot(async ({ router, store }) => {
           .get(process.env.API_SERVER + "/api/user")
           .then((response) => {
             isUser = response.data.isUser;
+            isAdmin = response.data.isAdmin;
           })
       } catch(ex) {
         console.log(ex)

@@ -1,6 +1,15 @@
 <template>
-      <div class="refresh-message">
+      <div class="col refresh-message">
         Tasks are auto-refreshed every 5 seconds
+      </div>
+
+      <div class="col" v-if="isAdmin">
+        <q-toggle
+          size="lg"
+          v-model="showAllTasks"
+          color="blue"
+          label="See tasks of all users"
+        />
       </div>
 
       <q-page class="tasks">
@@ -22,6 +31,9 @@ import { defineComponent } from "vue";
 
 import CompletedTasksTab from "./CompletedTasksTab.vue";
 import ActiveTasksTab from "./ActiveTasksTab.vue";
+import { isAdmin } from "../../../boot/auth.js";
+
+export const showAllTasks = ref(false);
 
 export default defineComponent({
   model: ref(null),
@@ -33,6 +45,8 @@ export default defineComponent({
   setup() {
     return {
       tab: ref("active"),
+      isAdmin,
+      showAllTasks,
     };
   },
 });
