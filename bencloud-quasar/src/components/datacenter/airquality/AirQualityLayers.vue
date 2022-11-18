@@ -29,6 +29,19 @@
           <template v-else>
             {{col.value}}
           </template>
+          <template v-if="col.name === 'edit' & props.row.share_scope != 1">
+            <q-btn
+              dense
+              round
+              flat
+              color="grey"
+              @click.stop="editRow(props)"
+              icon="mdi-pencil"
+            ></q-btn>
+          </template>
+          <template v-if="col.name === 'user' && props.row.share_scope != 1 && !!props.row.user_id">
+            {{props.row.user_id}}
+          </template>
         </q-td>
       </q-tr>
     </template>  
@@ -49,6 +62,7 @@ import { ref, unref, onMounted, onBeforeMount, watch, watchEffect } from "vue";
 import axios from "axios";
 import { useStore } from "vuex";
 import { layerName } from '../../common/AirQualityUploadForm.vue';
+import { showAll } from '../../../pages/datacenter/airquality/ReviewAirQuality.vue';
 
 var trackCurrentPage = null;
 var numLayers = null;
@@ -98,6 +112,14 @@ export default defineComponent({
       }
     },
 
+    editRow(props) {
+
+      //Pop up form to include edit name and share_scope fields
+      //only admin can edit share_scope
+      //non-admin can only edit suraces that are their own and not shared (share_scope == 0)
+
+    },
+    
     rowClicked(props) {
       this.selected = [];
       this.selected.push(props.row);
@@ -175,6 +197,27 @@ export default defineComponent({
         });
     })
 
+    watch(
+      () => showAll.value,
+      () => {
+        console.log("Show all layers: " + showAll.value);
+        if(showAll.value && !visibleColumns.includes("user")) {
+          visibleColumns.push("user");
+          //visibleColumns.push("edit");
+        }
+        if(!showAll.value && visibleColumns.includes("user")) {
+          visibleColumns.pop("user");
+          //visibleColumns.pop("edit");
+        }
+        console.log(visibleColumns);
+        onRequest({
+          filter: "",
+          pagination: pagination.value,
+          rows: [],
+        });
+      }
+    );
+
     function onRequest(props) {
       console.log("on onRequest()");
       if (store.state.airquality.pollutantId != 0) {
@@ -206,6 +249,7 @@ export default defineComponent({
               descending: descending,
               filter: filter,
               pollutantId: store.state.airquality.pollutantId,
+              showAll: showAll.value,
             },
           })
           .then((response) => {
@@ -241,6 +285,7 @@ export default defineComponent({
               descending: descending,
               filter: filter,
               pollutantId: store.state.airquality.pollutantId,
+              showAll: showAll.value,
             },
           })
           .then((response) => {
@@ -262,10 +307,9 @@ export default defineComponent({
 
             rows.value = [];
             let rowCount = 0;
-            for(let i = 1; i <= records.length; i++) {
-              if((i <= (loadPage * rowsPerPage)) && (i > ((loadPage - 1) * rowsPerPage))) {
-                rows.value[rowCount] = records[i-1];
-                rowCount++;
+            for(let i = 0; i < rowsPerPage; i++) {
+              if(!!records[(loadPage-1)*rowsPerPage + i]) {
+                rows.value[i] = records[(loadPage-1)*rowsPerPage + i];
               }
             }
 
@@ -363,7 +407,19 @@ const columns = [
     sortable: true,
   },
   { 
+    name: "user", 
+    label: "User", 
+    field: "", 
+    align: "center" 
+  },
+  { 
     name: "actions", 
+    label: "", 
+    field: "", 
+    align: "center" 
+  },
+  { 
+    name: "edit", 
     label: "", 
     field: "", 
     align: "center" 
