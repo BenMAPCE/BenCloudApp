@@ -11,6 +11,15 @@
           </Suspense>
         </div>
 
+        <div class="col" v-if="currentPollutantId && isAdmin">
+          <q-toggle
+            size="lg"
+            v-model="showAll"
+            color="blue"
+            label="See AQ surfaces of all users"
+          />
+        </div>
+
         <div class="col" v-if="currentPollutantId">
           <AirQualityAdd
             :pollutantId=selectedPollutantId 
@@ -43,6 +52,9 @@ import AirQualityLayers from "../../../components/datacenter/airquality/AirQuali
 import Pollutants from "../../../components/common/Pollutants.vue";
 import AirQualityAdd from "../../../components/common/AirQualityAdd.vue";
 import { useStore } from "vuex";
+import { isAdmin } from "../../../boot/auth.js";
+
+export const showAll = ref(false);
 
 export default defineComponent({
   model: ref(null),
@@ -56,8 +68,8 @@ export default defineComponent({
   setup(props, context) {
     const store = useStore();
     const currentPollutantId = ref(0);
-    const selectedPollutantId = reactive(ref(0))
-    const selectedPollutantFriendlyName = ref("OOPS")
+    const selectedPollutantId = reactive(ref(0));
+    const selectedPollutantFriendlyName = ref("OOPS");
 
     watch(
       () => store.state.airquality.pollutantId,
@@ -82,6 +94,8 @@ export default defineComponent({
       selectedPollutantId,
       selectedPollutantFriendlyName,
       onChangePollutantValue,
+      showAll,
+      isAdmin
     };
   },
 });

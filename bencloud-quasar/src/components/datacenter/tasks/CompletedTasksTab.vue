@@ -146,6 +146,22 @@ export default defineComponent({
       })();
 
     }
+    
+    
+    watch(
+      () => showAllTasks.value,
+      () => {
+        console.log("Show all tasks: " + showAllTasks.value);
+        //if(showAllTasks.value && !visibleColumns.includes("user")) {
+        //  visibleColumns.push("user");
+        //}
+        //if(!showAllTasks.value && visibleColumns.includes("user")) {
+        //  visibleColumns.pop("user");
+        //}
+        console.log(visibleColumns);
+        loadCompletedTasks();
+      }
+    );
 
     function enableAutoRefresh() {
     
@@ -285,22 +301,23 @@ export default defineComponent({
       completedTasksRefreshInterval
     };
   },
+
 });
 
 const rows = [];
 
 const visibleColumns = [
-  // "task_uuid",
+  //"task_uuid",
   "task_name",
   //"task_type",
-        "task_submitted_date",
-  //      "task_started_date",
-        "task_completed_date",
+  "task_submitted_date",
+  //"task_started_date",
+  "task_completed_date",
   "task_elapsed_time",
+  "user",
   "task_successful",
   "task_message",
   "download",
-  "user_id",
 ];
 
 const columns = [
@@ -346,7 +363,7 @@ const columns = [
     sortable: true,
   },
   {
-    name: "user_id",
+    name: "user",
     label: "User",
     field: (row) => row.task_user_id,
     format: (val) => `${val}`,
