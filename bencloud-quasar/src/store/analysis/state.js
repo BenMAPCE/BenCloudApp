@@ -20,6 +20,7 @@ export default function () {
     valuationsForHealthImpactFunctionGroups: [],
     location,
     airQualityLayers : null,
-    stepNumber: 1
+    stepNumber: 1,
+    aggregationScale: null
   }
 }
