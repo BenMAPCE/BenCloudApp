@@ -75,6 +75,7 @@ import { populationDatasetIdHasValue } from "../../composables/validation/analys
 import { populationYearHasValue } from "../../composables/validation/analysis-validations";
 import { incidenceIdHasValue } from "../../composables/validation/analysis-validations";
 import { healthEffectsHasValue } from "../../composables/validation/analysis-validations";
+import { aggregationScaleHasValue } from "../../composables/validation/analysis-validations";
 
 export default {
   components: {
@@ -172,14 +173,21 @@ export default {
         }
       }
 
-     if (step == 6) {
-          stepHasError.value = false;
-          thisStepper.next();
+      if (step == 6) {
+        if(
+            aggregationScaleHasValue(store)
+          ) {
+            stepHasError.value = false;
+            thisStepper.next();
+          } else {
+            stepHasError.value = true;
+            atStep.value = 6;
+          }
       }
 
-     if (step == 7) {
-          stepHasError.value = false;
-          thisStepper.next();
+      if (step == 7) {
+        stepHasError.value = false;
+        thisStepper.next();  
       }
 }
     return {

@@ -106,3 +106,7 @@ export function airQualityLayers (state) {
   return state.airQualityLayers
 }
 
+export function aggegationScale (state) {
+  return state.aggegationScale;
+}
+

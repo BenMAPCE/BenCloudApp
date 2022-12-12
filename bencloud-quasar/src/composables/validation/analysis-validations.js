@@ -104,3 +104,16 @@ export const healthEffectsHasValue = (store) => {
 
     return isValid
 }
+
+export const aggregationScaleHasValue = (store) => {
+
+    var isValid = true
+    if(store.state.analysis.aggregationScale) {
+        if((store.state.analysis.aggregationScale) === 0) {
+            isValid = false;
+        } 
+    } else {
+        isValid = false;
+    }
+    return isValid;
+}

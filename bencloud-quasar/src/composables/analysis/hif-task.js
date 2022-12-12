@@ -110,7 +110,7 @@ export const submitHifTask = (hifTaskJSON, store) => {
         console.log(data.value);
 
         if (valuationsForHealthImpactFunctionGroups.length > 0) {
-          var valuationTaskJSON = buildValuationTaskJSON(hifTaskJSON.name + " - Valuation", data.value.task_uuid, valuationsForHealthImpactFunctionGroups);
+          var valuationTaskJSON = buildValuationTaskJSON(hifTaskJSON.name + " - Valuation", data.value.task_uuid, valuationsForHealthImpactFunctionGroups, store);
           console.log(valuationTaskJSON);
           submitValuationTask(valuationTaskJSON, store).fetch();
         } else {

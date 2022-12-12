@@ -1,7 +1,7 @@
 import { ref } from "vue";
 import axios from "axios";
 
-export const buildValuationTaskJSON = (taskName, hifTaskUuid, valuationsForHealthImpactFunctionGroups) => {
+export const buildValuationTaskJSON = (taskName, hifTaskUuid, valuationsForHealthImpactFunctionGroups, store) => {
 
 //   const valuationsForHealthImpactFunctionGroups =
 //     store.state.analysis.valuationsForHealthImpactFunctionGroups;
@@ -16,6 +16,7 @@ export const buildValuationTaskJSON = (taskName, hifTaskUuid, valuationsForHealt
   valuationInfo["name"] = taskName;
   valuationInfo["type"] = "Valuation";
   valuationInfo["hif_result_dataset_id"] = null;
+  valuationInfo["grid_definition_id"] = store.state.analysis.aggregationScale;
   valuationInfo["hif_task_uuid"] = hifTaskUuid;
   valuationInfo["parent_task_uuid"] = hifTaskUuid;
 

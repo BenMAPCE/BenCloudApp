@@ -124,3 +124,7 @@ export function updateValuationsForHealthImpactFunctionGroups(state, payload) {
 export function updateAirQualityLayers (state, airQualityLayers) {
     state.airQualityLayers = airQualityLayers;
 }
+
+export function updateAggregationScale (state, aggregationScale) {
+    state.aggregationScale = aggregationScale;
+}
