@@ -12,6 +12,7 @@
         binary-state-sort
         v-model:selected="selected"
         class="active-tasks"
+        :visible-columns="visibleColumns"
       >
         <template v-slot:top-right>
           <!-- <q-btn
@@ -99,6 +100,19 @@ export default defineComponent({
     let myFilter = unref(filter);
     let activeTasksRefreshInterval = null;
 
+    watch(
+      () => showAllTasks.value,
+      () => {
+        if(showAllTasks.value && !visibleColumns.value.includes("user")) {
+          visibleColumns.value.push("user");
+        }
+        if(!showAllTasks.value && visibleColumns.value.includes("user")) {
+          visibleColumns.value.pop("user");
+        }
+        loadActiveTasks();
+      }
+    );
+
     function loadActiveTasks() {
 
       loading.value = true;
@@ -131,8 +145,6 @@ export default defineComponent({
 
     });
 
-    onBeforeMount(() => {});
-
     onBeforeUnmount(() => {
       //console.log("before unmount")
       disableAutoRefresh()
@@ -149,12 +161,20 @@ export default defineComponent({
       getActiveTasks,
       loadActiveTasks,
       activeTasksRefreshInterval,
-      progress1
+      progress1,
+      visibleColumns
     };
   },
 });
 
 const rows = [];
+
+const visibleColumns = ref([
+  "task_name",
+  "task_status_message",
+  "task_progress_message",
+  "actions"
+]);
 
 const columns = [
   {
@@ -170,13 +190,15 @@ const columns = [
     name: "task_status_message",
     label: "Status",
     field: "task_status_message",
+    align: "left",
     sortable: true,
   },
   {
-    name: "user_id",
+    name: "user",
     label: "User",
     field: (row) => row.task_user_id,
     format: (val) => `${val}`,
+    align: "left",
     sortable: true,
   },
   {
@@ -186,8 +208,12 @@ const columns = [
     sortable: true,
     style: "width: 300px"
   },
-
-  { name: "actions", label: "", field: "", align: "center" },
+  { 
+    name: "actions", 
+    label: "",
+    field: "",
+    align: "left" 
+  },
 ];
 </script>
 
