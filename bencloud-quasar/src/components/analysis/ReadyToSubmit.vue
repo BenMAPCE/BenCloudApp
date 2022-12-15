@@ -180,12 +180,17 @@ export default defineComponent({
 
         templateName.value = "";
 
-        templateNotification({
-          spinner: false, // we reset the spinner setting so the icon can be displayed
-          message: "Template Saved!",
-          color: "green",
-          timeout: 2000, // we will timeout it in 2 seconds
-        });
+        if(!!response.data.value.message) {
+          templateNotification();
+          alert(response.data.value.message);
+        } else {
+          templateNotification({
+            spinner: false, // we reset the spinner setting so the icon can be displayed
+            message: "Template Saved!",
+            color: "green",
+            timeout: 2000, // we will timeout it in 2 seconds
+          });
+        }
       })();
     }
 

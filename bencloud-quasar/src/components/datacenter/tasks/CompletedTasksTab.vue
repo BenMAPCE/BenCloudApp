@@ -152,13 +152,13 @@ export default defineComponent({
       () => showAllTasks.value,
       () => {
         console.log("Show all tasks: " + showAllTasks.value);
-        //if(showAllTasks.value && !visibleColumns.includes("user")) {
-        //  visibleColumns.push("user");
-        //}
-        //if(!showAllTasks.value && visibleColumns.includes("user")) {
-        //  visibleColumns.pop("user");
-        //}
-        console.log(visibleColumns);
+        if(showAllTasks.value && !visibleColumns.value.includes("user")) {
+          visibleColumns.value.push("user");
+        }
+        if(!showAllTasks.value && visibleColumns.value.includes("user")) {
+          visibleColumns.value.pop("user");
+        }
+        console.log(visibleColumns.value);
         loadCompletedTasks();
       }
     );
@@ -306,7 +306,7 @@ export default defineComponent({
 
 const rows = [];
 
-const visibleColumns = [
+const visibleColumns = ref([
   //"task_uuid",
   "task_name",
   //"task_type",
@@ -314,11 +314,10 @@ const visibleColumns = [
   //"task_started_date",
   "task_completed_date",
   "task_elapsed_time",
-  "user",
   "task_successful",
   "task_message",
   "download",
-];
+]);
 
 const columns = [
   {

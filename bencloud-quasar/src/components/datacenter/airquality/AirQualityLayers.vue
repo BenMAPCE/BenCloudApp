@@ -151,7 +151,7 @@ export default defineComponent({
 
     let myFilter = unref(filter);
 
-   watch(
+    watch(
       () => store.state.airquality.airQualityLayerAddedDate,
       (airQualityLayerAddedDate, prevAirQualityLayerAddedDate) => {
           console.log("--- updated Air Quality Layer")
@@ -161,7 +161,7 @@ export default defineComponent({
          });
     })
 
-  watch(
+    watch(
       () => store.state.airquality.airQualityForceReloadValue,
       (newValue, oldValue) => {
         if(newValue > oldValue) {
@@ -201,15 +201,14 @@ export default defineComponent({
       () => showAll.value,
       () => {
         console.log("Show all layers: " + showAll.value);
-        if(showAll.value && !visibleColumns.includes("user")) {
-          visibleColumns.push("user");
-          //visibleColumns.push("edit");
+        if(showAll.value && !visibleColumns.value.includes("user")) {
+          visibleColumns.value.push("user");
+          //visibleColumns.value.push("edit");
         }
-        if(!showAll.value && visibleColumns.includes("user")) {
-          visibleColumns.pop("user");
-          //visibleColumns.pop("edit");
+        if(!showAll.value && visibleColumns.value.includes("user")) {
+          visibleColumns.value.pop("user");
+          //visibleColumns.value.pop("edit");
         }
-        console.log(visibleColumns);
         onRequest({
           filter: "",
           pagination: pagination.value,
@@ -328,18 +327,10 @@ export default defineComponent({
     }
 
     onBeforeMount(() => {
-
-      visibleColumns.value = [];
-      visibleColumns.push("name");
-      visibleColumns.push("grid_definition_name");
-      // visibleColumns.push("cell_count");
-      // visibleColumns.push("mean_value");
-      visibleColumns.push("actions");
-
       console.log("includeLayerName: " + props.includeLayerName);
 
       if (props.includeLayerName) {
-        visibleColumns.push("id");
+        visibleColumns.value.push("id");
       }
 
     })
@@ -367,7 +358,13 @@ export default defineComponent({
 
 const rows = [];
 
-const visibleColumns = [];
+const visibleColumns = ref([
+  "name",
+  "grid_definition_name",
+  //"cell_count",
+  //"mean_value",
+  "actions"
+]);
 
 const columns = [
   {
@@ -410,19 +407,19 @@ const columns = [
     name: "user", 
     label: "User", 
     field: "", 
-    align: "center" 
+    align: "left" 
   },
   { 
     name: "actions", 
     label: "", 
     field: "", 
-    align: "center" 
+    align: "left" 
   },
   { 
     name: "edit", 
     label: "", 
     field: "", 
-    align: "center" 
+    align: "left" 
   },
 ];
 </script>
