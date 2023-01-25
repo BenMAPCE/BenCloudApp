@@ -15,6 +15,7 @@
         </div>
         <div class="row odd choices">
           <div class="title">Post-Policy</div>
+<!--      <div>{{ this.postPolicyAirQualityNameList }}</div> -->
           <div>{{ this.postPolicyAirQualityName }}</div>
         </div>
         <div class="row even choices">
@@ -127,6 +128,9 @@ export default defineComponent({
     const prePolicyAirQualityName = store.state.analysis.prePolicyAirQualityName;
     const postPolicyAirQualityId = store.state.analysis.postPolicyAirQualityId;
     const postPolicyAirQualityName = store.state.analysis.postPolicyAirQualityName;
+    //const postPolicyAirQualityNameList = postPolicyAirQualityName.join(', ');
+    //console.log(postPolicyAirQualityName);
+    //console.log(postPolicyAirQualityNameList);
 
     const incidenceId = store.state.analysis.incidenceId;
     const incidenceName = store.state.analysis.incidenceName;
@@ -181,9 +185,15 @@ export default defineComponent({
         templateName.value = "";
 
         if(!!response.data.value.message) {
-          templateNotification();
-          alert(response.data.value.message);
+          // if there is an issue, display the error message
+          templateNotification({
+            spinner: false, // we reset the spinner setting so the icon can be displayed
+            message: response.data.value.message,
+            color: "red",
+            timeout: 4000, // we will timeout it in 4 seconds
+          });
         } else {
+          // if the template was saved
           templateNotification({
             spinner: false, // we reset the spinner setting so the icon can be displayed
             message: "Template Saved!",
@@ -276,6 +286,7 @@ export default defineComponent({
       prePolicyAirQualityName,
       postPolicyAirQualityId,
       postPolicyAirQualityName,
+      //postPolicyAirQualityNameList,
       incidenceId,
       incidenceName,
       populationDatasetId,

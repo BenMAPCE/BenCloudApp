@@ -229,7 +229,7 @@ export const createTemplate = (taskName, store) => {
 
 
 export const loadTemplate = (model, store) => {
-  var parameters = model.value.parameters;
+  var parameters = model.parameters;
   console.log(parameters);
 
   var pollutant = parameters.pollutant;
