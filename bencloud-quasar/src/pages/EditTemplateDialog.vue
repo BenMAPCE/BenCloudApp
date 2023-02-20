@@ -7,13 +7,12 @@
                     <div class="text-h6">Edit Template {{ this.templateName }}</div>
                 </q-card-section>
                 <q-card-section>
-                <q-input v-model="this.newName" label="Template Name: "></q-input>
+                <q-input v-model="newName" label="Template Name: "></q-input>
                 </q-card-section>
                 <q-card-actions>
                     <q-card-actions>
                         <q-btn color="primary" label="OK" @click="onOKClick()" />
                     </q-card-actions>
-
                     <q-card-actions>
                         <q-btn color="primary" label="Cancel" @click="onCancelClick()" />
                     </q-card-actions>
@@ -21,7 +20,6 @@
             </q-form>
             <q-card-section class="error-card" v-if="this.errorMessage != ''">
                 {{ this.errorMessage }}
-
             </q-card-section>                
             </q-card>
 
@@ -30,10 +28,13 @@
 </template>
 
 <script>
+import { ref } from "vue";
+import { useQuasar } from "quasar";
+
 export default {
   data: () => ({
     errorMessage: "",
-    newName:""
+    newName: ""
   }),
 
  props: {
@@ -51,6 +52,10 @@ export default {
     // REQUIRED
     "ok", "hide"
   ],
+
+  setup() {
+    const $q = useQuasar();
+  },
 
   methods: {
     // following method is REQUIRED
@@ -75,6 +80,39 @@ export default {
       // on OK, it is REQUIRED to
       // emit "ok" event (with optional payload)
       // before hiding the QDialog
+
+      const templateData = new FormData();
+      templateData.append("newName", this.newName);
+
+        this.$axios
+          .put(process.env.API_SERVER + "/api/task-configs/" + this.templateId, templateData, )
+          .then((response) => {
+            if(response.status === 204) {       
+              window.location.reload();
+              console.log("Successfully renamed template: " + this.newName);
+              this.$q.notify({
+                group: false, 
+                type: 'positive',
+                timeout: 4000, 
+                color: "green",
+                spinner: false, 
+                position: "top",
+                message: response.data.message,
+              });
+            } else {
+              console.log("Unable to renamed template: " + this.newName);
+              this.$q.notify({
+                group: false, // required to be updatable
+                type: 'negative',
+                timeout: 4000, // we will timeout it in 4 seconds
+                color: "red",
+                spinner: false, // we reset the spinner setting so the icon can be displayed
+                position: "top",
+                message: response.data.message,
+              });                           
+            }
+          });
+
       this.$emit('ok')
       // or with payload: this.$emit('ok', { ... })
 
@@ -96,8 +134,5 @@ export default {
       });
     },
   },
-  setup(props, context){
-    
-  }
 };
 </script>
