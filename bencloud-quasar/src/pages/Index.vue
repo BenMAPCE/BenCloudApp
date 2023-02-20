@@ -92,58 +92,21 @@ export default defineComponent({
     }
 
     function editTemplate(template) {
-      
-      
+
       $q.dialog({
-        component:EditTemplateDialog,
-        parent:this,
+        component: EditTemplateDialog,
+        parent: this,
         persistent: true,
-        componentProps:{
-          templateName: template.name
+        componentProps: {
+          templateId: template.id,
+          templateName: template.name,
         },
         data:{
-          newName:template.name
-        }     
+          newName: ""
+        }
       })
-      .onOk((newName) => {
-          console.log(newName);
-          axios
-          .put(process.env.API_SERVER + "/api/task-configs/" + template.id,{
-            params:{
-              id:template.id,
-              newName:newName,
-            },
-          })
-          .then((response) => {
-            if(response.status === 204) {              
-              console.log("Successfully renamed template: " + template.name);
-               $q.notify({
-                group: false, 
-                type: 'positive',
-                timeout: 4000, 
-                color: "green",
-                spinner: false, 
-                position: "top",
-                message: response.data.message,
-              });
-              //todo: hide pop-up dialog
-              window.location.reload();
-            } else {
-              console.log("Unable to renamed template: " + template.name);
-              $q.notify({
-                group: false, // required to be updatable
-                type: 'negative',
-                timeout: 4000, // we will timeout it in 4 seconds
-                color: "red",
-                spinner: false, // we reset the spinner setting so the icon can be displayed
-                position: "top",
-                message: response.data.message,
-              });             
-              
-              //alert("An error occurred, template was not deleted.")
-            }
-          });
-
+      .onOk(() => {
+        // console.log('OK')
       })
       .onCancel(() => {
         // console.log('Cancel')
@@ -151,7 +114,6 @@ export default defineComponent({
       .onDismiss(() => {
         // console.log('I am triggered on both OK and Cancel')
       });
-      console.log("Edit template - functionality to be added");
 
     }
 
