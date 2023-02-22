@@ -61,7 +61,8 @@ export default {
     // following method is REQUIRED
     // (don't change its name --> "show")
     show () {
-      this.$refs.dialog.show()
+      this.$refs.dialog.show();
+      this.newName = this.templateName;
     },
 
     // following method is REQUIRED
@@ -87,9 +88,9 @@ export default {
         this.$axios
           .put(process.env.API_SERVER + "/api/task-configs/" + this.templateId, templateData, )
           .then((response) => {
-            if(response.status === 204) {       
-              window.location.reload();
+            if(response.status === 200) {       
               console.log("Successfully renamed template: " + this.newName);
+              //window.location.reload();
               this.$q.notify({
                 group: false, 
                 type: 'positive',
@@ -99,6 +100,8 @@ export default {
                 position: "top",
                 message: response.data.message,
               });
+              this.hide();
+              
             } else {
               console.log("Unable to renamed template: " + this.newName);
               this.$q.notify({

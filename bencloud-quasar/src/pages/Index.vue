@@ -2,12 +2,13 @@
   <q-page>
     <div class="q-pa-sm q-gutter-sm">
       <p class="description">
-        Welcome to BenMAP
+        What would you like to do?
       </p>
       <div>
         <p class="prompt"> Start a new analysis</p>
         <div class="home-options">
           <q-btn flat
+                no-caps
                 color="primary"
                 push
                 @click="$router.replace('analysis')"
@@ -16,6 +17,7 @@
         </div>
         <div class="home-options">
           <q-btn flat
+              no-caps
               color="primary"
               push
               label="Analyze Exposure to Air Pollutants"
@@ -30,6 +32,7 @@
             <ul>
               <li v-for="option in options" :key="option.id">
                 <q-btn flat
+                  no-caps
                   color="primary"
                   push
                   @click="startAnalysisFromTemplate(option)">
@@ -85,6 +88,7 @@ export default defineComponent({
       (async () => {
         console.log("loadTemplates");
         const response = await getTemplates().fetch();
+        options.value.length = 0;
         for(var i = 0; i < response.data.value.length; i++) {
           options.value.push(response.data.value[i]);
         }
@@ -102,11 +106,12 @@ export default defineComponent({
           templateName: template.name,
         },
         data:{
-          newName: ""
+          newName: template.name,
         }
       })
       .onOk(() => {
         // console.log('OK')
+        displayTemplates();
       })
       .onCancel(() => {
         // console.log('Cancel')
@@ -129,7 +134,7 @@ export default defineComponent({
           })
           .then((response) => {
             if(response.status === 204) {
-              window.location.reload();
+              displayTemplates();
               console.log("Successfully deleted template: " + template.name);
             } else {
               alert("An error occurred, template was not deleted.")
