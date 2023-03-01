@@ -86,7 +86,12 @@ export default {
       templateData.append("newName", this.newName);
 
         this.$axios
-          .put(process.env.API_SERVER + "/api/task-configs/" + this.templateId, templateData, )
+          .put(process.env.API_SERVER + "/api/task-configs/" + this.templateId, 
+          templateData,
+          {validateStatus: function (status) {
+              return status < 500; // Default is >=200 and <300. If not set status >300 will return null response.
+            }}
+            )
           .then((response) => {
             if(response.status === 200) {       
               console.log("Successfully renamed template: " + this.newName);
@@ -102,19 +107,44 @@ export default {
               });
               this.hide();
               
-            } else {
+            } else if(response.status === 409){
               console.log("Unable to renamed template: " + this.newName);
               this.$q.notify({
                 group: false, // required to be updatable
                 type: 'negative',
-                timeout: 4000, // we will timeout it in 4 seconds
+                timeout: 6000, // we will timeout it in 4 seconds
                 color: "red",
                 spinner: false, // we reset the spinner setting so the icon can be displayed
                 position: "top",
                 message: response.data.message,
               });                           
             }
-          });
+            else{
+              this.$q.notify({
+                group: false, 
+                type: 'negative',
+                timeout: 4000, 
+                color: "red",
+                spinner: false, 
+                position: "top",
+                message: "Something went wrong.",
+              }); 
+            }
+            
+          })
+          .catch(function (error) {
+            if(error.response){
+              console.log(error.response.data);
+              console.log(error.response.status);
+              console.log(error.response.headers);
+            }
+            else{
+              console.log('Error', error.message);
+            }
+            console.log(error.config);
+
+            //return Promise.reject(error);
+        });
 
       this.$emit('ok')
       // or with payload: this.$emit('ok', { ... })
