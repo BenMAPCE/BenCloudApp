@@ -100,7 +100,7 @@ export default defineComponent({
       $q.dialog({
         component: EditTemplateDialog,
         parent: this,
-        persistent: true,
+        persistent: false,
         componentProps: {
           templateId: template.id,
           templateName: template.name,
@@ -118,7 +118,7 @@ export default defineComponent({
       })
       .onDismiss(() => {
         // console.log('I am triggered on both OK and Cancel')
-        displayTemplates();
+        //displayTemplates();
       });
 
     }

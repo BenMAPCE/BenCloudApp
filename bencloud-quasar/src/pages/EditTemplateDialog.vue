@@ -1,13 +1,13 @@
 <template>
     <div class="q-pa-sm q-gutter-sm">
-        <q-dialog ref="dialog" persistent @hide="onDialogHide">
+        <q-dialog ref="dialog" @hide="onDialogHide">
             <q-card>
             <q-form>
                 <q-card-section>
                     <div class="text-h6">Edit Template {{ this.templateName }}</div>
                 </q-card-section>
                 <q-card-section>
-                <q-input v-model="newName" label="Template Name: "></q-input>
+                <q-input v-model="newName" label="Template Name: " @keydown.enter="onOKClick()"></q-input>
                 </q-card-section>
                 <q-card-actions>
                     <q-card-actions>
@@ -30,6 +30,7 @@
 <script>
 import { ref } from "vue";
 import { useQuasar } from "quasar";
+import axios from 'axios';
 
 export default {
   data: () => ({
@@ -77,18 +78,33 @@ export default {
       this.$emit('hide')
     },
 
-    onOKClick () {
+    async onOKClick () {
       // on OK, it is REQUIRED to
       // emit "ok" event (with optional payload)
       // before hiding the QDialog
 
-      const templateData = new FormData();
-      templateData.append("newName", this.newName);
+      //If users did not change the template name. do not put. 
+      if(this.templateName == this.newName){
+        this.$q.notify({
+          group: false, 
+          type: 'positive',
+          timeout: 4000, 
+          color: "green",
+          spinner: false, 
+          position: "top",
+          message: "Template name was not changed.",
+        });
+        this.$emit('ok')
+        this.hide();
+      }
+      else{
+        const templateData = new FormData();
+        templateData.append("newName", this.newName);
 
-        this.$axios
+        await axios
           .put(process.env.API_SERVER + "/api/task-configs/" + this.templateId, 
-          templateData,
-          {validateStatus: function (status) {
+            templateData,
+            {validateStatus: function (status) {
               return status < 500; // Default is >=200 and <300. If not set status >300 will return null response.
             }}
             )
@@ -105,6 +121,7 @@ export default {
                 position: "top",
                 message: response.data.message,
               });
+              this.$emit('ok')
               this.hide();
               
             } else if(response.status === 409){
@@ -117,7 +134,8 @@ export default {
                 spinner: false, // we reset the spinner setting so the icon can be displayed
                 position: "top",
                 message: response.data.message,
-              });                           
+              });
+              this.$emit('ok')
             }
             else{
               this.$q.notify({
@@ -129,6 +147,7 @@ export default {
                 position: "top",
                 message: "Something went wrong.",
               }); 
+              this.$emit('ok')
             }
             
           })
@@ -143,14 +162,10 @@ export default {
             }
             console.log(error.config);
 
-            //return Promise.reject(error);
-        });
+            //this.$emit('ok')
+        });       
 
-      this.$emit('ok')
-      // or with payload: this.$emit('ok', { ... })
-
-      // then hiding dialog
-      //this.hide()
+      }
     },
 
     onCancelClick () {
