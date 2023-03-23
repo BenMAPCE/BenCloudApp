@@ -27,6 +27,9 @@ export default boot(async ({ router, store }) => {
             status = error.status;
           }
         })
+        .catch(error => {
+          console.log("/api/user ERROR: " + error.response.data.error);
+        })
     } catch(ex) {
       console.log(ex)
     }
