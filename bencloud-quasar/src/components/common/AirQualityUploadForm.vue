@@ -31,13 +31,81 @@
                 filled
                 dense
                 v-model="name"
-                label="Name"
+                label="*Layer Name"
                 hint=""
                 lazy-rules
                 :rules="[(val) => (val && val.length > 0) || 'Please enter a name']"
               />
             </div>
           </div>
+
+          <div class="row">
+            <div class="col-12">
+              <q-input
+                filled
+                dense
+                v-model="aqYear"
+                label="*Year"
+                hint=""
+                lazy-rules
+                :rules="[val => (val > 1900 && val < 3000) || 'Please enter a valid year']"
+              />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-12">
+              <q-input
+                filled
+                dense
+                v-model="source"
+                label="*Source"
+                hint="Citation, web page, publishing organization, etc." 
+                lazy-rules
+                :rules="[(val) => (val && val.length > 0) || 'Please enter a source for this data']"               
+              />
+            </div>
+          </div>
+
+          <!-- <div class="row">
+            <div class="col-12">
+              <q-input
+                filled
+                dense
+                v-model="dataType"
+                label="Data type"
+                hint="Baseline, Scenario, or leave it blank"                
+              />
+            </div>
+          </div> -->
+
+          <div class="row">
+            <div class="col-12">
+              <q-select 
+              square
+              dense
+              outlined 
+              v-model="dataType" 
+              :options="['Model', 'Monitor', 'Satellite', 'Hybrid model']" 
+              label="Data type"
+              @input="hybridSelected"/>
+              
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-12">
+              <q-input
+                filled
+                dense
+                v-model="description"
+                label="Description"
+                :hint="descriptionHint"                
+              />
+            </div>
+          </div>
+
+          
 
           <div class="row">
             <div class="col-12">
@@ -81,9 +149,15 @@ export default {
     gridValue: 0,
     errorMessage: "",
     name: "",
+    aqYear:"",
+    source:"",
+    dataType:"",
+    description:"",
+    filename:"",
     dashData: [],
+    descriptionHint:"",
   }),
-
+  
   components: {
     GridDefinitions,
   },
@@ -181,6 +255,12 @@ export default {
         hasErrors = true;
       }
 
+      if (this.source === "") {
+        this.errorMessage =
+          this.errorMessage + (hasErrors ? ", " : "") + "Source is required";
+        hasErrors = true;
+      }
+
       if (hasErrors) {
         return;
       }
@@ -191,6 +271,11 @@ export default {
       fileData.append("name", this.name);
       fileData.append("pollutantId", this.pollutantId);
       fileData.append("gridId", this.gridValue);
+      fileData.append("aqYear", this.aqYear);
+      fileData.append("source", this.source);
+      fileData.append("dataType", this.dataType);
+      fileData.append("description", this.description);
+      fileData.append("filename", this.selected_file.name);
       var self = this;
 
       this.$q.loading.show({
@@ -226,7 +311,7 @@ export default {
                   persistent: true,
                   componentProps: {
                     errorList: response.data.messages,
-                    fileName: this.selected_file.name,
+                    filename: this.selected_file.name,
                   },
                 })
                 .onOk(() => {
@@ -245,7 +330,7 @@ export default {
                 parent: this,
                 persistent: true,
                 componentProps: {
-                  fileName: this.selected_file.name,
+                  filename: this.selected_file.name,
                   parentDialog: this.$refs.dialog,
                 },
               })
@@ -323,6 +408,14 @@ export default {
     onChangeGridValue(value) {
       this.gridValue = value;
     },
+
+    hybridSelected(value){
+      debugger;
+      if(value.toLowerCase()=="hybrid model")
+      {
+        this.descriptionHint = "Please enter the description for this hybrid model.";
+      }
+    }
   },
 };
 </script>
