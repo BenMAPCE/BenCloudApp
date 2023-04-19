@@ -31,13 +31,71 @@
                 filled
                 dense
                 v-model="name"
-                label="Name"
+                label="*Layer Name"
                 hint=""
                 lazy-rules
                 :rules="[(val) => (val && val.length > 0) || 'Please enter a name']"
               />
             </div>
           </div>
+
+          <div class="row">
+            <div class="col-12">
+              <q-input
+                filled
+                dense
+                v-model="aqYear"
+                label="*Year"
+                hint=""
+                lazy-rules
+                :rules="[val => (val > 1900 && val < 3000) || 'Please enter a valid year']"
+              />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-12">
+              <q-input
+                filled
+                dense
+                v-model="source"
+                label="*Source"
+                hint="Citation, web page, publishing organization, etc." 
+                lazy-rules
+                :rules="[(val) => (val && val.length > 0) || 'Please enter a source for this data']"               
+              />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-12">
+              <q-select 
+                square
+                dense
+                outlined 
+                v-model="dataType" 
+                :options="['Photochemical AQ Model', 'Land Use Regression Model', 'Satellite', 'Sensor', 'Hybrid Model']" 
+                label="Data type"
+                lazy-rules
+                :rules="[(val) => (val && val.length > 0) || 'Please select a data type for this data']" 
+              />
+              
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-12">
+              <q-input
+                filled
+                dense
+                v-model="description"
+                label="Description"
+                :hint="descriptionHint"                
+              />
+            </div>
+          </div>
+
+          
 
           <div class="row">
             <div class="col-12">
@@ -81,9 +139,15 @@ export default {
     gridValue: 0,
     errorMessage: "",
     name: "",
+    aqYear:"",
+    source:"",
+    dataType:"",
+    description:"",
+    filename:"",
     dashData: [],
+    descriptionHint:"",
   }),
-
+  
   components: {
     GridDefinitions,
   },
@@ -104,6 +168,18 @@ export default {
     "ok",
     "hide",
   ],
+
+  watch: {
+    dataType(newValue, oldValue) {
+      if (newValue.toLowerCase()=="hybrid model") {
+        this.descriptionHint = "Please enter details about the hybrid model.";
+        console.log("newValue.toLowerCase()=='hybrid model'");
+      }
+      else{
+        this.descriptionHint = "";
+      }
+    },
+  },
 
   methods: {
     // following method is REQUIRED
@@ -181,6 +257,38 @@ export default {
         hasErrors = true;
       }
 
+      if (this.aqYear === "") {
+        this.errorMessage =
+          this.errorMessage + (hasErrors ? ", " : "") + "Year is required";
+        hasErrors = true;
+      }
+      else{
+        const yearRegex = /^\d{2}(\d{2})?$/;
+        if(!yearRegex.test(this.aqYear)) {
+          this.errorMessage + (hasErrors ? ", " : "") + "Please enter a valid year";
+        hasErrors = true;
+        }
+      }
+
+      if (this.dataType === "") {
+        this.errorMessage =
+          this.errorMessage + (hasErrors ? ", " : "") + "Data type is required";
+        hasErrors = true;
+      }
+
+      if (this.source === "") {
+        this.errorMessage =
+          this.errorMessage + (hasErrors ? ", " : "") + "Source is required";
+        hasErrors = true;
+      }
+
+      if(this.dataType.toLowerCase() ==="hybrid model"){
+        if(this.description === ""){
+          this.errorMessage = this.errorMessage + (hasErrors ? ", " : "") + "Description is required when Hybrid model is selected";
+        hasErrors = true;
+        }
+      }
+
       if (hasErrors) {
         return;
       }
@@ -191,6 +299,11 @@ export default {
       fileData.append("name", this.name);
       fileData.append("pollutantId", this.pollutantId);
       fileData.append("gridId", this.gridValue);
+      fileData.append("aqYear", this.aqYear);
+      fileData.append("source", this.source);
+      fileData.append("dataType", this.dataType);
+      fileData.append("description", this.description);
+      fileData.append("filename", this.selected_file.name);
       var self = this;
 
       this.$q.loading.show({
@@ -226,7 +339,7 @@ export default {
                   persistent: true,
                   componentProps: {
                     errorList: response.data.messages,
-                    fileName: this.selected_file.name,
+                    filename: this.selected_file.name,
                   },
                 })
                 .onOk(() => {
@@ -245,7 +358,7 @@ export default {
                 parent: this,
                 persistent: true,
                 componentProps: {
-                  fileName: this.selected_file.name,
+                  filename: this.selected_file.name,
                   parentDialog: this.$refs.dialog,
                 },
               })
@@ -323,6 +436,14 @@ export default {
     onChangeGridValue(value) {
       this.gridValue = value;
     },
+
+    hybridSelected(value){
+      debugger; //todo:
+      if(value.toLowerCase()=="hybrid model")
+      {
+        this.descriptionHint = "Please enter the description for this hybrid model.";
+      }
+    }
   },
 };
 </script>

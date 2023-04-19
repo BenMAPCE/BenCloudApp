@@ -361,6 +361,11 @@ const rows = [];
 const visibleColumns = ref([
   "name",
   "grid_definition_name",
+  "aq_year",
+  "source",
+  "data_type",
+  "description",
+  "filename",
   //"cell_count",
   //"mean_value",
   "actions"
@@ -389,6 +394,41 @@ const columns = [
     align: "left",
     label: "Grid",
     field: "grid_definition_name",
+    sortable: true,
+  },
+  {
+    name: "aq_year",
+    align: "left",
+    label: "Year",
+    field: "aq_year",
+    sortable: true,
+  },
+  {
+    name: "source",
+    align: "left",
+    label: "Source",
+    field: "source",
+    sortable: true,
+  },
+  {
+    name: "data_type",
+    align: "left",
+    label: "Data type",
+    field: "data_type",
+    sortable: true,
+  },
+  {
+    name: "description",
+    align: "left",
+    label: "Description",
+    field: "description",
+    sortable: true,
+  },
+  {
+    name: "filename",
+    align: "left",
+    label: "Filename",
+    field: "filename",
     sortable: true,
   },
   {
