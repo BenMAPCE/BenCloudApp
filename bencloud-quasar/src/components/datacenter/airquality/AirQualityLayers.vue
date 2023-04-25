@@ -63,6 +63,7 @@ import axios from "axios";
 import { useStore } from "vuex";
 import { layerName } from '../../common/AirQualityUploadForm.vue';
 import { showAll } from '../../../pages/datacenter/airquality/ReviewAirQuality.vue';
+import { date } from 'quasar'
 
 var trackCurrentPage = null;
 var numLayers = null;
@@ -366,6 +367,7 @@ const visibleColumns = ref([
   "data_type",
   "description",
   "filename",
+  "upload_date",
   //"cell_count",
   //"mean_value",
   "actions"
@@ -429,6 +431,14 @@ const columns = [
     align: "left",
     label: "Filename",
     field: "filename",
+    sortable: true,
+  },
+  {
+    name: "upload_date",
+    align: "left",
+    label: "Upload date",
+    field: "upload_date",
+    format: val => date.formatDate(val, 'YYYY-MM-DD HH:mm:ss'),
     sortable: true,
   },
   {
