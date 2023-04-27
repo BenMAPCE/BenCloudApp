@@ -438,7 +438,6 @@ export default {
     },
 
     hybridSelected(value){
-      debugger; //todo:
       if(value.toLowerCase()=="hybrid model")
       {
         this.descriptionHint = "Please enter the description for this hybrid model.";
