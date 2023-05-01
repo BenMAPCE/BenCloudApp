@@ -75,7 +75,7 @@
                 outlined 
                 v-model="dataType" 
                 :options="['Photochemical AQ Model', 'Land Use Regression Model', 'Satellite', 'Sensor', 'Hybrid Model']" 
-                label="Data type"
+                label="*Data type"
                 lazy-rules
                 :rules="[(val) => (val && val.length > 0) || 'Please select a data type for this data']" 
               />
@@ -144,6 +144,7 @@ export default {
     dataType:"",
     description:"",
     filename:"",
+    uploadDate: "",
     dashData: [],
     descriptionHint:"",
   }),
@@ -293,6 +294,10 @@ export default {
         return;
       }
 
+      //get upload time in local time and "yyyy-MM-dd'T'HH:mm:ss" format. Without calculating timezone offset, the date time will be in UTC.
+      var tzoffset = (new Date()).getTimezoneOffset() * 60000
+      var localISOTime = (new Date(Date.now() - tzoffset)).toISOString();
+
       const url = process.env.API_SERVER + "/api/air-quality-data";
       const fileData = new FormData();
       fileData.append("file", this.selected_file);
@@ -304,6 +309,7 @@ export default {
       fileData.append("dataType", this.dataType);
       fileData.append("description", this.description);
       fileData.append("filename", this.selected_file.name);
+      fileData.append("uploadDate",localISOTime)
       var self = this;
 
       this.$q.loading.show({
