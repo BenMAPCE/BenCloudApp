@@ -20,7 +20,7 @@
       </div>
       <div class="row odd choices">
         <div class="title">Year</div>
-        <div>{{ this.populationYear }}</div>
+        <div>{{ this.populationYearsSelected }}</div>
       </div>
       <div class="row even choices">
         <div class="title">Incidence</div>
@@ -136,7 +136,7 @@ export default defineComponent({
     const incidenceName = store.state.analysis.incidenceName;
     const populationDatasetId = store.state.analysis.populationDatasetId;
     const populationDatasetName = store.state.analysis.populationDatasetName;
-    const populationYear = store.state.analysis.populationYear;
+    const populationYearsSelected = store.state.analysis.populationYearsSelected;
     const valuationsForHealthImpactFunctionGroups =
       store.state.analysis.valuationsForHealthImpactFunctionGroups;
 
@@ -242,7 +242,7 @@ export default defineComponent({
       incidenceName,
       populationDatasetId,
       populationDatasetName,
-      populationYear,
+      populationYearsSelected,
       healthEffectsIds,
       healthEffectsNames,
       healthImpactFunctions,

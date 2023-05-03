@@ -110,3 +110,11 @@ export function aggegationScale (state) {
   return state.aggegationScale;
 }
 
+export function applyYearsToAll (state) {
+  return state.applyYearsToAll;
+}
+
+export function batchTaskObject (state) {
+  return state.batchTaskObject;
+}
+

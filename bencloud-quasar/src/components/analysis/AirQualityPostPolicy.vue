@@ -1,12 +1,13 @@
 <template>
 
-       <q-scroll-area class="aq-post-policy-scroll-area" visible: true>
-            <q-option-group
-              v-model="selectedItem"
-              :options="rows"
-              color="primary"
-            ></q-option-group>
-        </q-scroll-area>
+  <q-scroll-area class="aq-post-policy-scroll-area" visible: true>
+      <q-option-group
+        v-model="selectedItems"
+        :options="rows"
+        color="primary"
+        type="checkbox"
+      ></q-option-group>
+  </q-scroll-area>
 
 </template>
 
@@ -24,21 +25,34 @@ export default defineComponent({
 async setup(props, context) {
     const store = useStore();
     const rows = ref([]);
-    const selectedItem  = ref(0);
+    const selectedItems = ref([]);
 
     watch(
-      () => selectedItem.value,
-      (currentSelectedItem, prevSelectedItem) => {
-        console.log("watch: " + currentSelectedItem + " |" + prevSelectedItem)
-        if (currentSelectedItem != prevSelectedItem) {
-          console.log("selectedItem: " + currentSelectedItem)
-
-          var name = rows.value.find((opt) => opt.value === currentSelectedItem).label;
-
+      () => selectedItems.value,
+      (currentSelectedItems, prevSelectedItems) => {
+        console.log("watch: " + currentSelectedItems + " |" + prevSelectedItems)
+        if (currentSelectedItems != prevSelectedItems) {
+          var names = [];
+          rows.value.forEach(element => {
+            if(currentSelectedItems.includes(element.value)) {
+              var scenario = null;
+              if(!!store.state.analysis.postPolicyAirQualityName) {
+                scenario = store.state.analysis.postPolicyAirQualityName.find(e => e.name === element.label)
+              }
+              //if this element is already stored, there may be corresponding years stored
+              if(!!scenario) {
+                names.push(scenario);
+                //if the element is not stored, the years value is empty for now
+              } else {
+                var scenario = { name: element.label, years:[], popYears: []};
+                names.push(scenario);
+              }
+            }
+          })
           store.commit("analysis/updatePostPolicyAirQuality",
           {
-            postPolicyAirQualityId: currentSelectedItem,
-            postPolicyAirQualityName: name
+            postPolicyAirQualityId: currentSelectedItems,
+            postPolicyAirQualityName: names
           });
         }
       });
@@ -50,7 +64,7 @@ async setup(props, context) {
     (newData, oldData) => {
       rows.value = convertAirQualityLayers(newData);
       if (store.state.analysis.postPolicyAirQualityId != null) {
-        selectedItem.value = store.state.analysis.postPolicyAirQualityId;
+        selectedItems.value = store.state.analysis.postPolicyAirQualityId;
       }
     }
   );
@@ -61,7 +75,7 @@ async setup(props, context) {
         //   rows.value = convertAirQualityLayers(response.data.value);
         //
         // if (store.state.analysis.postPolicyAirQualityId != null) {
-        //   selectedItem.value = store.state.analysis.postPolicyAirQualityId;
+        //   selectedItems.value = store.state.analysis.postPolicyAirQualityId;
         // }
         //
         // })()
@@ -69,7 +83,7 @@ async setup(props, context) {
 
     return {
       rows,
-      selectedItem,
+      selectedItems,
     };
 }
 });
