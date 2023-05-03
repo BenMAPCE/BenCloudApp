@@ -10,7 +10,7 @@
 
           <div>
             <div style="text-align: right;"><q-icon :name="'mdi-account-circle'" size="20px" /> {{username}}</div>
-            <div style="text-align: right;">v{{ 0.01 }} beta {{ environment === 'Production' ? '' : '(' + environment + ')' }}</div>
+            <div style="text-align: right;">v{{ 0.02 }} beta {{ environment === 'Production' ? '' : '(' + environment + ')' }}</div>
           </div>
         </q-toolbar>
       </div>
