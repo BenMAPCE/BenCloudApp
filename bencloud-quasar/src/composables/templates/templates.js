@@ -98,6 +98,7 @@ export const createTemplate = (taskName, store) => {
   const healthImpactFunctions = store.state.analysis.healthImpactFunctions;
   const valuationsForHealthImpactFunctionGroups =
     store.state.analysis.valuationsForHealthImpactFunctionGroups;
+  const batchTaskObject = store.state.analysis.batchTaskObject;
 
   var template = {};
 
@@ -210,6 +211,7 @@ export const createTemplate = (taskName, store) => {
   }
 
   template["functions"] = functionsArray;
+  template["batchTaskObject"] = batchTaskObject;
 
   const MY_NAMESPACE = "1b671a64-40d5-491e-99b0-da01ff1f3341";
   const hash = uuidv5(JSON.stringify(template), MY_NAMESPACE);
@@ -288,7 +290,6 @@ export const loadTemplate = (model, store) => {
   console.log("**** " + population.incidenceId)
   console.log("**** " + population.incidenceName)
 
-  store.commit("analysis/updatePopulationYear", population.populationYear);
   store.commit("analysis/updatePopulationDataset", {
     populationDatasetId: population.populationDatasetId,
     populationDatasetName: population.populationDatasetName,
@@ -357,6 +358,9 @@ export const loadTemplate = (model, store) => {
           console.log(store.state.analysis.valuationsForHealthImpactFunctionGroups)
         }
       }
+
+      var batchTaskObject = parameters.batchTaskObject;
+      store.commit("analysis/updateBatchTaskObject", batchTaskObject);
 
       console.log(store.state.analysis.valuationsForHealthImpactFunctionGroups);
       //console.log(parameters.functions);

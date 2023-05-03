@@ -1,5 +1,5 @@
 <template>
-  <div class="air-quality-pre-policy">
+  <div class="q-pt-xl air-quality-pre-policy">
     <q-select
       :class="{ 'metric-options': 1 === 1 }"
       v-model="selectedItem"
@@ -194,7 +194,7 @@ export default defineComponent({
               metric_statistics[m].seasonal_metric_id === parseInt(metric_ids[1])
             ) {
               var row = {};
-
+              
               row.input_file_characteristic = "AQ year";
               row.value = airQualityLayers[i].aq_year;
               rows.value.push(row);

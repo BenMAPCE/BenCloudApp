@@ -72,7 +72,7 @@ import { pollutantIdHasValue } from "../../composables/validation/analysis-valid
 import { prePolicyAirQualityIdHasValue } from "../../composables/validation/analysis-validations";
 import { postPolicyAirQualityIdHasValue } from "../../composables/validation/analysis-validations";
 import { populationDatasetIdHasValue } from "../../composables/validation/analysis-validations";
-import { populationYearHasValue } from "../../composables/validation/analysis-validations";
+import { populationYearsHaveValue } from "../../composables/validation/analysis-validations";
 import { incidenceIdHasValue } from "../../composables/validation/analysis-validations";
 import { healthEffectsHasValue } from "../../composables/validation/analysis-validations";
 import { aggregationScaleHasValue } from "../../composables/validation/analysis-validations";
@@ -150,7 +150,7 @@ export default {
       if (step == 4) {
         if (
           populationDatasetIdHasValue(store) &&
-          populationYearHasValue(store) &&
+          populationYearsHaveValue(store) &&
           incidenceIdHasValue(store)
         ) {
           stepHasError.value = false;

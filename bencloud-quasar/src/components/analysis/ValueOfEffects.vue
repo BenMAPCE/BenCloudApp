@@ -1,4 +1,7 @@
 <template>
+  <div>
+    Selected valuation functions will be run for each task (each Post-Policy/Year combination).
+  </div>
   <q-table
     :rows="rows"
     :columns="columns"
@@ -244,6 +247,8 @@ export default defineComponent({
           var valuationIds = [];
           console.log(records.length);
           var valuationDisplay = "";
+          
+          var valuationFunctionsArray = [];
           for (var i = 0; i < records.length; i++) {
             console.log(records[i].qualifier);
             valuationDisplay =
@@ -257,7 +262,33 @@ export default defineComponent({
 
             valuations = valuations + "<p>" + valuationDisplay + "</p>";
             valuationIds.push(records[i].id);
+            var valuationFunction = {
+              hifId: row.health_function_id,
+              hifInstanceId: null,
+              vfId: records[i].id,
+              vfRecord: records[i]
+            }
+            valuationFunctionsArray.push(valuationFunction);
           }
+
+          var batchTaskObject = JSON.parse(JSON.stringify(store.state.analysis.batchTaskObject));
+          for(var i = 0; i < batchTaskObject.batchHifGroups.length; i++) {
+            if(batchTaskObject.batchHifGroups[i].name === row.group_name) {
+              for(var j = 0; j < batchTaskObject.batchHifGroups[i].hifs.length; j++) {
+                if(batchTaskObject.batchHifGroups[i].hifs[j].hifId === row.health_function_id) {
+                  for(var k = 0; k < valuationFunctionsArray.length; k++) {
+                    valuationFunctionsArray[k].hifInstanceId = batchTaskObject.batchHifGroups[i].hifs[j].hifInstanceId;
+                  }
+                  batchTaskObject.batchHifGroups[i].hifs[j]['valuationFunctions'] = valuationFunctionsArray;
+                  break;
+                }
+              }
+              break;
+            }
+          }
+
+          store.commit("analysis/updateBatchTaskObject", batchTaskObject);
+          console.log(store.state.analysis.batchTaskObject);
           console.log(valuationIds);
           console.log(row);
 

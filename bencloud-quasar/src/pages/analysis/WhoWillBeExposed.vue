@@ -10,7 +10,7 @@
           <PopulationDataset></PopulationDataset>
         </Suspense>
       </div>
-      <div class="row">Step 2. In what year will people be exposed?</div>
+      <div class="row">Step 2. Select population year(s) for each post-policy air quality scenario.</div>
       <div class="row">
           <PopulationYears></PopulationYears>
       </div>

@@ -29,8 +29,9 @@ export function updatePopulationDataset(state, populationDataset) {
     state.populationDatasetName = populationDataset.populationDatasetName;
 }
 
-export function updatePopulationYear(state, populationYear) {
-    state.populationYear = populationYear;
+export function updatePopulationYearsSelected(state, populationYearsSelected) {
+    
+    state.populationYearsSelected = populationYearsSelected;
 }
 
 export function updatePopulationYears(state, populationYears) {
@@ -73,6 +74,22 @@ export function updatePostPolicyAirQualityId(state, postPolicyAirQualityId) {
 
 export function updatePostPolicyAirQualityName(state, postPolicyAirQualityName) {
     state.postPolicyAirQualityName = postPolicyAirQualityName;
+}
+
+export function updatePostPolicyAirQualityHifs(state, postPolicyAirQuality) {
+    for(var i = 0; i < state.postPolicyAirQualityName.length; i++) {
+        if(state.postPolicyAirQualityName[i].name == postPolicyAirQuality.name) {
+            for(var j = 0; j < state.postPolicyAirQualityName[i].popYears.length; j++) {
+                if(state.postPolicyAirQualityName[i].popYears[j].year == postPolicyAirQuality.year) {
+                    state.postPolicyAirQualityName[i].popYears[j].hifs = postPolicyAirQuality.hifs;
+                }
+            }
+        }
+ }   
+}
+
+export function updatePostPolicyAirQualitySelection(state, postPolicyAirQualitySelection) {
+    state.postPolicyAirQualitySelection = postPolicyAirQualitySelection;
 }
 
 export function updatePostPolicyAirQualityMetricId(state, metricId) {
@@ -127,4 +144,12 @@ export function updateAirQualityLayers (state, airQualityLayers) {
 
 export function updateAggregationScale (state, aggregationScale) {
     state.aggregationScale = aggregationScale;
+}
+
+export function updateApplyYearsToAll (state, applyYearsToAll) {
+    state.applyYearsToAll = applyYearsToAll;
+}
+
+export function updateBatchTaskObject (state, batchTaskObject) {
+    state.batchTaskObject = batchTaskObject;
 }
