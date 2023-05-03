@@ -24,8 +24,8 @@ export default store(function (/* { ssrContext } */) {
       airquality,
       app,
       analysis,
-      auth,
-      exposure
+      auth//,
+      //exposure
     },
 
     // enable strict mode (adds overhead!)
