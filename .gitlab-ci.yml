@@ -97,7 +97,8 @@ deploy_testdev:
  script:
   - apk add gettext
   - kubectl config use-context "$KUBE_CONTEXT"
-  - kubectl apply -f k8s/bencloud-dev-app.yml -n benmap-dev
+  - envsubst < k8s/bencloud-dev-app.yml | kubectl apply -f -
+  # - kubectl apply -f k8s/bencloud-dev-app.yml -n benmap-dev
  environment:
   name: testdev
   url: https://dev.bencloud-dev.aws.epa.gov
@@ -115,7 +116,8 @@ deploy_staging:
  script:
   - apk add gettext
   - kubectl config use-context "$KUBE_CONTEXT"
-  - kubectl apply -f k8s/bencloud-stage-app.yml -n benmap-stg
+  - envsubst < k8s/bencloud-stage-app.yml | kubectl apply -f -
+  # - kubectl apply -f k8s/bencloud-stage-app.yml -n benmap-stg
  environment:
   name: staging
   url: https://stg.bencloud-stage.aws.epa.gov
