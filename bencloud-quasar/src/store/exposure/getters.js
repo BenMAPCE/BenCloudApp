@@ -17,16 +17,6 @@ export function pollutantFriendlyName (state) {
   return state.pollutantFriendlyName
 }
 
-export function incidenceId (state) {
-  console.log("--- getting incidenceId: " + state.incidenceId)
-  return state.incidenceId
-}
-
-export function incidenceName (state) {
-  console.log("--- getting incidenceName: " + state.incidenceName)
-  return state.incidenceName
-}
-
 export function populationDatasetId (state) {
   return state.populationDatasetId
 }
@@ -39,12 +29,16 @@ export function populationYears (state) {
   return state.populationYears
 }
 
-export function healthEffects (state) {
-  return state.healthEffects
+export function populationGroups (state) {
+  return state.populationGroups
 }
 
-export function healthImpactFunctions (state) {
-  return state.healthImpactFunctions
+export function populationGroupIds (state) {
+  return state.populationGroupIds
+}
+
+export function populationGroupNames (state) {
+  return state.populationGroupNames
 }
 
 export function prePolicyAirQualityId (state) {
@@ -71,39 +65,8 @@ export function postPolicyAirQualityMetricId (state) {
   return state.postPolicyAirQualityMetricId
 }
 
-export function valuationsForHealthImpactFunctionGroups (state) {
-  return state.valuationsForHealthImpactFunctionGroups
-}
-
-export const getValuationsForHealthFunctionId = (state) => (healthFunctionId) => {
-
-  console.log("######")
-  console.log(healthFunctionId)
-  console.log(state.valuationsForHealthImpactFunctionGroups)
-  console.log("######")
-
-  for (var v = 0; v < state.valuationsForHealthImpactFunctionGroups.length; v++) {
-    console.log("$$$")
-    console.log(state.valuationsForHealthImpactFunctionGroups[v])
-    if (
-      "health_function_id" in state.valuationsForHealthImpactFunctionGroups[v]
-     ) {
-         if (state.valuationsForHealthImpactFunctionGroups[v].health_function_id === healthFunctionId) {
-          //console.log("... found health_function_id: " + healthFunctionId);
-          return state.valuationsForHealthImpactFunctionGroups[v];
-      }
-    }
-  }
-
-  return {};
-}
-
 export function airQualityLayers (state) {
   return state.airQualityLayers
-}
-
-export function aggegationScale (state) {
-  return state.aggegationScale;
 }
 
 export function applyYearsToAll (state) {

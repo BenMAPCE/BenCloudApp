@@ -87,7 +87,6 @@ export const createTemplate = (taskName, store) => {
     store.state.analysis.postPolicyAirQualityMetricId;
   const populationDatasetId = store.state.analysis.populationDatasetId;
   const populationDatasetName = store.state.analysis.populationDatasetName;
-  const populationYear = store.state.analysis.populationYear;
   const incidenceId = store.state.analysis.incidenceId;
   const incidenceName = store.state.analysis.incidenceName;
   const pollutantId = store.state.analysis.pollutantId;
@@ -140,7 +139,6 @@ export const createTemplate = (taskName, store) => {
   var population = {};
   population["populationDatasetId"] = populationDatasetId;
   population["populationDatasetName"] = populationDatasetName;
-  population["populationYear"] = populationYear;
   population["incidenceId"] = incidenceId;
   population["incidenceName"] = incidenceName;
 
@@ -284,7 +282,6 @@ export const loadTemplate = (model, store) => {
 
   var population = parameters.population;
 
-  console.log("**** " + population.populationYear)
   console.log("**** " + population.populationDatasetId)
   console.log("**** " + population.populationDatasetName)
   console.log("**** " + population.incidenceId)

@@ -10,7 +10,6 @@ export const buildHifTaskJSON = (taskName, store) => {
   const prePolicyAirQualityId = store.state.analysis.prePolicyAirQualityId;
   const postPolicyAirQuality = store.state.analysis.postPolicyAirQualityName;
   const populationDatasetId = store.state.analysis.populationDatasetId;
-  const populationYear = store.state.analysis.populationYear;
   const healthImpactFunctions = store.state.analysis.healthImpactFunctions;
 
   const valuationsForHealthImpactFunctionGroups =
@@ -37,7 +36,6 @@ export const buildHifTaskJSON = (taskName, store) => {
 
   var population = {};
   population["id"] = populationDatasetId;
-  population["year"] = populationYear;
 
   hifInfo["population"] = population;
 

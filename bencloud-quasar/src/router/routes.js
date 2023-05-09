@@ -116,6 +116,18 @@ const routes = [
   },
 
   {
+    path: "/exposure",
+    component: () => import("layouts/MainLayout.vue"),
+    children: [
+      {
+        path: "",
+        component: () => import("pages/Exposure.vue"),
+        meta: { requiresUser: true, requiresAdmin: false },
+      },
+    ],
+  },
+
+  {
     path: "/datacenter",
     component: () => import("layouts/MainLayout.vue"),
     children: [
