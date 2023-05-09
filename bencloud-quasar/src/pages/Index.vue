@@ -20,6 +20,7 @@
               no-caps
               color="primary"
               push
+              @click="$router.replace('exposure')"
               label="Analyze Exposure to Air Pollutants"
             />
         </div>
