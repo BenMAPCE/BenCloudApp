@@ -39,10 +39,6 @@ export function populationYears (state) {
   return state.populationYears
 }
 
-export function populationYear (state) {
-  return state.populationYears
-}
-
 export function healthEffects (state) {
   return state.healthEffects
 }
