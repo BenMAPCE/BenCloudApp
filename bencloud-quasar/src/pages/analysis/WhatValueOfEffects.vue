@@ -1,5 +1,8 @@
 <template>
   <div class="row">
+    Selected valuation functions will be run for each task (each Post-Policy/Year combination).
+  </div>
+  <div class="row">
     <Suspense>
       <ValueOfEffects></ValueOfEffects>
     </Suspense>

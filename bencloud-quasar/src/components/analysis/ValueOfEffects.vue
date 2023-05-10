@@ -1,45 +1,44 @@
 <template>
-  <div>
-    Selected valuation functions will be run for each task (each Post-Policy/Year combination).
+  <div class="q-pa-md">
+    <q-table
+      :rows="rows"
+      :columns="columns"
+      :rows-per-page-options="[0]"
+      v-model:pagination="pagination"
+      :loading="loading"
+      :filter="filter"
+      binary-state-sort
+      :visible-columns="visibleColumns"
+    >
+      <template v-slot:top-right>
+        <q-input borderless dense debounce="300" v-model="filter" placeholder="Search">
+          <template v-slot:append>
+            <q-icon name="mdi-magnify" />
+          </template>
+        </q-input>
+      </template>
+
+      <template v-slot:body-cell-edit="props">
+        <q-td :props="props" class="edit-column">
+          <q-btn
+            dense
+            flat
+            round
+            color="blue"
+            field="edit"
+            icon="mdi-pencil"
+            @click="editValueOfEffects(props.row)"
+          ></q-btn>
+        </q-td>
+      </template>
+
+      <template v-slot:body-cell-valuation="props">
+        <q-td :props="props" class="valuation-column">
+          <div v-html="props.row.valuation"></div>
+        </q-td>
+      </template>
+    </q-table>
   </div>
-  <q-table
-    :rows="rows"
-    :columns="columns"
-    :rows-per-page-options="[0]"
-    v-model:pagination="pagination"
-    :loading="loading"
-    :filter="filter"
-    binary-state-sort
-    :visible-columns="visibleColumns"
-  >
-    <template v-slot:top-right>
-      <q-input borderless dense debounce="300" v-model="filter" placeholder="Search">
-        <template v-slot:append>
-          <q-icon name="mdi-magnify" />
-        </template>
-      </q-input>
-    </template>
-
-    <template v-slot:body-cell-edit="props">
-      <q-td :props="props" class="edit-column">
-        <q-btn
-          dense
-          flat
-          round
-          color="blue"
-          field="edit"
-          icon="mdi-pencil"
-          @click="editValueOfEffects(props.row)"
-        ></q-btn>
-      </q-td>
-    </template>
-
-    <template v-slot:body-cell-valuation="props">
-      <q-td :props="props" class="valuation-column">
-        <div v-html="props.row.valuation"></div>
-      </q-td>
-    </template>
-  </q-table>
 </template>
 
 <script>
