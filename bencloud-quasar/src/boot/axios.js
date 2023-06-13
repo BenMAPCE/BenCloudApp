@@ -21,7 +21,7 @@ export default boot(({ app }) => {
   //       so you can easily perform requests against your app's API
 
   axios.defaults.headers.common['uid'] = 'test@test.com';
-  axios.defaults.headers.common['displayname'] = 'John Doe';
+  axios.defaults.headers.common['displayname'] = 'Local User';
   axios.defaults.headers.common['ismemberof'] = 'BenMAP_Users';
 })
 

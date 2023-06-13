@@ -14,7 +14,7 @@
 <div class="row">
     <div class="col-6">
         <div>
-            <p>Step 1. Select your pre-policy air quality data</p>
+            <p>Step 1. Select your pre-policy air quality scenario</p>
             <Suspense>
                 <AirQualityPrePolicy></AirQualityPrePolicy>
             </Suspense>
@@ -25,7 +25,7 @@
     </div>
     <div class="col-6">
         <div>
-            <p>Step 2. Select your post-policy air quality data</p>
+            <p>Step 2. Select your post-policy air quality scenario(s)</p>
             <Suspense>
                 <AirQualityPostPolicy></AirQualityPostPolicy>
             </Suspense>

@@ -22,12 +22,25 @@
               round
               flat
               color="grey"
-              @click="deleteRow(props)"
+              @click.stop="deleteRow(props)"
               icon="mdi-delete"
             ></q-btn>
           </template>
           <template v-else>
             {{col.value}}
+          </template>
+          <template v-if="col.name === 'edit' & props.row.share_scope != 1">
+            <q-btn
+              dense
+              round
+              flat
+              color="grey"
+              @click.stop="editRow(props)"
+              icon="mdi-pencil"
+            ></q-btn>
+          </template>
+          <template v-if="col.name === 'user' && props.row.share_scope != 1 && !!props.row.user_id">
+            {{props.row.user_id}}
           </template>
         </q-td>
       </q-tr>
@@ -48,6 +61,12 @@ import { defineComponent } from "vue";
 import { ref, unref, onMounted, onBeforeMount, watch, watchEffect } from "vue";
 import axios from "axios";
 import { useStore } from "vuex";
+import { layerName } from '../../common/AirQualityUploadForm.vue';
+import { showAll } from '../../../pages/datacenter/airquality/ReviewAirQuality.vue';
+import { date } from 'quasar'
+
+var trackCurrentPage = null;
+var numLayers = null;
 
 export default defineComponent({
   model: ref(null),
@@ -78,6 +97,7 @@ export default defineComponent({
           })
           .then((response) => {
             if(response.status === 204) {
+              trackCurrentPage = this.pagination.page;
               console.log("Successfully deleted AQ layer: " + props.row.name);
 
               // Reload list
@@ -91,6 +111,14 @@ export default defineComponent({
             }
           });
       }
+    },
+
+    editRow(props) {
+
+      //Pop up form to include edit name and share_scope fields
+      //only admin can edit share_scope
+      //non-admin can only edit suraces that are their own and not shared (share_scope == 0)
+
     },
     
     rowClicked(props) {
@@ -118,13 +146,13 @@ export default defineComponent({
       sortBy: "name",
       descending: false,
       page: 1,
-      rowsPerPage: 10,
+      rowsPerPage: 25,
       rowsNumber: 0,
     });
 
     let myFilter = unref(filter);
 
-   watch(
+    watch(
       () => store.state.airquality.airQualityLayerAddedDate,
       (airQualityLayerAddedDate, prevAirQualityLayerAddedDate) => {
           console.log("--- updated Air Quality Layer")
@@ -134,15 +162,17 @@ export default defineComponent({
          });
     })
 
-  watch(
+    watch(
       () => store.state.airquality.airQualityForceReloadValue,
       (newValue, oldValue) => {
-        console.log("--- added Air Quality Layer")
+        if(newValue > oldValue) {
+          console.log("--- added Air Quality Layer");
+        } else if(newValue < oldValue) {
+          console.log("--- deleted Air Quality Layer");
+        }
         filter.value = "";
         pagination.value.sortBy = "name";
-        pagination.value.descending = false;
-        pagination.value.page = 1;
-        pagination.value.rowsPerPage = 10;
+        pagination.value.descending = pagination.value.descending;
         pagination.value.rowsNumber = 0;
         onRequest({
             pagination: pagination.value,
@@ -159,7 +189,6 @@ export default defineComponent({
         pagination.value.sortBy = "name";
         pagination.value.descending = false;
         pagination.value.page = 1;
-        pagination.value.rowsPerPage = 10;
         pagination.value.rowsNumber = 0;
         console.log("resetting table.....");
         onRequest({
@@ -168,6 +197,26 @@ export default defineComponent({
           rows: [],
         });
     })
+
+    watch(
+      () => showAll.value,
+      () => {
+        console.log("Show all layers: " + showAll.value);
+        if(showAll.value && !visibleColumns.value.includes("user")) {
+          visibleColumns.value.push("user");
+          //visibleColumns.value.push("edit");
+        }
+        if(!showAll.value && visibleColumns.value.includes("user")) {
+          visibleColumns.value.pop("user");
+          //visibleColumns.value.pop("edit");
+        }
+        onRequest({
+          filter: "",
+          pagination: pagination.value,
+          rows: [],
+        });
+      }
+    );
 
     function onRequest(props) {
       console.log("on onRequest()");
@@ -178,62 +227,111 @@ export default defineComponent({
 
     function loadAirQualityLayers(props) {
       console.log(props.pagination);
+      if(!!trackCurrentPage) {
+        props.pagination.page = trackCurrentPage;
+      }
+      let layer = layerName;
       const { page, rowsPerPage, sortBy, descending } = props.pagination;
       const filter = props.filter;
 
       //console.log("--------------------------------------------")
       //console.log(filter)
       //console.log("--------------------------------------------")
-
       loading.value = true;
 
-      axios
-        .get(process.env.API_SERVER + "/api/air-quality-data", {
-          params: {
-            page: page,
-            rowsPerPage: rowsPerPage,
-            sortBy: sortBy,
-            descending: descending,
-            filter: filter,
-            pollutantId: store.state.airquality.pollutantId,
-          },
-        })
-        .then((response) => {
-          let records = response.data.records;
-          let data = response.data;
+      if(layer === null) {
+        axios
+          .get(process.env.API_SERVER + "/api/air-quality-data", {
+            params: {
+              page: page,
+              rowsPerPage: rowsPerPage,
+              sortBy: sortBy,
+              descending: descending,
+              filter: filter,
+              pollutantId: store.state.airquality.pollutantId,
+              showAll: showAll.value,
+            },
+          })
+          .then((response) => {
+            let records = response.data.records;
+            let data = response.data;
 
-          console.log("----- return -----");
-          console.log(records);
+            console.log("----- return -----");
+            console.log(records);
 
-          rows.value = records;
+            rows.value = records;
 
-          store.commit("airquality/updateAirQualityLayerId", 0);
+            store.commit("airquality/updateAirQualityLayerId", 0);
 
-          // don't forget to update local pagination object
-          pagination.value.page = page;
-          pagination.value.rowsPerPage = rowsPerPage;
-          pagination.value.sortBy = sortBy;
-          pagination.value.descending = descending;
-          pagination.value.rowsNumber = data.filteredRecordsCount;
+            // don't forget to update local pagination object
+            pagination.value.page = page;
+            pagination.value.rowsPerPage = rowsPerPage;
+            pagination.value.sortBy = sortBy;
+            pagination.value.descending = descending;
+            pagination.value.rowsNumber = data.filteredRecordsCount;
+            numLayers = data.filteredRecordsCount;
 
-          // ...and turn of loading indicator
-          loading.value = false;
-        });
+            // ...and turn of loading indicator
+            loading.value = false;
+            trackCurrentPage = null;
+          });
+      } else {
+        axios
+          .get(process.env.API_SERVER + "/api/air-quality-data", {
+            params: {
+              page: page,
+              rowsPerPage: ++numLayers,
+              sortBy: sortBy,
+              descending: descending,
+              filter: filter,
+              pollutantId: store.state.airquality.pollutantId,
+              showAll: showAll.value,
+            },
+          })
+          .then((response) => {
+            let records = response.data.records;
+            let data = response.data;
+
+            console.log("----- return -----");
+            console.log(records);
+
+            store.commit("airquality/updateAirQualityLayerId", 0);
+
+            let loadPage = 1;
+            for(let i = 0; i < records.length; i++) {
+              if(records[i].name === layer) {
+                loadPage = Math.floor((i/rowsPerPage) + 1);
+                break;
+              }
+            }
+
+            rows.value = [];
+            let rowCount = 0;
+            for(let i = 0; i < rowsPerPage; i++) {
+              if(!!records[(loadPage-1)*rowsPerPage + i]) {
+                rows.value[i] = records[(loadPage-1)*rowsPerPage + i];
+              }
+            }
+
+            // don't forget to update local pagination object
+            pagination.value.page = loadPage;
+            pagination.value.rowsPerPage = rowsPerPage;
+            pagination.value.sortBy = sortBy;
+            pagination.value.descending = descending;
+            pagination.value.rowsNumber = data.filteredRecordsCount;
+
+            // ...and turn of loading indicator
+            loading.value = false;
+            trackCurrentPage = null;
+          });
+      }
     }
 
     onBeforeMount(() => {
-
-      visibleColumns.value = [];
-      visibleColumns.push("name");
-      visibleColumns.push("grid_definition_name");
-      // visibleColumns.push("cell_count");
-      // visibleColumns.push("mean_value");
-      visibleColumns.push("actions");
-
       console.log("includeLayerName: " + props.includeLayerName);
 
       if (props.includeLayerName) {
-        visibleColumns.push("id");
+        visibleColumns.value.push("id");
       }
 
     })
@@ -261,7 +359,19 @@ export default defineComponent({
 
 const rows = [];
 
-const visibleColumns = [];
+const visibleColumns = ref([
+  "name",
+  "grid_definition_name",
+  "aq_year",
+  "source",
+  "data_type",
+  "description",
+  "filename",
+  "upload_date",
+  //"cell_count",
+  //"mean_value",
+  "actions"
+]);
 
 const columns = [
   {
@@ -289,6 +399,49 @@ const columns = [
     sortable: true,
   },
   {
+    name: "aq_year",
+    align: "left",
+    label: "Year",
+    field: "aq_year",
+    sortable: true,
+  },
+  {
+    name: "source",
+    align: "left",
+    label: "Source",
+    field: "source",
+    sortable: true,
+  },
+  {
+    name: "data_type",
+    align: "left",
+    label: "Data type",
+    field: "data_type",
+    sortable: true,
+  },
+  {
+    name: "description",
+    align: "left",
+    label: "Description",
+    field: "description",
+    sortable: true,
+  },
+  {
+    name: "filename",
+    align: "left",
+    label: "Filename",
+    field: "filename",
+    sortable: true,
+  },
+  {
+    name: "upload_date",
+    align: "left",
+    label: "Upload date",
+    field: "upload_date",
+    format: val => date.formatDate(val, 'YYYY-MM-DD HH:mm:ss'),
+    sortable: true,
+  },
+  {
     name: "cell_count",
     label: "Cell Count",
     field: "metric_statistics.cell_count",
@@ -301,10 +454,22 @@ const columns = [
     sortable: true,
   },
   { 
+    name: "user", 
+    label: "User", 
+    field: "", 
+    align: "left" 
+  },
+  { 
     name: "actions", 
     label: "", 
     field: "", 
-    align: "center" 
+    align: "left" 
+  },
+  { 
+    name: "edit", 
+    label: "", 
+    field: "", 
+    align: "left" 
   },
 ];
 </script>

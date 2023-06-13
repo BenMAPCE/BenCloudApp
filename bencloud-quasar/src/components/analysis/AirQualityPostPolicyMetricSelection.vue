@@ -1,4 +1,16 @@
 <template>
+  <div class="aq-post-policy-selection q-pt-sm q-pb-sm">
+    <q-select
+      square
+      dense
+      outlined
+      v-model="selectedScenario"
+      :options="scenarios"
+      emit-value
+      v-if="scenarios.length != 0"
+      label="Post Policy Scenario"
+    />
+  </div>
   <div class="air-quality-post-policy">
     <div class="aaa">
       <q-select
@@ -38,7 +50,10 @@ export default defineComponent({
 
   setup(props, context) {
     const store = useStore();
-    const selectedItem = ref(0);
+    const selectedItem = ref();
+    const scenarios = ref([]);
+    const selectedScenario = ref(store.state.analysis.postPolicyAirQualitySelection);
+    console.log(store.state.analysis.postPolicyAirQualitySelection);
 
     const options = ref([]);
     const rows = ref([]);
@@ -52,41 +67,64 @@ export default defineComponent({
             " | " +
             prevSelectedItem
         );
-        loadAirQualityMetricsWhenReady(true);
+        if(selectedScenario.value != null && !store.state.analysis.postPolicyAirQualityName.includes(selectedScenario.value)) {
+          selectedScenario.value = null;
+        }
+        loadPostPolicyScenarios(true);
       }
     );
+
+    watch(
+      () => selectedScenario.value,
+      (currentSelectedItem, prevSelectedItem) => {
+        console.log("watch: " + currentSelectedItem + " | " + prevSelectedItem);
+        if(selectedScenario.value === null) {
+          selectedItem.value = null;
+        }
+        if(currentSelectedItem != prevSelectedItem) {
+            store.commit(
+              "analysis/updatePostPolicyAirQualitySelection",
+              currentSelectedItem
+            )
+          loadAirQualityMetricsWhenReady(true);
+        }
+      }
+    )
 
     watch(
       () => selectedItem.value,
       (currentSelectedItem, prevSelectedItem) => {
         console.log("watch: " + currentSelectedItem + " | " + prevSelectedItem);
         // remove the air quality layer id from the metrics
-        var metrics = currentSelectedItem.split("-");
-        if (currentSelectedItem != prevSelectedItem) {
-          store.commit(
-            "analysis/updatePostPolicyAirQualityMetricId",
-            metrics[0] + "-" + metrics[1]
-          );
-
-          console.log(
-            "postPolicyAirQualityId currentSelectedItem: " + currentSelectedItem
-          );
-          loadMetricDetailsWhenReady(currentSelectedItem);
+        if(currentSelectedItem === null || currentSelectedItem.length === 0) {
+          options.value = [];
+          rows.value = [];
         } else {
-          console.log("*** SAME VALUE");
+          var metrics = currentSelectedItem.split("-");
+          if (currentSelectedItem != prevSelectedItem) {
+            store.commit(
+              "analysis/updatePostPolicyAirQualityMetricId",
+              metrics[0] + "-" + metrics[1]
+            );
+            loadMetricDetailsWhenReady(currentSelectedItem);
+          } else {
+            console.log("*** SAME VALUE");
+          }
         }
       }
     );
 
+    function loadPostPolicyScenarios(stateChange) {
+      scenarios.value = [];
+      store.state.analysis.postPolicyAirQualityName.forEach(element => {
+        scenarios.value.push(element.name);
+      })
+    }
+
     function loadAirQualityMetricsWhenReady(stateChange) {
-      (async () => {
-        console.log("waiting for airQualityLayers");
-        while (!store.state.analysis.airQualityLayers)
-          // define the condition as you like
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-        console.log("airQualityLayers is defined");
+      if(selectedScenario.value != null) {
         loadAirQualityMetrics(stateChange);
-      })();
+      }
     }
 
     function loadAirQualityMetrics(stateChange) {
@@ -109,10 +147,8 @@ export default defineComponent({
       console.log("selectedItem.value = " + selectedItem.value);
       options.value = [];
       var selectedMetrics = "";
-
       for (var i = 0; i < airQualityLayers.length; i++) {
-        if (airQualityLayers[i].id == store.state.analysis.postPolicyAirQualityId) {
-          console.log(airQualityLayers[i].id);
+        if (selectedScenario.value === airQualityLayers[i].name) {
           var metric_statistics = airQualityLayers[i].metric_statistics;
           for (var m = 0; m < metric_statistics.length; m++) {
             console.log(
@@ -190,7 +226,7 @@ export default defineComponent({
       var metric_ids = metric_statistic_ids.split("-");
 
       for (var i = 0; i < airQualityLayers.length; i++) {
-        if (airQualityLayers[i].id == store.state.analysis.postPolicyAirQualityId) {
+        if (selectedScenario.value == airQualityLayers[i].name) {
           console.log(airQualityLayers[i].id);
 
           var metric_statistics = airQualityLayers[i].metric_statistics;
@@ -204,6 +240,36 @@ export default defineComponent({
               metric_statistics[m].seasonal_metric_id === parseInt(metric_ids[1])
             ) {
               var row = {};
+
+              row.input_file_characteristic = "AQ year";
+              row.value = airQualityLayers[i].aq_year;
+              rows.value.push(row);
+
+              row = {};
+
+              row.input_file_characteristic = "Source";
+              row.value = airQualityLayers[i].source;
+              rows.value.push(row);
+
+              row = {};
+
+              row.input_file_characteristic = "Data type";
+              row.value = airQualityLayers[i].data_type;
+              rows.value.push(row);
+
+              row = {};
+
+              row.input_file_characteristic = "Description";
+              row.value = airQualityLayers[i].description;
+              rows.value.push(row);
+
+              row = {};
+
+              row.input_file_characteristic = "filename";
+              row.value = airQualityLayers[i].filename;
+              rows.value.push(row);
+
+              row = {};
 
               row.input_file_characteristic = "Number of grid cells";
               row.value = metric_statistics[m].cell_count;
@@ -234,6 +300,10 @@ export default defineComponent({
       if (store.state.analysis.postPolicyAirQualityId) {
         console.log(" ### updating postPolicyAirQualityId");
 
+        store.state.analysis.postPolicyAirQualityName.forEach(element => {
+          scenarios.value.push(element.name);
+        })
+
         loadAirQualityMetricsWhenReady(false);
 
         console.log(options.value);
@@ -262,6 +332,8 @@ export default defineComponent({
 
     return {
       selectedItem,
+      selectedScenario,
+      scenarios,
       options,
       rows,
       columns,
@@ -276,13 +348,17 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+
+.aq-post-policy-selection {
+  max-width: 95%;
+}
 .air-quality-post-policy {
   .metric-characteristics {
     margin-top: 25px;
     max-width: 95%;
   }
   .metric-options {
-    margin-top: 15px;
+    margin-top: 7px;
     max-width: 95%;
     .q-field__label {
       padding-bottom: 20px;

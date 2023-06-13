@@ -10,7 +10,7 @@
 
           <div>
             <div style="text-align: right;"><q-icon :name="'mdi-account-circle'" size="20px" /> {{username}}</div>
-            <div style="text-align: right;">v{{ 0.01 }} beta {{ environment === 'Production' ? '' : '(' + environment + ')' }}</div>
+            <div style="text-align: right;">v{{ 0.02 }} beta {{ environment === 'Production' ? '' : '(' + environment + ')' }}</div>
           </div>
         </q-toolbar>
       </div>
@@ -96,7 +96,7 @@ export default defineComponent({
       (response) => {
         // If the session has timed out, reload the page
         if(!!response && response.status === 302) {
-          window.location.reload;
+          window.location.reload();
         }
         return response;
       },
@@ -105,7 +105,7 @@ export default defineComponent({
           // If the error is due to session timing out, reload the page
           if(error.response.status === 302) {
             console.log("302 error");
-            window.location.reload;
+            window.location.reload();
             // If there is a message in the error response, display it in a pop up
           } 
           else if(!!error.response.data.message && error.response.status === 401) {

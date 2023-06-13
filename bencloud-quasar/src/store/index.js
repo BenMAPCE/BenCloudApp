@@ -7,6 +7,7 @@ import airquality from './airquality'
 import app from './app'
 import analysis from './analysis'
 import auth from './auth'
+import exposure from './exposure'
 
 /*
  * If not building with SSR mode, you can
@@ -23,7 +24,8 @@ export default store(function (/* { ssrContext } */) {
       airquality,
       app,
       analysis,
-      auth
+      auth,
+      exposure
     },
 
     // enable strict mode (adds overhead!)

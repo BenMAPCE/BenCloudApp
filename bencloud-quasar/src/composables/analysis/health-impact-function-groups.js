@@ -23,8 +23,12 @@ export const loadHealthImpactFunctionGroups = (store) => {
       var healthEffects = "";
       for (var i = 0; i < heItems.length; i++) {
         //console.log(heItems[i].healthEffectId);
-        healthEffects = healthEffects + heItems[i].healthEffectId + ",";
+        healthEffects += heItems[i].healthEffectId;
+        if(i < heItems.length -1) {
+          healthEffects += ",";
+        }
       }
+
       /*
       var healthEffects = "";
       for (var he = 0; he < selectedHealthEffects.length; he++) {
@@ -33,32 +37,53 @@ export const loadHealthImpactFunctionGroups = (store) => {
  */
       //console.log("healthEffects: " + healthEffects);
 
-      // /health-impact-function-groups/{ids}?incidencePrevalenceDataset=39&popYear=2020&pollutantId=6
+      // /health-impact-function-groups/{ids}?incidencePrevalenceDataset=39&popYear=2020&pollutantId=6\
 
+      var postPolicyItems = store.state.analysis.postPolicyAirQualityName;
+      var postPolicyIds = store.state.analysis.postPolicyAirQualityId;
+      var postPolicy = "";
+      if(postPolicyItems.length === postPolicyIds.length) {
+        for(var i = 0; i < postPolicyIds.length; i++) {
+          postPolicy += postPolicyIds[i] + "|";
+          for(var j = 0; j < postPolicyItems[i].years.length; j++) {
+            postPolicy += postPolicyItems[i].years[j];
+            if(j < postPolicyItems[i].years.length - 1) {
+              postPolicy += "~";
+            }
+          }
+          if(i < postPolicyIds.length - 1) {
+            postPolicy += ",";
+          }
+        }
+      }
+
+      console.log(postPolicy);
+      
       const result = await axios
         .get(
           process.env.API_SERVER +
-            "/api/health-impact-function-groups/" +
+            "/api/batch-task-config?" +
+            "groupIds=" +
             healthEffects +
-            "?" +
-            "incidencePrevalenceDataset=" +
-            store.state.analysis.incidenceId +
-            "&popYear=" +
-            store.state.analysis.populationYear +
             "&pollutantId=" +
-            store.state.analysis.pollutantId + 
+            store.state.analysis.pollutantId +
             "&baselineId=" +
             store.state.analysis.prePolicyAirQualityId + 
-            "&scenarioId=" +
-            store.state.analysis.postPolicyAirQualityId,
-
+            "&populationId=" +
+            store.state.analysis.populationDatasetId +
+            "&gridDefinitionId=" +
+            store.state.analysis.aggregationScale +
+            "&scenarios=" +
+            postPolicy + 
+            "&incidencePrevalenceDataset=" +
+            store.state.analysis.incidenceId,
           {
             params: {},
           }
         )
         .then((response) => {
           data.value = response.data;
-          console.log(data.value);
+          store.commit("analysis/updateBatchTaskObject", data.value);
         });
     } catch (ex) {
       error.value = ex;
@@ -82,57 +107,58 @@ export const buildHealthImpactFunctionGroups = (
 
   var records = JSON.parse(JSON.stringify(data));
   //console.log(records);
+  var groups = records.batchHifGroups;
   var options = [];
   var option = {};
   var functions = {};
 
   var healthImpactFunctions = [];
 
-  for (var i = 0; i < records.length; i++) {
+  for(var i = 0; i < records.aqScenarios.length; i++) {
+    var scenario = records.aqScenarios[i];
+    var hifConfigs = [];
+    var name = scenario.name;
+    for(var j = 0; j < scenario.popConfigs.length; j++) {
+      var year = scenario.popConfigs[j].popYear;
+      hifConfigs = scenario.popConfigs[j].scenarioHifConfigs;
+      var config = {name: name, year: year, hifs: hifConfigs};
+      store.commit("analysis/updatePostPolicyAirQualityHifs", config);
+    }
+  }
+
+  for (var i = 0; i < groups.length; i++) {
     option = {};
-    functions = records[i].functions;
+    functions = groups[i].hifs;
     //console.log(functions.length);
 
     for (var f = 0; f < functions.length; f++) {
-      healthImpactFunctions.push(functions[f]);
+      healthImpactFunctions.push(functions[f].hifRecord);
 
       option = {};
-      option.value = records[i].id;
-      option.group_name = records[i].name;
+      option.value = groups[i].id;
+      option.group_name = groups[i].name;
 
-      //console.log(functions[f].id);
-      option.health_function_id = functions[f].id;
+      option.health_function_id = functions[f].hifRecord.id;
 
-      option.endpoint_group_id = functions[f].endpoint_group_id;
-      option.location = functions[f].location;
-      option.endpoint_id = functions[f].endpoint_id;
+      option.endpoint_group_id = functions[f].hifRecord.endpoint_group_id;
+      option.location = functions[f].hifRecord.location;
+      option.endpoint_id = functions[f].hifRecord.endpoint_id;
       option.author_year =
-        functions[f].author + " / " + functions[f].function_year;
-      option.endpoint_name = functions[f].endpoint_name;
-      option.age_range = functions[f].start_age + " - " + functions[f].end_age;
-      option.end_age = functions[f].end_age;
+        functions[f].hifRecord.author + " / " + functions[f].hifRecord.function_year;
+      option.endpoint_name = functions[f].hifRecord.endpoint_name;
+      option.age_range = functions[f].hifRecord.start_age + " - " + functions[f].hifRecord.end_age;
+      option.end_age = functions[f].hifRecord.end_age;
       option.race_ethnicity_gender =
-        functions[f].race_name +
+        functions[f].hifRecord.race_name +
         " / " +
-        functions[f].ethnicity_name +
+        functions[f].hifRecord.ethnicity_name +
         " / " +
-        functions[f].gender_name;
-      if (functions[f].prevalence_dataset_name === null && functions[f].incidence_dataset_name === null) {
-        option.incidence_prevalence = ""
+        functions[f].hifRecord.gender_name;
+
+      if (functions[f].incidenceName === null) {
+        option.incidence_prevalence = "";
       } else {
-        if (functions[f].prevalence_dataset_name === null) {
-          option.incidence_prevalence =
-            functions[f].incidence_dataset_name +
-            " (" +
-            functions[f].incidence_year +
-            ")";
-        } else {
-          option.incidence_prevalence =
-            functions[f].prevalence_dataset_name +
-            " (" +
-            functions[f].prevalence_year +
-            ")";
-        }
+        option.incidence_prevalence = functions[f].incidenceName;
       }
 
   
@@ -141,14 +167,49 @@ export const buildHealthImpactFunctionGroups = (
       var valuationsForEndpointGroupId =
         getValuationFunctionsForEndpointGroupId(
           valuationFunctions.value,
-          functions[f].endpoint_group_id
+          functions[f].hifRecord.endpoint_group_id
         );
       let valuationsSelected = store.getters[
         "analysis/getValuationsForHealthFunctionId"
-      ](functions[f].id);
+      ](functions[f].hifId);
+
+      let valuationsArray = [];
+
+      if(!!valuationsSelected.valuation_ids) {
+        for(var j = 0; j < valuationsSelected.valuation_ids.length; j++) {
+          for(var k = 0; k < valuationsForEndpointGroupId.length; k++) {
+            if(valuationsForEndpointGroupId[k].id === valuationsSelected.valuation_ids[j]) {
+              valuationsArray.push( {
+                hifId: valuationsSelected.health_function_id,
+                hifInstanceId: null,
+                vfId: valuationsForEndpointGroupId[k].id,
+                vfRecord: valuationsForEndpointGroupId[k]
+              })
+            }
+          }
+        }
+      }
+
+      var batchTaskObject = JSON.parse(JSON.stringify(store.state.analysis.batchTaskObject));
+      for(var h = 0; h < batchTaskObject.batchHifGroups.length; h++) {
+        if(batchTaskObject.batchHifGroups[h].name === groups[i].name) {
+          for(var j = 0; j < batchTaskObject.batchHifGroups[h].hifs.length; j++) {
+            if(batchTaskObject.batchHifGroups[h].hifs[j].hifId === valuationsSelected.health_function_id) {
+              for(var k = 0; k < valuationsArray.length; k++) {
+                valuationsArray[k].hifInstanceId = batchTaskObject.batchHifGroups[h].hifs[j].hifInstanceId;
+              }
+              batchTaskObject.batchHifGroups[h].hifs[j]['valuationFunctions'] = valuationsArray;
+              break;
+            }
+          }
+          break;
+        }
+      }
+
+      store.commit("analysis/updateBatchTaskObject", batchTaskObject);
 
       var valuations = "";
-
+      
       if (
         valuationsSelected != undefined &&
         valuationsSelected.valuation_ids != undefined
@@ -186,6 +247,5 @@ export const buildHealthImpactFunctionGroups = (
       );
     }
   }
-
   return options;
 };

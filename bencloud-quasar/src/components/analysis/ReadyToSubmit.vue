@@ -11,31 +11,40 @@
         </div>
         <div class="row even choices">
           <div class="title">Pre-Policy</div>
-          <div>{{ this.prePolicyAirQualityName }}</div>
+          <div class="prePolicyList">{{ this.prePolicyAirQualityName }}</div>
         </div>
         <div class="row odd choices">
           <div class="title">Post-Policy</div>
-          <div>{{ this.postPolicyAirQualityName }}</div>
+          <div> 
+            <li class="postPolicyList" v-for="postPolicy in this.postPolicyAirQualityName" :key=postPolicy.name>
+              {{ postPolicy.name }} <br> &emsp;
+              Population year(s): {{ postPolicy.years.toString().replaceAll(",", ", ") }}
+            </li>
+          </div>
         </div>
         <div class="row even choices">
           <div class="title">Population Dataset</div>
           <div>{{ this.populationDatasetName }}</div>
         </div>
         <div class="row odd choices">
-          <div class="title">Year</div>
-          <div>{{ this.populationYear }}</div>
-        </div>
-        <div class="row even choices">
           <div class="title">Incidence</div>
           <div>{{ this.incidenceName }}</div>
         </div>
-        <div class="row odd choices">
+        <div class="row even choices">
           <div class="title">Health Effects</div>
           <div>{{ this.healthEffectsNames }}</div>
         </div>
-        <div class="row even choices">
+        <div class="row odd choices">
           <div class="title">Health Impact Functions</div>
           <div>{{ this.healthImpactFunctions.length }}</div>
+        </div>
+        <div class="row even choices">
+          <div class="title">Valuation Functions</div>
+          <div>{{ this.valuationFunctionCount }}</div>
+        </div>
+        <div class="row odd choices">
+          <div class="title">Total number of tasks</div>
+          <div>{{ this.totalTaskCount }}</div>
         </div>
       </q-card>
     </div>
@@ -132,7 +141,6 @@ export default defineComponent({
     const incidenceName = store.state.analysis.incidenceName;
     const populationDatasetId = store.state.analysis.populationDatasetId;
     const populationDatasetName = store.state.analysis.populationDatasetName;
-    const populationYear = store.state.analysis.populationYear;
     const valuationsForHealthImpactFunctionGroups =
       store.state.analysis.valuationsForHealthImpactFunctionGroups;
 
@@ -148,6 +156,20 @@ export default defineComponent({
     const errorMessage = ref("");
 
     var hifTaskId = null;
+    var valuationFunctionCount = null;
+    var totalTaskCount = null;
+
+    valuationsForHealthImpactFunctionGroups.forEach(e => {
+      valuationFunctionCount += e.valuation_ids.length;
+    })
+
+    postPolicyAirQualityName.forEach(e => {
+      totalTaskCount += e.years.length;
+    })
+
+    if(valuationFunctionCount > 0) {
+      totalTaskCount *= 2;
+    }
 
     watch(
       () => hifTaskId,
@@ -180,12 +202,23 @@ export default defineComponent({
 
         templateName.value = "";
 
-        templateNotification({
-          spinner: false, // we reset the spinner setting so the icon can be displayed
-          message: "Template Saved!",
-          color: "green",
-          timeout: 2000, // we will timeout it in 2 seconds
-        });
+        if(!!response.data.value.message) {
+          // if there is an issue, display the error message
+          templateNotification({
+            spinner: false, // we reset the spinner setting so the icon can be displayed
+            message: response.data.value.message,
+            color: "red",
+            timeout: 4000, // we will timeout it in 4 seconds
+          });
+        } else {
+          // if the template was saved
+          templateNotification({
+            spinner: false, // we reset the spinner setting so the icon can be displayed
+            message: "Template Saved!",
+            color: "green",
+            timeout: 2000, // we will timeout it in 2 seconds
+          });
+        }
       })();
     }
 
@@ -210,13 +243,17 @@ export default defineComponent({
         healthEffectsNamesList.length - 2
       );
 
-      var hifTaskJSON = buildHifTaskJSON(taskName.value, store);
-      console.log(JSON.stringify(hifTaskJSON));
+      var hifTaskJSON = JSON.parse(JSON.stringify(store.state.analysis.batchTaskObject));
+      hifTaskJSON['name'] = taskName.value;
+      hifTaskJSON['gridDefinitionId'] = store.state.analysis.aggregationScale;
+      store.commit("analysis/updateBatchTaskObject", hifTaskJSON);
+      console.log("----- Batch task configuration -----")
+      console.log(hifTaskJSON);
 
-      var template = createTemplate(taskName.value, store);
-      console.log("----- template -----");
-      console.log(template);
-      console.log("--------------------");
+      // var template = createTemplate(taskName.value, store);
+      // console.log("----- template -----");
+      // console.log(template);
+      // console.log("--------------------");
 
       hifTaskId = submitHifTask(hifTaskJSON, store).fetch();
 
@@ -275,11 +312,12 @@ export default defineComponent({
       incidenceName,
       populationDatasetId,
       populationDatasetName,
-      populationYear,
       healthEffectsIds,
       healthEffectsNames,
       healthImpactFunctions,
       valuationsForHealthImpactFunctionGroups,
+      valuationFunctionCount,
+      totalTaskCount,
       submitTask,
       submitTemplate,
       saveTemplate,
@@ -308,24 +346,37 @@ export default defineComponent({
   margin-top: 10px;
 }
 .choices-card {
-  width: 500px;
+  width: 700px;
   margin-bottom: 50px;
 }
 
 .choices {
-  max-width: 600px;
+  max-width: 700px;
   padding: 5px;
 }
 
 .title {
   width: 200px;
+  font-weight: bold;
 }
 
 .value {
-  width: 250px;
+  width: 450px;
 }
 
 .even {
   background-color: #eee;
 }
+
+.postPolicyList {
+  list-style-type: none;
+  overflow-wrap: break-word;
+}
+
+.prePolicyList {
+  list-style-type: none;
+  overflow-wrap: break-word;
+  float: right;
+}
+
 </style>

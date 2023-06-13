@@ -72,9 +72,10 @@ import { pollutantIdHasValue } from "../../composables/validation/analysis-valid
 import { prePolicyAirQualityIdHasValue } from "../../composables/validation/analysis-validations";
 import { postPolicyAirQualityIdHasValue } from "../../composables/validation/analysis-validations";
 import { populationDatasetIdHasValue } from "../../composables/validation/analysis-validations";
-import { populationYearHasValue } from "../../composables/validation/analysis-validations";
+import { populationYearsHaveValue } from "../../composables/validation/analysis-validations";
 import { incidenceIdHasValue } from "../../composables/validation/analysis-validations";
 import { healthEffectsHasValue } from "../../composables/validation/analysis-validations";
+import { aggregationScaleHasValue } from "../../composables/validation/analysis-validations";
 
 export default {
   components: {
@@ -149,7 +150,7 @@ export default {
       if (step == 4) {
         if (
           populationDatasetIdHasValue(store) &&
-          populationYearHasValue(store) &&
+          populationYearsHaveValue(store) &&
           incidenceIdHasValue(store)
         ) {
           stepHasError.value = false;
@@ -172,14 +173,21 @@ export default {
         }
       }
 
-     if (step == 6) {
-          stepHasError.value = false;
-          thisStepper.next();
+      if (step == 6) {
+        if(
+            aggregationScaleHasValue(store)
+          ) {
+            stepHasError.value = false;
+            thisStepper.next();
+          } else {
+            stepHasError.value = true;
+            atStep.value = 6;
+          }
       }
 
-     if (step == 7) {
-          stepHasError.value = false;
-          thisStepper.next();
+      if (step == 7) {
+        stepHasError.value = false;
+        thisStepper.next();  
       }
 }
     return {

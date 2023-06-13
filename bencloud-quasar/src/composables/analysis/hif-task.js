@@ -3,13 +3,13 @@ import { ref } from "vue";
 import axios from "axios";
 import { buildValuationTaskJSON } from "./valuation-task";
 import { submitValuationTask } from "./valuation-task";
+import { populationDatasetName } from "src/store/analysis/getters";
 
 export const buildHifTaskJSON = (taskName, store) => {
 
   const prePolicyAirQualityId = store.state.analysis.prePolicyAirQualityId;
-  const postPolicyAirQualityId = store.state.analysis.postPolicyAirQualityId;
+  const postPolicyAirQuality = store.state.analysis.postPolicyAirQualityName;
   const populationDatasetId = store.state.analysis.populationDatasetId;
-  const populationYear = store.state.analysis.populationYear;
   const healthImpactFunctions = store.state.analysis.healthImpactFunctions;
 
   const valuationsForHealthImpactFunctionGroups =
@@ -36,7 +36,6 @@ export const buildHifTaskJSON = (taskName, store) => {
 
   var population = {};
   population["id"] = populationDatasetId;
-  population["year"] = populationYear;
 
   hifInfo["population"] = population;
 
@@ -104,13 +103,13 @@ export const submitHifTask = (hifTaskJSON, store) => {
 
     try {
       const {data:response} = await axios
-      .post(process.env.API_SERVER + "/api/tasks", hifTaskJSON)
+      .post(process.env.API_SERVER + "/api/batch-tasks", hifTaskJSON)
       .then((response) => {
         data.value = response.data;
         console.log(data.value);
 
         if (valuationsForHealthImpactFunctionGroups.length > 0) {
-          var valuationTaskJSON = buildValuationTaskJSON(hifTaskJSON.name + " - Valuation", data.value.task_uuid, valuationsForHealthImpactFunctionGroups);
+          var valuationTaskJSON = buildValuationTaskJSON(hifTaskJSON.name + " - Valuation", data.value.task_uuid, valuationsForHealthImpactFunctionGroups, store);
           console.log(valuationTaskJSON);
           submitValuationTask(valuationTaskJSON, store).fetch();
         } else {

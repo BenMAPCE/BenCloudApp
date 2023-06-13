@@ -60,13 +60,15 @@ export const populationDatasetIdHasValue = (store) => {
     return isValid
 }
 
-export const populationYearHasValue = (store) => {
+export const populationYearsHaveValue = (store) => {
 
     var isValid = true;
 
-    if (store.state.analysis.populationYear) {
-        if (store.state.analysis.populationYear === 0) {
-            isValid = false;
+    if (store.state.analysis.postPolicyAirQualityName) {
+        for(let i = 0; i < store.state.analysis.postPolicyAirQualityName.length; i++) {
+            if(store.state.analysis.postPolicyAirQualityName[i].years.length === 0) {
+                isValid = false;
+            }
         }
     } else {
         isValid = false;
@@ -103,4 +105,17 @@ export const healthEffectsHasValue = (store) => {
     }
 
     return isValid
+}
+
+export const aggregationScaleHasValue = (store) => {
+
+    var isValid = true
+    if(store.state.analysis.aggregationScale) {
+        if((store.state.analysis.aggregationScale) === 0) {
+            isValid = false;
+        } 
+    } else {
+        isValid = false;
+    }
+    return isValid;
 }

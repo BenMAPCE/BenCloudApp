@@ -1,5 +1,6 @@
 import axios from "axios";
 import { ref } from "vue";
+import { showAllTasks } from "../../components/datacenter/tasks/ManageTasksTabs.vue";
 
 export const getCompletedTasks = (userIdentifier) => {
     const data = ref(null)
@@ -10,12 +11,12 @@ export const getCompletedTasks = (userIdentifier) => {
     const fetch = async() => {
         loading.value = true;
         try {
-
             const result = await axios
                 .get(process.env.API_SERVER + "/api/tasks/completed", {
             params: {
                 page: 1,
                 rowsPerPage: 9999999,
+                showAll: showAllTasks.value,
                 },
             })
             .then((response) => {

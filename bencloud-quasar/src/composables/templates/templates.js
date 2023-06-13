@@ -87,7 +87,6 @@ export const createTemplate = (taskName, store) => {
     store.state.analysis.postPolicyAirQualityMetricId;
   const populationDatasetId = store.state.analysis.populationDatasetId;
   const populationDatasetName = store.state.analysis.populationDatasetName;
-  const populationYear = store.state.analysis.populationYear;
   const incidenceId = store.state.analysis.incidenceId;
   const incidenceName = store.state.analysis.incidenceName;
   const pollutantId = store.state.analysis.pollutantId;
@@ -98,6 +97,7 @@ export const createTemplate = (taskName, store) => {
   const healthImpactFunctions = store.state.analysis.healthImpactFunctions;
   const valuationsForHealthImpactFunctionGroups =
     store.state.analysis.valuationsForHealthImpactFunctionGroups;
+  const batchTaskObject = store.state.analysis.batchTaskObject;
 
   var template = {};
 
@@ -139,7 +139,6 @@ export const createTemplate = (taskName, store) => {
   var population = {};
   population["populationDatasetId"] = populationDatasetId;
   population["populationDatasetName"] = populationDatasetName;
-  population["populationYear"] = populationYear;
   population["incidenceId"] = incidenceId;
   population["incidenceName"] = incidenceName;
 
@@ -210,6 +209,7 @@ export const createTemplate = (taskName, store) => {
   }
 
   template["functions"] = functionsArray;
+  template["batchTaskObject"] = batchTaskObject;
 
   const MY_NAMESPACE = "1b671a64-40d5-491e-99b0-da01ff1f3341";
   const hash = uuidv5(JSON.stringify(template), MY_NAMESPACE);
@@ -229,7 +229,7 @@ export const createTemplate = (taskName, store) => {
 
 
 export const loadTemplate = (model, store) => {
-  var parameters = model.value.parameters;
+  var parameters = model.parameters;
   console.log(parameters);
 
   var pollutant = parameters.pollutant;
@@ -282,13 +282,11 @@ export const loadTemplate = (model, store) => {
 
   var population = parameters.population;
 
-  console.log("**** " + population.populationYear)
   console.log("**** " + population.populationDatasetId)
   console.log("**** " + population.populationDatasetName)
   console.log("**** " + population.incidenceId)
   console.log("**** " + population.incidenceName)
 
-  store.commit("analysis/updatePopulationYear", population.populationYear);
   store.commit("analysis/updatePopulationDataset", {
     populationDatasetId: population.populationDatasetId,
     populationDatasetName: population.populationDatasetName,
@@ -357,6 +355,9 @@ export const loadTemplate = (model, store) => {
           console.log(store.state.analysis.valuationsForHealthImpactFunctionGroups)
         }
       }
+
+      var batchTaskObject = parameters.batchTaskObject;
+      store.commit("analysis/updateBatchTaskObject", batchTaskObject);
 
       console.log(store.state.analysis.valuationsForHealthImpactFunctionGroups);
       //console.log(parameters.functions);

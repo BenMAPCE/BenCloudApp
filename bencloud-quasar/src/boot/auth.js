@@ -1,6 +1,9 @@
 import { boot } from "quasar/wrappers";
 import { LocalStorage, Notify } from "quasar";
-import axios from 'axios'
+import axios from 'axios';
+import { ref } from "vue";
+
+export var isAdmin = ref(false);
 
 export default boot(async ({ router, store }) => {
   console.log("----- in auth.js -----");
@@ -17,11 +20,15 @@ export default boot(async ({ router, store }) => {
         .get(process.env.API_SERVER + "/api/user")
         .then((response) => {
           isUser = response.data.isUser;
+          isAdmin = response.data.isAdmin;
           if(!!response) {
             status = response.status;
           } else if (!!error) {
             status = error.status;
           }
+        })
+        .catch(error => {
+          console.log("/api/user ERROR: " + error.response.data.error);
         })
     } catch(ex) {
       console.log(ex)
@@ -39,7 +46,7 @@ export default boot(async ({ router, store }) => {
         return '/requestaccess';
       } 
     }
-    if(to.path === '/requestaccess') {
+    if(to.path === '/requestaccess' || to.path === '/requestaccess/') {
       var isUser = false;
       // If the current user is a BenMAP user, we don't want them to get stuck on the request access page
       try {
@@ -47,6 +54,7 @@ export default boot(async ({ router, store }) => {
           .get(process.env.API_SERVER + "/api/user")
           .then((response) => {
             isUser = response.data.isUser;
+            isAdmin = response.data.isAdmin;
           })
       } catch(ex) {
         console.log(ex)

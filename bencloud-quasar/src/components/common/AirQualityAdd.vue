@@ -1,6 +1,6 @@
 <template>
-  <q-btn push color="primary" ref="btn" @click="alert">
-    Add {{ pollutantFriendlyName }} Air Quality Layer</q-btn
+  <q-btn no-caps push color="primary" ref="btn" @click="alert">
+    ADD {{ pollutantFriendlyName.includes("μm") ? pollutantFriendlyName.toUpperCase().replace("ΜM","μm") : pollutantFriendlyName.toUpperCase()}} AIR QUALITY LAYER</q-btn
   >
 </template>
 
@@ -53,7 +53,6 @@ export default defineComponent({
           // console.log('I am triggered on both OK and Cancel')
         });
     }
-
   
 
     onMounted(() => {

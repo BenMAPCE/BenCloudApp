@@ -39,10 +39,6 @@ export function populationYears (state) {
   return state.populationYears
 }
 
-export function populationYear (state) {
-  return state.populationYears
-}
-
 export function healthEffects (state) {
   return state.healthEffects
 }
@@ -104,5 +100,17 @@ export const getValuationsForHealthFunctionId = (state) => (healthFunctionId) =>
 
 export function airQualityLayers (state) {
   return state.airQualityLayers
+}
+
+export function aggegationScale (state) {
+  return state.aggegationScale;
+}
+
+export function applyYearsToAll (state) {
+  return state.applyYearsToAll;
+}
+
+export function batchTaskObject (state) {
+  return state.batchTaskObject;
 }
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="air-quality-pre-policy">
+  <div class="q-pt-xl air-quality-pre-policy">
     <q-select
       :class="{ 'metric-options': 1 === 1 }"
       v-model="selectedItem"
@@ -194,6 +194,36 @@ export default defineComponent({
               metric_statistics[m].seasonal_metric_id === parseInt(metric_ids[1])
             ) {
               var row = {};
+              
+              row.input_file_characteristic = "AQ year";
+              row.value = airQualityLayers[i].aq_year;
+              rows.value.push(row);
+
+              row = {};
+
+              row.input_file_characteristic = "Source";
+              row.value = airQualityLayers[i].source;
+              rows.value.push(row);
+
+              row = {};
+
+              row.input_file_characteristic = "Data type";
+              row.value = airQualityLayers[i].data_type;
+              rows.value.push(row);
+
+              row = {};
+
+              row.input_file_characteristic = "Description";
+              row.value = airQualityLayers[i].description;
+              rows.value.push(row);
+
+              row = {};
+
+              row.input_file_characteristic = "filename";
+              row.value = airQualityLayers[i].filename;
+              rows.value.push(row);
+
+              row = {};
 
               row.input_file_characteristic = "Number of grid cells";
               row.value = metric_statistics[m].cell_count;

@@ -96,6 +96,7 @@ import { useStore } from "vuex";
 import { useQuasar, date } from "quasar";
 
 import { getCompletedTasks } from "../../../composables/tasks/completed-tasks";
+import { showAllTasks } from "../tasks/ManageTasksTabs.vue";
 
 export default defineComponent({
   model: ref(null),
@@ -145,6 +146,22 @@ export default defineComponent({
       })();
 
     }
+    
+    
+    watch(
+      () => showAllTasks.value,
+      () => {
+        console.log("Show all tasks: " + showAllTasks.value);
+        if(showAllTasks.value && !visibleColumns.value.includes("user")) {
+          visibleColumns.value.push("user");
+        }
+        if(!showAllTasks.value && visibleColumns.value.includes("user")) {
+          visibleColumns.value.pop("user");
+        }
+        console.log(visibleColumns.value);
+        loadCompletedTasks();
+      }
+    );
 
     function enableAutoRefresh() {
     
@@ -284,22 +301,23 @@ export default defineComponent({
       completedTasksRefreshInterval
     };
   },
+
 });
 
 const rows = [];
 
-const visibleColumns = [
-  // "task_uuid",
+const visibleColumns = ref([
+  //"task_uuid",
   "task_name",
   //"task_type",
-        "task_submitted_date",
-  //      "task_started_date",
-        "task_completed_date",
+  "task_submitted_date",
+  //"task_started_date",
+  "task_completed_date",
   "task_elapsed_time",
   "task_successful",
   "task_message",
   "download",
-];
+]);
 
 const columns = [
   {
@@ -341,6 +359,13 @@ const columns = [
     name: "task_successful",
     label: "Successful",
     field: "task_successful",
+    sortable: true,
+  },
+  {
+    name: "user",
+    label: "User",
+    field: (row) => row.task_user_id,
+    format: (val) => `${val}`,
     sortable: true,
   },
   {
