@@ -1,8 +1,6 @@
 
 import { ref } from "vue";
 import axios from "axios";
-import { buildValuationTaskJSON } from "./valuation-task";
-import { submitValuationTask } from "./valuation-task";
 
 export const buildExposureTaskJSON = (taskName, store) => {
 

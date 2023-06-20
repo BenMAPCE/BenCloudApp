@@ -109,8 +109,7 @@ import { ref, onBeforeMount, onMounted, watch } from "vue";
 import { useStore } from "vuex";
 import { useQuasar } from "quasar";
 
-import { buildHifTaskJSON, submitHifTask } from "../../composables/analysis/hif-task";
-import { buildValuationTaskJSON } from "../../composables/analysis/valuation-task";
+import { buildBatchTaskJSON, submitBatchTask } from "../../composables/analysis/batch-task";
 import TaskSubmittedDialog from "./TaskSubmittedDialog.vue";
 
 export default defineComponent({
@@ -151,13 +150,13 @@ export default defineComponent({
     const templateName = ref("");
     const errorMessage = ref("");
 
-    var hifTaskId = null;
+    var batchTaskId = null;
 
     watch(
-      () => hifTaskId,
-      (currentHifTaskId, prevHifTaskId) => {
-        if (currentHifTaskId != prevHifTaskId) {
-          console.log("yes... " + currentHifTaskId);
+      () => batchTaskId,
+      (currentBatchTaskId, prevBatchTaskId) => {
+        if (currentBatchTaskId != prevBatchTaskId) {
+          console.log("yes... " + currentBatchTaskId);
         }
       }
     );
@@ -184,10 +183,10 @@ export default defineComponent({
         healthEffectsNamesList.length - 2
       );
 
-      var hifTaskJSON = buildHifTaskJSON(taskName.value, store);
-      console.log(JSON.stringify(hifTaskJSON));
+      var batchTaskJSON = buildBatchTaskJSON(taskName.value, store);
+      console.log(JSON.stringify(batchTaskJSON));
 
-      hifTaskId = submitHifTask(hifTaskJSON, store).fetch();
+      batchTaskId = submitBatchTask(batchTaskJSON, store).fetch();
 
       $q.dialog({
         component: TaskSubmittedDialog,
