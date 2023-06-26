@@ -1,11 +1,9 @@
 
 import { ref } from "vue";
 import axios from "axios";
-import { buildValuationTaskJSON } from "./valuation-task";
-import { submitValuationTask } from "./valuation-task";
 import { populationDatasetName } from "src/store/analysis/getters";
 
-export const buildHifTaskJSON = (taskName, store) => {
+export const buildBatchTaskJSON = (taskName, store) => {
 
   const prePolicyAirQualityId = store.state.analysis.prePolicyAirQualityId;
   const postPolicyAirQuality = store.state.analysis.postPolicyAirQualityName;
@@ -87,7 +85,7 @@ export const buildHifTaskJSON = (taskName, store) => {
   return hifInfo;
 };
 
-export const submitHifTask = (hifTaskJSON, store) => {
+export const submitBatchTask = (batchTaskJSON, store) => {
   const data = ref(null);
   const error = ref(null);
   const loading = ref(false);
@@ -96,25 +94,17 @@ export const submitHifTask = (hifTaskJSON, store) => {
     store.state.analysis.valuationsForHealthImpactFunctionGroups;
     
   const fetch = async () => {
-    console.log("submitting hifTask")
-    console.log(hifTaskJSON)
+    console.log("submitting batchTask")
+    console.log(batchTaskJSON)
     console.log(valuationsForHealthImpactFunctionGroups.length)
     loading.value = true;
 
     try {
       const {data:response} = await axios
-      .post(process.env.API_SERVER + "/api/batch-tasks", hifTaskJSON)
+      .post(process.env.API_SERVER + "/api/batch-tasks", batchTaskJSON)
       .then((response) => {
         data.value = response.data;
         console.log(data.value);
-
-        if (valuationsForHealthImpactFunctionGroups.length > 0) {
-          var valuationTaskJSON = buildValuationTaskJSON(hifTaskJSON.name + " - Valuation", data.value.task_uuid, valuationsForHealthImpactFunctionGroups, store);
-          console.log(valuationTaskJSON);
-          submitValuationTask(valuationTaskJSON, store).fetch();
-        } else {
-          console.log("No valuations....");
-        }
         return data.value;
       });
     } catch (ex) {

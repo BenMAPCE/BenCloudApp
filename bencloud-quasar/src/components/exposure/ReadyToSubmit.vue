@@ -110,8 +110,7 @@ import { useStore } from "vuex";
 import { useQuasar } from "quasar";
 
 import { createTemplate, saveTemplate } from "../../composables/templates/templates";
-// import { buildHifTaskJSON, submitHifTask } from "../../composables/exposure/hif-task";
-// import { buildValuationTaskJSON } from "../../composables/exposure/valuation-task";
+// import { buildBatchTaskJSON, submitBatchTask } from "../../composables/exposure/batch-task";
 // import TaskSubmittedDialog from "./TaskSubmittedDialog.vue";
 import SubmissionErrorDialog from "./SubmissionErrorDialog.vue";
 
@@ -142,15 +141,15 @@ export default defineComponent({
     const templateName = ref("");
     const errorMessage = ref("");
 
-    var hifTaskId = null;
+    var batchTaskId = null;
     var valuationFunctionCount = null;
     var totalTaskCount = null;
 
     watch(
-      () => hifTaskId,
-      (currentHifTaskId, prevHifTaskId) => {
-        if (currentHifTaskId != prevHifTaskId) {
-          // console.log("yes... " + currentHifTaskId);
+      () => batchTaskId,
+      (currentBatchTaskId, prevBatchTaskId) => {
+        if (currentBatchTaskId != prevBatchTaskId) {
+          // console.log("yes... " + currentBatchTaskId);
         }
       }
     );
@@ -240,19 +239,19 @@ export default defineComponent({
     //     healthEffectsNamesList.length - 2
     //   );
 
-    //   var hifTaskJSON = JSON.parse(JSON.stringify(store.state.exposure.batchTaskObject));
-    //   hifTaskJSON['name'] = taskName.value;
-    //   hifTaskJSON['gridDefinitionId'] = store.state.exposure.aggregationScale;
-    //   store.commit("exposure/updateBatchTaskObject", hifTaskJSON);
+    //   var batchTaskJSON = JSON.parse(JSON.stringify(store.state.exposure.batchTaskObject));
+    //   batchTaskJSON['name'] = taskName.value;
+    //   batchTaskJSON['gridDefinitionId'] = store.state.exposure.aggregationScale;
+    //   store.commit("exposure/updateBatchTaskObject", batchTaskJSON);
     //   console.log("----- Batch task configuration -----")
-    //   console.log(hifTaskJSON);
+    //   console.log(batchTaskJSON);
 
     //   // var template = createTemplate(taskName.value, store);
     //   // console.log("----- template -----");
     //   // console.log(template);
     //   // console.log("--------------------");
 
-    //   hifTaskId = submitHifTask(hifTaskJSON, store).fetch();
+    //   batchTaskId = submitBatchTask(batchTaskJSON, store).fetch();
 
     //   $q.dialog({
     //     component: TaskSubmittedDialog,
