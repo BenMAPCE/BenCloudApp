@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
   <q-table
     :rows="rows"
     :columns="columns"
@@ -6,9 +6,7 @@
     v-model:pagination="pagination"
     :loading="loading"
     :filter="filter"
-    @request="onRequest"
     binary-state-sort
-    v-if="pollutantId != 0"
     v-model:selected="selected"
     :visible-columns="visibleColumns"
   >
@@ -71,11 +69,6 @@ var numLayers = null;
 export default defineComponent({
   model: ref(null),
   name: "AirQualityLayers",
-  computed: {
-    pollutantId() {
-      return this.$store.state.airquality.pollutantId;
-    },
-  },
 
   props: {
     includeLayerName: {
@@ -84,49 +77,46 @@ export default defineComponent({
     },
   },
 
-  methods: {
-    deleteRow(props) {
-      // Prompt user to confirm AQ layer deletion
-      if(confirm("Are you sure you wish to permanently delete " + props.row.name + "?")){
-        // Delete AQ layer, reload the AQ layer list if successful, alert the user if unsuccessful       
-        axios
-          .delete(process.env.API_SERVER + "/api/air-quality-data/" + props.row.id, {
-            params: {
-              id: props.row.id,
-            },
-          })
-          .then((response) => {
-            if(response.status === 204) {
-              trackCurrentPage = this.pagination.page;
-              console.log("Successfully deleted AQ layer: " + props.row.name);
+  // methods: {
+  //   deleteRow(props) {
+  //     // Prompt user to confirm AQ layer deletion
+  //     if(confirm("Are you sure you wish to permanently delete " + props.row.name + "?")){
+  //       // Delete AQ layer, reload the AQ layer list if successful, alert the user if unsuccessful       
+  //       axios
+  //         .delete(process.env.API_SERVER + "/api/incidence/" + props.row.id, {
+  //         })
+  //         .then((response) => {
+  //           if(response.status === 204) {
+  //             trackCurrentPage = this.pagination.page;
+  //             console.log("Successfully deleted AQ layer: " + props.row.name);
 
-              // Reload list
-              var oldValue =  this.$store.state.airquality.airQualityForceReloadValue
-              console.log("oldValue: " + oldValue);
-              var newValue = oldValue - 1;
-              console.log("newValue: " + newValue);
-              this.$store.commit("airquality/updateAirQualityForceReloadValue", newValue)
-            } else {
-              alert("An error occurred, air quality layer was not deleted.")
-            }
-          });
-      }
-    },
+  //             // Reload list
+  //             var oldValue =  this.$store.state.airquality.airQualityForceReloadValue
+  //             console.log("oldValue: " + oldValue);
+  //             var newValue = oldValue - 1;
+  //             console.log("newValue: " + newValue);
+  //             this.$store.commit("airquality/updateAirQualityForceReloadValue", newValue)
+  //           } else {
+  //             alert("An error occurred, air quality layer was not deleted.")
+  //           }
+  //         });
+  //     }
+  //   },
 
-    editRow(props) {
+  //   editRow(props) {
 
-      //Pop up form to include edit name and share_scope fields
-      //only admin can edit share_scope
-      //non-admin can only edit suraces that are their own and not shared (share_scope == 0)
+  //     //Pop up form to include edit name and share_scope fields
+  //     //only admin can edit share_scope
+  //     //non-admin can only edit suraces that are their own and not shared (share_scope == 0)
 
-    },
+  //   },
     
-    rowClicked(props) {
-      this.selected = [];
-      this.selected.push(props.row);
-      this.$store.commit("airquality/updateAirQualityLayerId", props.row.id);
-    },
-  },
+  //   rowClicked(props) {
+  //     this.selected = [];
+  //     this.selected.push(props.row);
+  //     this.$store.commit("airquality/updateAirQualityLayerId", props.row.id);
+  //   },
+  // },
 
   data() {
     return {
@@ -150,82 +140,8 @@ export default defineComponent({
       rowsNumber: 0,
     });
 
-    let myFilter = unref(filter);
 
-    watch(
-      () => store.state.airquality.airQualityLayerAddedDate,
-      (airQualityLayerAddedDate, prevAirQualityLayerAddedDate) => {
-          console.log("--- updated Air Quality Layer")
-          onRequest({
-            pagination: pagination.value,
-            filter: undefined,
-         });
-    })
-
-    watch(
-      () => store.state.airquality.airQualityForceReloadValue,
-      (newValue, oldValue) => {
-        if(newValue > oldValue) {
-          console.log("--- added Air Quality Layer");
-        } else if(newValue < oldValue) {
-          console.log("--- deleted Air Quality Layer");
-        }
-        filter.value = "";
-        pagination.value.sortBy = "name";
-        pagination.value.descending = pagination.value.descending;
-        pagination.value.rowsNumber = 0;
-        onRequest({
-            pagination: pagination.value,
-            filter: undefined,
-         });
-      })
-
-    watch(
-      () => store.state.airquality.pollutantId,
-      (pollutantId, prevPollutantId) => {
-        console.log("--- changed Air Quality Layer")
-        pollutantId = pollutantId;
-        filter.value = "";
-        pagination.value.sortBy = "name";
-        pagination.value.descending = false;
-        pagination.value.page = 1;
-        pagination.value.rowsNumber = 0;
-        console.log("resetting table.....");
-        onRequest({
-          filter: "",
-          pagination: pagination.value,
-          rows: [],
-        });
-    })
-
-    watch(
-      () => showAll.value,
-      () => {
-        console.log("Show all layers: " + showAll.value);
-        if(showAll.value && !visibleColumns.value.includes("user")) {
-          visibleColumns.value.push("user");
-          //visibleColumns.value.push("edit");
-        }
-        if(!showAll.value && visibleColumns.value.includes("user")) {
-          visibleColumns.value.pop("user");
-          //visibleColumns.value.pop("edit");
-        }
-        onRequest({
-          filter: "",
-          pagination: pagination.value,
-          rows: [],
-        });
-      }
-    );
-
-    function onRequest(props) {
-      console.log("on onRequest()");
-      if (store.state.airquality.pollutantId != 0) {
-        loadAirQualityLayers(props);
-      }
-    }
-
-    function loadAirQualityLayers(props) {
+    function loadIncidence(props) {
       console.log(props.pagination);
       if(!!trackCurrentPage) {
         props.pagination.page = trackCurrentPage;
@@ -241,7 +157,7 @@ export default defineComponent({
 
       if(layer === null) {
         axios
-          .get(process.env.API_SERVER + "/api/air-quality-data", {
+          .get(process.env.API_SERVER + "/api/incidence", {
             params: {
               page: page,
               rowsPerPage: rowsPerPage,
@@ -277,7 +193,7 @@ export default defineComponent({
           });
       } else {
         axios
-          .get(process.env.API_SERVER + "/api/air-quality-data", {
+          .get(process.env.API_SERVER + "/api/incidence", {
             params: {
               page: page,
               rowsPerPage: ++numLayers,
@@ -472,4 +388,77 @@ const columns = [
     align: "left" 
   },
 ];
+</script> -->
+
+
+<!-- <script>
+import axios from 'axios';
+
+export default {
+  data() {
+    return {
+      data: [],
+    };
+  },
+  mounted() {
+    axios.get(process.env.API_SERVER + "/api/incidence")
+      .then(response => {
+        let records = response.data.records;
+
+        console.log("----- return -----");
+        console.log(records);
+    
+        this.data = response.data;
+        // console.log(this.data);
+      })
+      .catch(error => {
+        console.error(error);
+        console.error('incidence data not loading');
+      });
+  },
+};
+</script> -->
+<template>
+  <div>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>ID</th>
+          <th>Grid Definition ID</th>
+          <th>Years</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="item in data" :key="item.id">
+          <td>{{ item.name }}</td>
+          <td>{{ item.id }}</td>
+          <td>{{ item.grid_definition_id }}</td>
+          <td>{{ item.years.join(', ') }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</template>
+
+<script>
+import axios from 'axios';
+
+export default {
+  data() {
+    return {
+      data: []
+    };
+  },
+  mounted() {
+    axios.get(process.env.API_SERVER + "/api/incidence")
+      .then(response => {
+        this.data = response.data;
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  }
+};
 </script>
+

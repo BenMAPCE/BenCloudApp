@@ -1,6 +1,6 @@
 <template>
   <q-btn no-caps push color="primary" ref="btn" @click="alert">
-    ADD INCIDENCE DATA</q-btn
+    ADD INCIDENCE DATASET</q-btn
   >
 </template>
 
@@ -8,6 +8,7 @@
 import { defineComponent, ref, reactive } from "vue";
 import { useQuasar, date } from "quasar";
 import AirQualityUploadForm from "./AirQualityUploadForm.vue";
+import IncidenceUploadForm from "./IncidenceUploadForm.vue";
 import { onMounted, watch } from "vue";
 import { useStore } from "vuex";
 
@@ -34,7 +35,7 @@ export default defineComponent({
 
     function alert() {
       $q.dialog({
-        component: AirQualityUploadForm,
+        component: IncidenceUploadForm,
         parent: this,
         persistent: true,
         componentProps: {
