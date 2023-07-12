@@ -1,6 +1,6 @@
 <template>
   <q-btn no-caps push color="primary" ref="btn" @click="alert">
-    ADD INCIDENCE DATA</q-btn
+    ADD AIR QUALITY DATA</q-btn
   >
 </template>
 

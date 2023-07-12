@@ -1,6 +1,6 @@
 <template>
   <div class="upload-incidence">
-    <q-dialog class="upload-air-incidence-dialog" ref="dialog" @hide="onDialogHide">
+    <q-dialog class="upload-incidence-dialog" ref="dialog" @hide="onDialogHide">
       <q-card class="upload-card">
         <q-form @submit="onSubmit" class="q-gutter-md">
           <div class="row">
@@ -20,7 +20,7 @@
           </div>
 
           <div class="row">
-            <div class="col-12 air-quality-name">
+            <div class="col-12 incidence-name">
               Add Incidence Dataset
             </div>
           </div>
@@ -136,16 +136,6 @@ export default {
     GridDefinitions,
   },
 
-  props: {
-    pollutantId: {
-      type: Number,
-      default: 0,
-    },
-    pollutantFriendlyName: {
-      type: String,
-      default: "None",
-    },
-  },
 
   emits: [
     // REQUIRED
@@ -187,7 +177,6 @@ export default {
     onUploadClick() {
       console.log("onUploadClick");
       console.log(this.name);
-      console.log("pollutantValue: " + this.pollutantValue);
       console.log("gridValue: " + this.gridValue);
 
       // on OK, it is REQUIRED to
@@ -255,7 +244,7 @@ export default {
         hasErrors = true;
       }
 
-
+   
       if (hasErrors) {
         return;
       }
@@ -264,12 +253,10 @@ export default {
       var tzoffset = (new Date()).getTimezoneOffset() * 60000
       var localISOTime = (new Date(Date.now() - tzoffset)).toISOString();
 
-      const url = process.env.API_SERVER + "/api/incidence";
-      // const url = process.env.API_SERVER + "/api/air-quality-data";
+      const url = process.env.API_SERVER + "/api/incidence-data";
       const fileData = new FormData();
       fileData.append("file", this.selected_file);
       fileData.append("name", this.name);
-      fileData.append("pollutantId", this.pollutantId);
       fileData.append("gridId", this.gridValue);
       fileData.append("aqYear", this.aqYear);
       fileData.append("source", this.source);
@@ -327,7 +314,7 @@ export default {
           } else {
             this.$q
               .dialog({
-                component: AirQualityUploadSuccessDialog,
+                component: IncidenceUploadSuccessDialog,
                 parent: this,
                 persistent: true,
                 componentProps: {
@@ -421,13 +408,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.upload-air-quality {
+.upload-incidence {
   .q-field {
     padding-left: 10px;
     padding-right: 10px;
   }
 
-  .air-quality-name {
+  .incidence-name {
     padding-left: 15px;
   }
   .upload-card {
