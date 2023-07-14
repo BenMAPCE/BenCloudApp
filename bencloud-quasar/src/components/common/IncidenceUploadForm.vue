@@ -258,7 +258,7 @@ export default {
       fileData.append("file", this.selected_file);
       fileData.append("name", this.name);
       fileData.append("gridId", this.gridValue);
-      fileData.append("aqYear", this.aqYear);
+      fileData.append("year", this.year);
       fileData.append("source", this.source);
       fileData.append("dataType", this.dataType);
       fileData.append("description", this.description);
@@ -314,7 +314,7 @@ export default {
           } else {
             this.$q
               .dialog({
-                component: IncidenceUploadSuccessDialog,
+                component: AirQualityUploadSuccessDialog,
                 parent: this,
                 persistent: true,
                 componentProps: {

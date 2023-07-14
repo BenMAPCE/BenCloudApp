@@ -2,18 +2,17 @@
   <q-page>
     <div class="q-pa-md q-gutter-sm">
       <div class="row">
-        <div class="col">Review Incidence</div>
+        <div class="col"></div>
       </div>
       <div class="row">
         <div class="col">
-        </div>
-
-        <div class="q-pa-md">
-          <IncidenceDatasets></IncidenceDatasets>
+          <Suspense>
+          </Suspense>
         </div>
 
         <div class="col">
           <IncidenceAdd
+
           >
             ></IncidenceAdd
           >
@@ -21,9 +20,12 @@
       </div>
 
       <div class="q-pa-md">
-        <AirQualityTabs></AirQualityTabs>
+        <IncidenceDatasets></IncidenceDatasets>
+
+      <div class="q-pa-md">
       </div>
     </div>
+  </div>
   </q-page>
 </template>
 
@@ -32,11 +34,6 @@ import { defineComponent } from "vue";
 import { ref, reactive } from "vue";
 import { watch, onBeforeMount } from "vue";
 
-import AirQualityTabs from "../../../../components/datacenter/airquality/AirQualityTabs.vue";
-
-import AirQualityLayers from "../../../../components/datacenter/airquality/AirQualityLayers.vue";
-import Pollutants from "../../../../components/common/Pollutants.vue";
-import AirQualityAdd from "../../../../components/common/AirQualityAdd.vue";
 import IncidenceAdd from "../../../../components/common/IncidenceAdd.vue";
 import IncidenceDatasets from "../../../../components/datacenter/incidence/IncidenceDatasets.vue";
 import { useStore } from "vuex";
@@ -49,7 +46,7 @@ export default defineComponent({
   name: "ReviewIncidence",
   components: {
     IncidenceAdd,
-    IncidenceDatasets
+    IncidenceDatasets,
 },
   setup(props, context) {
     const store = useStore();

@@ -7,14 +7,13 @@
 <script>
 import { defineComponent, ref, reactive } from "vue";
 import { useQuasar, date } from "quasar";
-import AirQualityUploadForm from "./AirQualityUploadForm.vue";
 import IncidenceUploadForm from "./IncidenceUploadForm.vue";
 import { onMounted, watch } from "vue";
 import { useStore } from "vuex";
 
 export default defineComponent({
   model: ref(null),
-  name: "AirQualityAdd",
+  name: "IncidenceAdd",
   components: {},
 
   props: {
@@ -38,14 +37,10 @@ export default defineComponent({
         component: IncidenceUploadForm,
         parent: this,
         persistent: true,
-        componentProps: {
-          pollutantFriendlyName: props.pollutantFriendlyName,
-          pollutantId: props.pollutantId,
-        },
       })
         .onOk(() => {
-          console.log("Upload AQ OK");
-          store.commit("airquality/updateAirQualityLayerAddedDate", new Date());
+          console.log("Upload Incidence OK");
+          store.commit("incidence/updateIncidenceAddedDate", new Date());
         })
         .onCancel(() => {
           // console.log('Cancel')

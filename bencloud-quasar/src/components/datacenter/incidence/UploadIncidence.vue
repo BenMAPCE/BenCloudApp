@@ -1,7 +1,7 @@
 <template>
     <div>
-      <h4>Incidence Data Cells</h4>
-      <!-- Your component to display incidence data cells goes here -->
+      <h4>Upload Incidence Data</h4>
+      <!-- Your upload form component goes here -->
     </div>
   </template>
   
@@ -9,7 +9,7 @@
   import { defineComponent } from "vue";
   
   export default defineComponent({
-    name: "IncidenceDataCells",
+    name: "IncidenceDataUpload",
   });
   </script>
   
