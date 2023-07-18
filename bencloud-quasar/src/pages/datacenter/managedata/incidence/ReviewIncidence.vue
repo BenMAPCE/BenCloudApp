@@ -12,7 +12,6 @@
 
         <div class="col">
           <IncidenceAdd
-
           >
             ></IncidenceAdd
           >
@@ -21,10 +20,12 @@
 
       <div class="q-pa-md">
         <IncidenceDatasets></IncidenceDatasets>
-
-      <div class="q-pa-md">
       </div>
-    </div>
+      
+      <div class="q-pa-md">
+        <IncidenceTabs></IncidenceTabs>
+      </div>
+
   </div>
   </q-page>
 </template>
@@ -36,6 +37,8 @@ import { watch, onBeforeMount } from "vue";
 
 import IncidenceAdd from "../../../../components/common/IncidenceAdd.vue";
 import IncidenceDatasets from "../../../../components/datacenter/incidence/IncidenceDatasets.vue";
+import IncidenceTabs from "src/components/datacenter/incidence/IncidenceTabs.vue";
+
 import { useStore } from "vuex";
 import { isAdmin } from "../../../../boot/auth.js";
 
@@ -45,8 +48,9 @@ export default defineComponent({
   model: ref(null),
   name: "ReviewIncidence",
   components: {
-    IncidenceAdd,
+    IncidenceTabs,
     IncidenceDatasets,
+    IncidenceAdd
 },
   setup(props, context) {
     const store = useStore();

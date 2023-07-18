@@ -69,17 +69,49 @@ var numLayers = null;
 
 export default defineComponent({
   model: ref(null),
-  name: "AirQualityLayers",
-  computed: {
-    pollutantId() {
-      return this.$store.state.airquality.pollutantId;
-    },
-  },
+  name: "IncidenceDatasets",
 
   props: {
     includeLayerName: {
       type: Boolean,
       default: false,
+    },
+  },
+  methods: {
+    // deleteRow(props) {
+    //   // Prompt user to confirm AQ layer deletion
+    //   if(confirm("Are you sure you wish to permanently delete " + props.row.name + "?")){
+    //     // Delete AQ layer, reload the AQ layer list if successful, alert the user if unsuccessful       
+    //     axios
+    //       .delete(process.env.API_SERVER + "/api/air-quality-data/" + props.row.id, {
+    //         params: {
+    //           id: props.row.id,
+    //         },
+    //       })
+    //       .then((response) => {
+    //         if(response.status === 204) {
+    //           trackCurrentPage = this.pagination.page;
+    //           console.log("Successfully deleted AQ layer: " + props.row.name);
+
+    //           // Reload list
+    //           var oldValue =  this.$store.state.airquality.airQualityForceReloadValue
+    //           console.log("oldValue: " + oldValue);
+    //           var newValue = oldValue - 1;
+    //           console.log("newValue: " + newValue);
+    //           this.$store.commit("airquality/updateAirQualityForceReloadValue", newValue)
+    //         } else {
+    //           alert("An error occurred, air quality layer was not deleted.")
+    //         }
+    //       });
+    //   }
+    // },
+
+   
+    
+    rowClicked(props) {
+      this.selected = [];
+      this.selected.push(props.row);
+      this.$store.commit("incidence/updateIncidenceDatasetId", props.row.id);
     },
   },
 
@@ -108,9 +140,9 @@ export default defineComponent({
     let myFilter = unref(filter);
 
     watch(
-      () => store.state.airquality.airQualityLayerAddedDate,
-      (airQualityLayerAddedDate, prevAirQualityLayerAddedDate) => {
-          console.log("--- updated Air Quality Layer")
+      () => store.state.incidence.incidenceDatasetAddedDate,
+      (incidenceDatasetAddedDate, prevIncidenceDatasetAddedDate) => {
+          console.log("--- updated Incidence Dataset")
           onRequest({
             pagination: pagination.value,
             filter: undefined,
@@ -118,12 +150,12 @@ export default defineComponent({
     })
 
     watch(
-      () => store.state.airquality.airQualityForceReloadValue,
+      () => store.state.incidence.incidenceForceReloadValue,
       (newValue, oldValue) => {
         if(newValue > oldValue) {
-          console.log("--- added Air Quality Layer");
+          console.log("--- added Incidence Dataset");
         } else if(newValue < oldValue) {
-          console.log("--- deleted Air Quality Layer");
+          console.log("--- deleted Incidence Dataset");
         }
         filter.value = "";
         pagination.value.sortBy = "name";
@@ -135,33 +167,33 @@ export default defineComponent({
          });
       })
 
-    watch(
-      () => showAll.value,
-      () => {
-        console.log("Show all layers: " + showAll.value);
-        if(showAll.value && !visibleColumns.value.includes("user")) {
-          visibleColumns.value.push("user");
-          //visibleColumns.value.push("edit");
-        }
-        if(!showAll.value && visibleColumns.value.includes("user")) {
-          visibleColumns.value.pop("user");
-          //visibleColumns.value.pop("edit");
-        }
-        onRequest({
-          filter: "",
-          pagination: pagination.value,
-          rows: [],
-        });
-      }
-    );
+    // watch(
+    //   () => showAll.value,
+    //   () => {
+    //     console.log("Show all layers: " + showAll.value);
+    //     if(showAll.value && !visibleColumns.value.includes("user")) {
+    //       visibleColumns.value.push("user");
+    //       //visibleColumns.value.push("edit");
+    //     }
+    //     if(!showAll.value && visibleColumns.value.includes("user")) {
+    //       visibleColumns.value.pop("user");
+    //       //visibleColumns.value.pop("edit");
+    //     }
+    //     onRequest({
+    //       filter: "",
+    //       pagination: pagination.value,
+    //       rows: [],
+    //     });
+    //   }
+    // );
 
     function onRequest(props) {
       console.log("on onRequest()");
-        loadAirQualityLayers(props);
+        loadIncidenceDatasets(props);
 
     }
 
-    function loadAirQualityLayers(props) {
+    function loadIncidenceDatasets(props) {
       console.log(props.pagination);
       if(!!trackCurrentPage) {
         props.pagination.page = trackCurrentPage;
@@ -193,7 +225,7 @@ export default defineComponent({
             console.log("----- return -----");
             console.log(data);
 
-            store.commit("airquality/updateAirQualityLayerId", 0);
+            store.commit("incidence/updateIncidenceDatasetId", 0);
 
             let loadPage = 1;
             for(let i = 0; i < data.length; i++) {
@@ -226,9 +258,9 @@ export default defineComponent({
     
 
     onBeforeMount(() => {
-      console.log("includeLayerName: " + props.includeLayerName);
+      console.log("includeDatasetName: " + props.includeDatasetName);
 
-      if (props.includeLayerName) {
+      if (props.includeDatasetName) {
         visibleColumns.value.push("id");
       }
 
@@ -261,7 +293,6 @@ const visibleColumns = ref([
   "id",
   "name",
   "grid_definition_id",
-  "years",
 ]);
 
 const columns = [

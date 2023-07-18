@@ -1,13 +1,7 @@
-
-export function updatePollutantId ({ commit }, pollutantId) {
-    console.log('checking i am here or not.')
-    console.log("pollutantId: " + pollutantId);
-}
-
-export function updateAirQualityLayerId ({ commit }, airQualityLayerId) {
+export function updateIncidenceDatasetId ({ commit }, incidenceDatasetId) {
   console.log('checking i am here or not.')
-  console.log("airQualityLayerId: " + airQualityLayerId);
+  console.log("incidenceDatasetId: " + incidenceDatasetId);
 }
 
-export function updateAirQualityLayerAddedDate ({ commit }, newDate) {
+export function updateIncidenceDatasetAddedDate ({ commit }, newDate) {
 }

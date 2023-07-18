@@ -8,6 +8,7 @@ import app from './app'
 import analysis from './analysis'
 import auth from './auth'
 import exposure from './exposure'
+import incidence from './incidence'
 
 /*
  * If not building with SSR mode, you can
@@ -25,7 +26,8 @@ export default store(function (/* { ssrContext } */) {
       app,
       analysis,
       auth,
-      exposure
+      exposure,
+      incidence
     },
 
     // enable strict mode (adds overhead!)

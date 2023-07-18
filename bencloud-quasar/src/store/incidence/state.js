@@ -1,9 +1,7 @@
 export default function () {
   return {
-    pollutantId: 0,
-    pollutantFriendlyName: "",
-    airQualityLayerId : 0,
-    airQualityLayerAddedDate : null,
-    airQualityForceReloadValue: 1
+    incidenceDatasetId : 0,
+    incidenceDatasetAddedDate : null,
+    incidenceForceReloadValue: 1
   }
 }
