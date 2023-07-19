@@ -78,33 +78,33 @@ export default defineComponent({
     },
   },
   methods: {
-    // deleteRow(props) {
-    //   // Prompt user to confirm AQ layer deletion
-    //   if(confirm("Are you sure you wish to permanently delete " + props.row.name + "?")){
-    //     // Delete AQ layer, reload the AQ layer list if successful, alert the user if unsuccessful       
-    //     axios
-    //       .delete(process.env.API_SERVER + "/api/air-quality-data/" + props.row.id, {
-    //         params: {
-    //           id: props.row.id,
-    //         },
-    //       })
-    //       .then((response) => {
-    //         if(response.status === 204) {
-    //           trackCurrentPage = this.pagination.page;
-    //           console.log("Successfully deleted AQ layer: " + props.row.name);
+    deleteRow(props) {
+      // Prompt user to confirm incidence dataset deletion
+      if(confirm("Are you sure you wish to permanently delete " + props.row.name + "?")){
+        // Delete AQ layer, reload the incidence dataset list if successful, alert the user if unsuccessful       
+        axios
+          .delete(process.env.API_SERVER + "/api/incidence/" + props.row.id, {
+            params: {
+              id: props.row.id,
+            },
+          })
+          .then((response) => {
+            if(response.status === 204) {
+              trackCurrentPage = this.pagination.page;
+              console.log("Successfully deleted incidence dataset: " + props.row.name);
 
-    //           // Reload list
-    //           var oldValue =  this.$store.state.airquality.airQualityForceReloadValue
-    //           console.log("oldValue: " + oldValue);
-    //           var newValue = oldValue - 1;
-    //           console.log("newValue: " + newValue);
-    //           this.$store.commit("airquality/updateAirQualityForceReloadValue", newValue)
-    //         } else {
-    //           alert("An error occurred, air quality layer was not deleted.")
-    //         }
-    //       });
-    //   }
-    // },
+              // Reload list
+              var oldValue =  this.$store.state.incidence.incidenceForceReloadValue
+              console.log("oldValue: " + oldValue);
+              var newValue = oldValue - 1;
+              console.log("newValue: " + newValue);
+              this.$store.commit("incidence/updateIncidenceForceReloadValue", newValue)
+            } else {
+              alert("An error occurred, incidence dataset was not deleted.")
+            }
+          });
+      }
+    },
 
    
     
@@ -293,6 +293,7 @@ const visibleColumns = ref([
   "id",
   "name",
   "grid_definition_id",
+  "actions"
 ]);
 
 const columns = [
@@ -327,6 +328,18 @@ const columns = [
     field: "years",
     format: (val) => val.join(", "),
     sortable: true,
+  },
+  { 
+    name: "actions", 
+    label: "", 
+    field: "", 
+    align: "left" 
+  },
+  { 
+    name: "edit", 
+    label: "", 
+    field: "", 
+    align: "left" 
   },
 ];
 </script>

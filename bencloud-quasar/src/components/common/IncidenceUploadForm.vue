@@ -333,12 +333,12 @@ export default {
 
           self.$q.loading.hide();
 
-          var oldValue =  this.$store.state.airquality.airQualityForceReloadValue
+          var oldValue =  this.$store.state.incidence.incidenceForceReloadValue
           console.log("oldValue: " + oldValue);
           var newValue = oldValue + 1;
           console.log("newValue: " + newValue);
           layerName = this.name;
-          this.$store.commit("airquality/updateAirQualityForceReloadValue", newValue)
+          this.$store.commit("incidence/updateIncidenceForceReloadValue", newValue)
 
           //self.hide();
           //self.$emit("ok");
