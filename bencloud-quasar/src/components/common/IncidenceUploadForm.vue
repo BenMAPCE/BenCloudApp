@@ -39,7 +39,7 @@
             </div>
           </div>
 
-          <div class="row">
+          <!-- <div class="row">
             <div class="col-12">
               <q-input
                 filled
@@ -51,9 +51,9 @@
                 :rules="[val => (val > 1900 && val < 3000) || 'Please enter a valid year']"
               />
             </div>
-          </div>
+          </div> -->
 
-          <div class="row">
+          <!-- <div class="row">
             <div class="col-12">
               <q-input
                 filled
@@ -65,10 +65,10 @@
                 :rules="[(val) => (val && val.length > 0) || 'Please enter a source for this data']"               
               />
             </div>
-          </div>
+          </div> -->
 
 
-          <div class="row">
+          <!-- <div class="row">
             <div class="col-12">
               <q-input
                 filled
@@ -78,7 +78,7 @@
                 :hint="descriptionHint"                
               />
             </div>
-          </div>
+          </div> -->
 
           
 
@@ -122,14 +122,14 @@ export default {
     gridValue: 0,
     errorMessage: "",
     name: "",
-    aqYear:"",
-    source:"",
-    dataType:"",
-    description:"",
-    filename:"",
+    // aqYear:"",
+    // source:"",
+    // dataType:"",
+    // description:"",
+    fileName:"",
     uploadDate: "",
     dashData: [],
-    descriptionHint:"",
+    // descriptionHint:"",
   }),
   
   components: {
@@ -225,24 +225,24 @@ export default {
         hasErrors = true;
       }
 
-      if (this.aqYear === "") {
-        this.errorMessage =
-          this.errorMessage + (hasErrors ? ", " : "") + "Year is required";
-        hasErrors = true;
-      }
-      else{
-        const yearRegex = /^\d{2}(\d{2})?$/;
-        if(!yearRegex.test(this.aqYear)) {
-          this.errorMessage + (hasErrors ? ", " : "") + "Please enter a valid year";
-        hasErrors = true;
-        }
-      }
+      // if (this.aqYear === "") {
+      //   this.errorMessage =
+      //     this.errorMessage + (hasErrors ? ", " : "") + "Year is required";
+      //   hasErrors = true;
+      // }
+      // else{
+      //   const yearRegex = /^\d{2}(\d{2})?$/;
+      //   if(!yearRegex.test(this.aqYear)) {
+      //     this.errorMessage + (hasErrors ? ", " : "") + "Please enter a valid year";
+      //   hasErrors = true;
+      //   }
+      // }
 
-      if (this.source === "") {
-        this.errorMessage =
-          this.errorMessage + (hasErrors ? ", " : "") + "Source is required";
-        hasErrors = true;
-      }
+      // if (this.source === "") {
+      //   this.errorMessage =
+      //     this.errorMessage + (hasErrors ? ", " : "") + "Source is required";
+      //   hasErrors = true;
+      // }
 
    
       if (hasErrors) {
@@ -258,11 +258,12 @@ export default {
       fileData.append("file", this.selected_file);
       fileData.append("name", this.name);
       fileData.append("gridId", this.gridValue);
-      fileData.append("year", this.year);
-      fileData.append("source", this.source);
-      fileData.append("dataType", this.dataType);
-      fileData.append("description", this.description);
-      fileData.append("filename", this.selected_file.name);
+      // fileData.append("year", this.year);
+      // fileData.append("source", this.source);
+      // fileData.append("dataType", this.dataType);
+      // fileData.append("description", this.description);
+      fileData.append("fileName", this.selected_file.name);
+      console.log(fileData);
       fileData.append("uploadDate",localISOTime)
       var self = this;
 
@@ -299,7 +300,7 @@ export default {
                   persistent: true,
                   componentProps: {
                     errorList: response.data.messages,
-                    filename: this.selected_file.name,
+                    fileName: this.selected_file.name,
                   },
                 })
                 .onOk(() => {
@@ -318,7 +319,7 @@ export default {
                 parent: this,
                 persistent: true,
                 componentProps: {
-                  filename: this.selected_file.name,
+                  fileName: this.selected_file.name,
                   parentDialog: this.$refs.dialog,
                 },
               })

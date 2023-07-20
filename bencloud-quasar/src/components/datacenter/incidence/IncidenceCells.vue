@@ -16,7 +16,7 @@
         class="export-to-csv-button"
         label="Export to csv"
         no-caps
-        @click="exportincidenceDataset"
+        @click="exportIncidenceCells"
       />
 
       <q-input
@@ -273,40 +273,24 @@ const columns = [
   {
     name: "type",
     align: "left",
-    label: "Type",
+    label: "Prevalence",
     field: "type",
     sortable: true,
   },
-  // {
-  //   name: "timeframe",
-  //   align: "left",
-  //   label: "Timeframe",
-  //   field: "timeframe",
-  //   sortable: true,
-  // },
-  // {
-  //   name: "units",
-  //   align: "left",
-  //   label: "Units",
-  //   field: "units",
-  //   sortable: true,
-  // },
-  // {
-  //   name: "distribution",
-  //   align: "left",
-  //   label: "Distribution",
-  //   field: "distribution",
-  //   sortable: true,
-  // },
-  // {
-  //   name: "standard error",
-  //   align: "left",
-  //   label: "Standard Error",
-  //   field: "standard_error",
-  //   sortable: true,
-  // },
-
-
+  {
+    name: "timeframe",
+    align: "left",
+    label: "Timeframe",
+    field: "timeframe",
+    sortable: true,
+  },
+  {
+    name: "units",
+    align: "left",
+    label: "Units",
+    field: "units",
+    sortable: true,
+  },
   {
     name: "value",
     align: "left",
@@ -314,6 +298,21 @@ const columns = [
     field: "value",
     sortable: true,
   },
+  {
+    name: "distribution",
+    align: "left",
+    label: "Distribution",
+    field: "distribution",
+    sortable: true,
+  },
+  {
+    name: "standard error",
+    align: "left",
+    label: "Standard Error",
+    field: "standard_error",
+    sortable: true,
+  },
+  
 ];
 
 const rows = [];
