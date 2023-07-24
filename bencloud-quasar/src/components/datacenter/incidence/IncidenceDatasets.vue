@@ -15,7 +15,7 @@
     <template v-slot:body="props">
       <q-tr class="cursor-pointer" :props="props" @click.exact="rowClicked(props)">
         <q-td v-for="col in props.cols" :key="col.name" :props="props">
-          <template v-if="col.name === 'actions' & props.row.share_scope != 1">
+          <template v-if="col.name === 'actions' && props.row.share_scope != 1">
             <q-btn
               dense
               round
@@ -28,7 +28,7 @@
           <template v-else>
             {{col.value}}
           </template>
-          <template v-if="col.name === 'edit' & props.row.share_scope != 1">
+          <template v-if="col.name === 'edit' && props.row.share_scope != 1">
             <q-btn
               dense
               round
@@ -167,25 +167,25 @@ export default defineComponent({
          });
       })
 
-    // watch(
-    //   () => showAll.value,
-    //   () => {
-    //     console.log("Show all layers: " + showAll.value);
-    //     if(showAll.value && !visibleColumns.value.includes("user")) {
-    //       visibleColumns.value.push("user");
-    //       //visibleColumns.value.push("edit");
-    //     }
-    //     if(!showAll.value && visibleColumns.value.includes("user")) {
-    //       visibleColumns.value.pop("user");
-    //       //visibleColumns.value.pop("edit");
-    //     }
-    //     onRequest({
-    //       filter: "",
-    //       pagination: pagination.value,
-    //       rows: [],
-    //     });
-    //   }
-    // );
+    watch(
+      () => showAll.value,
+      () => {
+        console.log("Show all layers: " + showAll.value);
+        if(showAll.value && !visibleColumns.value.includes("user")) {
+          visibleColumns.value.push("user");
+          //visibleColumns.value.push("edit");
+        }
+        if(!showAll.value && visibleColumns.value.includes("user")) {
+          visibleColumns.value.pop("user");
+          //visibleColumns.value.pop("edit");
+        }
+        onRequest({
+          filter: "",
+          pagination: pagination.value,
+          rows: [],
+        });
+      }
+    );
 
     function onRequest(props) {
       console.log("on onRequest()");
@@ -293,7 +293,8 @@ const visibleColumns = ref([
   "id",
   "name",
   "grid_definition_id",
-  "actions"
+  "upload_date",
+  "actions",
 ]);
 
 const columns = [
@@ -327,6 +328,27 @@ const columns = [
     label: "Years",
     field: "years",
     format: (val) => val.join(", "),
+    sortable: true,
+  },
+  { 
+    name: "user", 
+    label: "User", 
+    field: "", 
+    align: "left" 
+  },
+  {
+    name: "filename",
+    align: "left",
+    label: "Filename",
+    field: "filename",
+    sortable: true,
+  },
+  {
+    name: "upload_date",
+    align: "left",
+    label: "Upload date",
+    field: "upload_date",
+    format: val => date.formatDate(val, 'YYYY-MM-DD HH:mm:ss'),
     sortable: true,
   },
   { 

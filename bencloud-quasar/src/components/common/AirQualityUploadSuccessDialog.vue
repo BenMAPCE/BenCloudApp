@@ -2,7 +2,7 @@
   <q-dialog ref="dialog" persistent @hide="onDialogHide">
     <q-card id="success-list-card" class="success-list-card">
       <q-card-section>
-        <div class="success-dialog">Your upload of {{ this.filename }} was successful</div>
+        <div class="success-dialog">Your upload was successful</div>
       </q-card-section>
 
       <q-card-actions align="right">
@@ -22,7 +22,7 @@
 <script>
 export default {
   props: {
-    filename: {
+    fileName: {
       type: String,
       default: "",
     },

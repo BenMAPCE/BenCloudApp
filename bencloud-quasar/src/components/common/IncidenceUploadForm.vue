@@ -126,7 +126,7 @@ export default {
     // source:"",
     // dataType:"",
     // description:"",
-    fileName:"",
+    filename:"",
     uploadDate: "",
     dashData: [],
     // descriptionHint:"",
@@ -262,7 +262,7 @@ export default {
       // fileData.append("source", this.source);
       // fileData.append("dataType", this.dataType);
       // fileData.append("description", this.description);
-      fileData.append("fileName", this.selected_file.name);
+      fileData.append("filename", this.selected_file.name);
       console.log(fileData);
       fileData.append("uploadDate",localISOTime)
       var self = this;
