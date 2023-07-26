@@ -294,7 +294,7 @@ const visibleColumns = ref([
   "name",
   "grid_definition_id",
   "upload_date",
-  "actions",
+  "actions"
 ]);
 
 const columns = [
