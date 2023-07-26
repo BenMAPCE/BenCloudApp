@@ -1,6 +1,6 @@
 <template>
-  <div class="upload-air-quality">
-    <q-dialog class="upload-air-quality-dialog" ref="dialog" @hide="onDialogHide">
+  <div class="upload-incidence">
+    <q-dialog class="upload-incidence-dialog" ref="dialog" @hide="onDialogHide">
       <q-card class="upload-card">
         <q-form @submit="onSubmit" class="q-gutter-md">
           <div class="row">
@@ -20,8 +20,8 @@
           </div>
 
           <div class="row">
-            <div class="col-12 air-quality-name">
-              Add {{ pollutantFriendlyName }} Air Quality Layer
+            <div class="col-12 incidence-name">
+              Add Incidence Dataset
             </div>
           </div>
 
@@ -31,7 +31,7 @@
                 filled
                 dense
                 v-model="name"
-                label="*Layer Name"
+                label="*File Name"
                 hint=""
                 lazy-rules
                 :rules="[(val) => (val && val.length > 0) || 'Please enter a name']"
@@ -39,7 +39,7 @@
             </div>
           </div>
 
-          <div class="row">
+          <!-- <div class="row">
             <div class="col-12">
               <q-input
                 filled
@@ -51,9 +51,9 @@
                 :rules="[val => (val > 1900 && val < 3000) || 'Please enter a valid year']"
               />
             </div>
-          </div>
+          </div> -->
 
-          <div class="row">
+          <!-- <div class="row">
             <div class="col-12">
               <q-input
                 filled
@@ -65,25 +65,10 @@
                 :rules="[(val) => (val && val.length > 0) || 'Please enter a source for this data']"               
               />
             </div>
-          </div>
+          </div> -->
 
-          <div class="row">
-            <div class="col-12">
-              <q-select 
-                square
-                dense
-                outlined 
-                v-model="dataType" 
-                :options="['Photochemical AQ Model', 'Land Use Regression Model', 'Satellite', 'Sensor', 'Hybrid Model']" 
-                label="*Data type"
-                lazy-rules
-                :rules="[(val) => (val && val.length > 0) || 'Please select a data type for this data']" 
-              />
-              
-            </div>
-          </div>
 
-          <div class="row">
+          <!-- <div class="row">
             <div class="col-12">
               <q-input
                 filled
@@ -93,7 +78,7 @@
                 :hint="descriptionHint"                
               />
             </div>
-          </div>
+          </div> -->
 
           
 
@@ -102,8 +87,6 @@
               <GridDefinitions @changeGridValue="onChangeGridValue"></GridDefinitions>
             </div>
           </div>
-
-          <input type="hidden" name="pollutantId" :value="pollutantId" />
 
           <div class="row justify-center">
             <q-card-actions>
@@ -139,30 +122,20 @@ export default {
     gridValue: 0,
     errorMessage: "",
     name: "",
-    aqYear:"",
-    source:"",
-    dataType:"",
-    description:"",
+    // aqYear:"",
+    // source:"",
+    // dataType:"",
+    // description:"",
     filename:"",
     uploadDate: "",
     dashData: [],
-    descriptionHint:"",
+    // descriptionHint:"",
   }),
   
   components: {
     GridDefinitions,
   },
 
-  props: {
-    pollutantId: {
-      type: Number,
-      default: 0,
-    },
-    pollutantFriendlyName: {
-      type: String,
-      default: "None",
-    },
-  },
 
   emits: [
     // REQUIRED
@@ -204,7 +177,6 @@ export default {
     onUploadClick() {
       console.log("onUploadClick");
       console.log(this.name);
-      console.log("pollutantValue: " + this.pollutantValue);
       console.log("gridValue: " + this.gridValue);
 
       // on OK, it is REQUIRED to
@@ -234,17 +206,10 @@ export default {
       this.errorMessage = "";
 
       console.log(this.selected_file);
-      console.log(this.selected_file.name);
-
 
       if (this.name === "") {
         this.errorMessage =
           this.errorMessage + (hasErrors ? ", " : "") + "Name is required";
-        hasErrors = true;
-      }
-      if (this.pollutantId === 0) {
-        this.errorMessage =
-          this.errorMessage + (hasErrors ? ", " : "") + "Pollutant is required";
         hasErrors = true;
       }
 
@@ -260,38 +225,26 @@ export default {
         hasErrors = true;
       }
 
-      if (this.aqYear === "") {
-        this.errorMessage =
-          this.errorMessage + (hasErrors ? ", " : "") + "Year is required";
-        hasErrors = true;
-      }
-      else{
-        const yearRegex = /^\d{2}(\d{2})?$/;
-        if(!yearRegex.test(this.aqYear)) {
-          this.errorMessage + (hasErrors ? ", " : "") + "Please enter a valid year";
-        hasErrors = true;
-        }
-      }
+      // if (this.aqYear === "") {
+      //   this.errorMessage =
+      //     this.errorMessage + (hasErrors ? ", " : "") + "Year is required";
+      //   hasErrors = true;
+      // }
+      // else{
+      //   const yearRegex = /^\d{2}(\d{2})?$/;
+      //   if(!yearRegex.test(this.aqYear)) {
+      //     this.errorMessage + (hasErrors ? ", " : "") + "Please enter a valid year";
+      //   hasErrors = true;
+      //   }
+      // }
 
-      if (this.dataType === "") {
-        this.errorMessage =
-          this.errorMessage + (hasErrors ? ", " : "") + "Data type is required";
-        hasErrors = true;
-      }
+      // if (this.source === "") {
+      //   this.errorMessage =
+      //     this.errorMessage + (hasErrors ? ", " : "") + "Source is required";
+      //   hasErrors = true;
+      // }
 
-      if (this.source === "") {
-        this.errorMessage =
-          this.errorMessage + (hasErrors ? ", " : "") + "Source is required";
-        hasErrors = true;
-      }
-
-      if(this.dataType.toLowerCase() ==="hybrid model"){
-        if(this.description === ""){
-          this.errorMessage = this.errorMessage + (hasErrors ? ", " : "") + "Description is required when Hybrid model is selected";
-        hasErrors = true;
-        }
-      }
-
+   
       if (hasErrors) {
         return;
       }
@@ -300,22 +253,22 @@ export default {
       var tzoffset = (new Date()).getTimezoneOffset() * 60000
       var localISOTime = (new Date(Date.now() - tzoffset)).toISOString();
 
-      const url = process.env.API_SERVER + "/api/air-quality-data";
+      const url = process.env.API_SERVER + "/api/incidence-data";
       const fileData = new FormData();
       fileData.append("file", this.selected_file);
       fileData.append("name", this.name);
-      fileData.append("pollutantId", this.pollutantId);
       fileData.append("gridId", this.gridValue);
-      fileData.append("aqYear", this.aqYear);
-      fileData.append("source", this.source);
-      fileData.append("dataType", this.dataType);
-      fileData.append("description", this.description);
+      // fileData.append("year", this.year);
+      // fileData.append("source", this.source);
+      // fileData.append("dataType", this.dataType);
+      // fileData.append("description", this.description);
       fileData.append("filename", this.selected_file.name);
+      console.log(fileData);
       fileData.append("uploadDate",localISOTime)
       var self = this;
 
       this.$q.loading.show({
-        message: "Uploading Air Quality Layer. Please wait...",
+        message: "Uploading Incidence Data. Please wait...",
         boxClass: "bg-grey-2 text-grey-9",
         spinnerColor: "primary",
       });
@@ -334,7 +287,6 @@ export default {
           console.log(response.statusText);
           console.log(response.data.success);
           console.log(response.data.messages);
-          
 
           if (response.data.success === false) {
             console.log("BAD NEWS");
@@ -382,12 +334,12 @@ export default {
 
           self.$q.loading.hide();
 
-          var oldValue =  this.$store.state.airquality.airQualityForceReloadValue
+          var oldValue =  this.$store.state.incidence.incidenceForceReloadValue
           console.log("oldValue: " + oldValue);
           var newValue = oldValue + 1;
           console.log("newValue: " + newValue);
           layerName = this.name;
-          this.$store.commit("airquality/updateAirQualityForceReloadValue", newValue)
+          this.$store.commit("incidence/updateIncidenceForceReloadValue", newValue)
 
           //self.hide();
           //self.$emit("ok");
@@ -457,13 +409,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.upload-air-quality {
+.upload-incidence {
   .q-field {
     padding-left: 10px;
     padding-right: 10px;
   }
 
-  .air-quality-name {
+  .incidence-name {
     padding-left: 15px;
   }
   .upload-card {

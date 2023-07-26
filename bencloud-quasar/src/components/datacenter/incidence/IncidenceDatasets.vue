@@ -8,7 +8,6 @@
     :filter="filter"
     @request="onRequest"
     binary-state-sort
-    v-if="pollutantId != 0"
     v-model:selected="selected"
     :visible-columns="visibleColumns"
   >
@@ -16,7 +15,7 @@
     <template v-slot:body="props">
       <q-tr class="cursor-pointer" :props="props" @click.exact="rowClicked(props)">
         <q-td v-for="col in props.cols" :key="col.name" :props="props">
-          <template v-if="col.name === 'actions' & props.row.share_scope != 1">
+          <template v-if="col.name === 'actions' && props.row.share_scope != 1">
             <q-btn
               dense
               round
@@ -29,7 +28,7 @@
           <template v-else>
             {{col.value}}
           </template>
-          <template v-if="col.name === 'edit' & props.row.share_scope != 1">
+          <template v-if="col.name === 'edit' && props.row.share_scope != 1">
             <q-btn
               dense
               round
@@ -70,12 +69,7 @@ var numLayers = null;
 
 export default defineComponent({
   model: ref(null),
-  name: "AirQualityLayers",
-  computed: {
-    pollutantId() {
-      return this.$store.state.airquality.pollutantId;
-    },
-  },
+  name: "IncidenceDatasets",
 
   props: {
     includeLayerName: {
@@ -83,14 +77,13 @@ export default defineComponent({
       default: false,
     },
   },
-
   methods: {
     deleteRow(props) {
-      // Prompt user to confirm AQ layer deletion
+      // Prompt user to confirm incidence dataset deletion
       if(confirm("Are you sure you wish to permanently delete " + props.row.name + "?")){
-        // Delete AQ layer, reload the AQ layer list if successful, alert the user if unsuccessful       
+        // Delete AQ layer, reload the incidence dataset list if successful, alert the user if unsuccessful       
         axios
-          .delete(process.env.API_SERVER + "/api/air-quality-data/" + props.row.id, {
+          .delete(process.env.API_SERVER + "/api/incidence/" + props.row.id, {
             params: {
               id: props.row.id,
             },
@@ -98,33 +91,27 @@ export default defineComponent({
           .then((response) => {
             if(response.status === 204) {
               trackCurrentPage = this.pagination.page;
-              console.log("Successfully deleted AQ layer: " + props.row.name);
+              console.log("Successfully deleted incidence dataset: " + props.row.name);
 
               // Reload list
-              var oldValue =  this.$store.state.airquality.airQualityForceReloadValue
+              var oldValue =  this.$store.state.incidence.incidenceForceReloadValue
               console.log("oldValue: " + oldValue);
               var newValue = oldValue - 1;
               console.log("newValue: " + newValue);
-              this.$store.commit("airquality/updateAirQualityForceReloadValue", newValue)
+              this.$store.commit("incidence/updateIncidenceForceReloadValue", newValue)
             } else {
-              alert("An error occurred, air quality layer was not deleted.")
+              alert("An error occurred, incidence dataset was not deleted.")
             }
           });
       }
     },
 
-    editRow(props) {
-
-      //Pop up form to include edit name and share_scope fields
-      //only admin can edit share_scope
-      //non-admin can only edit suraces that are their own and not shared (share_scope == 0)
-
-    },
+   
     
     rowClicked(props) {
       this.selected = [];
       this.selected.push(props.row);
-      this.$store.commit("airquality/updateAirQualityLayerId", props.row.id);
+      this.$store.commit("incidence/updateIncidenceDatasetId", props.row.id);
     },
   },
 
@@ -153,9 +140,9 @@ export default defineComponent({
     let myFilter = unref(filter);
 
     watch(
-      () => store.state.airquality.airQualityLayerAddedDate,
-      (airQualityLayerAddedDate, prevAirQualityLayerAddedDate) => {
-          console.log("--- updated Air Quality Layer")
+      () => store.state.incidence.incidenceDatasetAddedDate,
+      (incidenceDatasetAddedDate, prevIncidenceDatasetAddedDate) => {
+          console.log("--- updated Incidence Dataset")
           onRequest({
             pagination: pagination.value,
             filter: undefined,
@@ -163,12 +150,12 @@ export default defineComponent({
     })
 
     watch(
-      () => store.state.airquality.airQualityForceReloadValue,
+      () => store.state.incidence.incidenceForceReloadValue,
       (newValue, oldValue) => {
         if(newValue > oldValue) {
-          console.log("--- added Air Quality Layer");
+          console.log("--- added Incidence Dataset");
         } else if(newValue < oldValue) {
-          console.log("--- deleted Air Quality Layer");
+          console.log("--- deleted Incidence Dataset");
         }
         filter.value = "";
         pagination.value.sortBy = "name";
@@ -179,24 +166,6 @@ export default defineComponent({
             filter: undefined,
          });
       })
-
-    watch(
-      () => store.state.airquality.pollutantId,
-      (pollutantId, prevPollutantId) => {
-        console.log("--- changed Air Quality Layer")
-        pollutantId = pollutantId;
-        filter.value = "";
-        pagination.value.sortBy = "name";
-        pagination.value.descending = false;
-        pagination.value.page = 1;
-        pagination.value.rowsNumber = 0;
-        console.log("resetting table.....");
-        onRequest({
-          filter: "",
-          pagination: pagination.value,
-          rows: [],
-        });
-    })
 
     watch(
       () => showAll.value,
@@ -220,12 +189,11 @@ export default defineComponent({
 
     function onRequest(props) {
       console.log("on onRequest()");
-      if (store.state.airquality.pollutantId != 0) {
-        loadAirQualityLayers(props);
-      }
+        loadIncidenceDatasets(props);
+
     }
 
-    function loadAirQualityLayers(props) {
+    function loadIncidenceDatasets(props) {
       console.log(props.pagination);
       if(!!trackCurrentPage) {
         props.pagination.page = trackCurrentPage;
@@ -239,67 +207,29 @@ export default defineComponent({
       //console.log("--------------------------------------------")
       loading.value = true;
 
-      if(layer === null) {
+    
         axios
-          .get(process.env.API_SERVER + "/api/air-quality-data", {
-            params: {
-              page: page,
-              rowsPerPage: rowsPerPage,
-              sortBy: sortBy,
-              descending: descending,
-              filter: filter,
-              pollutantId: store.state.airquality.pollutantId,
-              showAll: showAll.value,
-            },
-          })
-          .then((response) => {
-            let records = response.data.records;
-            let data = response.data;
-
-            console.log("----- return -----");
-            console.log(records);
-
-            rows.value = records;
-
-            store.commit("airquality/updateAirQualityLayerId", 0);
-
-            // don't forget to update local pagination object
-            pagination.value.page = page;
-            pagination.value.rowsPerPage = rowsPerPage;
-            pagination.value.sortBy = sortBy;
-            pagination.value.descending = descending;
-            pagination.value.rowsNumber = data.filteredRecordsCount;
-            numLayers = data.filteredRecordsCount;
-
-            // ...and turn of loading indicator
-            loading.value = false;
-            trackCurrentPage = null;
-          });
-      } else {
-        axios
-          .get(process.env.API_SERVER + "/api/air-quality-data", {
+          .get(process.env.API_SERVER + "/api/incidence", {
             params: {
               page: page,
               rowsPerPage: ++numLayers,
               sortBy: sortBy,
               descending: descending,
               filter: filter,
-              pollutantId: store.state.airquality.pollutantId,
               showAll: showAll.value,
             },
           })
           .then((response) => {
-            let records = response.data.records;
             let data = response.data;
 
             console.log("----- return -----");
-            console.log(records);
+            console.log(data);
 
-            store.commit("airquality/updateAirQualityLayerId", 0);
+            store.commit("incidence/updateIncidenceDatasetId", 0);
 
             let loadPage = 1;
-            for(let i = 0; i < records.length; i++) {
-              if(records[i].name === layer) {
+            for(let i = 0; i < data.length; i++) {
+              if(data[i].name === layer) {
                 loadPage = Math.floor((i/rowsPerPage) + 1);
                 break;
               }
@@ -308,8 +238,8 @@ export default defineComponent({
             rows.value = [];
             let rowCount = 0;
             for(let i = 0; i < rowsPerPage; i++) {
-              if(!!records[(loadPage-1)*rowsPerPage + i]) {
-                rows.value[i] = records[(loadPage-1)*rowsPerPage + i];
+              if(!!data[(loadPage-1)*rowsPerPage + i]) {
+                rows.value[i] = data[(loadPage-1)*rowsPerPage + i];
               }
             }
 
@@ -325,12 +255,12 @@ export default defineComponent({
             trackCurrentPage = null;
           });
       }
-    }
+    
 
     onBeforeMount(() => {
-      console.log("includeLayerName: " + props.includeLayerName);
+      console.log("includeDatasetName: " + props.includeDatasetName);
 
-      if (props.includeLayerName) {
+      if (props.includeDatasetName) {
         visibleColumns.value.push("id");
       }
 
@@ -360,17 +290,11 @@ export default defineComponent({
 const rows = [];
 
 const visibleColumns = ref([
+  "id",
   "name",
-  "grid_definition_name",
-  "aq_year",
-  "source",
-  "data_type",
-  "description",
-  "filename",
+  "grid_definition_id",
   "upload_date",
-  //"cell_count",
-  //"mean_value",
-  "actions"
+  "actions",
 ]);
 
 const columns = [
@@ -392,39 +316,25 @@ const columns = [
     sortable: true,
   },
   {
-    name: "grid_definition_name",
+    name: "grid_definition_id",
     align: "left",
-    label: "Grid",
-    field: "grid_definition_name",
+    label: "Grid ID",
+    field: "grid_definition_id",
     sortable: true,
   },
   {
-    name: "aq_year",
+    name: "years",
     align: "left",
-    label: "Year",
-    field: "aq_year",
+    label: "Years",
+    field: "years",
+    format: (val) => val.join(", "),
     sortable: true,
   },
-  {
-    name: "source",
-    align: "left",
-    label: "Source",
-    field: "source",
-    sortable: true,
-  },
-  {
-    name: "data_type",
-    align: "left",
-    label: "Data type",
-    field: "data_type",
-    sortable: true,
-  },
-  {
-    name: "description",
-    align: "left",
-    label: "Description",
-    field: "description",
-    sortable: true,
+  { 
+    name: "user", 
+    label: "User", 
+    field: "", 
+    align: "left" 
   },
   {
     name: "filename",
@@ -440,24 +350,6 @@ const columns = [
     field: "upload_date",
     format: val => date.formatDate(val, 'YYYY-MM-DD HH:mm:ss'),
     sortable: true,
-  },
-  {
-    name: "cell_count",
-    label: "Cell Count",
-    field: "metric_statistics.cell_count",
-    sortable: true,
-  },
-  {
-    name: "mean_value",
-    label: "Mean Value",
-    field: "mean_value",
-    sortable: true,
-  },
-  { 
-    name: "user", 
-    label: "User", 
-    field: "", 
-    align: "left" 
   },
   { 
     name: "actions", 
