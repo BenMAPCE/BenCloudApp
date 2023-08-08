@@ -1,53 +1,156 @@
 <template>
 
-      <q-table
-        :rows="rows"
-        :columns="columns"
-        row-key="name"
-        :rows-per-page-options="[0]"
-        v-model:pagination="pagination"
-        :loading="loading"
-        :filter="filter"
-        @request="getCompletedTasks"
-        binary-state-sort
-        v-model:selected="selected"
-        :visible-columns="visibleColumns"
-        class="completed-tasks"
-      >
-        <template v-slot:top-right>
-          <!-- <q-btn
-            color="primary"
-            icon-right="mdi-reload"
-            class="reload-button"
-            label="Reload"
-            no-caps
-            @click="getCompletedTasks"
-          /> -->
+    <q-table
+      :rows="rows"
+      :columns="columns"
+      row-key="name"
+      :rows-per-page-options="[0]"
+      v-model:pagination="pagination"
+      :loading="loading"
+      :filter="filter"
+      @request="getCompletedTasks"
+      binary-state-sort
+      v-model:selected="selected"
+      :visible-columns="visibleColumns"
+      class="completed-tasks"
+    >
 
-          <q-input borderless dense debounce="300" v-model="filter" placeholder="Search">
-            <template v-slot:append>
-              <q-icon name="mdi-magnify" />
-            </template>
-          </q-input>
-        </template>
-
-        <template v-slot:body-cell-downloadz="props">
-          <q-td :props="props">
+      <template v-slot:body="props">
+        <q-tr :props="props">
+          <q-td
+            key="expand"
+            name="expand"
+            :props="props"
+            auto-width
+          >
             <q-btn
-              round
               flat
-              color="grey"
-              @click="showOptions(props)"
-              icon="mdi-dots-vertical"
-            ></q-btn>
+              round
+              color="primary"
+              :icon="props.expand ? 'mdi-minus-circle' : 'mdi-plus-circle'"
+              @click="props.expand = !props.expand"
+            />
           </q-td>
-        </template>
+          <q-td
+            key="task_name"
+            :props="props"
+          >
+            {{ props.row.batch_task_name }}
+          </q-td>
+          <q-td
+            key="task_completed_date"
+            :props="props"
+          >
+          </q-td>
+          <q-td
+            key="task_elapsed_time"
+            :props="props"
+          >
+          </q-td>
+          <q-td
+            key="task_successful"
+            :props="props"
+            >
+          </q-td>
+          <q-td
+            key="user"
+            :props="props"
+            >
+              {{ props.row.batch_task_user_id }}
+          </q-td>
+          <q-td
+            key="task_message"
+            :props="props"
+          >
+          </q-td>
+          <q-td 
+            key="download"  
+            :props="props"
+            >
+              <q-btn-dropdown color="primary" label="" dense>
+                <q-list>
+                  <q-item dense clickable v-close-popup @click="onClickViewExport(props)">
+                    <q-item-section>
+                      <q-item-label>View/Export Results</q-item-label>
+                    </q-item-section>
+                  </q-item>
 
-        <template v-slot:body-cell-download="props">
-           <q-td :props="props">
-           <q-btn-dropdown color="primary" label="" dense>
+                  <!-- <q-item dense clickable v-close-popup @click="onClick(props)">
+                    <q-item-section>
+                      <q-item-label>View Configuration Details</q-item-label>
+                    </q-item-section>
+                  </q-item>
+
+                  <q-item dense clickable v-close-popup @click="onClick(props)">
+                    <q-item-section>
+                      <q-item-label>Use as a template for new analysys</q-item-label>
+                    </q-item-section>
+                  </q-item> -->
+
+                  <q-separator light style="color: red"></q-separator>
+
+                  <q-item dense clickable v-close-popup @click="onClickPromptDelete(props)">
+                    <q-item-section>
+                      <q-item-label dense>Delete</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+              </q-btn-dropdown>
+          </q-td>
+        </q-tr>
+        <!-- We show the batch task details if "props.expand" is true -->
+        <q-tr v-for="row in props.row.tasks" :key="row.task_name"
+          v-show="props.expand"
+          :props="props"
+        >
+          <q-td
+            key="expand"
+            :props="props"
+          >
+          </q-td>
+          <q-td
+            key="task_name"
+            :props="props"
+          >
+            {{ row.task_name }}
+          </q-td>
+          <q-td
+            key="task_completed_date"
+            :props="props"
+          >
+            {{ row.task_completed_date }}
+          </q-td>
+          <q-td
+            key="task_elapsed_time"
+            :props="props"
+          >
+            {{ row.task_elapsed_time }}
+          </q-td>
+          <q-td
+            key="task_successful"
+            :props="props"
+          >
+            <q-badge color="green" :label="row.task_successful ? 'Yes' : 'No'" />
+          </q-td>
+          <q-td
+            key="user"
+            :props="props"
+          >
+            {{ row.task_user_id }}
+          </q-td>
+          <q-td
+            key="task_message"
+            :props="props"
+          >
+            {{ row.task_message }}
+          </q-td>
+          <q-td 
+            key="download"  
+            :props="props"
+          >
+            <q-btn-dropdown color="primary" label="" dense>
               <q-list>
-                <q-item dense clickable v-close-popup @click="onClickViewExport(props)">
+                <q-item dense clickable v-close-popup @click="onClickViewExport(row)">
                   <q-item-section>
                     <q-item-label>View/Export Results</q-item-label>
                   </q-item-section>
@@ -74,17 +177,18 @@
                 </q-item>
               </q-list>
             </q-btn-dropdown>
-           </q-td>
-       </template>
-
-        <template v-slot:body-cell-task_successful="props">
-          <q-td :props="props">
-            <div>
-              <q-badge color="green" :label="props.value ? 'Yes' : 'No'" />
-            </div>
           </q-td>
-        </template>
-      </q-table>
+        </q-tr>
+      </template>
+
+      <template v-slot:top-right>
+        <q-input borderless dense debounce="300" v-model="filter" placeholder="Search">
+          <template v-slot:append>
+            <q-icon name="mdi-magnify" />
+          </template>
+        </q-input>
+      </template>
+    </q-table>
 
 </template>
 
@@ -138,10 +242,13 @@ export default defineComponent({
       loading.value = true;
 
       (async () => {
-        const response = await getCompletedTasks().fetch();
-        //console.log(unref(response.data).data)
-        rows.value = unref(response.data).data;
-        //console.log(rows.value)
+        const response = await getCompletedTasks().fetch();        
+        // console.log(unref(response.data));
+
+        rows.value = [];
+        for (var i = 0; i < (unref(response.data).data).length; i++) {
+          rows.value.push(unref(response.data).data[i])
+        }
         loading.value = false;
       })();
 
@@ -191,10 +298,9 @@ export default defineComponent({
       console.log(item);
     }
 
-    function onClickViewExport(props) {
+    function onClickViewExport(row) {
       console.log("onClickViewExport");
-      console.log(props);
-      var row = JSON.parse(JSON.stringify(props.row))
+      var row = JSON.parse(JSON.stringify(row))
       //if (row.task_type === "HIF") {
         var task_type = (row.task_type).substring(0,1)
         this.$router.push({ path: `/datacenter/view-export-task/${task_type}-${row.task_uuid}` })
@@ -307,6 +413,7 @@ export default defineComponent({
 const rows = [];
 
 const visibleColumns = ref([
+  "expand",
   //"task_uuid",
   "task_name",
   //"task_type",
@@ -320,6 +427,13 @@ const visibleColumns = ref([
 ]);
 
 const columns = [
+  
+  {
+    name: "expand",
+    label: "",
+    field: "expand",
+    sortable: false,
+  },
   {
     name: "task_uuid",
     label: "Task UUID",
@@ -343,7 +457,8 @@ const columns = [
     field: (row) => row.task_name,
     format: (val) => `${val}`,
     sortable: true,
-  },  {
+  },
+  {
     name: "task_completed_date",
     label: "Completed",
     field: "task_completed_date",

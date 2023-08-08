@@ -12,7 +12,7 @@ export const getCompletedTasks = (userIdentifier) => {
         loading.value = true;
         try {
             const result = await axios
-                .get(process.env.API_SERVER + "/api/tasks/completed", {
+                .get(process.env.API_SERVER + "/api/batch-tasks/completed", {
             params: {
                 page: 1,
                 rowsPerPage: 9999999,
@@ -20,9 +20,8 @@ export const getCompletedTasks = (userIdentifier) => {
                 },
             })
             .then((response) => {
-                // console.log("Tasks Completed")
                 data.value = response.data
-                console.log(response.data)
+                // console.log(response.data)
             })
         } catch (ex) {
             error.value = ex;
