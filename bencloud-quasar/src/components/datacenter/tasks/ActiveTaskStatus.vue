@@ -28,13 +28,13 @@ export default defineComponent({
     const statusMessages = ref("")
 
     onUpdated(() => {
-        console.log("status: " + props.status);
+        // console.log(props.status);
         statusMessages.value = "SSSS"
     })
 
     onMounted(() => {
       
-        console.log("status: " + props.status);
+        //console.log(props.status);
 
 
       })
