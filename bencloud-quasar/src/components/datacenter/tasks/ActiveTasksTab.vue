@@ -3,7 +3,7 @@
     <q-table
       :rows="rows"
       :columns="columns"
-      row-key="name"
+      row-key="batch_task_name"
       :rows-per-page-options="[0]"
       v-model:pagination="pagination"
       :loading="loading"
@@ -40,6 +40,7 @@
             key="task_status_message"
             :props="props"
           >
+            {{ props.row.batch_started_date }}
           </q-td>
           <q-td
             key="user"

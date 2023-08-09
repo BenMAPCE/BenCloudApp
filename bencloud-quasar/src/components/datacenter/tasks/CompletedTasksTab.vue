@@ -3,7 +3,7 @@
     <q-table
       :rows="rows"
       :columns="columns"
-      row-key="name"
+      row-key="batch_task_name"
       :rows-per-page-options="[0]"
       v-model:pagination="pagination"
       :loading="loading"
@@ -32,6 +32,17 @@
             />
           </q-td>
           <q-td
+            key="task_uuid"
+            :props="props"
+          >
+            {{ props.row.batch_task_id }}
+          </q-td>
+          <q-td
+            key="task_type"
+            :props="props"
+          >
+          </q-td>
+          <q-td
             key="task_name"
             :props="props"
           >
@@ -41,16 +52,24 @@
             key="task_completed_date"
             :props="props"
           >
+          {{ props.row.batch_completed_date }}
           </q-td>
           <q-td
             key="task_elapsed_time"
             :props="props"
           >
+          {{ props.row.batch_execution_time }}
           </q-td>
           <q-td
             key="task_successful"
             :props="props"
             >
+            <div v-if="props.row.batch_task_successful">
+              <q-badge color="green" label="Yes" />
+            </div>
+            <div v-if="!props.row.batch_task_successful">
+              <q-badge color="red" label="No" />
+            </div>
           </q-td>
           <q-td
             key="user"
@@ -109,6 +128,18 @@
           >
           </q-td>
           <q-td
+            key="task_uuid"
+            :props="props"
+          >
+            {{ row.task_uuid }}
+          </q-td>
+          <q-td
+            key="task_type"
+            :props="props"
+          >
+            {{ row.task_type }}
+          </q-td>
+          <q-td
             key="task_name"
             :props="props"
           >
@@ -130,7 +161,12 @@
             key="task_successful"
             :props="props"
           >
-            <q-badge color="green" :label="row.task_successful ? 'Yes' : 'No'" />
+          <div v-if="row.task_successful">
+            <q-badge color="green" label="Yes" />
+          </div>
+          <div v-if="!row.task_successful">
+            <q-badge color="red" label="No" />
+          </div>
           </q-td>
           <q-td
             key="user"
@@ -170,7 +206,7 @@
 
                 <q-separator light style="color: red"></q-separator>
 
-                <q-item dense clickable v-close-popup @click="onClickPromptDelete(props)">
+                <q-item dense clickable v-close-popup @click="onClickPromptDelete(row)">
                   <q-item-section>
                     <q-item-label dense>Delete</q-item-label>
                   </q-item-section>
@@ -303,7 +339,7 @@ export default defineComponent({
       var row = JSON.parse(JSON.stringify(row))
       //if (row.task_type === "HIF") {
         var task_type = (row.task_type).substring(0,1)
-        this.$router.push({ path: `/datacenter/view-export-task/${task_type}-${row.task_uuid}` })
+        this.$router.push({ path: `/datacenter/view-export-task/${task_type}-${row.batch_task_id}` })
       //} else {
         
       //}
@@ -311,19 +347,20 @@ export default defineComponent({
 
     function onClickPromptDelete(props) {
       // Prompt user to confirm task deletion
-      if(confirm("Are you sure you wish to permanently delete " + props.row.task_name + "?")){
+      console.log(props)
+      if(confirm("Are you sure you wish to permanently delete " + props.task_name + "?")){
         deleteTask(props);
       }
     }
 
     function deleteTask(props) {
-      console.log( "deleting " + process.env.API_SERVER + "/api/tasks/" + props.row.task_uuid);   
+      console.log( "deleting " + process.env.API_SERVER + "/api/tasks/" + props.task_uuid);   
       // Delete task, reload the task list if successful, alert the user if unsuccessful
       axios
-      .delete(process.env.API_SERVER + "/api/tasks/" + props.row.task_uuid)
+      .delete(process.env.API_SERVER + "/api/tasks/" + props.task_uuid)
       .then((response) => {
         if(response.status === 204) {
-          console.log("Successfully deleted task: " + props.row.task_uuid);
+          console.log("Successfully deleted task: " + props.task_uuid);
           loadCompletedTasks();
         } else {
           alert("An error occurred, task was not deleted.")
