@@ -41,16 +41,24 @@
             key="task_completed_date"
             :props="props"
           >
+          {{ props.row.batch_completed_date }}
           </q-td>
           <q-td
             key="task_elapsed_time"
             :props="props"
           >
+          {{ props.row.batch_execution_time }}
           </q-td>
           <q-td
             key="task_successful"
             :props="props"
             >
+            <div v-if="props.row.batch_task_successful">
+              <q-badge color="green" label="Yes" />
+            </div>
+            <div v-if="!props.row.batch_task_successful">
+              <q-badge color="red" label="No" />
+            </div>
           </q-td>
           <q-td
             key="user"
@@ -130,7 +138,12 @@
             key="task_successful"
             :props="props"
           >
-            <q-badge color="green" :label="row.task_successful ? 'Yes' : 'No'" />
+          <div v-if="row.task_successful">
+            <q-badge color="green" label="Yes" />
+          </div>
+          <div v-if="!row.task_successful">
+            <q-badge color="red" label="No" />
+          </div>
           </q-td>
           <q-td
             key="user"
