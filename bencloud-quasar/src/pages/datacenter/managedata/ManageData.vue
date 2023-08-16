@@ -32,7 +32,7 @@
             color="accent"
             icon-right="mdi-grid"
             push
-            @click="$router.replace('/datacenter/manage-data')"
+            @click="$router.replace('/datacenter/review-grids')"
             label="Review Grid Definitions"
           />
         </q-card-actions>

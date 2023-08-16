@@ -146,6 +146,7 @@ export default defineComponent({
     }
 
     function loadAirQualityCells(props) {
+      console.log(store.state.airquality.airQualityLayerId);
       console.log(props.pagination);
       const { page, rowsPerPage, sortBy, descending } = props.pagination;
       const filter = props.filter;

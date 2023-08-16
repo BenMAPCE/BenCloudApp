@@ -1,6 +1,6 @@
 <template>
     <div>
-      <h4>Upload Incidence Data</h4>
+      <h4>Upload Grid Definitions</h4>
     </div>
   </template>
   
@@ -8,7 +8,7 @@
   import { defineComponent } from "vue";
   
   export default defineComponent({
-    name: "IncidenceDataUpload",
+    name: "GridDefinitionUpload",
   });
   </script>
   

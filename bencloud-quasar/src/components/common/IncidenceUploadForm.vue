@@ -225,25 +225,6 @@ export default {
         hasErrors = true;
       }
 
-      // if (this.aqYear === "") {
-      //   this.errorMessage =
-      //     this.errorMessage + (hasErrors ? ", " : "") + "Year is required";
-      //   hasErrors = true;
-      // }
-      // else{
-      //   const yearRegex = /^\d{2}(\d{2})?$/;
-      //   if(!yearRegex.test(this.aqYear)) {
-      //     this.errorMessage + (hasErrors ? ", " : "") + "Please enter a valid year";
-      //   hasErrors = true;
-      //   }
-      // }
-
-      // if (this.source === "") {
-      //   this.errorMessage =
-      //     this.errorMessage + (hasErrors ? ", " : "") + "Source is required";
-      //   hasErrors = true;
-      // }
-
    
       if (hasErrors) {
         return;
@@ -258,10 +239,6 @@ export default {
       fileData.append("file", this.selected_file);
       fileData.append("name", this.name);
       fileData.append("gridId", this.gridValue);
-      // fileData.append("year", this.year);
-      // fileData.append("source", this.source);
-      // fileData.append("dataType", this.dataType);
-      // fileData.append("description", this.description);
       fileData.append("filename", this.selected_file.name);
       console.log(fileData);
       fileData.append("uploadDate",localISOTime)
@@ -281,8 +258,6 @@ export default {
           },
         })
         .then((response) => {
-          //data.value = response.data;
-
           console.log(response.status);
           console.log(response.statusText);
           console.log(response.data.success);
@@ -391,9 +366,6 @@ export default {
     onRejected(rejectedEntries) {
     },
 
-    onChangePollutantValue(value) {
-      this.pollutantValue = value;
-    },
     onChangeGridValue(value) {
       this.gridValue = value;
     },

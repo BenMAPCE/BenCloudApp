@@ -1,8 +1,10 @@
 <template>
   <div class="bencloud-page">
-    <div class="app-header">BenMAP - Benefits Mapping and Analysis Program
+    <div class="app-header">BenMAP - Benefits Mapping and Analysis Program 
     <app-top-navigation></app-top-navigation>
+    </div>
   </div>
+
  
 </template>
 

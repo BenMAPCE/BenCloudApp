@@ -16,19 +16,7 @@ export default defineComponent({
   name: "IncidenceAdd",
   components: {},
 
-  props: {
-    pollutantId: {
-      type: Number,
-      default: 0,
-    },
-    pollutantFriendlyName: {
-      type: String,
-      default: "None",
-    },
-
-  },
-
-  setup(props) {
+  setup() {
     const $q = useQuasar();
     const store = useStore();
 
