@@ -13,7 +13,7 @@
       v-model:selected="selected"
       class="active-tasks"
       :visible-columns="visibleColumns"
-    >;
+    >
       <template v-slot:body="props">
         <q-tr :props="props">
           <q-td
@@ -58,6 +58,9 @@
             key="actions"
             :props="props"
           >
+            <q-btn color="white" text-color="black" label="Cancel" 
+                @click="onClickCancelBatchTask(props)"
+              />
           </q-td>
         </q-tr>
         <!-- We show the details if "props.expand" is true -->
@@ -107,6 +110,9 @@
             key="actions"
             :props="props"
           >
+            <q-btn color="white" text-color="black" label="Cancel" v-if="row.task_status_message == 'Pending'" :size="'sm'"
+                @click="onClickCancelOneTask(row)"
+              />
           </q-td>
         </q-tr>
       </template>
@@ -230,6 +236,54 @@ export default defineComponent({
       //clearInterval(activeTasksRefreshInterval);
     })
 
+    function onClickCancelBatchTask(props){
+      // Prompt user to confirm canceling a batch task
+      console.log(props)
+      if(confirm("Are you sure you wish to cancel task " + props.task_name + "?")){
+        cancelBatch(props);
+      }
+    }
+
+    function cancelBatch(props){
+      console.log( "Canceling " + process.env.API_SERVER + "/api/batch-tasks/" + props.row.batch_task_id);   
+      // Delete (batch) task, reload the task list if successful, alert the user if unsuccessful
+      axios
+      .put(process.env.API_SERVER + "/api/batch-tasks/" + props.row.batch_task_id)
+      .then((response) => {
+        if(response.status === 204) {
+          console.log("Successfully canceled task: " + props.row.batch_task_id);
+          loadActiveTasks();
+        } else {
+          alert("An error occurred during canceling batch task.")
+        }
+        return response;
+      });
+    }
+
+    function onClickCancelOneTask(row){
+      // Prompt user to confirm canceling one (sub)task
+      console.log(row)
+      if(confirm("Are you sure you wish to cancel task " + row.task_name + "?")){
+        cancelOne(row);
+      }
+    }
+
+    function cancelOne(row){
+      console.log( "Canceling " + process.env.API_SERVER + "/api/tasks/" + row.task_uuid);   
+      // Delete (batch) task, reload the task list if successful, alert the user if unsuccessful
+      axios
+      .put(process.env.API_SERVER + "/api/tasks/" + row.task_uuid)
+      .then((response) => {
+        if(response.status === 204) {
+          console.log("Successfully canceled task: " + row.task_uuid);
+          loadActiveTasks();
+        } else {
+          alert("An error occurred during canceling batch task.")
+        }
+        return response;
+      });
+    }
+
     return {
       columns,
       filter,
@@ -239,6 +293,8 @@ export default defineComponent({
       selected: ref([]),
       getActiveTasks,
       loadActiveTasks,
+      onClickCancelOneTask,
+      onClickCancelBatchTask,
       activeTasksRefreshInterval,
       progress1,
       visibleColumns
