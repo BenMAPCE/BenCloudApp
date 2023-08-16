@@ -206,11 +206,11 @@
 
                 <q-separator light style="color: red"></q-separator>
 
-                <q-item dense clickable v-close-popup @click="onClickPromptDelete(row)">
+                <!-- <q-item dense clickable v-close-popup @click="onClickPromptDelete(row)">
                   <q-item-section>
                     <q-item-label dense>Delete</q-item-label>
                   </q-item-section>
-                </q-item>
+                </q-item> -->
               </q-list>
             </q-btn-dropdown>
           </q-td>
@@ -354,13 +354,13 @@ export default defineComponent({
     }
 
     function deleteTask(props) {
-      console.log( "deleting " + process.env.API_SERVER + "/api/tasks/" + props.task_uuid);   
-      // Delete task, reload the task list if successful, alert the user if unsuccessful
+      console.log( "deleting " + process.env.API_SERVER + "/api/batch-tasks/" + props.row.batch_task_id);   
+      // Delete (batch) task, reload the task list if successful, alert the user if unsuccessful
       axios
-      .delete(process.env.API_SERVER + "/api/tasks/" + props.task_uuid)
+      .delete(process.env.API_SERVER + "/api/batch-tasks/" + props.row.batch_task_id)
       .then((response) => {
         if(response.status === 204) {
-          console.log("Successfully deleted task: " + props.task_uuid);
+          console.log("Successfully deleted task: " + props.row.batch_task_id);
           loadCompletedTasks();
         } else {
           alert("An error occurred, task was not deleted.")
