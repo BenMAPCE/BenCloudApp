@@ -7,7 +7,7 @@
     :filter="filter"
     @request="onRequest"
     binary-state-sort
-    v-if="incidenceDatasetId != 0"
+    v-if= "gridId != 0"
   >
     <template v-slot:top-right>
       <q-btn
@@ -16,7 +16,7 @@
         class="export-to-csv-button"
         label="Export to csv"
         no-caps
-        @click="exportIncidenceCells"
+        @click="exportGridGeometries"
       />
 
       <q-input
@@ -42,10 +42,29 @@ import { useStore } from "vuex";
 
 export default defineComponent({
   model: ref(null),
-  name: "IncidenceCells",
+  name: "GridGeometries",
   computed: {
-    incidenceDatasetId() {
-      return this.$store.state.incidence.incidenceDatasetId;
+    gridId() {
+      return this.$store.state.grids.gridId;
+    },
+
+    columnLabelMap() {
+      return {
+        col: "Column",
+        row: "Row",
+        geom: "Geometry",
+      };
+    },
+    // Compute columns dynamically based on the fields of the first record
+    columns() {
+      const firstRecord = this.rows[0] || {};
+      return Object.keys(firstRecord).map(field => ({
+        name: field,
+        align: "left",
+        label: this.columnLabelMap[field], // Use mapping or default to field name
+        field,
+        sortable: true,
+      }));
     },
   },
 
@@ -77,41 +96,41 @@ export default defineComponent({
 
     const store = useStore();
 
-  watch(
-    () => store.state.incidence.incidenceDatasetId,
-    (incidenceDatasetId, prevIncidenceDatasetId) => {
-      incidenceDatasetId = incidenceDatasetId;
-      filter.value = "";
-      pagination.value.sortBy = "";
-      pagination.value.descending = false;
-      pagination.value.page = 1;
-      pagination.value.rowsPerPage = 10;
-      pagination.value.rowsNumber = 0;
-      console.log("resetting table.....");
-      onRequest({
-        filter: "",
-        pagination: pagination.value,
-        rows: [],
-      });
-    }
-  );
+    watch(
+      () => store.state.grids.gridId,
+      (gridId, prevGridId) => {
+        gridId = gridId;
+        filter.value = "";
+        pagination.value.sortBy = "";
+        pagination.value.descending = false;
+        pagination.value.page = 1;
+        pagination.value.rowsPerPage = 10;
+        pagination.value.rowsNumber = 0;
+        console.log("resetting table.....");
+        onRequest({
+          filter: "",
+          pagination: pagination.value,
+          rows: [],
+        });
+      }
+    );
 
     function onRequest(props) {
       console.log("on onRequest()");
-      if (store.state.incidence.incidenceDatasetId != 0)
-        loadIncidenceCells(props);
-      
+      if (store.state.grids.gridId != 0) {
+        loadGridGeometries(props);
+      }
     }
 
-    function exportIncidenceCells() {
-      console.log("exportIncidenceCells");
+    function exportGridGeometries() {
+      console.log("exportGridGeometries");
 
       loading.value = true;
 
       axios
         .get(
-          process.env.API_SERVER + "/api/incidence/" +
-            store.state.incidence.incidenceDatasetId +
+          process.env.API_SERVER + "/api/grid-definitions/" +
+            store.state.grids.gridId +
             "/contents",
           {
             params: {
@@ -145,7 +164,7 @@ export default defineComponent({
         });
     }
 
-    function loadIncidenceCells(props) {
+    function loadGridGeometries(props) {
       console.log(props.pagination);
       const { page, rowsPerPage, sortBy, descending } = props.pagination;
       const filter = props.filter;
@@ -155,12 +174,11 @@ export default defineComponent({
       console.log("--------------------------------------------");
 
       loading.value = true;
-      console.log(store.state.incidence.incidenceDatasetId);
 
       axios
         .get(
-          process.env.API_SERVER + "/api/incidence/" +
-            store.state.incidence.incidenceDatasetId +
+          process.env.API_SERVER + "/api/grid-definitions/" +
+            store.state.grids.gridId +
             "/contents",
           {
             params: {
@@ -173,13 +191,12 @@ export default defineComponent({
           }
         )
         .then((response) => {
-          let records = response.data.records;
           let data = response.data;
 
           console.log("----- return -----");
-          console.log(records);
+          console.log(data);
 
-          rows.value = records;
+          rows.value = data;
 
           // don't forget to update local pagination object
           pagination.value.page = page;
@@ -202,120 +219,40 @@ export default defineComponent({
     });
 
     return {
-      columns,
       filter,
       loading,
       pagination,
       rows,
       onRequest,
-      exportIncidenceCells,
+      exportGridGeometries
     };
   },
 });
 
-const columns = [
-  {
-    name: "grid_col",
-    align: "left",
-    label: "Column",
-    field: "grid_col",
-    sortable: true,
-  },
-  {
-    name: "grid_row",
-    align: "left",
-    label: "Row",
-    field: "grid_row",
-    sortable: true,
-  },
-  { name: "endpoint group", 
-    align: "left", 
-    label: "Endpoint Group", 
-    field: "endpoint_group",
-    sortable: true,
-  },
-  { name: "endpoint", 
-    align: "left", 
-    label: "Endpoint", 
-    field: "endpoint",
-    sortable: true,
-  },
-  { name: "race", 
-    align: "left", 
-    label: "Race", 
-    field: "race",
-    sortable: true,
-  },
-  { name: "gender", 
-    align: "left", 
-    label: "Gender", 
-    field: "gender",
-    sortable: true,
-  },
-  { name: "ethnicity", 
-    align: "left", 
-    label: "Ethnicity", 
-    field: "ethnicity",
-    sortable: true,
-  },
-  {
-    name: "start age",
-    align: "left",
-    label: "Start Age",
-    field: "start_age",
-    sortable: true,
-  },
-  {
-    name: "end_age",
-    align: "left",
-    label: "End Age",
-    field: "end_age",
-    sortable: true,
-  },
-  {
-    name: "type",
-    align: "left",
-    label: "Prevalence",
-    field: "type",
-    sortable: true,
-  },
-  {
-    name: "timeframe",
-    align: "left",
-    label: "Timeframe",
-    field: "timeframe",
-    sortable: true,
-  },
-  {
-    name: "units",
-    align: "left",
-    label: "Units",
-    field: "units",
-    sortable: true,
-  },
-  {
-    name: "value",
-    align: "left",
-    label: "Value",
-    field: "value",
-    sortable: true,
-  },
-  {
-    name: "distribution",
-    align: "left",
-    label: "Distribution",
-    field: "distribution",
-    sortable: true,
-  },
-  {
-    name: "standard error",
-    align: "left",
-    label: "Standard Error",
-    field: "standard_error",
-    sortable: true,
-  },
+// const columns = [
+//   {
+//     name: "col",
+//     align: "left",
+//     label: "Column",
+//     field: "col",
+//     sortable: true,
+//   },
+//   {
+//     name: "row",
+//     align: "left",
+//     label: "Row",
+//     field: "row",
+//     sortable: true,
+//   },
+//   {
+//     name: "geom",
+//     align: "left",
+//     label: "Geometry",
+//     field: "geom",
+//     sortable: true,
+//   }
   
-];
+// ];
 
 const rows = [];
 </script>

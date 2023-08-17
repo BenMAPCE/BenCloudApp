@@ -61,7 +61,7 @@ import { ref, unref, onMounted, onBeforeMount, watch, watchEffect } from "vue";
 import axios from "axios";
 import { useStore } from "vuex";
 import { layerName } from '../../common/AirQualityUploadForm.vue';
-import { showAll } from '../../../pages/datacenter/managedata/incidence/ReviewIncidence.vue';
+import { showAll } from '../../../pages/datacenter/managedata/grids/ReviewGridDefinitions.vue';
 import { date } from 'quasar'
 
 var trackCurrentPage = null;
@@ -69,49 +69,22 @@ var numLayers = null;
 
 export default defineComponent({
   model: ref(null),
-  name: "IncidenceDatasets",
+  name: "gridDefinitions",
 
   props: {
-    includeDatasetName: {
+    includeGridName: {
       type: Boolean,
       default: false,
     },
   },
   methods: {
-    deleteRow(props) {
-      // Prompt user to confirm incidence dataset deletion
-      if(confirm("Are you sure you wish to permanently delete " + props.row.name + "?")){
-        // Delete AQ layer, reload the incidence dataset list if successful, alert the user if unsuccessful       
-        axios
-          .delete(process.env.API_SERVER + "/api/incidence/" + props.row.id, {
-            params: {
-              id: props.row.id,
-            },
-          })
-          .then((response) => {
-            if(response.status === 204) {
-              trackCurrentPage = this.pagination.page;
-              console.log("Successfully deleted incidence dataset: " + props.row.name);
-
-              // Reload list
-              var oldValue =  this.$store.state.incidence.incidenceForceReloadValue
-              console.log("oldValue: " + oldValue);
-              var newValue = oldValue - 1;
-              console.log("newValue: " + newValue);
-              this.$store.commit("incidence/updateIncidenceForceReloadValue", newValue)
-            } else {
-              alert("An error occurred, incidence dataset was not deleted.")
-            }
-          });
-      }
-    },
-
    
-    
+  //might need later once maps are added to display the grid definitions
+
     rowClicked(props) {
-      this.selected = [];
-      this.selected.push(props.row);
-      this.$store.commit("incidence/updateIncidenceDatasetId", props.row.id);
+      // this.selected = [];
+      // this.selected.push(props.row);
+      // this.$store.commit("grids/updateGridId", props.row.id);
     },
   },
 
@@ -140,9 +113,9 @@ export default defineComponent({
     let myFilter = unref(filter);
 
     watch(
-      () => store.state.incidence.incidenceDatasetAddedDate,
-      (incidenceDatasetAddedDate, prevIncidenceDatasetAddedDate) => {
-          console.log("--- updated Incidence Dataset")
+      () => store.state.grids.gridAddedDate,
+      (gridAddedDate, prevGridDefinitionAddedDate) => {
+          console.log("--- updated Grid Definition")
           onRequest({
             pagination: pagination.value,
             filter: undefined,
@@ -150,12 +123,12 @@ export default defineComponent({
     })
 
     watch(
-      () => store.state.incidence.incidenceForceReloadValue,
+      () => store.state.grids.gridForceReloadValue,
       (newValue, oldValue) => {
         if(newValue > oldValue) {
-          console.log("--- added Incidence Dataset");
+          console.log("--- added Grid Definition");
         } else if(newValue < oldValue) {
-          console.log("--- deleted Incidence Dataset");
+          console.log("--- deleted Grid Definition");
         }
         filter.value = "";
         pagination.value.sortBy = "name";
@@ -170,7 +143,7 @@ export default defineComponent({
     watch(
       () => showAll.value,
       () => {
-        console.log("Show all layers: " + showAll.value);
+        console.log("Show all grids: " + showAll.value);
         if(showAll.value && !visibleColumns.value.includes("user")) {
           visibleColumns.value.push("user");
           //visibleColumns.value.push("edit");
@@ -189,11 +162,11 @@ export default defineComponent({
 
     function onRequest(props) {
       console.log("on onRequest()");
-        loadIncidenceDatasets(props);
+        loadGridDefinitions(props);
 
     }
 
-    function loadIncidenceDatasets(props) {
+    function loadGridDefinitions(props) {
       console.log(props.pagination);
       if(!!trackCurrentPage) {
         props.pagination.page = trackCurrentPage;
@@ -209,7 +182,7 @@ export default defineComponent({
 
     
         axios
-          .get(process.env.API_SERVER + "/api/incidence", {
+          .get(process.env.API_SERVER + "/api/grid-definitions-info", {
             params: {
               page: page,
               rowsPerPage: ++numLayers,
@@ -225,7 +198,7 @@ export default defineComponent({
             console.log("----- return -----");
             console.log(data);
 
-            store.commit("incidence/updateIncidenceDatasetId", 0);
+            store.commit("grids/updateGridId", 0);
 
             let loadPage = 1;
             for(let i = 0; i < data.length; i++) {
@@ -258,9 +231,9 @@ export default defineComponent({
     
 
     onBeforeMount(() => {
-      console.log("includeDatasetName: " + props.includeDatasetName);
+      console.log("includeGridName: " + props.includeGridName);
 
-      if (props.includeDatasetName) {
+      if (props.includeGridName) {
         visibleColumns.value.push("id");
       }
 
@@ -292,9 +265,8 @@ const rows = [];
 const visibleColumns = ref([
   "id",
   "name",
-  "grid_definition_id",
-  "upload_date",
-  "actions"
+  "col_count",
+  "row_count"
 ]);
 
 const columns = [
@@ -316,41 +288,24 @@ const columns = [
     sortable: true,
   },
   {
-    name: "grid_definition_id",
+    name: "col_count",
+    required: true,
+    label: "Columns",
     align: "left",
-    label: "Grid ID",
-    field: "grid_definition_id",
+    field: (row) => row.col_count,
+    format: (val) => `${val}`,
     sortable: true,
   },
   {
-    name: "years",
+    name: "row_count",
+    required: true,
+    label: "Rows",
     align: "left",
-    label: "Years",
-    field: "years",
-    format: (val) => val.join(", "),
+    field: (row) => row.row_count,
+    format: (val) => `${val}`,
     sortable: true,
   },
-  { 
-    name: "user", 
-    label: "User", 
-    field: "", 
-    align: "left" 
-  },
-  {
-    name: "filename",
-    align: "left",
-    label: "Filename",
-    field: "filename",
-    sortable: true,
-  },
-  {
-    name: "upload_date",
-    align: "left",
-    label: "Upload date",
-    field: "upload_date",
-    format: val => date.formatDate(val, 'YYYY-MM-DD HH:mm:ss'),
-    sortable: true,
-  },
+  
   { 
     name: "actions", 
     label: "", 

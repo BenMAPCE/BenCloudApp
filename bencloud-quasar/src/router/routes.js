@@ -163,6 +163,18 @@ const routes = [
       },
     ],
   },
+  {
+    path: "/datacenter/review-grids",
+    component: () => import("layouts/MainLayout.vue"),
+    children: [
+      {
+        path: "",
+        component: () =>
+          import("src/pages/datacenter/managedata/grids/ReviewGridDefinitions.vue"),
+        meta: { requiresUser: true, requiresAdmin: false },
+      },
+    ],
+  },
 
   {
     path: "/datacenter/manage-tasks",

@@ -52,14 +52,17 @@ export default defineComponent({
     IncidenceDatasets,
     IncidenceAdd
 },
-  setup(props, context) {
-    const store = useStore();
-  },
+setup(props, context) {
+  const store = useStore();
+
+  onBeforeMount(() => {});
+  return {
+    showAll,
+    isAdmin
+  };
+},
 });
 </script>
 
 <style lang="scss" scoped>
-.pollutant-options {
-  width: 250px;
-}
 </style>
