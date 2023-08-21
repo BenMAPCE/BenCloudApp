@@ -315,6 +315,18 @@ const columns = [
     sortable: false,
     style: "width: 200px",
   },
+  {
+    name: "formatted_results_2sf",
+    label: "Formatted Results (2 sig. figs.)",
+    field: "formatted_results_2sf",
+    sortable: false
+  },
+  {
+    name: "formatted_results_3sf",
+    label: "Formatted Results (3 sig. figs.)",
+    field: "formatted_results_3sf",
+    sortable: false
+  },
 ];
 </script>
 
