@@ -58,7 +58,7 @@
             key="actions"
             :props="props"
           >
-            <q-btn color="white" text-color="black" label="Cancel" 
+            <q-btn color="primary" label="Cancel" 
                 @click="onClickCancelBatchTask(props)"
               />
           </q-td>
@@ -110,9 +110,9 @@
             key="actions"
             :props="props"
           >
-            <q-btn color="white" text-color="black" label="Cancel" v-if="row.task_status_message == 'Pending'" :size="'sm'"
+            <!-- <q-btn color="white" text-color="black" label="Cancel" v-if="row.task_status_message == 'Pending'" :size="'sm'"
                 @click="onClickCancelOneTask(row)"
-              />
+              /> -->
           </q-td>
         </q-tr>
       </template>
@@ -239,7 +239,7 @@ export default defineComponent({
     function onClickCancelBatchTask(props){
       // Prompt user to confirm canceling a batch task
       console.log(props)
-      if(confirm("Are you sure you wish to cancel task " + props.task_name + "?")){
+      if(confirm("Are you sure you wish to cancel task " + props.row.batch_task_name + "?")){
         cancelBatch(props);
       }
     }
@@ -352,9 +352,9 @@ const columns = [
   },
   { 
     name: "actions", 
-    label: "",
+    label: "Action",
     field: "",
-    align: "left" 
+    align: "center" 
   },
 ];
 </script>

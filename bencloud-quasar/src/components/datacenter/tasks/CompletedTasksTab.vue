@@ -184,35 +184,6 @@
             key="download"  
             :props="props"
           >
-            <q-btn-dropdown color="primary" label="" dense>
-              <q-list>
-                <q-item dense clickable v-close-popup @click="onClickViewExport(row)">
-                  <q-item-section>
-                    <q-item-label>View/Export Results</q-item-label>
-                  </q-item-section>
-                </q-item>
-
-                <!-- <q-item dense clickable v-close-popup @click="onClick(props)">
-                  <q-item-section>
-                    <q-item-label>View Configuration Details</q-item-label>
-                  </q-item-section>
-                </q-item>
-
-                <q-item dense clickable v-close-popup @click="onClick(props)">
-                  <q-item-section>
-                    <q-item-label>Use as a template for new analysys</q-item-label>
-                  </q-item-section>
-                </q-item> -->
-
-                <q-separator light style="color: red"></q-separator>
-
-                <!-- <q-item dense clickable v-close-popup @click="onClickPromptDelete(row)">
-                  <q-item-section>
-                    <q-item-label dense>Delete</q-item-label>
-                  </q-item-section>
-                </q-item> -->
-              </q-list>
-            </q-btn-dropdown>
           </q-td>
         </q-tr>
       </template>
@@ -301,7 +272,6 @@ export default defineComponent({
         if(!showAllTasks.value && visibleColumns.value.includes("user")) {
           visibleColumns.value.pop("user");
         }
-        console.log(visibleColumns.value);
         loadCompletedTasks();
       }
     );
@@ -321,34 +291,32 @@ export default defineComponent({
     function onValueChange(props, val) {
       console.log("SELECT value changed: ");
       console.log(optionSelected.value);
-      console.log(props);
+      // console.log(props);
     }
     function showOptions(props) {
       console.log("showOptions");
-      console.log(props);
+      // console.log(props);
     }
 
     function onClick(props, item) {
       console.log("onClick");
-      console.log(props);
-      console.log(item);
+      // console.log(props);
+      // console.log(item);
     }
 
-    function onClickViewExport(row) {
+    function onClickViewExport(props) {
       console.log("onClickViewExport");
-      var row = JSON.parse(JSON.stringify(row))
-      //if (row.task_type === "HIF") {
-        var task_type = (row.task_type).substring(0,1)
-        this.$router.push({ path: `/datacenter/view-export-task/${task_type}-${row.batch_task_id}` })
-      //} else {
-        
-      //}
+      var row = JSON.parse(JSON.stringify(props.row))
+      // console.log(row);
+
+      var task_id = row.tasks[0].task_uuid
+      var batch_task_id = row.batch_task_id
+      this.$router.push({ path: `/datacenter/view-export-task/${batch_task_id}-${task_id}` })
     }
 
     function onClickPromptDelete(props) {
       // Prompt user to confirm task deletion
-      console.log(props)
-      if(confirm("Are you sure you wish to permanently delete " + props.task_name + "?")){
+      if(confirm("Are you sure you wish to permanently delete " + props.row.batch_task_name + "?")){
         deleteTask(props);
       }
     }
@@ -371,8 +339,6 @@ export default defineComponent({
 
     function exportTaskResults(props) {
       console.log("exportTaskResults");
-
-      console.log(props.row.task_uuid);
 
       loading.value = true;
 

@@ -211,7 +211,7 @@ const routes = [
     ],
   },
   {
-    path: "/datacenter/view-export-task/:task_uuid",
+    path: "/datacenter/view-export-task/:batch_task_id-:task_uuid",
     props: true,
     name: "view-results",
     component: () => import("layouts/MainLayout.vue"),
