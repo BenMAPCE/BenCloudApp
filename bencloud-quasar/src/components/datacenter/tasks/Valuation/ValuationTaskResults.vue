@@ -61,7 +61,7 @@ export default defineComponent({
   model: ref(null),
   name: "ValuationTaskResults",
 
-  props: ["task_uuid", "task_name", "task_type"],
+  props: ["valuation_task_uuid", "valuation_task_name", "valuation_task_type"],
 
   setup(props, context) {
     //const task_type = ref("");
@@ -83,7 +83,7 @@ export default defineComponent({
       loading.value = true;
 
       (async () => {
-        const response = await getValuationTaskResults(props.task_uuid).fetch();
+        const response = await getValuationTaskResults(props.valuation_task_uuid).fetch();
 
         // create a unique if for the table key - will later come from the back end
         var valuationResults = JSON.parse(JSON.stringify(unref(response.data)));
@@ -92,7 +92,6 @@ export default defineComponent({
         }
 
         rows.value = valuationResults;
-        console.log(rows.value)
         loading.value = false;
       })();
     }
@@ -103,9 +102,9 @@ export default defineComponent({
         parent: this,
         persistent: true,
         componentProps: {
-          task_uuid: props.task_uuid,
-          task_name: props.task_name,
-          task_type: props.task_type,
+          task_uuid: props.valuation_task_uuid,
+          task_name: props.valuation_task_name,
+          task_type: props.valuation_task_type,
         },
       })
         .onOk(() => {
