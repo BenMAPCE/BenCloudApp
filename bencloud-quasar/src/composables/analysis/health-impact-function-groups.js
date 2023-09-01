@@ -63,7 +63,7 @@ export const loadHealthImpactFunctionGroups = (store) => {
         .get(
           process.env.API_SERVER +
             "/api/batch-task-config?" +
-            "groupIds=" +
+            "hifGroupIds=" +
             healthEffects +
             "&pollutantId=" +
             store.state.analysis.pollutantId +

@@ -15,7 +15,6 @@
 import { defineComponent } from "vue";
 import { ref, watch, onBeforeMount } from "vue";
 import { useStore } from "vuex";
-import { loadAirQualityLayers } from '../../composables/exposure/air-quality';
 import { convertAirQualityLayers } from '../../composables/exposure/air-quality';
 
 export default defineComponent({
