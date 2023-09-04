@@ -205,6 +205,12 @@ export default {
           "/api/valuation-result-datasets/" +
           this.task_uuid +
           "/export?gridId=" + gridList;
+      } else if(this.task_type === "E") {
+        downloadUrl =
+          process.env.API_SERVER +
+          "/api/exposure-result-datasets/" +
+          this.task_uuid +
+          "/export?gridId=" + gridList;
       }
 
       axios

@@ -8,12 +8,17 @@
     align="justify"
     narrow-indicator
   >
-    <q-tab name="hif-results" class="hif-results" label="HIF Results" />
-    <q-tab name="valuation-results" class="valuation-results" label="Valuation Results" />
+    <div class="tabs q-pl-sm" v-if="task_type != 'E'">
+      <q-tab name="results" class="hif-results" label="HIF Results" />
+      <q-tab name="valuation-results" class="valuation-results" label="Valuation Results" />
+    </div>
+    <div class="q-pl-sm" v-if="task_type == 'E'">
+      <q-tab name="results" class="exposure-results" label="Exposure Results" />
+    </div>
   </q-tabs>
 
-  <q-tab-panels v-model="tab" animated>
-    <q-tab-panel name="hif-results"> 
+  <q-tab-panels v-model="tab" animated v-if="task_type != 'E'">
+    <q-tab-panel name="results"> 
       <div v-if="task_type === 'H'">
         <HIFTaskResults  v-bind:task_uuid="task_uuid" v-bind:task_name="task_name" v-bind:task_type="task_type" :key="componentKey"></HIFTaskResults>
       </div>
@@ -28,6 +33,13 @@
       </div>
     </q-tab-panel>
   </q-tab-panels>
+  <q-tab-panels v-model="tab" animated v-if="task_type == 'E'">
+    <q-tab-panel name="results"> 
+      <div v-if="task_type === 'E'">
+        <ExposureTaskResults  v-bind:task_uuid="task_uuid" v-bind:task_name="task_name" v-bind:task_type="task_type" :key="componentKey"></ExposureTaskResults>
+      </div>
+    </q-tab-panel>
+  </q-tab-panels>
 </template>
 
 <script>
@@ -36,6 +48,7 @@ import { defineComponent } from "vue";
 
 import HIFTaskResults from "./HIF/HIFTaskResults.vue";
 import ValuationTaskResults from "./Valuation/ValuationTaskResults.vue";
+import ExposureTaskResults from "./Exposure/ExposureTaskResults.vue";
 
 export default defineComponent({
   model: ref(null),
@@ -44,7 +57,8 @@ export default defineComponent({
 
   components: {
     HIFTaskResults,
-    ValuationTaskResults
+    ValuationTaskResults,
+    ExposureTaskResults
   },
   setup(props) {
 
@@ -75,7 +89,7 @@ export default defineComponent({
     })
 
     return {
-      tab: ref("hif-results"),
+      tab: ref("results"),
       task_uuid,
       task_type,
       componentKey,
@@ -88,13 +102,8 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.q-tab.hif-results {
-  flex: 0 0 auto;
-  align-items: left;
-  align-self: left;
-}
-.q-tab.valuation-results {
-  flex: 0 0 auto;
+.tabs {
+  display: flex;
   align-items: left;
   align-self: left;
 }

@@ -128,6 +128,12 @@ export default defineComponent({
             }
             continue
           }
+          else if(currentTask.task_type === "Exposure" && currentTask.aq_scenario_name === selected_scenario_name.value && currentTask.pop_year === currentSelectedItem) {
+            valuation_task_uuid_with_type.value = "";
+            valuation_task_name.value = "";
+            task_uuid_with_type.value = "E-" + currentTask.task_uuid;
+            task_name.value = currentTask.task_name;
+          }
         }
         componentKey.value += 1;
       }
