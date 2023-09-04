@@ -32,17 +32,16 @@ export function updatePopulationYears(state, populationYears) {
     state.populationYears = populationYears;
 }
 
-export function updatePopulationGroups(state, populationGroups) {
-    state.populationGroups = populationGroups;
-    console.log(populationGroups);
-    var groupIds = [];
-    var groupNames = [];
-    populationGroups.forEach(e => {
-        groupIds.push(e.healthEffectId);
-        groupNames.push(e.healthEffectName);
-    });
-    state.populationGroupIds = groupIds;
-    state.populationGroupNames = groupNames;
+export function updateExposureFunctionGroups(state, exposureFunctionGroups) {
+    var ids = [];
+    var names = [];
+    for(var i = 0; i < exposureFunctionGroups.length; i++) {
+        ids.push(exposureFunctionGroups[i].exposureGroupId);
+        names.push(exposureFunctionGroups[i].exposureGroupName);
+    }
+
+    state.exposureFunctionGroupIds = ids;
+    state.exposureFunctionGroupNames = names;
 }
 
 export function updatePrePolicyAirQuality(state, prePolicyAirQuality) {

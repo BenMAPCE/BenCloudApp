@@ -15,11 +15,11 @@
           <PopulationYears></PopulationYears>
       </div>
       <div class="row">
-        Step 3. What population groups would you like to include?
+        Step 3. Which exposure functions would you like to include?
       </div>
       <div class="row">
         <Suspense>
-          <PopulationGroups></PopulationGroups>
+          <ExposureFunctionGroups></ExposureFunctionGroups>
         </Suspense>
       </div>
     </div>
@@ -30,13 +30,13 @@
 import { defineComponent, reactive, inject } from "vue";
 import PopulationDataset from "../../components/exposure/PopulationDataset.vue";
 import PopulationYears from "../../components/exposure/PopulationYears.vue";
-import PopulationGroups from "../../components/exposure/PopulationGroups.vue";
+import ExposureFunctionGroups from "../../components/exposure/ExposureFunctionGroups.vue";
 //import Incidence from "../../components/analysis/Incidence.vue";
 import { useStore } from "vuex";
 
 export default defineComponent({
   name: "WhoWillBeExposed",
-  components: { PopulationDataset, PopulationYears, PopulationGroups },
+  components: { PopulationDataset, PopulationYears, ExposureFunctionGroups },
 
   setup() {
     const store = useStore();

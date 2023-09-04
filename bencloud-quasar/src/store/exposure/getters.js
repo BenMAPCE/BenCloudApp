@@ -29,8 +29,8 @@ export function populationYears (state) {
   return state.populationYears
 }
 
-export function populationGroups (state) {
-  return state.populationGroups
+export function exposureFunctionGroups (state) {
+  return state.exposureFunctionGroups
 }
 
 export function populationGroupIds (state) {

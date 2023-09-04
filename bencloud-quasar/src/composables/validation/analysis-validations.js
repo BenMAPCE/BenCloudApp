@@ -20,7 +20,7 @@ export const postPolicyAirQualityIdHasValue = (store) => {
     var isValid = true;
 
     if (store.state.analysis.postPolicyAirQualityId) {
-        if (store.state.analysis.postPolicyAirQualityId === 0) {
+        if (store.state.analysis.postPolicyAirQualityId.length === 0) {
             isValid = false;
         }
     } else {

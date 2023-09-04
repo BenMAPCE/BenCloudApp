@@ -21,10 +21,6 @@
       <WhoIsExposed></WhoIsExposed>
     </q-step>
 
-    <!-- <q-step :name="4" title="What exposures?" :done="step > 4" prefix="4">
-      <WhatExposures></WhatExposures>
-    </q-step> -->
-
     <q-step :name="4" title="Review &amp; Submit" :done="step > 4" prefix="4">
       <ReviewAndSubmit></ReviewAndSubmit>
     </q-step>
@@ -64,7 +60,7 @@ import { prePolicyAirQualityIdHasValue } from "../../composables/validation/expo
 import { postPolicyAirQualityIdHasValue } from "../../composables/validation/exposure-validations";
 import { populationDatasetIdHasValue } from "../../composables/validation/exposure-validations";
 import { populationYearsHaveValue } from "../../composables/validation/exposure-validations";
-import { populationGroupsHasValue } from "../../composables/validation/exposure-validations";
+import { exposureFunctionGroupsHasValue } from "../../composables/validation/exposure-validations";
 
 export default {
   components: {
@@ -137,7 +133,7 @@ export default {
         if (
           populationDatasetIdHasValue(store) &&
           populationYearsHaveValue(store) &&
-          populationGroupsHasValue(store)
+          exposureFunctionGroupsHasValue(store)
         ) {
           stepHasError.value = false;
           thisStepper.next();
@@ -146,18 +142,6 @@ export default {
           atStep.value = 3;
         }
       }
-
-      // if (step == 4) {
-      //   if (
-      //     healthEffectsHasValue(store)
-      //   ) {
-      //     stepHasError.value = false;
-      //     thisStepper.next();
-      //   } else {
-      //     stepHasError.value = true;
-      //     atStep.value = 4;
-      //   }
-      // }
 
      if (step == 4) {
           stepHasError.value = false;
