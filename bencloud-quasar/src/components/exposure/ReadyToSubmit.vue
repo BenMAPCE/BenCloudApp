@@ -73,7 +73,7 @@
   </div>
   <div class="row enter-template-row">
     <div class="col-3">
-      <q-form @submit="saveTemplate()" class="q-gutter-md">
+      <q-form @submit="submitTemplate()" class="q-gutter-md">
         <q-input
           outlined
           dense
@@ -109,7 +109,7 @@ import { ref, onBeforeMount, onMounted, watch } from "vue";
 import { useStore } from "vuex";
 import { useQuasar } from "quasar";
 
-import { createTemplate, saveTemplate } from "../../composables/templates/templates";
+import { createExposureTemplate, saveTemplate } from "../../composables/templates/templates";
 import { buildExposureBatchTask, submitExposureTask } from "../../composables/exposure/exposure-task";
 import TaskSubmittedDialog from "./TaskSubmittedDialog.vue";
 import SubmissionErrorDialog from "./SubmissionErrorDialog.vue";
@@ -156,58 +156,46 @@ export default defineComponent({
 
     function submitTemplate() {
 
-      $q.dialog({
-        component: SubmissionErrorDialog,
-        parent: this,
-        persistent: true,
-        componentProps: {},
-      })
-        .onOk(() => {
-          //taskName.value = ""
-        })
+      var template = createExposureTemplate(taskName.value, store);
 
-      // var template = createTemplate(taskName.value, store);
+      const templateNotification = $q.notify({
+        group: false, // required to be updatable
+        timeout: 0, // we want to be in control when it gets dismissed
+        spinner: true,
+        position: "top",
+        message: "Saving Template...",
+      });
 
-      // const templateNotification = $q.notify({
-      //   group: false, // required to be updatable
-      //   timeout: 0, // we want to be in control when it gets dismissed
-      //   spinner: true,
-      //   position: "top",
-      //   message: "Saving Template...",
-      // });
+      (async () => {
+        const response = await saveTemplate(
+          templateName.value,
+          "Exposure Analysis",
+          template,
+          store
+        ).fetch();
 
-      // (async () => {
-      //   const response = await saveTemplate(
-      //     templateName.value,
-      //     "v1",
-      //     template,
-      //     store
-      //   ).fetch();
+        templateName.value = "";
 
-      //   templateName.value = "";
-
-      //   if(!!response.data.value.message) {
-      //     // if there is an issue, display the error message
-      //     templateNotification({
-      //       spinner: false, // we reset the spinner setting so the icon can be displayed
-      //       message: response.data.value.message,
-      //       color: "red",
-      //       timeout: 4000, // we will timeout it in 4 seconds
-      //     });
-      //   } else {
-      //     // if the template was saved
-      //     templateNotification({
-      //       spinner: false, // we reset the spinner setting so the icon can be displayed
-      //       message: "Template Saved!",
-      //       color: "green",
-      //       timeout: 2000, // we will timeout it in 2 seconds
-      //     });
-      //   }
-      // })();
+        if(!!response.data.value.message) {
+          // if there is an issue, display the error message
+          templateNotification({
+            spinner: false, // we reset the spinner setting so the icon can be displayed
+            message: response.data.value.message,
+            color: "red",
+            timeout: 4000, // we will timeout it in 4 seconds
+          });
+        } else {
+          // if the template was saved
+          templateNotification({
+            spinner: false, // we reset the spinner setting so the icon can be displayed
+            message: "Template Saved!",
+            color: "green",
+            timeout: 2000, // we will timeout it in 2 seconds
+          });
+        }
+      })();
     }
 
-    //console.log("----- healthImpactFunctions -----");
-    //console.log(healthImpactFunctions);
 
     function submitTask() {
 

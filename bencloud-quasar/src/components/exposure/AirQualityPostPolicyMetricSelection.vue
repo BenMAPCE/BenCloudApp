@@ -38,8 +38,8 @@
 </template>
 
 <script>
-import { defineComponent, onActivated } from "vue";
-import { ref, watch, onMounted, onBeforeUpdate, onUpdated } from "vue";
+import { defineComponent } from "vue";
+import { ref, watch, onMounted } from "vue";
 import { useStore } from "vuex";
 
 export default defineComponent({

@@ -75,7 +75,7 @@ export const saveTemplate = (name, type, template, store) => {
   return { fetch };
 };
 
-export const createTemplate = (taskName, store) => {
+export const createHifTemplate = (taskName, store) => {
   const prePolicyAirQualityId = store.state.analysis.prePolicyAirQualityId;
   const postPolicyAirQualityId = store.state.analysis.postPolicyAirQualityId;
   const prePolicyAirQualityName = store.state.analysis.prePolicyAirQualityName;
@@ -116,8 +116,14 @@ export const createTemplate = (taskName, store) => {
   var airQualityArray = [];
   var airQuality = {};
 
-  var prePolicyAirQualityMetric = prePolicyAirQualityMetricId.split("-");
-  var postPolicyAirQualityMetric = postPolicyAirQualityMetricId.split("-");
+  var prePolicyAirQualityMetric = [];
+  if(prePolicyAirQualityMetricId !== "") {
+    prePolicyAirQualityMetric = prePolicyAirQualityMetricId.split("-");
+  }
+  var postPolicyAirQualityMetric = [];
+  if(postPolicyAirQualityMetricId !== "") {
+    postPolicyAirQualityMetric = postPolicyAirQualityMetricId.split("-");
+  }
 
   airQuality["type"] = "baseline";
   airQuality["id"] = prePolicyAirQualityId;
@@ -227,8 +233,101 @@ export const createTemplate = (taskName, store) => {
   return template;
 };
 
+export const createExposureTemplate = (taskName, store) => {
+  const prePolicyAirQualityId = store.state.exposure.prePolicyAirQualityId;
+  const postPolicyAirQualityId = store.state.exposure.postPolicyAirQualityId;
+  const prePolicyAirQualityName = store.state.exposure.prePolicyAirQualityName;
+  const postPolicyAirQualityName =
+    store.state.exposure.postPolicyAirQualityName;
+  const prePolicyAirQualityMetricId =
+    store.state.exposure.prePolicyAirQualityMetricId;
+  const postPolicyAirQualityMetricId =
+    store.state.exposure.postPolicyAirQualityMetricId;
+  const populationDatasetId = store.state.exposure.populationDatasetId;
+  const populationDatasetName = store.state.exposure.populationDatasetName;
+  const pollutantId = store.state.exposure.pollutantId;
+  const pollutantFriendlyName = store.state.exposure.pollutantFriendlyName;
+  const exposureFunctionGroups = store.state.exposure.exposureFunctionGroups;
+  const batchTaskObject = store.state.exposure.batchTaskObject;
 
-export const loadTemplate = (model, store) => {
+  var template = {};
+
+  template["name"] = taskName;
+  template["type"] = "Exposure";
+
+  var pollutant = {};
+  pollutant["pollutantId"] = pollutantId;
+  pollutant["pollutantFriendlyName"] = pollutantFriendlyName;
+  template["pollutant"] = pollutant;
+
+  var airQualityArray = [];
+  var airQuality = {};
+
+  var prePolicyAirQualityMetric = [];
+  if(prePolicyAirQualityMetricId !== "") {
+    prePolicyAirQualityMetric = prePolicyAirQualityMetricId.split("-");
+  }
+  var postPolicyAirQualityMetric = [];
+  if(postPolicyAirQualityMetricId !== "") {
+    postPolicyAirQualityMetric = postPolicyAirQualityMetricId.split("-");
+  }
+
+  airQuality["type"] = "baseline";
+  airQuality["id"] = prePolicyAirQualityId;
+  airQuality["metricId"] = prePolicyAirQualityMetric[0];
+  airQuality["seasonalMetricId"] = prePolicyAirQualityMetric[1];
+  airQuality["name"] = prePolicyAirQualityName;
+  airQualityArray.push(airQuality);
+
+  airQuality = {};
+  airQuality["type"] = "scenario";
+  airQuality["id"] = postPolicyAirQualityId;
+  airQuality["metricId"] = postPolicyAirQualityMetric[0];
+  airQuality["seasonalMetricId"] = postPolicyAirQualityMetric[1];
+  airQuality["name"] = postPolicyAirQualityName;
+  airQualityArray.push(airQuality);
+
+  template["air_quality_data"] = airQualityArray;
+
+  var population = {};
+  population["populationDatasetId"] = populationDatasetId;
+  population["populationDatasetName"] = populationDatasetName;
+
+  template["population"] = population;
+
+  var selectedExposureFunctionGroups = [];
+  var selectedExposureFunctionGroup = {};
+
+  console.log("***** " + exposureFunctionGroups.length);
+  for (var efg = 0; efg < exposureFunctionGroups.length; efg++) {
+    selectedExposureFunctionGroup = {};
+    selectedExposureFunctionGroup["exposureGroupId"] = exposureFunctionGroups[efg].exposureGroupId;
+    selectedExposureFunctionGroup["exposureGroupName"] =
+      exposureFunctionGroups[efg].exposureGroupName;
+    selectedExposureFunctionGroups.push(selectedExposureFunctionGroup);
+  }
+  template["exposureFunctionGroups"] = selectedExposureFunctionGroups;
+
+  template["batchTaskObject"] = batchTaskObject;
+
+  const MY_NAMESPACE = "1b671a64-40d5-491e-99b0-da01ff1f3341";
+  const hash = uuidv5(JSON.stringify(template), MY_NAMESPACE);
+  console.log(hash);
+
+  template["hash"] = hash;
+  const hashWithHash = uuidv5(JSON.stringify(template), MY_NAMESPACE);
+  console.log(hashWithHash);
+  console.log(template);
+
+  //delete template["hash"]
+  //const hashRemoveHash = uuidv5(JSON.stringify(template), MY_NAMESPACE);
+  //console.log(hashRemoveHash)
+
+  return template;
+};
+
+
+export const loadHifTemplate = (model, store) => {
   var parameters = model.parameters;
   console.log(parameters);
 
@@ -367,6 +466,80 @@ export const loadTemplate = (model, store) => {
     })();
     console.log("=============================================");
   })();
+
+  //airQuality["metricId"] = prePolicyAirQualityMetric[0];
+  //airQuality["seasonalMetricId"] = prePolicyAirQualityMetric[1];
+};
+
+export const loadExposureTemplate = (model, store) => {
+  var parameters = model.parameters;
+  console.log(parameters);
+
+  var pollutant = parameters.pollutant;
+
+  store.commit("exposure/updatePollutantId", pollutant.pollutantId);
+  store.commit(
+    "exposure/updatePollutantFriendlyName",
+    pollutant.pollutantFriendlyName
+  );
+
+  var air_quality_data = parameters.air_quality_data;
+  if (air_quality_data[0].type === "baseline") {
+    console.log("baseline: " + air_quality_data[0].id);
+    store.commit("exposure/updatePrePolicyAirQuality", {
+      prePolicyAirQualityId: air_quality_data[0].id,
+      prePolicyAirQualityName: air_quality_data[0].name,
+    });
+    store.commit(
+      "exposure/updatePrePolicyAirQualityMetricId",
+      air_quality_data[0].metricId + "-" + air_quality_data[0].seasonalMetricId
+    );
+
+    store.commit("exposure/updatePostPolicyAirQuality", {
+      postPolicyAirQualityId: air_quality_data[1].id,
+      postPolicyAirQualityName: air_quality_data[1].name,
+    });
+    store.commit(
+      "exposure/updatePostPolicyAirQualityMetricId",
+      air_quality_data[1].metricId + "-" + air_quality_data[1].seasonalMetricId
+    );
+  } else {
+    console.log("scenario: " + air_quality_data[0].id);
+    store.commit("exposure/updatePostPolicyAirQuality", {
+      postPolicyAirQualityId: air_quality_data[0].id,
+      postPolicyAirQualityName: "",
+    });
+    store.commit(
+      "exposure/updatePostPolicyAirQualityMetricId",
+      air_quality_data[0].metricId + "-" + air_quality_data[0].seasonalMetricId
+    );
+    store.commit("exposure/updatePostPolicyAirQuality", {
+      prePolicyAirQualityId: air_quality_data[1].id,
+      prePolicyAirQualityName: "",
+    });
+    store.commit(
+      "exposure/updatePrePolicyAirQualityMetricId",
+      air_quality_data[1].metricId + "-" + air_quality_data[1].seasonalMetricId
+    );
+  }
+
+  var population = parameters.population;
+
+  console.log("**** " + population.populationDatasetId)
+  console.log("**** " + population.populationDatasetName)
+  console.log("**** " + population.incidenceId)
+  console.log("**** " + population.incidenceName)
+
+  store.commit("exposure/updatePopulationDataset", {
+    populationDatasetId: population.populationDatasetId,
+    populationDatasetName: population.populationDatasetName,
+  });
+
+  console.log(parameters.exposureFunctionGroups);
+  store.commit("exposure/updateExposureFunctionGroups", parameters.exposureFunctionGroups);
+
+  var batchTaskObject = parameters.batchTaskObject;
+  store.commit("exposure/updateBatchTaskObject", batchTaskObject);
 
   //airQuality["metricId"] = prePolicyAirQualityMetric[0];
   //airQuality["seasonalMetricId"] = prePolicyAirQualityMetric[1];

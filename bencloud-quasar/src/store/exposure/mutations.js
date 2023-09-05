@@ -1,3 +1,4 @@
+import exposure from ".";
 
 export function updateStepNumber(state, stepNumber ) {
     state.stepNumber = stepNumber;
@@ -39,7 +40,7 @@ export function updateExposureFunctionGroups(state, exposureFunctionGroups) {
         ids.push(exposureFunctionGroups[i].exposureGroupId);
         names.push(exposureFunctionGroups[i].exposureGroupName);
     }
-
+    state.exposureFunctionGroups = exposureFunctionGroups;
     state.exposureFunctionGroupIds = ids;
     state.exposureFunctionGroupNames = names;
 }
