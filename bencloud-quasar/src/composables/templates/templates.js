@@ -121,7 +121,7 @@ export const createHifTemplate = (taskName, store) => {
     prePolicyAirQualityMetric = prePolicyAirQualityMetricId.split("-");
   }
   var postPolicyAirQualityMetric = [];
-  if(postPolicyAirQualityMetricId !== "") {
+  if(postPolicyAirQualityMetricId.length !== 0) {
     postPolicyAirQualityMetric = postPolicyAirQualityMetricId.split("-");
   }
 
@@ -268,7 +268,7 @@ export const createExposureTemplate = (taskName, store) => {
     prePolicyAirQualityMetric = prePolicyAirQualityMetricId.split("-");
   }
   var postPolicyAirQualityMetric = [];
-  if(postPolicyAirQualityMetricId !== "") {
+  if(postPolicyAirQualityMetricId.length !== 0) {
     postPolicyAirQualityMetric = postPolicyAirQualityMetricId.split("-");
   }
 
