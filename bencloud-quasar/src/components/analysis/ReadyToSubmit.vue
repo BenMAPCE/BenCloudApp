@@ -77,7 +77,7 @@
   </div>
   <div class="row enter-template-row">
     <div class="col-3">
-      <q-form @submit="saveTemplate()" class="q-gutter-md">
+      <q-form @submit="submitTemplate()" class="q-gutter-md">
         <q-input
           outlined
           dense
@@ -109,12 +109,12 @@
 
 <script>
 import { defineComponent } from "vue";
-import { ref, onBeforeMount, onMounted, watch } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { useStore } from "vuex";
 import { useQuasar } from "quasar";
 
-import { createTemplate, saveTemplate } from "../../composables/templates/templates";
-import { buildBatchTaskJSON, submitBatchTask } from "../../composables/analysis/batch-task";
+import { createHifTemplate, saveTemplate } from "../../composables/templates/templates";
+import { submitBatchTask } from "../../composables/analysis/batch-task";
 import TaskSubmittedDialog from "./TaskSubmittedDialog.vue";
 
 export default defineComponent({
@@ -181,7 +181,7 @@ export default defineComponent({
 
     function submitTemplate() {
 
-      var template = createTemplate(taskName.value, store);
+      var template = createHifTemplate(taskName.value, store);
 
       const templateNotification = $q.notify({
         group: false, // required to be updatable
@@ -194,7 +194,7 @@ export default defineComponent({
       (async () => {
         const response = await saveTemplate(
           templateName.value,
-          "v1",
+          "Health Impact Analysis",
           template,
           store
         ).fetch();

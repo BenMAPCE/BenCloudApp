@@ -68,7 +68,7 @@
 <script>
 import { defineComponent, ref, onMounted, onBeforeMount } from "vue";
 import AppTopNavigation from "../components/navigation/AppTopNavigation.vue";
-import { getTemplates, loadTemplate } from "../composables/templates/templates";
+import { getTemplates, loadHifTemplate, loadExposureTemplate } from "../composables/templates/templates";
 import { useStore } from "vuex";
 import axios from "axios";
 import { useQuasar } from "quasar";
@@ -147,20 +147,23 @@ export default defineComponent({
 
     function startAnalysisFromTemplate(template) {
      (async () => {
-        loadTemplate(template, store);
-
-        while (store.state.analysis.healthImpactFunctions.length === 0) {
-          await new Promise((resolve) => setTimeout(resolve, 1000));
+        if(template.type === "Health Impact Analysis") {
+          loadHifTemplate(template, store);
+          while (store.state.analysis.healthImpactFunctions.length === 0) {
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+          }
+          this.$router.replace('/analysis')
+        } else if(template.type === "Exposure Analysis") {
+          loadExposureTemplate(template, store);
+          this.$router.replace('/exposure')
         }
-
-        this.$router.replace('/analysis')
       })();
 
     }
 
     function goToReviewAnalysisFromTemplate() {
       (async () => {
-        loadTemplate(template, store);
+        loadHifTemplate(template, store);
 
         while (store.state.analysis.healthImpactFunctions.length === 0) {
           await new Promise((resolve) => setTimeout(resolve, 1000));
