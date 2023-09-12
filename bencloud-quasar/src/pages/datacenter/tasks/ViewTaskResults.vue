@@ -103,6 +103,31 @@ export default defineComponent({
           }
         }
         selected_scenario_year.value = scenario_years.value[0]
+        for(var i = 0; i < batch_info.value.tasks.length; i++) {
+          var currentTask = batch_info.value.tasks[i];
+          if(currentTask.task_type === "HIF" && currentTask.aq_scenario_name === selected_scenario_name.value && currentTask.pop_year === selected_scenario_year.value) {
+            valuation_task_uuid_with_type.value = "";
+            valuation_task_name.value = "";
+            task_uuid_with_type.value = "H-" + currentTask.task_uuid;
+            task_name.value = currentTask.task_name;
+            for(var j = 0; j < batch_info.value.tasks.length; j++) {
+              {
+                var currentTaskValuation = batch_info.value.tasks[j];
+                if(currentTaskValuation.task_type === "Valuation" && currentTaskValuation.task_parent_uuid === currentTask.task_uuid) {
+                  valuation_task_uuid_with_type.value = "V-" + currentTaskValuation.task_uuid
+                  valuation_task_name.value = currentTaskValuation.task_name;
+                }
+              }
+            }
+            continue
+          }
+          else if(currentTask.task_type === "Exposure" && currentTask.aq_scenario_name === selected_scenario_name.value && currentTask.pop_year === selected_scenario_year.value) {
+            valuation_task_uuid_with_type.value = "";
+            valuation_task_name.value = "";
+            task_uuid_with_type.value = "E-" + currentTask.task_uuid;
+            task_name.value = currentTask.task_name;
+          }
+        }
         componentKey.value += 1;
       }
     )
