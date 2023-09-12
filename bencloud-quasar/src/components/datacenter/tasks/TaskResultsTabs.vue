@@ -20,23 +20,24 @@
   <q-tab-panels v-model="tab" animated v-if="task_type != 'E'">
     <q-tab-panel name="results"> 
       <div v-if="task_type === 'H'">
-        <HIFTaskResults  v-bind:task_uuid="task_uuid" v-bind:task_name="task_name" v-bind:task_type="task_type" :key="componentKey"></HIFTaskResults>
+        <HIFTaskResults  v-bind:task_uuid="task_uuid" v-bind:task_name="task_name" v-bind:task_type="task_type" v-bind:batch_task_id="batch_task_id" :key="componentKey"></HIFTaskResults>
       </div>
     </q-tab-panel>
 
     <q-tab-panel name="valuation-results">
       <div v-if="valuation_task_type === 'V'">
-        <ValuationTaskResults  v-bind:valuation_task_uuid="valuation_task_uuid" v-bind:valuation_task_name="valuation_task_name" v-bind:valuation_task_type="valuation_task_type" :key="componentKey"></ValuationTaskResults>
+        <ValuationTaskResults  v-bind:valuation_task_uuid="valuation_task_uuid" v-bind:valuation_task_name="valuation_task_name" v-bind:valuation_task_type="valuation_task_type" v-bind:batch_task_id="batch_task_id" :key="componentKey"></ValuationTaskResults>
       </div>
       <div v-if="valuation_task_type === ''">
         No valuation results for the selected post-policy
       </div>
     </q-tab-panel>
   </q-tab-panels>
+
   <q-tab-panels v-model="tab" animated v-if="task_type == 'E'">
     <q-tab-panel name="results"> 
       <div v-if="task_type === 'E'">
-        <ExposureTaskResults  v-bind:task_uuid="task_uuid" v-bind:task_name="task_name" v-bind:task_type="task_type" :key="componentKey"></ExposureTaskResults>
+        <ExposureTaskResults  v-bind:task_uuid="task_uuid" v-bind:task_name="task_name" v-bind:task_type="task_type" v-bind:batch_task_id="batch_task_id" :key="componentKey"></ExposureTaskResults>
       </div>
     </q-tab-panel>
   </q-tab-panels>
@@ -53,7 +54,7 @@ import ExposureTaskResults from "./Exposure/ExposureTaskResults.vue";
 export default defineComponent({
   model: ref(null),
   name: "TaskResultsTab",
-  props: ["task_uuid_with_type", "task_name", "valuation_task_uuid_with_type", "valuation_task_name"],
+  props: ["task_uuid_with_type", "task_name", "valuation_task_uuid_with_type", "valuation_task_name", "batch_task_id"],
 
   components: {
     HIFTaskResults,
@@ -69,6 +70,7 @@ export default defineComponent({
     const valuation_task_name = ref("");
     const valuation_task_uuid = ref(null);
     const componentKey = ref(0);
+    const batch_task_id = ref(0);
 
     onBeforeMount(() => {
 
@@ -78,6 +80,7 @@ export default defineComponent({
         // console.log("--------------------------------")
         task_type.value = props.task_uuid_with_type.substring(0,1)
         task_uuid.value = props.task_uuid_with_type.substring(2)
+        batch_task_id.value = props.batch_task_id
         task_name.value = props.task_name
         // console.log("--------------------------------")
         valuation_task_type.value = props.valuation_task_uuid_with_type.substring(0,1)
