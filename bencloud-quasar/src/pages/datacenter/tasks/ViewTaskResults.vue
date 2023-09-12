@@ -103,6 +103,7 @@ export default defineComponent({
           }
         }
         selected_scenario_year.value = scenario_years.value[0]
+        componentKey.value += 1;
       }
     )
 
