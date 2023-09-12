@@ -50,6 +50,7 @@
     <div class="task-results">
       <TaskResultsTabs v-bind:task_uuid_with_type="task_uuid_with_type" v-bind:task_name="task_name" 
         v-bind:valuation_task_uuid_with_type="valuation_task_uuid_with_type" v-bind:valuation_task_name="valuation_task_name"
+        v-bind:batch_task_id = "batch_task_id"
         :key="componentKey"></TaskResultsTabs>
     </div>
 
