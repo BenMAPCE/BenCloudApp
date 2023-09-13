@@ -8,7 +8,7 @@
             BenMAP - Benefits Mapping and Analysis Program
           </q-toolbar-title>
 
-          <div>v{{ 0.02 }} beta {{ environment === 'Production' ? '' : '(' + environment + ')' }}</div>
+          <div>UI v{{ 0.1 }} | API v{{ apiVersion }} | DB v{{ dbVersion }} {{ environment === 'Production' ? '' : '(' + environment + ')' }}</div>
         </q-toolbar>
       </div>    </q-header>
 
@@ -37,17 +37,34 @@ export default defineComponent({
   setup() {
     const environment = ref("DDDDD");
     const showEpaHeaderFooter = ref(true);
+    const apiVersion = ref("");
+    const dbVersion = ref("");
 
     onBeforeMount(() => {
       environment.value = process.env.ENV_TYPE;
       if (environment.value === "Development") {
         showEpaHeaderFooter.value = true;
       }
+      (async () => {
+        try {
+          const result = await axios
+            .get(process.env.API_SERVER + "/api/version")
+            .then((response) => {
+              apiVersion.value = response.data.apiVersion;
+              dbVersion.value = response.data.dbVersion;
+            })
+        } catch (ex) {
+          console.log(ex)
+        }
+        finally { }
+      })();
     })();
 
     return {
       environment,
-      showEpaHeaderFooter
+      showEpaHeaderFooter,
+      apiVersion,
+      dbVersion
     };
   },
 });
