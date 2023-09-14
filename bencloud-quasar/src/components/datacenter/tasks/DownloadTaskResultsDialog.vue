@@ -247,10 +247,49 @@ export default {
 
       console.log("NAME: |" + this.name + "|");
       console.log("UUID: |" + this.task_uuid + "|");
-      if (this.name === "" && this.include!="all") {
-        this.errorMessage =
+      if (this.include=="all") {
+        var include_hif = 0;
+        var include_vf = 0;
+        var include_exp = 0;
+
+        for (var i = 0; i < this.resultType.length; i++){
+          if(this.resultType[i]=="hif"){
+            include_hif=1;
+          }
+          else if(this.resultType[i]=="vf"){
+            include_vf=1;
+          }
+          else if(this.resultType[i]=="exp"){
+            include_exp=1;
+          }
+        }
+
+        if(this.task_type === "H" || this.task_type === "V"){
+          include_exp=0;
+          if(include_hif==0 && include_vf==0){
+            this.errorMessage =
+            this.errorMessage + (hasErrors ? ", " : "") + "Please select a result type.";
+          hasErrors = true;
+          }
+          
+        }
+        else if(this.task_type === "E"){
+          include_hif=0;
+          include_vf=0;
+          if(include_exp==0){
+              this.errorMessage =
+              this.errorMessage + (hasErrors ? ", " : "") + "Please select a result type";
+            hasErrors = true;
+          }        
+        }        
+      }
+      else{
+        if(this.name === ""){
+          this.errorMessage =
           this.errorMessage + (hasErrors ? ", " : "") + "Name is required";
-        hasErrors = true;
+          hasErrors = true;
+        }
+
       }
 
       if (this.grid.length === 0) {
@@ -259,40 +298,7 @@ export default {
         hasErrors = true;
       }
 
-      var include_hif = 0;
-      var include_vf = 0;
-      var include_exp = 0;
-
-      for (var i = 0; i < this.resultType.length; i++){
-        if(this.resultType[i]=="hif"){
-          include_hif=1;
-        }
-        else if(this.resultType[i]=="vf"){
-          include_vf=1;
-        }
-        else if(this.resultType[i]=="exp"){
-          include_exp=1;
-        }
-      }
-
-      if(this.task_type === "H" || this.task_type === "E"){
-        include_exp=0;
-        if(include_hif==0 && include_vf==0){
-          this.errorMessage =
-          this.errorMessage + (hasErrors ? ", " : "") + "Please select a result type";
-        hasErrors = true;
-        }
-        
-      }
-      else if(this.task_type === "E"){
-        include_hif=0;
-        include_vf=0;
-        if(include_exp==0){
-            this.errorMessage =
-            this.errorMessage + (hasErrors ? ", " : "") + "Please select a result type";
-          hasErrors = true;
-        }        
-      }
+      
 
       if (hasErrors) {
         return;
@@ -307,8 +313,7 @@ export default {
       });
 
       
-      console.log(this.batch_task_id + "|" + include_hif + "|" + include_vf + "|" + include_exp);
-
+      // console.log(this.batch_task_id + "|" + include_hif + "|" + include_vf + "|" + include_exp);
 
       var gridList = "";
       for (var i = 0; i < this.grid.length; i++){
