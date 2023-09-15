@@ -25,7 +25,7 @@
     <q-tab-panel name="standard">
       <div class="header-text">
         Estimate a standard set of health effects
-        <span>
+        <!-- <span>
           <q-icon name="mdi-information" />
           <q-tooltip
             class="bg-grey-11 text-black tooltip"
@@ -36,7 +36,7 @@
           >
             {{ heTooltip }}
           </q-tooltip>
-        </span>
+        </span> -->
       </div>
       <Suspense>
         <HealthEffectsStandard></HealthEffectsStandard>
