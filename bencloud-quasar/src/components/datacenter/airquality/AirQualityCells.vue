@@ -3,6 +3,7 @@
     :rows="rows"
     :columns="columns"
     v-model:pagination="pagination"
+    :rows-per-page-options="[5, 10, 25, 50]"
     :loading="loading"
     :filter="filter"
     @request="onRequest"
