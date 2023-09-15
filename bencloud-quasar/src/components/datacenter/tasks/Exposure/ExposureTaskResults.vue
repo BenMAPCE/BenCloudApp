@@ -203,14 +203,14 @@ const columns = [
   {
     name: "baseline_aq",
     label: "Pre-policy Conc (μm/m3)",
-    field: "baseline_aq",
+    field: (row) => row.baseline_aq.toLocaleString("en-US", { maximumFractionDigits: 4 }),
     sort: (a, b, rowA, rowB) => parseFloat(rowA.baseline_aq) - parseFloat(rowB.baseline_aq),
     sortable: true,
   },
   {
     name: "scenario_aq",
     label: "Post-policy Conc (μm/m3)",
-    field: "scenario_aq",
+    field: (row) => row.scenario_aq.toLocaleString("en-US", { maximumFractionDigits: 4 }),
     sort: (a, b, rowA, rowB) => parseFloat(rowA.scenario_aq) - parseFloat(rowB.scenario_aq),
     sortable: true,
   },
@@ -242,21 +242,6 @@ const columns = [
       row.percent_of_population.toLocaleString("en-US", { maximumFractionDigits: 4 }),
     sort: (a, b, rowA, rowB) => parseFloat(rowA.percent_of_population) - parseFloat(rowB.percent_of_population),
     sortable: true,
-  },
-
-  {
-    name: "download",
-    label: "Action",
-    field: "",
-    align: "center",
-    sortable: false,
-    style: "width: 200px",
-  },
-  {
-    name: "result",
-    label: "Result",
-    field: "result",
-    sortable: false
   },
   {
     name: "formatted_results_2sf",
