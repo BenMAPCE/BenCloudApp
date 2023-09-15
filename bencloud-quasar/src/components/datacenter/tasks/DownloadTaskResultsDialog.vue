@@ -190,11 +190,11 @@ export default {
       include: ref('current'),
       includeOptions: [
         {
-          label: "Current Scenario",
+          label: "Currently Viewed Results",
           value: "current",
         },
         {
-          label: "All Scenarios",
+          label: "All Results",
           value: "all",
         },
       ],
@@ -370,7 +370,7 @@ export default {
             .split(";")[0];
           }
           else{
-            //use user entered name when exporting current scenario
+            //use user entered name when exporting currently viewed data
             fileName=this.name + ".zip";
           }
             const url = window.URL.createObjectURL(new Blob([response.data]));
