@@ -88,7 +88,7 @@
             >
               <q-btn-dropdown color="primary" label="" dense>
                 <q-list>
-                  <q-item dense clickable v-close-popup @click="onClickViewExport(props)">
+                  <q-item v-if="props.row.batch_task_user_id == userId" dense clickable v-close-popup @click="onClickViewExport(props)">
                     <q-item-section>
                       <q-item-label>View/Export Results</q-item-label>
                     </q-item-section>
@@ -218,6 +218,7 @@ export default defineComponent({
   setup(props, context) {
     const store = useStore();
     const $q = useQuasar();
+    const userId = ref("");
 
     const rows = ref([]);
     const filter = ref("");
@@ -377,6 +378,21 @@ export default defineComponent({
         });
     }
 
+    onBeforeMount(() => {
+      (async () => {
+        try {
+          const result = await axios
+            .get(process.env.API_SERVER + "/api/user")
+            .then((response) => {
+              userId.value = response.data.uid;
+            })
+        } catch (ex) {
+          console.log(ex)
+        }
+        finally { }
+      })();
+    })
+
     onMounted(() => {
       loadCompletedTasks()
       enableAutoRefresh()
@@ -388,6 +404,7 @@ export default defineComponent({
     })
 
     return {
+      userId,
       columns,
       filter,
       loading,
