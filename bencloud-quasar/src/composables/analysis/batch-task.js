@@ -104,8 +104,9 @@ export const submitBatchTask = (batchTaskJSON, store) => {
       .post(process.env.API_SERVER + "/api/batch-tasks", batchTaskJSON)
       .then((response) => {
         data.value = response.data;
-        console.log(data.value);
+        //console.log(data.value);
         return data.value;
+        //return { response, error, data, loading };
       });
     } catch (ex) {
         error.value = ex;

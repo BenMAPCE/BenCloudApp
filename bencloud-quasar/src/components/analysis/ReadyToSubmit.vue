@@ -254,26 +254,33 @@ export default defineComponent({
       // console.log(template);
       // console.log("--------------------");
 
-      batchTaskId = submitBatchTask(batchTaskJSON, store).fetch();
-
-      $q.dialog({
-        component: TaskSubmittedDialog,
-        parent: this,
-        persistent: true,
-        componentProps: {
-          taskName: taskName,
-        },
-      })
-        .onOk(() => {
-          //taskName.value = ""
-          this.$router.replace("/datacenter/manage-tasks");
-        })
-        .onCancel(() => {
-          // Sounds backwards, but clicking on the 'OK' button is actually a Cancel since we don't
-          // want the user to go anywhere (we're cancelling out of the dialog)
-          // Clear the task name field
-          taskName.value = "";
-        });
+      (async () => {
+        const response = await submitBatchTask(batchTaskJSON, store).fetch();
+        //why is response always undifined???
+        if(!!response){
+            alert(response.data.value.message);
+          }
+          else{
+            $q.dialog({
+            component: TaskSubmittedDialog,
+            parent: this,
+            persistent: true,
+            componentProps: {
+              taskName: taskName,
+            },
+          })
+            .onOk(() => {
+              //taskName.value = ""
+              this.$router.replace("/datacenter/manage-tasks");
+            })
+            .onCancel(() => {
+              // Sounds backwards, but clicking on the 'OK' button is actually a Cancel since we don't
+              // want the user to go anywhere (we're cancelling out of the dialog)
+              // Clear the task name field
+              taskName.value = "";
+            });
+          }
+      })();        
     }
 
     onMounted(() => {
