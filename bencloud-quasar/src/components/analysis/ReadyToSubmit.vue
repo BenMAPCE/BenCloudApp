@@ -256,19 +256,15 @@ export default defineComponent({
 
       (async () => {
         const response = await submitBatchTask(batchTaskJSON, store).fetch();
-        //why is response always undifined???
-        if(!!response){
-            alert(response.data.value.message);
-          }
-          else{
-            $q.dialog({
-            component: TaskSubmittedDialog,
-            parent: this,
-            persistent: true,
-            componentProps: {
-              taskName: taskName,
-            },
-          })
+        if(response.data.value.message=="Task was submitted"){
+          $q.dialog({
+              component: TaskSubmittedDialog,
+              parent: this,
+              persistent: true,
+              componentProps: {
+                taskName: taskName,
+              },
+            })
             .onOk(() => {
               //taskName.value = ""
               this.$router.replace("/datacenter/manage-tasks");
@@ -279,6 +275,10 @@ export default defineComponent({
               // Clear the task name field
               taskName.value = "";
             });
+          }
+          else{
+            //Usually when reached the maximum of # task scenarios allowed per user.
+            alert(response.data.value.message);
           }
       })();        
     }
