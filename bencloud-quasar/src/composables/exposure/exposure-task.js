@@ -110,6 +110,7 @@ export const submitExposureTask = (exposureTaskJSON, store) => {
   const data = ref(null);
   const error = ref(null);
   const loading = ref(false);
+  const response = ref(false);
     
   const fetch = async () => {
     console.log("submitting exposureTask")
@@ -122,7 +123,8 @@ export const submitExposureTask = (exposureTaskJSON, store) => {
       .then((response) => {
         data.value = response.data;
         console.log(data.value);
-        return data.value;
+        //return data.value;
+        return { response, error, data, loading };
       });
     } catch (ex) {
         error.value = ex;
@@ -130,6 +132,10 @@ export const submitExposureTask = (exposureTaskJSON, store) => {
           console.log(error.value.response.status + " error occured");
         }
     } 
+    finally{
+      loading.value=false;
+      return {response, error, data, loading};
+    }
   };
   return { fetch };
 }

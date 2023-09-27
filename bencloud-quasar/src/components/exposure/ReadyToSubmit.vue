@@ -205,29 +205,34 @@ export default defineComponent({
       console.log("----- Batch task configuration -----")
       console.log(batchTaskJSON);
 
-      batchTaskId = submitExposureTask(batchTaskJSON, store).fetch();
-
-      $q.dialog({
-        component: TaskSubmittedDialog,
-        parent: this,
-        persistent: true,
-        componentProps: {
-          taskName: taskName,
-        },
-      })
-        .onOk(() => {
-          //taskName.value = ""
-          this.$router.replace("/datacenter/manage-tasks");
-        })
-        .onCancel(() => {
-          // Sounds backwards, but clicking on the 'OK' button is actually a Cancel since we don't
-          // want the user to go anywhere (we're cancelling out of the dialog)
-          // Clear the task name field
-          taskName.value = "";
-        });
+      (async () => {
+        const response = await submitExposureTask(batchTaskJSON, store).fetch();
+        if(response.data.value.message=="Task was submitted"){
+          $q.dialog({
+              component: TaskSubmittedDialog,
+              parent: this,
+              persistent: true,
+              componentProps: {
+                taskName: taskName,
+              },
+            })
+            .onOk(() => {
+              //taskName.value = ""
+              this.$router.replace("/datacenter/manage-tasks");
+            })
+            .onCancel(() => {
+              // Sounds backwards, but clicking on the 'OK' button is actually a Cancel since we don't
+              // want the user to go anywhere (we're cancelling out of the dialog)
+              // Clear the task name field
+              taskName.value = "";
+            });
+          }
+          else{
+            //Usually when reached the maximum of # task scenarios allowed per user.
+            alert(response.data.value.message);
+          }
+      })();       
     }
-
-
 
     onBeforeMount(() => {
 
