@@ -5,7 +5,6 @@
       dense
       outlined
       v-model="selectedItems"
-      multiple
       :options="rows"
       option-value="id"
       option-label="name"
