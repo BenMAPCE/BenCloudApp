@@ -247,7 +247,7 @@ const columns = [
     name: "annual_metric",
     align: "left",
     label: "Annual Metric",
-    field: "metric",
+    field: "annual_statistic",
     sortable: true,
   },
   {
