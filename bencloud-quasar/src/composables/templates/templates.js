@@ -247,7 +247,7 @@ export const createExposureTemplate = (taskName, store) => {
   const populationDatasetName = store.state.exposure.populationDatasetName;
   const pollutantId = store.state.exposure.pollutantId;
   const pollutantFriendlyName = store.state.exposure.pollutantFriendlyName;
-  const exposureFunctionGroups = store.state.exposure.exposureFunctionGroups;
+  const exposureFunctionGroups = store.state.exposure.exposureFunctionGroup;
   const batchTaskObject = store.state.exposure.batchTaskObject;
 
   var template = {};
@@ -295,18 +295,14 @@ export const createExposureTemplate = (taskName, store) => {
 
   template["population"] = population;
 
-  var selectedExposureFunctionGroups = [];
   var selectedExposureFunctionGroup = {};
 
-  console.log("***** " + exposureFunctionGroups.length);
-  for (var efg = 0; efg < exposureFunctionGroups.length; efg++) {
+  console.log("***** " + exposureFunctionGroups);
     selectedExposureFunctionGroup = {};
-    selectedExposureFunctionGroup["exposureGroupId"] = exposureFunctionGroups[efg].exposureGroupId;
+    selectedExposureFunctionGroup["exposureGroupId"] = exposureFunctionGroups.exposureGroupId;
     selectedExposureFunctionGroup["exposureGroupName"] =
-      exposureFunctionGroups[efg].exposureGroupName;
-    selectedExposureFunctionGroups.push(selectedExposureFunctionGroup);
-  }
-  template["exposureFunctionGroups"] = selectedExposureFunctionGroups;
+      exposureFunctionGroups.exposureGroupName;
+  template["exposureFunctionGroups"] = selectedExposureFunctionGroup;
 
   template["batchTaskObject"] = batchTaskObject;
 
@@ -536,7 +532,7 @@ export const loadExposureTemplate = (model, store) => {
   });
 
   console.log(parameters.exposureFunctionGroups);
-  store.commit("exposure/updateExposureFunctionGroups", parameters.exposureFunctionGroups);
+  store.commit("exposure/updateExposureFunctionGroup", parameters.exposureFunctionGroups);
 
   var batchTaskObject = parameters.batchTaskObject;
   store.commit("exposure/updateBatchTaskObject", batchTaskObject);

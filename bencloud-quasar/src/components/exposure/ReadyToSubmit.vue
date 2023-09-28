@@ -27,7 +27,7 @@
           <div>{{ this.populationDatasetName }}</div>
         </div>
         <div class="row odd choices">
-          <div class="title">Exposure Function Groups</div>
+          <div class="title">Exposure Function Group</div>
           <div>{{ this.exposureFunctionGroups }}</div>
         </div>
         <div class="row even choices">
@@ -135,7 +135,7 @@ export default defineComponent({
 
     const populationDatasetId = store.state.exposure.populationDatasetId;
     const populationDatasetName = store.state.exposure.populationDatasetName;
-    const exposureFunctionGroups = store.state.exposure.exposureFunctionGroupNames.toString().replaceAll(",", ", ");
+    const exposureFunctionGroups = store.state.exposure.exposureFunctionGroupName;
 
     const taskName = ref("");
     const templateName = ref("");

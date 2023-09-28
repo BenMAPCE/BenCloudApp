@@ -96,11 +96,7 @@ export const exposureFunctionGroupsHasValue = (store) => {
 
     var isValid = true;
 
-    if (store.state.exposure.exposureFunctionGroupIds) {
-        if ((store.state.exposure.exposureFunctionGroupIds).length === 0) {
-            isValid = false;
-        }
-    } else {
+    if (!store.state.exposure.exposureFunctionGroupId) {
         isValid = false;
     }
 
