@@ -19,7 +19,7 @@ export const postPolicyAirQualityIdHasValue = (store) => {
 
     var isValid = true;
 
-    if (store.state.exposure.postPolicyAirQualityId) {
+    if (store.state.exposure.postPolicyAirQualityId.length) {
         if (store.state.exposure.postPolicyAirQualityId === 0) {
             isValid = false;
         }
@@ -92,15 +92,11 @@ export const incidenceIdHasValue = (store) => {
     return isValid
 }
 
-export const populationGroupsHasValue = (store) => {
+export const exposureFunctionGroupsHasValue = (store) => {
 
     var isValid = true;
 
-    if (store.state.exposure.populationGroups) {
-        if ((store.state.exposure.populationGroups).length === 0) {
-            isValid = false;
-        }
-    } else {
+    if (!store.state.exposure.exposureFunctionGroupId) {
         isValid = false;
     }
 

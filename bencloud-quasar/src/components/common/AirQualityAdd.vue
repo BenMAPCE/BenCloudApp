@@ -1,6 +1,6 @@
 <template>
   <q-btn no-caps push color="primary" ref="btn" @click="alert">
-    ADD {{ pollutantFriendlyName.includes("μm") ? pollutantFriendlyName.toUpperCase().replace("ΜM","μm") : pollutantFriendlyName.toUpperCase()}} AIR QUALITY LAYER</q-btn
+    ADD AIR QUALITY DATA</q-btn
   >
 </template>
 

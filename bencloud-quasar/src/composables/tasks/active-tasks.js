@@ -14,20 +14,25 @@ export const getActiveTasks = (userIdentifier) => {
     const fetch = async() => {
         loading.value = true;
         try {
-
-            const result = await axios
-                .get(process.env.API_SERVER + "/api/tasks/pending", {
-            params: {
-                page: 1,
-                rowsPerPage: 9999999,
-                showAll: showAllTasks.value,
-                },
-            })
-            .then((response) => {
-                console.log("Tasks Pending")
-                data.value = response.data
-                console.log(data.value)
-            })
+            try {
+                const result = await axios
+                    .get(process.env.API_SERVER + "/api/batch-tasks/pending", {
+                params: {
+                    page: 1,
+                    rowsPerPage: 9999999,
+                    showAll: showAllTasks.value,
+                    },
+                })
+                .then((response) => {
+                    data.value = response.data
+                    // console.log(response.data)
+                })
+            } catch (ex) {
+                error.value = ex;
+            } finally {
+                loading.value = false;
+                return {response, error, data, loading }
+            }
         } catch (ex) {
             error.value = ex;
         } finally {

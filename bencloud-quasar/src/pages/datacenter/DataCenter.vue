@@ -6,15 +6,26 @@
         <q-card-actions vertical>
           <q-btn
             color="primary"
-            icon-right="mdi-grid"
+            icon-right="mdi-file-tree"
             push
             @click="$router.replace('/datacenter/manage-tasks')"
             label="Manage Tasks"
           />
         </q-card-actions>
       </q-card>
-
       <q-card class="my-card task-card">
+        <q-card-section> View or upload datasets. </q-card-section>
+        <q-card-actions vertical>
+          <q-btn
+            color="secondary"
+            icon-right="mdi-database-outline"
+            push
+            @click="$router.replace('/datacenter/manage-data')"
+            label="Manage Data"
+          />
+        </q-card-actions>
+      </q-card>
+      <!-- <q-card class="my-card task-card">
         <q-card-section> Review Air Quality Layers </q-card-section>
         <q-card-actions vertical>
           <q-btn
@@ -25,7 +36,19 @@
             label="Review Air Quality Layers"
           />
         </q-card-actions>
-      </q-card>
+      </q-card> -->
+      <!-- <q-card class="my-card task-card">
+        <q-card-section> Review Incidence Data </q-card-section>
+        <q-card-actions vertical>
+          <q-btn
+            color="tertiary"
+            icon-right="mdi-air-filter"
+            push
+            @click="$router.replace('/datacenter/review-incidence')"
+            label="Review Incidence Data"
+          />
+        </q-card-actions>
+      </q-card> -->
 
     </div>
   </q-page>

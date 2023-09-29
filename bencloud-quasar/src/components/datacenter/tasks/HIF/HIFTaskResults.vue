@@ -61,7 +61,7 @@ export default defineComponent({
   model: ref(null),
   name: "HIFTaskResults",
 
-  props: ["task_uuid", "task_name", "task_type"],
+  props: ["task_uuid", "task_name", "task_type", "batch_task_id"],
 
   setup(props, context) {
     //const task_type = ref("");
@@ -98,6 +98,7 @@ export default defineComponent({
           task_uuid: props.task_uuid,
           task_name: props.task_name,
           task_type: props.task_type,
+          batch_task_id: props.batch_task_id,
         },
       })
         .onOk(() => {
@@ -257,14 +258,14 @@ const columns = [
   {
     name: "baseline_aq",
     label: "Pre-policy AQ",
-    field: "baseline_aq",
+    field: (row) => row.baseline_aq.toLocaleString("en-US", { maximumFractionDigits: 4 }),
     sort: (a, b, rowA, rowB) => parseFloat(rowA.baseline_aq) - parseFloat(rowB.baseline_aq),
     sortable: true,
   },
   {
     name: "scenario_aq",
     label: "Post-policy AQ",
-    field: "scenario_aq",
+    field: (row) => row.scenario_aq.toLocaleString("en-US", { maximumFractionDigits: 4 }),
     sort: (a, b, rowA, rowB) => parseFloat(rowA.scenario_aq) - parseFloat(rowB.scenario_aq),
     sortable: true,
   },
@@ -306,14 +307,17 @@ const columns = [
     sort: (a, b, rowA, rowB) => parseFloat(rowA.percent_of_baseline) - parseFloat(rowB.percent_of_baseline),
     sortable: true,
   },
-
   {
-    name: "download",
-    label: "Action",
-    field: "",
-    align: "center",
-    sortable: false,
-    style: "width: 200px",
+    name: "formatted_results_2sf",
+    label: "Formatted Results (2 sig. figs.)",
+    field: "formatted_results_2sf",
+    sortable: false
+  },
+  {
+    name: "formatted_results_3sf",
+    label: "Formatted Results (3 sig. figs.)",
+    field: "formatted_results_3sf",
+    sortable: false
   },
 ];
 </script>

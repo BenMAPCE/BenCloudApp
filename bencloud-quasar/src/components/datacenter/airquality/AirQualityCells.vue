@@ -3,6 +3,7 @@
     :rows="rows"
     :columns="columns"
     v-model:pagination="pagination"
+    :rows-per-page-options="[5, 10, 25, 50]"
     :loading="loading"
     :filter="filter"
     @request="onRequest"
@@ -146,6 +147,7 @@ export default defineComponent({
     }
 
     function loadAirQualityCells(props) {
+      console.log(store.state.airquality.airQualityLayerId);
       console.log(props.pagination);
       const { page, rowsPerPage, sortBy, descending } = props.pagination;
       const filter = props.filter;
@@ -245,7 +247,7 @@ const columns = [
     name: "annual_metric",
     align: "left",
     label: "Annual Metric",
-    field: "metric",
+    field: "annual_statistic",
     sortable: true,
   },
   {

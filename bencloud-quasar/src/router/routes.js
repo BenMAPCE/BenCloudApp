@@ -146,7 +146,31 @@ const routes = [
       {
         path: "",
         component: () =>
-          import("src/pages/datacenter/airquality/ReviewAirQuality.vue"),
+          import("src/pages/datacenter/managedata/airquality/ReviewAirQuality.vue"),
+        meta: { requiresUser: true, requiresAdmin: false },
+      },
+    ],
+  },
+  {
+    path: "/datacenter/review-incidence",
+    component: () => import("layouts/MainLayout.vue"),
+    children: [
+      {
+        path: "",
+        component: () =>
+          import("src/pages/datacenter/managedata/incidence/ReviewIncidence.vue"),
+        meta: { requiresUser: true, requiresAdmin: false },
+      },
+    ],
+  },
+  {
+    path: "/datacenter/review-grids",
+    component: () => import("layouts/MainLayout.vue"),
+    children: [
+      {
+        path: "",
+        component: () =>
+          import("src/pages/datacenter/managedata/grids/ReviewGridDefinitions.vue"),
         meta: { requiresUser: true, requiresAdmin: false },
       },
     ],
@@ -159,6 +183,17 @@ const routes = [
       {
         path: "",
         component: () => import("src/pages/datacenter/tasks/ManageTasks.vue"),
+        meta: { requiresUser: true, requiresAdmin: false },
+      },
+    ],
+  },
+  {
+    path: "/datacenter/manage-data",
+    component: () => import("layouts/MainLayout.vue"),
+    children: [
+      {
+        path: "",
+        component: () => import("src/pages/datacenter/managedata/ManageData.vue"),
         meta: { requiresUser: true, requiresAdmin: false },
       },
     ],
@@ -176,7 +211,7 @@ const routes = [
     ],
   },
   {
-    path: "/datacenter/view-export-task/:task_uuid",
+    path: "/datacenter/view-export-task/:batch_task_id-:task_uuid",
     props: true,
     name: "view-results",
     component: () => import("layouts/MainLayout.vue"),

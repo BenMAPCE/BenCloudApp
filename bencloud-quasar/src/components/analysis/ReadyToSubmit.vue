@@ -77,7 +77,7 @@
   </div>
   <div class="row enter-template-row">
     <div class="col-3">
-      <q-form @submit="saveTemplate()" class="q-gutter-md">
+      <q-form @submit="submitTemplate()" class="q-gutter-md">
         <q-input
           outlined
           dense
@@ -109,13 +109,12 @@
 
 <script>
 import { defineComponent } from "vue";
-import { ref, onBeforeMount, onMounted, watch } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { useStore } from "vuex";
 import { useQuasar } from "quasar";
 
-import { createTemplate, saveTemplate } from "../../composables/templates/templates";
-import { buildHifTaskJSON, submitHifTask } from "../../composables/analysis/hif-task";
-import { buildValuationTaskJSON } from "../../composables/analysis/valuation-task";
+import { createHifTemplate, saveTemplate } from "../../composables/templates/templates";
+import { submitBatchTask } from "../../composables/analysis/batch-task";
 import TaskSubmittedDialog from "./TaskSubmittedDialog.vue";
 
 export default defineComponent({
@@ -155,7 +154,7 @@ export default defineComponent({
     const templateName = ref("");
     const errorMessage = ref("");
 
-    var hifTaskId = null;
+    var batchTaskId = null;
     var valuationFunctionCount = null;
     var totalTaskCount = null;
 
@@ -172,17 +171,17 @@ export default defineComponent({
     }
 
     watch(
-      () => hifTaskId,
-      (currentHifTaskId, prevHifTaskId) => {
-        if (currentHifTaskId != prevHifTaskId) {
-          // console.log("yes... " + currentHifTaskId);
+      () => batchTaskId,
+      (currentBatchTaskId, prevBatchTaskId) => {
+        if (currentBatchTaskId != prevBatchTaskId) {
+          // console.log("yes... " + currentBatchTaskId);
         }
       }
     );
 
     function submitTemplate() {
 
-      var template = createTemplate(taskName.value, store);
+      var template = createHifTemplate(taskName.value, store);
 
       const templateNotification = $q.notify({
         group: false, // required to be updatable
@@ -195,7 +194,7 @@ export default defineComponent({
       (async () => {
         const response = await saveTemplate(
           templateName.value,
-          "v1",
+          "Health Impact Analysis",
           template,
           store
         ).fetch();
@@ -243,38 +242,45 @@ export default defineComponent({
         healthEffectsNamesList.length - 2
       );
 
-      var hifTaskJSON = JSON.parse(JSON.stringify(store.state.analysis.batchTaskObject));
-      hifTaskJSON['name'] = taskName.value;
-      hifTaskJSON['gridDefinitionId'] = store.state.analysis.aggregationScale;
-      store.commit("analysis/updateBatchTaskObject", hifTaskJSON);
+      var batchTaskJSON = JSON.parse(JSON.stringify(store.state.analysis.batchTaskObject));
+      batchTaskJSON['name'] = taskName.value;
+      batchTaskJSON['gridDefinitionId'] = store.state.analysis.aggregationScale;
+      store.commit("analysis/updateBatchTaskObject", batchTaskJSON);
       console.log("----- Batch task configuration -----")
-      console.log(hifTaskJSON);
+      console.log(batchTaskJSON);
 
       // var template = createTemplate(taskName.value, store);
       // console.log("----- template -----");
       // console.log(template);
       // console.log("--------------------");
 
-      hifTaskId = submitHifTask(hifTaskJSON, store).fetch();
-
-      $q.dialog({
-        component: TaskSubmittedDialog,
-        parent: this,
-        persistent: true,
-        componentProps: {
-          taskName: taskName,
-        },
-      })
-        .onOk(() => {
-          //taskName.value = ""
-          this.$router.replace("/datacenter/manage-tasks");
-        })
-        .onCancel(() => {
-          // Sounds backwards, but clicking on the 'OK' button is actually a Cancel since we don't
-          // want the user to go anywhere (we're cancelling out of the dialog)
-          // Clear the task name field
-          taskName.value = "";
-        });
+      (async () => {
+        const response = await submitBatchTask(batchTaskJSON, store).fetch();
+        if(response.data.value.message=="Task was submitted"){
+          $q.dialog({
+              component: TaskSubmittedDialog,
+              parent: this,
+              persistent: true,
+              componentProps: {
+                taskName: taskName,
+              },
+            })
+            .onOk(() => {
+              //taskName.value = ""
+              this.$router.replace("/datacenter/manage-tasks");
+            })
+            .onCancel(() => {
+              // Sounds backwards, but clicking on the 'OK' button is actually a Cancel since we don't
+              // want the user to go anywhere (we're cancelling out of the dialog)
+              // Clear the task name field
+              taskName.value = "";
+            });
+          }
+          else{
+            //Usually when reached the maximum of # task scenarios allowed per user.
+            alert(response.data.value.message);
+          }
+      })();        
     }
 
     onMounted(() => {

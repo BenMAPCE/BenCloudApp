@@ -234,6 +234,8 @@ export default {
       this.errorMessage = "";
 
       console.log(this.selected_file);
+      console.log(this.selected_file.name);
+
 
       if (this.name === "") {
         this.errorMessage =
@@ -332,6 +334,7 @@ export default {
           console.log(response.statusText);
           console.log(response.data.success);
           console.log(response.data.messages);
+          
 
           if (response.data.success === false) {
             console.log("BAD NEWS");
@@ -345,7 +348,7 @@ export default {
                   persistent: true,
                   componentProps: {
                     errorList: response.data.messages,
-                    filename: this.selected_file.name,
+                    fileName: this.selected_file.name,
                   },
                 })
                 .onOk(() => {
@@ -364,7 +367,7 @@ export default {
                 parent: this,
                 persistent: true,
                 componentProps: {
-                  filename: this.selected_file.name,
+                  fileName: this.selected_file.name,
                   parentDialog: this.$refs.dialog,
                 },
               })

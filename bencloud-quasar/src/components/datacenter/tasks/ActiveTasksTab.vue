@@ -1,19 +1,122 @@
 <template>
 
-      <q-table
-        :rows="rows"
-        :columns="columns"
-        row-key="name"
-        :rows-per-page-options="[0]"
-        v-model:pagination="pagination"
-        :loading="loading"
-        :filter="filter"
-        @request="getActiveTasks"
-        binary-state-sort
-        v-model:selected="selected"
-        class="active-tasks"
-        :visible-columns="visibleColumns"
-      >
+    <q-table
+      :rows="rows"
+      :columns="columns"
+      row-key="batch_task_name"
+      :rows-per-page-options="[0]"
+      v-model:pagination="pagination"
+      :loading="loading"
+      :filter="filter"
+      @request="getActiveTasks"
+      binary-state-sort
+      v-model:selected="selected"
+      class="active-tasks"
+      :visible-columns="visibleColumns"
+    >
+      <template v-slot:body="props">
+        <q-tr :props="props">
+          <q-td
+            key="expand"
+            name="expand"
+            :props="props"
+            auto-width
+          >
+            <q-btn
+              flat
+              round
+              color="primary"
+              :icon="props.expand ? 'mdi-minus-circle' : 'mdi-plus-circle'"
+              @click="props.expand = !props.expand"
+            />
+          </q-td>
+          <q-td
+            key="task_name"
+            :props="props"
+          >
+            {{ props.row.batch_task_name }}
+          </q-td>
+          <q-td
+            key="task_status_message"
+            :props="props"
+          >
+            {{ props.row.batch_started_date }}
+          </q-td>
+          <q-td
+            key="user"
+            :props="props"
+          >
+            {{ props.row.batch_task_user_id }}
+          </q-td>
+          <q-td
+            key="task_progress_message"
+            :props="props"
+          >
+            {{ props.row.batch_task_progress }}
+          </q-td>
+          <q-td
+            key="actions"
+            :props="props"
+          >
+            <q-btn color="primary" label="Cancel" 
+                @click="onClickCancelBatchTask(props)"
+              />
+          </q-td>
+        </q-tr>
+        <!-- We show the details if "props.expand" is true -->
+        <q-tr v-for="row in props.row.tasks" :key="row.task_name"
+          v-show="props.expand"
+          :props="props"
+        >
+          <q-td
+            key="expand"
+            :props="props"
+          >
+          </q-td>
+          <q-td
+            key="task_name"
+            :props="props"
+          >
+            {{ row.task_name }}
+          </q-td>
+          <q-td
+            key="task_status_message"
+            :props="props"
+          >
+            {{ row.task_status_message ? row.task_status_message : "Pending" }}
+          </q-td>
+          <q-td
+            key="user"
+            :props="props"
+          >
+            {{ props.row.task_user_id }}
+          </q-td>
+          <q-td
+            key="task_progress_message"
+            :props="props"
+          >
+            <q-linear-progress size="25px" :value="row.task_percentage/100" color="accent" v-if="row.task_status_message != 'Pending' && row.task_progress_message != 'Complete'">
+              <div class="absolute-full flex flex-center">
+                <q-badge color="white" text-color="accent" :label="row.task_percentage + ' %'" />
+              </div>
+            </q-linear-progress>
+
+            <ActiveTaskStatus :status = row.task_progress_message>
+
+            </ActiveTaskStatus>
+
+          </q-td>
+          <q-td
+            key="actions"
+            :props="props"
+          >
+            <!-- <q-btn color="white" text-color="black" label="Cancel" v-if="row.task_status_message == 'Pending'" :size="'sm'"
+                @click="onClickCancelOneTask(row)"
+              /> -->
+          </q-td>
+        </q-tr>
+      </template>
+        
         <template v-slot:top-right>
           <!-- <q-btn
             color="primary"
@@ -29,29 +132,6 @@
               <q-icon name="mdi-magnify" />
             </template>
           </q-input>
-        </template>
-
-
-        <template v-slot:body-cell-task_progress_message="props">
-          <q-td :props="props">
-            <q-linear-progress size="25px" :value="props.row.task_percentage/100" color="accent" v-if="props.row.task_status_message != 'Pending'">
-              <div class="absolute-full flex flex-center">
-                <q-badge color="white" text-color="accent" :label="props.row.task_percentage + ' %'" />
-              </div>
-            </q-linear-progress>
-
-            <ActiveTaskStatus :status = props.row.task_progress_message>
-
-            </ActiveTaskStatus>
-
-
-          </q-td>
-        </template>
-
-        <template v-slot:body-cell-task_status="props">
-          <q-td :props="props">
-            <div>{{ props.value ? "Active" : "Pending" }}</div>
-          </q-td>
         </template>
       </q-table>
 
@@ -119,8 +199,13 @@ export default defineComponent({
 
       (async () => {
         const response = await getActiveTasks().fetch();
-        rows.value = unref(response.data).data;
-        console.log(rows.value)
+        // console.log(response);
+
+        rows.value = [];
+        for (var i = 0; i < (unref(response.data).data).length; i++) {
+          rows.value.push(unref(response.data).data[i]);
+        }
+
         loading.value = false;
       })();
 
@@ -151,6 +236,54 @@ export default defineComponent({
       //clearInterval(activeTasksRefreshInterval);
     })
 
+    function onClickCancelBatchTask(props){
+      // Prompt user to confirm canceling a batch task
+      console.log(props)
+      if(confirm("Are you sure you wish to cancel task " + props.row.batch_task_name + "?")){
+        cancelBatch(props);
+      }
+    }
+
+    function cancelBatch(props){
+      console.log( "Canceling " + process.env.API_SERVER + "/api/batch-tasks/" + props.row.batch_task_id);   
+      // Delete (batch) task, reload the task list if successful, alert the user if unsuccessful
+      axios
+      .put(process.env.API_SERVER + "/api/batch-tasks/" + props.row.batch_task_id)
+      .then((response) => {
+        if(response.status === 204) {
+          console.log("Successfully canceled task: " + props.row.batch_task_id);
+          loadActiveTasks();
+        } else {
+          alert("An error occurred during canceling batch task.")
+        }
+        return response;
+      });
+    }
+
+    function onClickCancelOneTask(row){
+      // Prompt user to confirm canceling one (sub)task
+      console.log(row)
+      if(confirm("Are you sure you wish to cancel task " + row.task_name + "?")){
+        cancelOne(row);
+      }
+    }
+
+    function cancelOne(row){
+      console.log( "Canceling " + process.env.API_SERVER + "/api/tasks/" + row.task_uuid);   
+      // Delete (batch) task, reload the task list if successful, alert the user if unsuccessful
+      axios
+      .put(process.env.API_SERVER + "/api/tasks/" + row.task_uuid)
+      .then((response) => {
+        if(response.status === 204) {
+          console.log("Successfully canceled task: " + row.task_uuid);
+          loadActiveTasks();
+        } else {
+          alert("An error occurred during canceling batch task.")
+        }
+        return response;
+      });
+    }
+
     return {
       columns,
       filter,
@@ -160,6 +293,8 @@ export default defineComponent({
       selected: ref([]),
       getActiveTasks,
       loadActiveTasks,
+      onClickCancelOneTask,
+      onClickCancelBatchTask,
       activeTasksRefreshInterval,
       progress1,
       visibleColumns
@@ -170,6 +305,7 @@ export default defineComponent({
 const rows = [];
 
 const visibleColumns = ref([
+  "expand",
   "task_name",
   "task_status_message",
   "task_progress_message",
@@ -177,6 +313,12 @@ const visibleColumns = ref([
 ]);
 
 const columns = [
+  {
+    name: "expand",
+    label: "",
+    field: "expand",
+    sortable: false,
+  },
   {
     name: "task_name",
     required: true,
@@ -210,9 +352,9 @@ const columns = [
   },
   { 
     name: "actions", 
-    label: "",
+    label: "Action",
     field: "",
-    align: "left" 
+    align: "center" 
   },
 ];
 </script>

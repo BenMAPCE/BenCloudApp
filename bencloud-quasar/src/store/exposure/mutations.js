@@ -1,3 +1,4 @@
+import exposure from ".";
 
 export function updateStepNumber(state, stepNumber ) {
     state.stepNumber = stepNumber;
@@ -32,17 +33,10 @@ export function updatePopulationYears(state, populationYears) {
     state.populationYears = populationYears;
 }
 
-export function updatePopulationGroups(state, populationGroups) {
-    state.populationGroups = populationGroups;
-    console.log(populationGroups);
-    var groupIds = [];
-    var groupNames = [];
-    populationGroups.forEach(e => {
-        groupIds.push(e.healthEffectId);
-        groupNames.push(e.healthEffectName);
-    });
-    state.populationGroupIds = groupIds;
-    state.populationGroupNames = groupNames;
+export function updateExposureFunctionGroup(state, exposureFunctionGroup) {
+    state.exposureFunctionGroup = exposureFunctionGroup;
+    state.exposureFunctionGroupId = exposureFunctionGroup.exposureGroupId;
+    state.exposureFunctionGroupName = exposureFunctionGroup.exposureGroupName;
 }
 
 export function updatePrePolicyAirQuality(state, prePolicyAirQuality) {

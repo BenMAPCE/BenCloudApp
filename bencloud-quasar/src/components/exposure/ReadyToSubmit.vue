@@ -27,8 +27,8 @@
           <div>{{ this.populationDatasetName }}</div>
         </div>
         <div class="row odd choices">
-          <div class="title">Population Groups</div>
-          <div>{{ this.populationGroups }}</div>
+          <div class="title">Exposure Function Group</div>
+          <div>{{ this.exposureFunctionGroups }}</div>
         </div>
         <div class="row even choices">
           <div class="title">Reference Population</div>
@@ -73,7 +73,7 @@
   </div>
   <div class="row enter-template-row">
     <div class="col-3">
-      <q-form @submit="saveTemplate()" class="q-gutter-md">
+      <q-form @submit="submitTemplate()" class="q-gutter-md">
         <q-input
           outlined
           dense
@@ -109,10 +109,9 @@ import { ref, onBeforeMount, onMounted, watch } from "vue";
 import { useStore } from "vuex";
 import { useQuasar } from "quasar";
 
-import { createTemplate, saveTemplate } from "../../composables/templates/templates";
-// import { buildHifTaskJSON, submitHifTask } from "../../composables/exposure/hif-task";
-// import { buildValuationTaskJSON } from "../../composables/exposure/valuation-task";
-// import TaskSubmittedDialog from "./TaskSubmittedDialog.vue";
+import { createExposureTemplate, saveTemplate } from "../../composables/templates/templates";
+import { buildExposureBatchTask, submitExposureTask } from "../../composables/exposure/exposure-task";
+import TaskSubmittedDialog from "./TaskSubmittedDialog.vue";
 import SubmissionErrorDialog from "./SubmissionErrorDialog.vue";
 
 export default defineComponent({
@@ -136,167 +135,112 @@ export default defineComponent({
 
     const populationDatasetId = store.state.exposure.populationDatasetId;
     const populationDatasetName = store.state.exposure.populationDatasetName;
-    const populationGroups = store.state.exposure.populationGroupNames.toString().replaceAll(",", ", ");
+    const exposureFunctionGroups = store.state.exposure.exposureFunctionGroupName;
 
     const taskName = ref("");
     const templateName = ref("");
     const errorMessage = ref("");
 
-    var hifTaskId = null;
+    var batchTaskId = null;
     var valuationFunctionCount = null;
     var totalTaskCount = null;
 
     watch(
-      () => hifTaskId,
-      (currentHifTaskId, prevHifTaskId) => {
-        if (currentHifTaskId != prevHifTaskId) {
-          // console.log("yes... " + currentHifTaskId);
+      () => batchTaskId,
+      (currentBatchTaskId, prevBatchTaskId) => {
+        if (currentBatchTaskId != prevBatchTaskId) {
+          // console.log("yes... " + currentBatchTaskId);
         }
       }
     );
 
     function submitTemplate() {
 
-      $q.dialog({
-        component: SubmissionErrorDialog,
-        parent: this,
-        persistent: true,
-        componentProps: {},
-      })
-        .onOk(() => {
-          //taskName.value = ""
-        })
+      var template = createExposureTemplate(taskName.value, store);
 
-      // var template = createTemplate(taskName.value, store);
+      const templateNotification = $q.notify({
+        group: false, // required to be updatable
+        timeout: 0, // we want to be in control when it gets dismissed
+        spinner: true,
+        position: "top",
+        message: "Saving Template...",
+      });
 
-      // const templateNotification = $q.notify({
-      //   group: false, // required to be updatable
-      //   timeout: 0, // we want to be in control when it gets dismissed
-      //   spinner: true,
-      //   position: "top",
-      //   message: "Saving Template...",
-      // });
+      (async () => {
+        const response = await saveTemplate(
+          templateName.value,
+          "Exposure Analysis",
+          template,
+          store
+        ).fetch();
 
-      // (async () => {
-      //   const response = await saveTemplate(
-      //     templateName.value,
-      //     "v1",
-      //     template,
-      //     store
-      //   ).fetch();
+        templateName.value = "";
 
-      //   templateName.value = "";
-
-      //   if(!!response.data.value.message) {
-      //     // if there is an issue, display the error message
-      //     templateNotification({
-      //       spinner: false, // we reset the spinner setting so the icon can be displayed
-      //       message: response.data.value.message,
-      //       color: "red",
-      //       timeout: 4000, // we will timeout it in 4 seconds
-      //     });
-      //   } else {
-      //     // if the template was saved
-      //     templateNotification({
-      //       spinner: false, // we reset the spinner setting so the icon can be displayed
-      //       message: "Template Saved!",
-      //       color: "green",
-      //       timeout: 2000, // we will timeout it in 2 seconds
-      //     });
-      //   }
-      // })();
+        if(!!response.data.value.message) {
+          // if there is an issue, display the error message
+          templateNotification({
+            spinner: false, // we reset the spinner setting so the icon can be displayed
+            message: response.data.value.message,
+            color: "red",
+            timeout: 4000, // we will timeout it in 4 seconds
+          });
+        } else {
+          // if the template was saved
+          templateNotification({
+            spinner: false, // we reset the spinner setting so the icon can be displayed
+            message: "Template Saved!",
+            color: "green",
+            timeout: 2000, // we will timeout it in 2 seconds
+          });
+        }
+      })();
     }
 
-    //console.log("----- healthImpactFunctions -----");
-    //console.log(healthImpactFunctions);
 
     function submitTask() {
 
-      $q.dialog({
-        component: SubmissionErrorDialog,
-        parent: this,
-        persistent: true,
-        componentProps: {},
-      })
-        .onOk(() => {
-          //taskName.value = ""
-        })
+      var batchTaskJSON = JSON.parse(JSON.stringify(store.state.exposure.batchTaskObject));
+      batchTaskJSON['name'] = taskName.value;
+      store.commit("analysis/updateBatchTaskObject", batchTaskJSON);
+      console.log("----- Batch task configuration -----")
+      console.log(batchTaskJSON);
 
-
-    //   var heItems = JSON.parse(JSON.stringify(healthEffects));
-    //   var heItemIds = "";
-    //   var healthEffectsNamesList = "";
-
-    //   for (var i = 0; i < heItems.length; i++) {
-    //     // console.log(heItems[i].healthEffectId);
-    //     heItemIds = heItemIds + heItems[i].healthEffectId + ",";
-    //     healthEffectsNamesList =
-    //       healthEffectsNamesList + heItems[i].healthEffectName + ", ";
-    //   }
-
-    //   healthEffectsIds.value = heItemIds.substring(0, heItemIds.length - 1);
-    //   healthEffectsNames.value = healthEffectsNamesList.substring(
-    //     0,
-    //     healthEffectsNamesList.length - 2
-    //   );
-
-    //   var hifTaskJSON = JSON.parse(JSON.stringify(store.state.exposure.batchTaskObject));
-    //   hifTaskJSON['name'] = taskName.value;
-    //   hifTaskJSON['gridDefinitionId'] = store.state.exposure.aggregationScale;
-    //   store.commit("exposure/updateBatchTaskObject", hifTaskJSON);
-    //   console.log("----- Batch task configuration -----")
-    //   console.log(hifTaskJSON);
-
-    //   // var template = createTemplate(taskName.value, store);
-    //   // console.log("----- template -----");
-    //   // console.log(template);
-    //   // console.log("--------------------");
-
-    //   hifTaskId = submitHifTask(hifTaskJSON, store).fetch();
-
-    //   $q.dialog({
-    //     component: TaskSubmittedDialog,
-    //     parent: this,
-    //     persistent: true,
-    //     componentProps: {
-    //       taskName: taskName,
-    //     },
-    //   })
-    //     .onOk(() => {
-    //       //taskName.value = ""
-    //       this.$router.replace("/datacenter/manage-tasks");
-    //     })
-    //     .onCancel(() => {
-    //       // Sounds backwards, but clicking on the 'OK' button is actually a Cancel since we don't
-    //       // want the user to go anywhere (we're cancelling out of the dialog)
-    //       // Clear the task name field
-    //       taskName.value = "";
-    //     });
+      (async () => {
+        const response = await submitExposureTask(batchTaskJSON, store).fetch();
+        if(response.data.value.message=="Task was submitted"){
+          $q.dialog({
+              component: TaskSubmittedDialog,
+              parent: this,
+              persistent: true,
+              componentProps: {
+                taskName: taskName,
+              },
+            })
+            .onOk(() => {
+              //taskName.value = ""
+              this.$router.replace("/datacenter/manage-tasks");
+            })
+            .onCancel(() => {
+              // Sounds backwards, but clicking on the 'OK' button is actually a Cancel since we don't
+              // want the user to go anywhere (we're cancelling out of the dialog)
+              // Clear the task name field
+              taskName.value = "";
+            });
+          }
+          else{
+            //Usually when reached the maximum of # task scenarios allowed per user.
+            alert(response.data.value.message);
+          }
+      })();       
     }
 
-    onMounted(() => {
-      // (async () => {
-      //   //var heItems = JSON.parse(JSON.stringify(store.state.exposure.healthEffects));
-      //   var heItemIds = "";
-      //   var healthEffectsNamesList = "";
+    onBeforeMount(() => {
 
-      //   console.log("----------");
-      //   //.log(heItems);
-      //   console.log("----------");
+      (async () => {
+        const response = await buildExposureBatchTask(store).fetch(store);
+      })();
 
-      //   for (var i = 0; i < heItems.length; i++) {
-      //     //console.log(heItems[i].healthEffectId);
-      //     heItemIds = heItemIds + heItems[i].healthEffectId + ",";
-      //     healthEffectsNamesList =
-      //       healthEffectsNamesList + heItems[i].healthEffectName + ", ";
-      //   }
-
-      //   healthEffectsNames.value = healthEffectsNamesList.substring(
-      //     0,
-      //     healthEffectsNamesList.length - 2
-      //   );
-      // })();
-    });
+    })();
 
     return {
       pollutantId,
@@ -305,7 +249,7 @@ export default defineComponent({
       prePolicyAirQualityName,
       postPolicyAirQualityId,
       postPolicyAirQualityName,
-      populationGroups,
+      exposureFunctionGroups,
       populationDatasetId,
       populationDatasetName,
       submitTask,

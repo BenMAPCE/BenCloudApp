@@ -10,7 +10,7 @@
 
           <div>
             <div style="text-align: right;"><q-icon :name="'mdi-account-circle'" size="20px" /> {{username}}</div>
-            <div style="text-align: right;">v{{ 0.02 }} beta {{ environment === 'Production' ? '' : '(' + environment + ')' }}</div>
+            <div style="text-align: right; color: #909090">UI v{{ 0.4 }} | API v{{ apiVersion }} | DB v{{ dbVersion }} {{ environment === 'Production' ? '' : '(' + environment + ')' }}</div>
           </div>
         </q-toolbar>
       </div>
@@ -90,6 +90,8 @@ export default defineComponent({
     const environment = ref("DDDDD");
     const showEpaHeaderFooter = ref(true);
     const username = ref("");
+    const apiVersion = ref("");
+    const dbVersion = ref("");
 
     // Intercept all HTTP responses
     axios.interceptors.response.use(
@@ -133,13 +135,29 @@ export default defineComponent({
         }
         finally { }
       })();
+
+      (async () => {
+        try {
+          const result = await axios
+            .get(process.env.API_SERVER + "/api/version")
+            .then((response) => {
+              apiVersion.value = response.data.apiVersion;
+              dbVersion.value = response.data.dbVersion;
+            })
+        } catch (ex) {
+          console.log(ex)
+        }
+        finally { }
+      })();
     })
 
     return {
       appNavLinks: linksList,
       environment,
       showEpaHeaderFooter,
-      username
+      username,
+      apiVersion,
+      dbVersion
     };
   }
 });

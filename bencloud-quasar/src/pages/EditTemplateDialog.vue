@@ -2,7 +2,7 @@
     <div class="q-pa-sm q-gutter-sm">
         <q-dialog ref="dialog" @hide="onDialogHide">
             <q-card>
-            <q-form>
+            <q-form @submit.prevent>
                 <q-card-section>
                     <div class="text-h6">Edit Template {{ this.templateName }}</div>
                 </q-card-section>

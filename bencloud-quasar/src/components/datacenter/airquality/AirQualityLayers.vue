@@ -4,6 +4,7 @@
     :columns="columns"
     row-key="name"
     v-model:pagination="pagination"
+    :rows-per-page-options="[5, 10, 25, 50]"
     :loading="loading"
     :filter="filter"
     @request="onRequest"
@@ -62,7 +63,7 @@ import { ref, unref, onMounted, onBeforeMount, watch, watchEffect } from "vue";
 import axios from "axios";
 import { useStore } from "vuex";
 import { layerName } from '../../common/AirQualityUploadForm.vue';
-import { showAll } from '../../../pages/datacenter/airquality/ReviewAirQuality.vue';
+import { showAll } from '../../../pages/datacenter/managedata/airquality/ReviewAirQuality.vue';
 import { date } from 'quasar'
 
 var trackCurrentPage = null;
