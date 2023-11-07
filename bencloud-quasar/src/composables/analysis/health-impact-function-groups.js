@@ -132,8 +132,21 @@ export const buildHealthImpactFunctionGroups = (
     //console.log(functions.length);
 
     for (var f = 0; f < functions.length; f++) {
+      var duplicate = false;
       healthImpactFunctions.push(functions[f].hifRecord);
-
+      //Prevent duplicate functions from showing in the value of effects table
+      //If the current function has been recorded from a previous group, 
+      //  add the current group name to that row and skip the rest of the loop
+      for(var g = 0; g < options.length; g++) {
+        if(options[g].health_function_id == functions[f].hifRecord.id) {
+          options[g].group_name += ", " + groups[i].name;
+          duplicate = true;
+          break;
+        }
+      }
+      if(duplicate) {
+        continue;
+      }
       option = {};
       option.value = groups[i].id;
       option.group_name = groups[i].name;
