@@ -120,7 +120,14 @@ export default defineComponent({
     }
 
     onMounted(() => {
-      visibleColumns.value = ["endpoint", "name", "study", "ages", "point_estimate"];
+      visibleColumns.value = [
+        "endpoint", 
+        "name", 
+        "study", 
+        "qualifier",
+        "ages", 
+        "point_estimate"
+      ];
       loadValuationResults(props.task_uuid);
     });
 
@@ -141,7 +148,7 @@ const visibleColumns = ref([
   "endpoint",
   "name",
   "study",
-  //"qualifier",
+  "qualifier",
   "ages",
   "point_estimate",
   //"standard_deviation",
