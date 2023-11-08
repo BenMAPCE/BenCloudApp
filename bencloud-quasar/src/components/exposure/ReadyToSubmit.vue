@@ -27,7 +27,7 @@
           <div>{{ this.populationDatasetName }}</div>
         </div>
         <div class="row odd choices">
-          <div class="title">Exposure Function Groups</div>
+          <div class="title">Exposure Function Group</div>
           <div>{{ this.exposureFunctionGroups }}</div>
         </div>
         <div class="row even choices">
@@ -112,7 +112,6 @@ import { useQuasar } from "quasar";
 import { createExposureTemplate, saveTemplate } from "../../composables/templates/templates";
 import { buildExposureBatchTask, submitExposureTask } from "../../composables/exposure/exposure-task";
 import TaskSubmittedDialog from "./TaskSubmittedDialog.vue";
-import SubmissionErrorDialog from "./SubmissionErrorDialog.vue";
 
 export default defineComponent({
   model: ref(null),
@@ -135,15 +134,13 @@ export default defineComponent({
 
     const populationDatasetId = store.state.exposure.populationDatasetId;
     const populationDatasetName = store.state.exposure.populationDatasetName;
-    const exposureFunctionGroups = store.state.exposure.exposureFunctionGroupNames.toString().replaceAll(",", ", ");
+    const exposureFunctionGroups = store.state.exposure.exposureFunctionGroupName;
 
     const taskName = ref("");
     const templateName = ref("");
     const errorMessage = ref("");
 
     var batchTaskId = null;
-    var valuationFunctionCount = null;
-    var totalTaskCount = null;
 
     watch(
       () => batchTaskId,

@@ -77,14 +77,14 @@ export function valuationsForHealthImpactFunctionGroups (state) {
 
 export const getValuationsForHealthFunctionId = (state) => (healthFunctionId) => {
 
-  console.log("######")
-  console.log(healthFunctionId)
-  console.log(state.valuationsForHealthImpactFunctionGroups)
-  console.log("######")
+  // console.log("######")
+  // console.log(healthFunctionId)
+  // console.log(state.valuationsForHealthImpactFunctionGroups)
+  // console.log("######")
 
   for (var v = 0; v < state.valuationsForHealthImpactFunctionGroups.length; v++) {
-    console.log("$$$")
-    console.log(state.valuationsForHealthImpactFunctionGroups[v])
+    // console.log("$$$")
+    // console.log(state.valuationsForHealthImpactFunctionGroups[v])
     if (
       "health_function_id" in state.valuationsForHealthImpactFunctionGroups[v]
      ) {

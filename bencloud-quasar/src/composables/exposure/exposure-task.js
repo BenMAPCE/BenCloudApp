@@ -35,7 +35,7 @@ export const buildExposureBatchTask = (store) => {
         process.env.API_SERVER +
           "/api/batch-task-config?" +
           "efGroupIds=" +
-          store.state.exposure.exposureFunctionGroupIds +
+          store.state.exposure.exposureFunctionGroupId +
           "&pollutantId=" +
           store.state.exposure.pollutantId +
           "&baselineId=" +

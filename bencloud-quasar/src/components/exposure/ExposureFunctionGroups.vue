@@ -29,7 +29,7 @@ export default defineComponent({
   async setup(props, context) {
     const store = useStore();
     const rows = ref([]);
-    const selectedItems = ref(store.state.exposure.exposureFunctionGroupIds);
+    const selectedItems = ref(store.state.exposure.exposureFunctionGroupId);
 
     watch(
       () => selectedItems.value,
@@ -38,12 +38,9 @@ export default defineComponent({
         if (currentSelectedItems != prevSelectedItems) {
           var efItems = [];
           var efItem = {};
-          for (var i = 0; i < currentSelectedItems.length; i++) {
-            var group = rows.value.find((opt) => opt.id === currentSelectedItems[i])
-            efItem = { exposureGroupId: group.id, exposureGroupName: group.name };
-            efItems.push(efItem);
-          }
-          store.commit("exposure/updateExposureFunctionGroups", efItems);
+          var group = rows.value.find((opt) => opt.id === currentSelectedItems)
+          efItem = { exposureGroupId: group.id, exposureGroupName: group.name };
+          store.commit("exposure/updateExposureFunctionGroup", efItem);
         }
       }
     );
@@ -67,8 +64,8 @@ export default defineComponent({
             console.log(ex)
         }
 
-        if (store.state.exposure.exposureFunctionGroupIds != null) {
-          selectedItems.value = store.state.exposure.exposureFunctionGroupIds;
+        if (store.state.exposure.exposureFunctionGroupId != null) {
+          selectedItems.value = store.state.exposure.exposureFunctionGroupId;
         }
       })();
     });
