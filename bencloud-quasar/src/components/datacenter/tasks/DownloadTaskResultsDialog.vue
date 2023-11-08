@@ -194,6 +194,10 @@ export default {
           value: "current",
         },
         {
+          label: "Currently Scenario",
+          value: "currents",
+        },
+        {
           label: "All Results",
           value: "all",
         },
