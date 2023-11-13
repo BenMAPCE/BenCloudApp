@@ -32,7 +32,7 @@
             </div>
           </div> 
 
-          <div class="row" v-if="this.include=='all'">            
+          <div class="row" v-if="this.include=='all' || this.include=='currents'">            
             <div class="col-6 group-selections">
               <div>Result Type(s)</div>
               <q-option-group
@@ -108,6 +108,10 @@ export default {
       type: String,
       default: "",
     },
+    hif_task_uuid: {
+      type: String,
+      default: "",
+    },
   },
 
   setup(props) {
@@ -155,7 +159,13 @@ export default {
       batch_task_id.value = props.batch_task_id;
       task_uuid.value = props.task_uuid;
       task_type.value = props.task_type;
-      name.value = props.task_name; 
+      //name.value = props.task_name; 
+      if(props.task_name.endsWith("-Valuation")){
+        name.value=props.task_name.substring(0,props.task_name.length-10) + ".zip";
+      }
+      else{
+        name.value=props.task_name + ".zip";
+      }
 
       (async () => {
           const response = await getGridDefinitions().fetch();
@@ -187,14 +197,15 @@ export default {
       ],
       resultType,
       resultTypeOptions,
-      include: ref('current'),
+      include: ref('currents'),
       includeOptions: [
+        // Hide this option and use "Current Scenario"
+        // {
+        //   label: "Currently Viewed Results",
+        //   value: "current",
+        // },
         {
-          label: "Currently Viewed Results",
-          value: "current",
-        },
-        {
-          label: "Currently Scenario",
+          label: "Current Scenario",
           value: "currents",
         },
         {
@@ -251,11 +262,11 @@ export default {
 
       console.log("NAME: |" + this.name + "|");
       console.log("UUID: |" + this.task_uuid + "|");
-      if (this.include=="all") {
-        var include_hif = 0;
-        var include_vf = 0;
-        var include_exp = 0;
-
+      var include_hif = 0;
+      var include_vf = 0;
+      var include_exp = 0;
+      if (this.include=="all" || this.include=="currents") {
+        
         for (var i = 0; i < this.resultType.length; i++){
           if(this.resultType[i]=="hif"){
             include_hif=1;
@@ -287,13 +298,12 @@ export default {
           }        
         }        
       }
-      else{
+      if (this.include=="current"||this.include=="currents"){
         if(this.name === ""){
           this.errorMessage =
           this.errorMessage + (hasErrors ? ", " : "") + "Name is required";
           hasErrors = true;
         }
-
       }
 
       if (this.grid.length === 0) {
@@ -332,8 +342,21 @@ export default {
           "/export?gridId=" + gridList +
           "&includeHealthImpact="+ include_hif +
           "&includeValuation="+ include_vf +
-          "&includeExposure="+ include_exp;
+          "&includeExposure="+ include_exp + 
+          "&exportType=all";
 
+      }
+      else if(this.include=="currents"){
+        //export the senario associated with current result. 
+        downloadUrl = process.env.API_SERVER +
+          "/api/batch-tasks/" + this.batch_task_id +
+          "/export?gridId=" + gridList +
+          "&includeHealthImpact="+ include_hif +
+          "&includeValuation="+ include_vf +
+          "&includeExposure="+ include_exp + 
+          "&taskUuid=" + this.task_uuid +
+          "&uuidType="+ this.task_type +
+          "&exportType=currents"; 
       }
       else{
         if (this.task_type === "H") {
@@ -372,6 +395,16 @@ export default {
             fileName = response.headers["content-disposition"]
             .split("filename=")[1]
             .split(";")[0];
+          }
+          else if(this.include=="currents"){
+            //use user entered name when exporting current scenario. 
+            if(this.name.endsWith(".zip")){
+              fileName=this.name;
+            }
+            else{
+              fileName=this.name + ".zip";
+            }
+            
           }
           else{
             //use user entered name when exporting currently viewed data
