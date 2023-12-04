@@ -17,7 +17,7 @@
     </div>
   </q-tabs>
 
-  <q-tab-panels v-model="tab" animated v-if="task_type != 'E'">
+  <q-tab-panels v-model="tab" animated v-if="task_type != 'E'" keep-alive>
     <q-tab-panel name="results"> 
       <div v-if="task_type === 'H'">
         <HIFTaskResults  v-bind:task_uuid="task_uuid" v-bind:task_name="task_name" v-bind:task_type="task_type" v-bind:batch_task_id="batch_task_id" :key="componentKey"></HIFTaskResults>
