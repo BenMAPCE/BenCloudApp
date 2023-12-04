@@ -18,7 +18,7 @@
           </div>
 
           <div class="row">
-            <div class="col">Endpoint</div>
+            <div class="col">Health Effect</div>
             <div class="col">
               {{ row.endpoint_name }}
             </div>
