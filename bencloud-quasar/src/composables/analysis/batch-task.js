@@ -96,8 +96,6 @@ export const submitBatchTask = (batchTaskJSON, store) => {
     
   const fetch = async () => {
     console.log("submitting batchTask")
-    console.log(batchTaskJSON)
-    console.log(valuationsForHealthImpactFunctionGroups.length)
     loading.value = true;
 
     try {

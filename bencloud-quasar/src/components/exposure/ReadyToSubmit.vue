@@ -112,7 +112,6 @@ import { useQuasar } from "quasar";
 import { createExposureTemplate, saveTemplate } from "../../composables/templates/templates";
 import { buildExposureBatchTask, submitExposureTask } from "../../composables/exposure/exposure-task";
 import TaskSubmittedDialog from "./TaskSubmittedDialog.vue";
-import SubmissionErrorDialog from "./SubmissionErrorDialog.vue";
 
 export default defineComponent({
   model: ref(null),
@@ -142,8 +141,6 @@ export default defineComponent({
     const errorMessage = ref("");
 
     var batchTaskId = null;
-    var valuationFunctionCount = null;
-    var totalTaskCount = null;
 
     watch(
       () => batchTaskId,

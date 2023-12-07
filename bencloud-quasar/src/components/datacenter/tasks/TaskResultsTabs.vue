@@ -9,15 +9,15 @@
     narrow-indicator
   >
     <div class="tabs q-pl-sm" v-if="task_type != 'E'">
-      <q-tab name="results" class="hif-results" label="HIF Results" />
-      <q-tab name="valuation-results" class="valuation-results" label="Valuation Results" />
+      <q-tab name="results" class="hif-results" label="HIF Results" @click="changeTabs('results')" />
+      <q-tab name="valuation-results" class="valuation-results" label="Valuation Results" @click="changeTabs('valuation-results')" />
     </div>
     <div class="q-pl-sm" v-if="task_type == 'E'">
-      <q-tab name="results" class="exposure-results" label="Exposure Results" />
+      <q-tab name="results" class="exposure-results" label="Exposure Results" @click="changeTabs('results')" />
     </div>
   </q-tabs>
 
-  <q-tab-panels v-model="tab" animated v-if="task_type != 'E'">
+  <q-tab-panels v-model="tab" animated v-if="task_type != 'E'" keep-alive>
     <q-tab-panel name="results"> 
       <div v-if="task_type === 'H'">
         <HIFTaskResults  v-bind:task_uuid="task_uuid" v-bind:task_name="task_name" v-bind:task_type="task_type" v-bind:batch_task_id="batch_task_id" :key="componentKey"></HIFTaskResults>
@@ -46,6 +46,7 @@
 <script>
 import { ref, onBeforeMount } from "vue";
 import { defineComponent } from "vue";
+import { useStore } from "vuex";
 
 import HIFTaskResults from "./HIF/HIFTaskResults.vue";
 import ValuationTaskResults from "./Valuation/ValuationTaskResults.vue";
@@ -62,6 +63,7 @@ export default defineComponent({
     ExposureTaskResults
   },
   setup(props) {
+    const store = useStore();
 
     const task_type = ref("");
     const task_name = ref("");
@@ -71,33 +73,39 @@ export default defineComponent({
     const valuation_task_uuid = ref(null);
     const componentKey = ref(0);
     const batch_task_id = ref(0);
+    const currentTab = ref(store.state.datacenter.resultsTab);
 
     onBeforeMount(() => {
 
         console.log("TaskResultsTab");
-        // console.log("--------------------------------")
-        // console.log(props.task_uuid_with_type)
-        // console.log("--------------------------------")
         task_type.value = props.task_uuid_with_type.substring(0,1)
+        if(task_type.value === "E") {
+          store.commit("datacenter/updateResultsTab", "results");
+          currentTab.value = "results";
+        }
         task_uuid.value = props.task_uuid_with_type.substring(2)
         batch_task_id.value = props.batch_task_id
         task_name.value = props.task_name
-        // console.log("--------------------------------")
         valuation_task_type.value = props.valuation_task_uuid_with_type.substring(0,1)
         valuation_task_uuid.value = props.valuation_task_uuid_with_type.substring(2)
         valuation_task_name.value = props.valuation_task_name
         componentKey.value += 1;
-        // console.log("--------------------------------")
     
     })
 
+    function changeTabs(tab) {
+      store.commit("datacenter/updateResultsTab", tab);
+      currentTab.value = tab;
+    }
+
     return {
-      tab: ref("results"),
+      tab: currentTab,
       task_uuid,
       task_type,
       componentKey,
       valuation_task_uuid,
       valuation_task_type,
+      changeTabs,
     };
 
   },
