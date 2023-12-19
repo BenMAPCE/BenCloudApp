@@ -91,11 +91,11 @@ export default defineComponent({
       if(confirm("Are you sure you wish to permanently delete " + props.row.name + "?")){
         // Delete AQ layer, reload the AQ layer list if successful, alert the user if unsuccessful       
         axios
-          .delete(process.env.API_SERVER + "/api/air-quality-data/" + props.row.id, {
-            params: {
-              id: props.row.id,
-            },
-          })
+          .delete(process.env.API_SERVER + "/api/air-quality-data/" + props.row.id, 
+            {validateStatus: function (status) {
+              return status < 500;
+            }}
+          )
           .then((response) => {
             if(response.status === 204) {
               trackCurrentPage = this.pagination.page;
@@ -107,10 +107,31 @@ export default defineComponent({
               var newValue = oldValue - 1;
               console.log("newValue: " + newValue);
               this.$store.commit("airquality/updateAirQualityForceReloadValue", newValue)
+            } else if(response.status === 403){
+              console.log("Forbidden action on AQ layer: " + props.row.name);
+              this.$q.notify({
+                group: false, // required to be updateable
+                type: 'negative',
+                timeout: 6000, 
+                color: "red",
+                spinner: false, // we reset the spinner setting so the icon can be displayed
+                position: "top",
+                message: response.data.message,
+              });
+              this.$emit('ok')
             } else {
-              alert("An error occurred, air quality layer was not deleted.")
+              this.$q.notify({
+                group: false, // required to be updateable
+                type: 'negative',
+                timeout: 6000, 
+                color: "red",
+                spinner: false, // we reset the spinner setting so the icon can be displayed
+                position: "top",
+                message: "Unknown error: " + response.status,
+              });
+              this.$emit('ok')
             }
-          });
+          })
       }
     },
 
