@@ -326,17 +326,36 @@ export default {
           headers: {
             "Content-Type": "multipart/form-data",
           },
+          validateStatus: function (status) {
+            return status < 500;
+          }
         })
         .then((response) => {
           //data.value = response.data;
-
           console.log(response.status);
           console.log(response.statusText);
           console.log(response.data.success);
           console.log(response.data.messages);
           
-
-          if (response.data.success === false) {
+          if(response.status === 200) {
+            this.$q
+              .dialog({
+                component: AirQualityUploadSuccessDialog,
+                parent: this,
+                persistent: true,
+                componentProps: {
+                  fileName: this.selected_file.name,
+                  parentDialog: this.$refs.dialog,
+                },
+              })
+              .onOk(() => {
+                console.log("OK");
+              })
+              .onCancel(() => {
+              })
+              .onDismiss(() => {
+              });
+          } else {
             console.log("BAD NEWS");
             if (response.data.messages.length > 0) {
               console.log("Show Errors");
@@ -360,24 +379,6 @@ export default {
                 .onDismiss(() => {
                });
             }
-          } else {
-            this.$q
-              .dialog({
-                component: AirQualityUploadSuccessDialog,
-                parent: this,
-                persistent: true,
-                componentProps: {
-                  fileName: this.selected_file.name,
-                  parentDialog: this.$refs.dialog,
-                },
-              })
-              .onOk(() => {
-                console.log("OK");
-              })
-              .onCancel(() => {
-              })
-              .onDismiss(() => {
-              });
           }
 
           self.$q.loading.hide();

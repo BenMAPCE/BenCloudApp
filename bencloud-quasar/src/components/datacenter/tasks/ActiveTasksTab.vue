@@ -248,13 +248,51 @@ export default defineComponent({
       console.log( "Canceling " + process.env.API_SERVER + "/api/batch-tasks/" + props.row.batch_task_id);   
       // Delete (batch) task, reload the task list if successful, alert the user if unsuccessful
       axios
-      .put(process.env.API_SERVER + "/api/batch-tasks/" + props.row.batch_task_id)
+      .put(process.env.API_SERVER + "/api/batch-tasks/" + props.row.batch_task_id, 
+        {validateStatus: function (status) {
+          return status < 500;
+        }}
+      )
       .then((response) => {
         if(response.status === 204) {
           console.log("Successfully canceled task: " + props.row.batch_task_id);
           loadActiveTasks();
+        } else if(response.status == 403) {
+          console.log("Forbidden action on task: " + props.row.batch_task_id);
+          this.$q.notify({
+            group: false, // required to be updateable
+            type: 'negative',
+            timeout: 6000, 
+            color: "red",
+            spinner: false, // we reset the spinner setting so the icon can be displayed
+            position: "top",
+            message: response.data.message,
+          });
+          this.$emit('ok')
+        } else if(response.status == 404) {
+          console.log("Task not found: " + props.row.batch_task_id);
+          this.$q.notify({
+            group: false, // required to be updateable
+            type: 'negative',
+            timeout: 6000, 
+            color: "red",
+            spinner: false, // we reset the spinner setting so the icon can be displayed
+            position: "top",
+            message: response.data.message,
+          });
+          this.$emit('ok')
         } else {
-          alert("An error occurred during canceling batch task.")
+          console.log("An error occurred: " + props.row.batch_task_id);
+          this.$q.notify({
+            group: false, // required to be updateable
+            type: 'negative',
+            timeout: 6000, 
+            color: "red",
+            spinner: false, // we reset the spinner setting so the icon can be displayed
+            position: "top",
+            message: "An error occurred cancelling task: " + props.row.batch_task_id,
+          });
+          this.$emit('ok')
         }
         return response;
       });

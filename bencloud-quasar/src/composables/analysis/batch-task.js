@@ -100,8 +100,13 @@ export const submitBatchTask = (batchTaskJSON, store) => {
 
     try {
       const {data:response} = await axios
-      .post(process.env.API_SERVER + "/api/batch-tasks", batchTaskJSON)
+      .post(process.env.API_SERVER + "/api/batch-tasks", batchTaskJSON,
+      {validateStatus: function (status) {
+        return status < 500;
+      }}
+      )
       .then((response) => {
+        console.log(response)
         data.value = response.data;
         //console.log(data.value);
         //return data.value;
