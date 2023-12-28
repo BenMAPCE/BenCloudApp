@@ -23,6 +23,7 @@ export default boot(({ app }) => {
   axios.defaults.headers.common['uid'] = 'test@test.com';
   axios.defaults.headers.common['displayname'] = 'Local User';
   axios.defaults.headers.common['ismemberof'] = 'BenMAP_Users';
+  axios.defaults.maxRedirects = 0;
 })
 
 export { api }
