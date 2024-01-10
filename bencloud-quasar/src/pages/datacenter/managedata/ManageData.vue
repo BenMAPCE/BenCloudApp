@@ -13,7 +13,7 @@
           />
         </q-card-actions>
       </q-card>
-      <!-- <q-card class="my-card task-card">
+      <q-card class="my-card task-card">
         <q-card-section> View or upload incidence data. </q-card-section>
         <q-card-actions vertical>
           <q-btn
@@ -24,7 +24,7 @@
             label="Review Incidence"
           />
         </q-card-actions>
-      </q-card> -->
+      </q-card>
       <!-- <q-card class="my-card task-card">
         <q-card-section> View or upload grid definitions. </q-card-section>
         <q-card-actions vertical>
