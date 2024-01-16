@@ -125,11 +125,11 @@ export default {
               this.hide();
               
             } else if(response.status === 409){
-              console.log("Unable to renamed template: " + this.newName);
+              console.log("Unable to rename template: " + this.newName);
               this.$q.notify({
-                group: false, // required to be updatable
+                group: false, // required to be updateable
                 type: 'negative',
-                timeout: 6000, // we will timeout it in 4 seconds
+                timeout: 6000, 
                 color: "red",
                 spinner: false, // we reset the spinner setting so the icon can be displayed
                 position: "top",

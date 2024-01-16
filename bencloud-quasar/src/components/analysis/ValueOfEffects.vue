@@ -104,14 +104,14 @@ export default defineComponent({
       {
         name: "endpoint_group_id",
         align: "left",
-        label: "Endpoint Group Id",
+        label: "Health Effect Group Id",
         field: "endpoint_group_id",
         sortable: false,
       },
       {
         name: "endpoint_id",
         align: "left",
-        label: "Endpoint Id",
+        label: "Health Effect Id",
         field: "endpoint_id",
         sortable: false,
       },
@@ -132,7 +132,7 @@ export default defineComponent({
       {
         name: "endpoint_name",
         align: "left",
-        label: "Endpoint",
+        label: "Health Effect",
         field: "endpoint_name",
         sortable: true,
       },
