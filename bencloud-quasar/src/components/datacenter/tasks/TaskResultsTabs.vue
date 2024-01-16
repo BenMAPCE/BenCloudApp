@@ -20,13 +20,15 @@
   <q-tab-panels v-model="tab" animated v-if="task_type != 'E'" keep-alive>
     <q-tab-panel name="results"> 
       <div v-if="task_type === 'H'">
-        <HIFTaskResults  v-bind:task_uuid="task_uuid" v-bind:task_name="task_name" v-bind:task_type="task_type" v-bind:batch_task_id="batch_task_id" :key="componentKey"></HIFTaskResults>
+        <HIFTaskResults  v-bind:task_uuid="task_uuid" v-bind:task_name="task_name" v-bind:task_type="task_type" 
+        v-bind:batch_task_id="batch_task_id" v-bind:valuation_grid_id = "valuation_grid_id" v-bind:valuation_grid_name = "valuation_grid_name" :key="componentKey"></HIFTaskResults>
       </div>
     </q-tab-panel>
 
     <q-tab-panel name="valuation-results">
       <div v-if="valuation_task_type === 'V'">
-        <ValuationTaskResults  v-bind:valuation_task_uuid="valuation_task_uuid" v-bind:valuation_task_name="valuation_task_name" v-bind:valuation_task_type="valuation_task_type" v-bind:batch_task_id="batch_task_id" :key="componentKey"></ValuationTaskResults>
+        <ValuationTaskResults  v-bind:valuation_task_uuid="valuation_task_uuid" v-bind:valuation_task_name="valuation_task_name" v-bind:valuation_task_type="valuation_task_type" 
+        v-bind:batch_task_id="batch_task_id" v-bind:valuation_grid_id = "valuation_grid_id" v-bind:valuation_grid_name = "valuation_grid_name" :key="componentKey"></ValuationTaskResults>
       </div>
       <div v-if="valuation_task_type === ''">
         No valuation results for the selected post-policy
@@ -55,7 +57,7 @@ import ExposureTaskResults from "./Exposure/ExposureTaskResults.vue";
 export default defineComponent({
   model: ref(null),
   name: "TaskResultsTab",
-  props: ["task_uuid_with_type", "task_name", "valuation_task_uuid_with_type", "valuation_task_name", "batch_task_id"],
+  props: ["task_uuid_with_type", "task_name", "valuation_task_uuid_with_type", "valuation_task_name", "batch_task_id","valuation_grid_id","valuation_grid_name"],
 
   components: {
     HIFTaskResults,
@@ -74,6 +76,8 @@ export default defineComponent({
     const componentKey = ref(0);
     const batch_task_id = ref(0);
     const currentTab = ref(store.state.datacenter.resultsTab);
+    const valuation_grid_name = ref("");
+    const valuation_grid_id = ref(0);
 
     onBeforeMount(() => {
 
@@ -89,6 +93,8 @@ export default defineComponent({
         valuation_task_type.value = props.valuation_task_uuid_with_type.substring(0,1)
         valuation_task_uuid.value = props.valuation_task_uuid_with_type.substring(2)
         valuation_task_name.value = props.valuation_task_name
+        valuation_grid_name.value = props.valuation_grid_name
+        valuation_grid_id.value = props.valuation_grid_id
         componentKey.value += 1;
     
     })

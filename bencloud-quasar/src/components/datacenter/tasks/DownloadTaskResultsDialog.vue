@@ -46,7 +46,7 @@
 
           <div class="row">
             <div class="col-6 grid-selections">
-              <div>Select Grid Levels</div>
+              <div>Select Grid Levels</div>              
               <q-option-group
                 v-model="grid"
                 :options="gridOptions"
@@ -54,6 +54,14 @@
                 type="checkbox"
               />
             </div>
+            <div class="col-6" v-if="this.resultType.includes('vf')">
+                <small>
+                  You have calculated valuation results at the <span style="color:red">{{valResultGridName}}</span> scale. 
+                  Disaggregating valuation results to geographic scales finer than this can introduce additional uncertainty in results. 
+                  For finer scale valuation results, we recommend re-running BenMAP and selecting the finer scale in Step 6.
+                </small>
+              </div>
+
           </div>
 
           <div class="row justify-center">
@@ -112,6 +120,15 @@ export default {
       type: String,
       default: "",
     },
+    valuation_grid_id: {
+      type: Number,
+      default: 0,
+    },
+    valuation_grid_name: {
+      type: String,
+      default: "",
+    },
+    
   },
 
   setup(props) {
@@ -130,6 +147,9 @@ export default {
     const resultTypeOptions = ref([]);
 
     const $q = useQuasar();
+
+    const valResultGridId = ref("");
+    const valResultGridName = ref("");
 
     if (props.task_type === "H" || props.task_type === "V"){
       resultTypeOptions.value = [
@@ -167,6 +187,27 @@ export default {
         name.value=props.task_name + ".zip";
       }
 
+      //get grid defintion id for selected result
+      //currently this is the task which calls the popup. It's usually the same as other tasks in the same batch.
+      // (async () => {
+      //   try {
+      //     const result = await axios
+      //       .get(process.env.API_SERVER + "/api/batch-task-vf-grid/" + props.task_uuid + "?uuidType="+ props.task_type)
+      //       .then((response) => {
+      //         valResultGridId.value = response.data.gridDefinitionId;
+      //         valResultGridName.value = response.data.gridDefinitionName;
+      //       })
+      //   } catch (ex) {
+      //     console.log(ex)
+      //   }
+      //   finally { }
+      // })();
+
+      //get valuation grid definition name
+      valResultGridName.value = props.valuation_grid_name;
+      valResultGridId.value = props.valuation_grid_id;
+
+      //get all grid definitions to list  
       (async () => {
           const response = await getGridDefinitions().fetch();
           gridOptions.value = buildGridDefinitionOptions(unref(response.data))
@@ -213,6 +254,8 @@ export default {
           value: "all",
         },
       ],
+      valResultGridId,
+      valResultGridName
 
     };
   },
