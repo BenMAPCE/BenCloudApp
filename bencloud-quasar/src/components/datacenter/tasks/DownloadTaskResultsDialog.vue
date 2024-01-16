@@ -92,8 +92,6 @@ export default {
     errorMessage: "",
     //name: "",
     dashData: [],
-    //valResultGridId: 0,
-    //valResultGridName: ""
   }),
 
   props: {
@@ -119,6 +117,14 @@ export default {
       default: "",
     },
     hif_task_uuid: {
+      type: String,
+      default: "",
+    },
+    valuation_grid_id: {
+      type: Number,
+      default: 0,
+    },
+    valuation_grid_name: {
       type: String,
       default: "",
     },
@@ -183,19 +189,23 @@ export default {
 
       //get grid defintion id for selected result
       //currently this is the task which calls the popup. It's usually the same as other tasks in the same batch.
-      (async () => {
-        try {
-          const result = await axios
-            .get(process.env.API_SERVER + "/api/batch-task-vf-grid/" + props.task_uuid + "?uuidType="+ props.task_type)
-            .then((response) => {
-              valResultGridId.value = response.data.gridDefinitionId;
-              valResultGridName.value = response.data.gridDefinitionName;
-            })
-        } catch (ex) {
-          console.log(ex)
-        }
-        finally { }
-      })();
+      // (async () => {
+      //   try {
+      //     const result = await axios
+      //       .get(process.env.API_SERVER + "/api/batch-task-vf-grid/" + props.task_uuid + "?uuidType="+ props.task_type)
+      //       .then((response) => {
+      //         valResultGridId.value = response.data.gridDefinitionId;
+      //         valResultGridName.value = response.data.gridDefinitionName;
+      //       })
+      //   } catch (ex) {
+      //     console.log(ex)
+      //   }
+      //   finally { }
+      // })();
+
+      //get valuation grid definition name
+      valResultGridName.value = props.valuation_grid_name;
+      valResultGridId.value = props.valuation_grid_id;
 
       //get all grid definitions to list  
       (async () => {

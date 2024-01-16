@@ -61,7 +61,7 @@ export default defineComponent({
   model: ref(null),
   name: "ValuationTaskResults",
 
-  props: ["valuation_task_uuid", "valuation_task_name", "valuation_task_type", "batch_task_id"],
+  props: ["valuation_task_uuid", "valuation_task_name", "valuation_task_type", "batch_task_id","valuation_grid_id", "valuation_grid_name"],
 
   setup(props, context) {
     //const task_type = ref("");
@@ -106,6 +106,8 @@ export default defineComponent({
           task_name: props.valuation_task_name,
           task_type: props.valuation_task_type,
           batch_task_id: props.batch_task_id,
+          valuation_grid_id:props.valuation_grid_id,
+          valuation_grid_name: props.valuation_grid_name
         },
       })
         .onOk(() => {

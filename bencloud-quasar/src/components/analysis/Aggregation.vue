@@ -82,7 +82,7 @@ export default defineComponent({
           }
         })
       } else {
-        selectedItem.value = rows.value[0];
+        selectedItem.value = rows.value[2]; //default to county
       }
       
     })();
