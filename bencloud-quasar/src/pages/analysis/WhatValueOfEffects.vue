@@ -1,5 +1,8 @@
 <template>
   <div class="row">
+    Select valuation functions via the edit button in each row.
+  </div>
+  <div class="row">
     Selected valuation functions will be run for each task (each Post-Policy/Year combination).
   </div>
   <div class="row">
