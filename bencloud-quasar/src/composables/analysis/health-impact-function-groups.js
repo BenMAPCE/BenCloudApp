@@ -2,7 +2,7 @@ import { useStore, mapGetters } from "vuex";
 import axios from "axios";
 import { ref } from "vue";
 import { healthEffects } from "src/store/analysis/getters";
-import { getValuationFunctionsForEndpointGroupId } from "./valuation-functions";
+import { getValuationFunctionsForEndpointGroupId, updateValuationFunctions } from "./valuation-functions";
 
 export const loadHealthImpactFunctionGroups = (store) => {
   const data = ref(null);
@@ -84,6 +84,7 @@ export const loadHealthImpactFunctionGroups = (store) => {
         .then((response) => {
           data.value = response.data;
           store.commit("analysis/updateBatchTaskObject", data.value);
+          updateValuationFunctions(store, data.value);
         });
     } catch (ex) {
       error.value = ex;
