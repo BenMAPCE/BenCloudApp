@@ -3,7 +3,7 @@
     <q-table
       :rows="rows"
       :columns="columns"
-      row-key="batch_task_name"
+      row-key="batch_task_id"
       :rows-per-page-options="[0]"
       v-model:pagination="pagination"
       :loading="loading"
@@ -118,7 +118,7 @@
           </q-td>
         </q-tr>
         <!-- We show the batch task details if "props.expand" is true -->
-        <q-tr v-for="row in props.row.tasks" :key="row.task_name"
+        <q-tr v-for="row in props.row.tasks" :key="row.task_uuid"
           v-show="props.expand"
           :props="props"
         >

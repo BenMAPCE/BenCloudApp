@@ -41,6 +41,8 @@ import { ref, unref, onMounted, watch, watchEffect } from "vue";
 import axios from "axios";
 import { useStore } from "vuex";
 
+var currentIncidenceDatasetId;
+
 export default defineComponent({
   model: ref(null),
   name: "IncidenceCells",
@@ -52,6 +54,46 @@ export default defineComponent({
 
   methods: {
     exportToCSV(props) {},
+    exportIncidenceCells() {
+      console.log("exportIncidenceCells");
+
+      var self = this;
+      self.$q.loading.show({
+        message: "Downloading incidence data. Please wait...",
+        boxClass: "bg-grey-2 text-grey-9",
+        spinnerColor: "primary",
+      });
+
+        axios
+        .get(
+          process.env.API_SERVER + "/api/incidence/" +
+            currentIncidenceDatasetId +
+            "/contents",
+          {
+            params: {
+              page: 1,
+              rowsPerPage: 9999999,
+            },
+          headers: { Accept: "application/zip", "Content-Type": "application/zip" },
+          responseType: "blob",
+        })
+        .then((response) => {          
+          var fileName = response.headers["content-disposition"]
+          .split("filename=")[1]
+          .split(";")[0];
+            
+
+          const url = window.URL.createObjectURL(new Blob([response.data]));
+          const link = document.createElement("a");
+          link.href = url;
+          link.setAttribute("download", fileName ); //or any other extension
+          document.body.appendChild(link);
+          link.click();
+        })
+        .finally(function () {
+          self.$q.loading.hide();
+        })
+    },
   },
 
   data() {
@@ -82,6 +124,7 @@ export default defineComponent({
     () => store.state.incidence.incidenceDatasetId,
     (incidenceDatasetId, prevIncidenceDatasetId) => {
       incidenceDatasetId = incidenceDatasetId;
+      currentIncidenceDatasetId = incidenceDatasetId;
       filter.value = "";
       pagination.value.sortBy = "";
       pagination.value.descending = false;
@@ -102,48 +145,6 @@ export default defineComponent({
       if (store.state.incidence.incidenceDatasetId != 0)
         loadIncidenceCells(props);
       
-    }
-
-    function exportIncidenceCells() {
-      console.log("exportIncidenceCells");
-
-      loading.value = true;
-
-      axios
-        .get(
-          process.env.API_SERVER + "/api/incidence/" +
-            store.state.incidence.incidenceDatasetId +
-            "/contents",
-          {
-            params: {
-              page: 1,
-              rowsPerPage: 9999999,
-            },
-            headers: { Accept: "text/csv", "Content-Type": "text/csv" },
-          }
-        )
-        .then((response) => {
-          let records = response.data.records;
-          let data = response.data;
-          //console.log(data);
-
-          console.log(response);
-
-          //console.log(response.headers['content-disposition']);
-
-          var fileName = response.headers["content-disposition"]
-            .split("filename=")[1]
-            .split(";")[0];
-
-          var hiddenElement = document.createElement("a");
-          hiddenElement.href = "data:text/csv;charset=utf-8," + encodeURI(data);
-          hiddenElement.target = "_blank";
-          hiddenElement.download = fileName;
-          hiddenElement.click();
-          hiddenElement.remove();
-
-          loading.value = false;
-        });
     }
 
     function loadIncidenceCells(props) {
@@ -209,7 +210,6 @@ export default defineComponent({
       pagination,
       rows,
       onRequest,
-      exportIncidenceCells,
     };
   },
 });

@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pa-md">
+  <div class="q-pa-md col-12">
     <q-table
       :rows="rows"
       :columns="columns"
@@ -8,14 +8,22 @@
       :loading="loading"
       :filter="filter"
       binary-state-sort
+      :fullscreen="fullscreen"
       :visible-columns="visibleColumns"
+      class="valuation-table"
     >
       <template v-slot:top-right>
-        <q-input borderless dense debounce="300" v-model="filter" placeholder="Search">
+        <q-input borderless dense debounce="300" v-model="filter" placeholder="Search" style="margin-right: 15px;">
           <template v-slot:append>
             <q-icon name="mdi-magnify" />
           </template>
         </q-input>
+        <q-btn
+          dense
+          flat
+          :icon="fullscreen ? 'mdi-fullscreen-exit' : 'mdi-fullscreen'"
+          @click="fullscreen = !fullscreen"
+        />
       </template>
 
       <template v-slot:body-cell-edit="props">
@@ -62,6 +70,7 @@ export default defineComponent({
 
   async setup(props, context) {
     const valuations = ref("");
+    const fullscreen = ref(false)
     const trial = ref("");
     const $q = useQuasar();
 
@@ -82,6 +91,7 @@ export default defineComponent({
       //      "health_function_id",
       //      "endpoint_group_id",
       //      "endpoint_id",
+      "edit",
       "location",
       "group_name",
       "author_year",
@@ -90,10 +100,16 @@ export default defineComponent({
       "race_ethnicity_gender",
       "incidence_prevalence",
       "valuation",
-      "edit",
     ];
 
     const columns = [
+      {
+        name: "edit",
+        align: "center",
+        label: "",
+        field: "edit",
+        sortable: false,
+      },
       {
         name: "health_function_id",
         align: "left",
@@ -171,13 +187,6 @@ export default defineComponent({
         label: "Valuation",
         field: "valuation",
         sortable: true,
-      },
-      {
-        name: "edit",
-        align: "center",
-        label: "",
-        field: "edit",
-        sortable: false,
       },
     ];
     watch(
@@ -363,6 +372,7 @@ export default defineComponent({
       editItem,
       visibleColumns,
       editValueOfEffects,
+      fullscreen,
     };
   },
 });
@@ -385,5 +395,23 @@ export default defineComponent({
 .location-column {
   max-width: 250px;
   white-space: normal;
+}
+
+td:first-child,
+th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  -webkit-position: sticky;
+  background-color: #fff;
+}
+
+td:last-child,
+th:last-child {
+  position: sticky;
+  right: 0;
+  z-index: 1;
+  -webkit-position: sticky;
+  background-color: #fff;
 }
 </style>

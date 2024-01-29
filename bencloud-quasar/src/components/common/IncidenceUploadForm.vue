@@ -245,7 +245,7 @@ export default {
       var self = this;
 
       this.$q.loading.show({
-        message: "Uploading Incidence Data. Please wait...",
+        message: "Uploading incidence data. Please wait...",
         boxClass: "bg-grey-2 text-grey-9",
         spinnerColor: "primary",
       });

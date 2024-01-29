@@ -81,3 +81,30 @@ export const convertValuationFunctions = (data) => {
 
 
 }
+
+export const updateValuationFunctions = (store, data) => {
+    const groups = data.batchHifGroups;
+    var valuationForHealthFunction = {};
+    var vfs = [];
+
+    for (var j = 0; j < groups.length; j++)
+    {
+      var groupId = groups[j].id;
+      for (var i = 0; i < groups[j].hifs.length; i++) {
+        var hif = groups[j].hifs[i];
+        if (hif.valuationFunctions) {
+          valuationForHealthFunction = {};
+          vfs = [];
+
+          for (var h = 0; h < hif.valuationFunctions.length; h++) {
+            vfs.push(hif.valuationFunctions[h].vfId);
+          }
+          valuationForHealthFunction["health_function_id"] = hif.hifId;
+          valuationForHealthFunction["valuation_ids"] = vfs;
+          valuationForHealthFunction["endpoint_group_id"] = groupId;
+          //valuationForHealthFunctions.push(valuationForHealthFunction);
+          store.commit("analysis/updateValuationsForHealthImpactFunctionGroups", valuationForHealthFunction);
+        }
+      }
+    }
+}
