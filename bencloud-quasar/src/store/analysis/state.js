@@ -25,5 +25,6 @@ export default function () {
     aggregationScale: null,
     applyYearsToAll: false,
     batchTaskObject: null,
+    applyValuation: "Select my own value functions",
   }
 }
