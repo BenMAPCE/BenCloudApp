@@ -76,7 +76,9 @@ export const loadHealthImpactFunctionGroups = (store) => {
             "&scenarios=" +
             postPolicy + 
             "&incidencePrevalenceDataset=" +
-            store.state.analysis.incidenceId,
+            store.state.analysis.incidenceId +
+            "&applyValuation=" +
+            store.state.analysis.applyValuation,
           {
             params: {},
           }

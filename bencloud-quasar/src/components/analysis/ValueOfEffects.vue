@@ -203,6 +203,25 @@ export default defineComponent({
       }
     );
 
+    watch(
+      () => store.state.analysis.applyValuation,
+      (currentSelectedItem, prevSelectedItem) => {
+        if (currentSelectedItem != prevSelectedItem) {
+          (async () => {
+          console.log("loadHealthImpactFunctionGroups");
+          const response = await loadHealthImpactFunctionGroups(store).fetch(store);
+          rows.value = response.data.value;
+          console.log(rows.value);
+          rows.value = buildHealthImpactFunctionGroups(
+            response.data.value,
+            valuationFunctions,
+            store
+          );
+        })();
+        }
+      }
+    );
+
     function setSelectedValuationFunctions(valuationFunctionsSelected, row) {
       console.log("getSelectedValuationFunctions");
       console.log(valuationFunctionsSelected);
