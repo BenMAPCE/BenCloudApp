@@ -415,22 +415,26 @@ export default defineComponent({
   max-width: 250px;
   white-space: normal;
 }
+</style>
 
-td:first-child,
-th:first-child {
-  position: sticky;
-  left: 0;
-  z-index: 1;
-  -webkit-position: sticky;
-  background-color: #fff;
-}
+<style lang="sass">
+.valuation-table
 
-td:last-child,
-th:last-child {
-  position: sticky;
-  right: 0;
-  z-index: 1;
-  -webkit-position: sticky;
-  background-color: #fff;
-}
+  thead tr:first-child th:first-child,
+  td:first-child
+    position: sticky
+    -webkit-position: sticky
+    left: 0
+    z-index: 1
+    background-color: #fff
+    opacity: 1
+
+  thead tr:first-child th:last-child,
+  td:last-child
+    position: sticky
+    -webkit-position: sticky 
+    right: 0
+    z-index: 1
+    background-color: #fff
+    opacity: 1
 </style>
