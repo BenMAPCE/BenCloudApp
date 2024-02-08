@@ -30,20 +30,12 @@ export default defineComponent({
     const rows = ref([]);
     const gridOptions = [
       {
-        name: 'Nation',
-        id: 20
+        name: 'Fragmented Grid',
+        id: 48
       }, 
       {
-        name: 'State',
-        id: 19
-      },
-      {
-        name: 'County',
-        id: 18
-      },
-      {
-        name: 'CMAQ 12km Nation',
-        id: 28
+        name: 'Countries',
+        id: 47
       }
     ]
     const selectedItem = ref();
@@ -82,7 +74,7 @@ export default defineComponent({
           }
         })
       } else {
-        selectedItem.value = rows.value[2]; //default to county
+        selectedItem.value = rows.value[1]; //default to countries
       }
       
     })();

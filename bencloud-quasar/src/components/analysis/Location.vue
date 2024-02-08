@@ -46,7 +46,7 @@ export default defineComponent({
 
   setup(props, context) {
     const rows = ref([]);
-    const selectedItem = ref('1');
+    const selectedItem = ref('4');
     const store = useStore();
 
     watch(
@@ -78,10 +78,10 @@ export default defineComponent({
     return {
       tab: ref("defaults"),
       options: [
-        { label: 'U.S. National', value: '1' },
+        { label: 'U.S. National', value: '1', disable: true },
         { label: 'Eastern U.S.', value: '2', disable: true },
         { label: 'Western U.S.', value: '3', disable: true  },
-        { label: 'Global (everywhere)', value: '4', disable: true }
+        { label: 'Global (everywhere)', value: '4' }
       ],
       selectedItem,
       rows
