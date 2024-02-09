@@ -1380,9 +1380,6 @@
     content: "";
     display: table;
   }
-  .epa-css header .site-logo {
-    display: none;
-  }
   .epa-css header #block-epa-core-gsa-epa-search {
     position: initial;
   }
