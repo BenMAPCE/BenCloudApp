@@ -28,14 +28,14 @@ export default defineComponent({
   async setup(props, context) {
     const store = useStore();
     const rows = ref([]);
-    const selectedItem = ref(store.state.analysis.applyValuation);
+    const selectedItem = ref(store.state.analysis.valuationSelection);
 
     watch(
       () => selectedItem.value,
       (currentSelectedItem, prevSelectedItem) => {
         if (currentSelectedItem != prevSelectedItem) {
           console.log(rows)
-          store.commit("analysis/updateApplyValuation", currentSelectedItem);
+          store.commit("analysis/updateValuationSelection", currentSelectedItem);
         }
       }
     );

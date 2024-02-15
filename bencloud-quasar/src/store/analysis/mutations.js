@@ -154,6 +154,6 @@ export function updateBatchTaskObject (state, batchTaskObject) {
     state.batchTaskObject = batchTaskObject;
 }
 
-export function updateApplyValuation (state, applyValuation) {
-    state.applyValuation = applyValuation;
+export function updateValuationSelection (state, valuationSelection) {
+    state.valuationSelection = valuationSelection;
 }

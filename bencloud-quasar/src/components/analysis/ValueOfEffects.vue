@@ -57,7 +57,6 @@ import { useQuasar } from "quasar";
 
 import { loadHealthImpactFunctionGroups } from "../../composables/analysis/health-impact-function-groups";
 import { buildHealthImpactFunctionGroups } from "../../composables/analysis/health-impact-function-groups";
-import { updateValuationsForHealthImpactFunctionGroups } from "../../composables/analysis/valuations";
 import {
   getValuationFunctionsForEndpointGroupId,
   loadValuationFunctions,
@@ -204,7 +203,7 @@ export default defineComponent({
     );
 
     watch(
-      () => store.state.analysis.applyValuation,
+      () => store.state.analysis.valuationSelection,
       (currentSelectedItem, prevSelectedItem) => {
         if (currentSelectedItem != prevSelectedItem) {
           (async () => {
@@ -326,8 +325,6 @@ export default defineComponent({
 
           console.log("... updateValuationsForHealthImpactFunctionGroups")
           store.commit("analysis/updateValuationsForHealthImpactFunctionGroups", payload);
-
-          //updateValuationsForHealthImpactFunctionGroups(store, row.endpoint_group_id, valuationIds);
 
           row.valuation = valuations;
           console.log(row.valuation);
