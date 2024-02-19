@@ -142,6 +142,8 @@ export default defineComponent({
     const populationDatasetName = store.state.analysis.populationDatasetName;
     const valuationsForHealthImpactFunctionGroups =
       store.state.analysis.valuationsForHealthImpactFunctionGroups;
+    
+    const valuationSelection = store.state.analysis.valuationSelection;
 
     const healthEffects = store.state.analysis.healthEffects;
 
@@ -305,6 +307,7 @@ export default defineComponent({
       healthEffectsNames,
       healthImpactFunctions,
       valuationsForHealthImpactFunctionGroups,
+      valuationSelection,
       valuationFunctionCount,
       totalTaskCount,
       submitTask,

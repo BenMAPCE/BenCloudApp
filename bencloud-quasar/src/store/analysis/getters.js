@@ -114,6 +114,6 @@ export function batchTaskObject (state) {
   return state.batchTaskObject;
 }
 
-export function applyValuation (state) {
-  return state.applyValuation;
+export function valuationSelection (state) {
+  return state.valuationSelection;
 }
