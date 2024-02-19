@@ -1,4 +1,7 @@
 <template>
+    <head>
+        <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro' rel='stylesheet' type='text/css'>
+    </head>
     <section
         class="usa-banner"
         aria-label="Official website of the United States government"
@@ -18,7 +21,6 @@
                 <p class="usa-banner__header-text">
                 An official website of the United States government
                 </p>
-                <p class="usa-banner__header-action">Here’s how you know</p>
             </div>
             <button
                 type="button"
@@ -133,7 +135,7 @@ export default defineComponent({
 
 <style lang="scss">
 .usa-accordion {
-    font-family: Source Sans Pro Web, "Noto Sans Arabic", "Noto Sans BN homepage", "Noto Sans GU homepage", "Noto Sans KR homepage", "Noto Sans SC homepage", "Noto Sans BN", "Noto Sans GU", "Noto Sans KR", "Noto Sans SC", "Noto Sans TC", "Helvetica Neue", Helvetica, Arial, sans;
+    font-family: "Source Sans Pro", "Noto Sans Arabic", "Noto Sans BN homepage", "Noto Sans GU homepage", "Noto Sans KR homepage", "Noto Sans SC homepage", "Noto Sans BN", "Noto Sans GU", "Noto Sans KR", "Noto Sans SC", "Noto Sans TC", "Helvetica Neue", Helvetica, Arial, sans;
     background-color: #f0f0f0;
     color: #1b1b1b;
     line-height: 1.5;
@@ -143,6 +145,7 @@ export default defineComponent({
     padding: 0;
     width: 100%;
     word-wrap: break-word;
+    letter-spacing: .1px;
 
     .usa-banner__inner {
         -webkit-box-align: center;
@@ -161,7 +164,7 @@ export default defineComponent({
         position: relative;
         color: #1b1b1b;
         min-height: 0;
-        font-size: .8rem;
+        font-size: .9rem;
         font-weight: normal;
     }
 
@@ -169,7 +172,7 @@ export default defineComponent({
     {
         background-color: rgba(0,0,0,0);
         display: block;
-        font-size: .8rem;
+        font-size: .9rem;
         font-weight: normal;
         min-height: 0;
         padding-right: 0;
@@ -194,22 +197,12 @@ export default defineComponent({
     .usa-banner__header-text {
         margin-bottom: 0;
         margin-top: 0;
-        font-size: .8rem;
+        font-size: .9rem;
         line-height: 1.1;
-    }
-
-    .usa-banner__header-action {
-        display: none;
-        color: #005ea2;
-        line-height: 1.1;
-        margin-bottom: 0;
-        margin-top: 2px;
-        text-decoration: underline;
     }
 
     .usa-banner__button{
         color: #005ea2;
-        font-size: .8rem;
         line-height: 1.1;
         font-weight: normal;
         text-align: left;
@@ -219,7 +212,7 @@ export default defineComponent({
         bottom: auto;
         left: auto;
         right: auto;
-        top: auto;
+        top: 1px;
         display: inline;
         margin-left: .5rem;
         border: none;
@@ -251,7 +244,7 @@ export default defineComponent({
         margin-right: auto;
         max-width: 64rem;
         background-color: rgba(0,0,0,0);
-        font-size: 1rem;
+        font-size: 1.1rem;
         overflow: hidden;
         width: 100%;
         color: #1b1b1b;
