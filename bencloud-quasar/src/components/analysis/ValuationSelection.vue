@@ -40,6 +40,15 @@ export default defineComponent({
       }
     );
 
+    watch(
+      () => store.state.analysis.valuationSelection,
+      (currentSelectedItem, prevSelectedItem) => {
+        if (currentSelectedItem != prevSelectedItem) {
+          selectedItem.value = store.state.analysis.valuationSelection;
+        }
+      }
+    );
+
     onBeforeMount(() => {
       (async () => {
         console.log("load valuation dataset options");
