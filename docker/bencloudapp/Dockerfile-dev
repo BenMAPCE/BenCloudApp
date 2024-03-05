@@ -1,5 +1,5 @@
 #FROM nginx:alpine
-FROM nginx:bookworm
+FROM nginx:stable-bullseye
 
 WORKDIR /var/www
 
