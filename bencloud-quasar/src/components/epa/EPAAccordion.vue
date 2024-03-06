@@ -14,7 +14,7 @@
                 aria-hidden="true"
                 class="usa-banner__header-flag"
                 src="./assets/us_flag_small.png"
-                alt="U.S Flag"
+                alt="U.S. Flag"
                 />
             </div>
             <div class="grid-col-fill tablet:grid-col-auto" aria-hidden="true">

@@ -158,8 +158,9 @@ export default defineComponent({
   .banner {
     background: #005ea2;
   }
-  .a.menu-link {
-    font-size: 88.23%;
+  nav.main-nav > .nav__inner > .menu > .menu-item > .menu-link {
+    color: #fff;
+    font-size: .98rem !important;
     font-family: "Merriweather", "Georgia", "Cambria", "Times New Roman", "Times", serif;
     font-weight: bold;
     line-height: 1;
@@ -201,7 +202,7 @@ export default defineComponent({
     bottom: 2rem;
     padding-right: 1em;
     position: absolute;
-    right: 0px;
+    right: 30px;
     clear: right;
     padding-top: 0px;
     float: right;
