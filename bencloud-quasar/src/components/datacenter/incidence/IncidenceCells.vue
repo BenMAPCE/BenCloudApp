@@ -15,7 +15,7 @@
         color="primary"
         icon-right="mdi-grid"
         class="export-to-csv-button"
-        label="Export to csv"
+        label="EXPORT TO CSV"
         no-caps
         @click="exportIncidenceCells"
       />

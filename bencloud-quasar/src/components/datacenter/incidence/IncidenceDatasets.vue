@@ -368,7 +368,7 @@ const columns = [
   {
     name: "upload_date",
     align: "left",
-    label: "Upload date",
+    label: "Upload Date",
     field: "upload_date",
     format: val => date.formatDate(val, 'YYYY-MM-DD HH:mm:ss'),
     sortable: true,
