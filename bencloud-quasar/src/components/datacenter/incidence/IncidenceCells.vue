@@ -39,6 +39,7 @@
 import { defineComponent } from "vue";
 import { ref, unref, onMounted, watch, watchEffect } from "vue";
 import axios from "axios";
+import { useQuasar } from "quasar";
 import { useStore } from "vuex";
 
 var currentIncidenceDatasetId;
@@ -119,6 +120,7 @@ export default defineComponent({
     let myFilter = unref(filter);
 
     const store = useStore();
+    const $q = useQuasar();
 
   watch(
     () => store.state.incidence.incidenceDatasetId,
@@ -229,6 +231,13 @@ const columns = [
     field: "Row",
     sortable: true,
   },
+  {
+    name: "year",
+    align: "left",
+    label: "Year",
+    field: "Year",
+    sortable: true,
+  },
   { name: "endpoint group", 
     align: "left", 
     label: "Health Effect Group", 
@@ -276,7 +285,7 @@ const columns = [
   {
     name: "type",
     align: "left",
-    label: "Prevalence",
+    label: "Type",
     field: "Type",
     sortable: true,
   },
