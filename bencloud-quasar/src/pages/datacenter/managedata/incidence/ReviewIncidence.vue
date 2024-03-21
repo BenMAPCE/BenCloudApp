@@ -10,6 +10,15 @@
           </Suspense>
         </div>
 
+      <div class="col" v-if="isAdmin">
+        <q-toggle
+          size="lg"
+          v-model="showAll"
+          color="blue"
+          label="See incidence datasets of all users"
+        />
+      </div>
+
         <div class="col">
           <IncidenceAdd
           >
