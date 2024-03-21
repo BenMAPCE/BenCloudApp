@@ -76,7 +76,7 @@ export default {
 
       incidence_dataset_id.value = props.incidence_dataset_id;
 
-      //get all grid definitions to list  
+      //get all years to list  
       (async () => {
           const response = await getIncidenceDatasetYears(incidence_dataset_id.value).fetch();
           yearOptions.value = buildIncidenceYearOptions(unref(response.data));
