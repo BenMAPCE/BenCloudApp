@@ -15,9 +15,9 @@
         color="primary"
         icon-right="mdi-grid"
         class="export-to-csv-button"
-        label="Export to csv"
+        label="EXPORT TO CSV"
         no-caps
-        @click="exportIncidenceCells"
+        @click="showDownloadDialog"
       />
 
       <q-input
@@ -39,7 +39,9 @@
 import { defineComponent } from "vue";
 import { ref, unref, onMounted, watch, watchEffect } from "vue";
 import axios from "axios";
+import { useQuasar } from "quasar";
 import { useStore } from "vuex";
+import DownloadIncidenceDatasetDialog from "./DownloadIncidenceDatasetDialog.vue"
 
 var currentIncidenceDatasetId;
 
@@ -54,46 +56,6 @@ export default defineComponent({
 
   methods: {
     exportToCSV(props) {},
-    exportIncidenceCells() {
-      console.log("exportIncidenceCells");
-
-      var self = this;
-      self.$q.loading.show({
-        message: "Downloading incidence data. Please wait...",
-        boxClass: "bg-grey-2 text-grey-9",
-        spinnerColor: "primary",
-      });
-
-        axios
-        .get(
-          process.env.API_SERVER + "/api/incidence/" +
-            currentIncidenceDatasetId +
-            "/contents",
-          {
-            params: {
-              page: 1,
-              rowsPerPage: 9999999,
-            },
-          headers: { Accept: "application/zip", "Content-Type": "application/zip" },
-          responseType: "blob",
-        })
-        .then((response) => {          
-          var fileName = response.headers["content-disposition"]
-          .split("filename=")[1]
-          .split(";")[0];
-            
-
-          const url = window.URL.createObjectURL(new Blob([response.data]));
-          const link = document.createElement("a");
-          link.href = url;
-          link.setAttribute("download", fileName ); //or any other extension
-          document.body.appendChild(link);
-          link.click();
-        })
-        .finally(function () {
-          self.$q.loading.hide();
-        })
-    },
   },
 
   data() {
@@ -119,6 +81,7 @@ export default defineComponent({
     let myFilter = unref(filter);
 
     const store = useStore();
+    const $q = useQuasar();
 
   watch(
     () => store.state.incidence.incidenceDatasetId,
@@ -195,6 +158,27 @@ export default defineComponent({
         });
     }
 
+    function showDownloadDialog() {
+      $q.dialog({
+        component: DownloadIncidenceDatasetDialog,
+        parent: this,
+        persistent: true,
+        componentProps: {
+          year: 0,
+          incidence_dataset_id: currentIncidenceDatasetId,
+        },
+      })
+        .onOk(() => {
+          console.log("Export OK");
+        })
+        .onCancel(() => {
+          // console.log('Cancel')
+        })
+        .onDismiss(() => {
+          // console.log('I am triggered on both OK and Cancel')
+        });
+    }
+
     onMounted(() => {
       // get initial data from server (1st page)
       onRequest({
@@ -209,6 +193,7 @@ export default defineComponent({
       loading,
       pagination,
       rows,
+      showDownloadDialog,
       onRequest,
     };
   },
@@ -227,6 +212,13 @@ const columns = [
     align: "left",
     label: "Row",
     field: "Row",
+    sortable: true,
+  },
+  {
+    name: "year",
+    align: "left",
+    label: "Year",
+    field: "Year",
     sortable: true,
   },
   { name: "endpoint group", 
@@ -276,7 +268,7 @@ const columns = [
   {
     name: "type",
     align: "left",
-    label: "Prevalence",
+    label: "Type",
     field: "Type",
     sortable: true,
   },

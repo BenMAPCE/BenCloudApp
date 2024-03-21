@@ -352,12 +352,6 @@ const columns = [
     format: (val) => val.join(", "),
     sortable: true,
   },
-  { 
-    name: "user", 
-    label: "User", 
-    field: "", 
-    align: "left" 
-  },
   {
     name: "filename",
     align: "left",
@@ -368,10 +362,16 @@ const columns = [
   {
     name: "upload_date",
     align: "left",
-    label: "Upload date",
+    label: "Upload Date",
     field: "upload_date",
     format: val => date.formatDate(val, 'YYYY-MM-DD HH:mm:ss'),
     sortable: true,
+  },
+  { 
+    name: "user", 
+    label: "User", 
+    field: "", 
+    align: "left" 
   },
   { 
     name: "actions", 
