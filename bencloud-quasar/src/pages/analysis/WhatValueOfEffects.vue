@@ -2,9 +2,12 @@
   <div class="header-text">
     How do you want to value the health effects? (Choice applies to all tasks in a batch run)
   </div>
-  <div class="row">
+  <div class="row flex">
     <Suspense>
       <ValuationSelection></ValuationSelection>
+    </Suspense>
+    <Suspense>
+      <InflationYear></InflationYear>
     </Suspense>
   </div>
   <div class="row">
@@ -33,13 +36,15 @@ import { defineComponent, reactive, inject } from 'vue';
 import ValueOfEffects from "../../components/analysis/ValueOfEffects.vue";
 import Aggregation from "../../components/analysis/Aggregation.vue";
 import ValuationSelection from "../../components/analysis/ValuationSelection.vue";
+import InflationYear from 'src/components/analysis/InflationYear.vue';
 
 export default defineComponent({
   name: 'WhatValueOfEffects',
   components: {
     ValueOfEffects,
     Aggregation,
-    ValuationSelection
+    ValuationSelection,
+    InflationYear
   },
   setup(props, context) {
 
@@ -67,6 +72,10 @@ export default defineComponent({
 
   .edit-btn-note:hover {
     cursor: text;
+  }
+
+  .flex {
+    display: flex;
   }
 
 </style>

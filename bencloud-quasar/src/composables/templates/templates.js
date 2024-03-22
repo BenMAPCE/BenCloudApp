@@ -241,7 +241,10 @@ export const createHifTemplate = (taskName, store) => {
   }
 
   template["functions"] = functionsArray;
+
+  batchTaskObject["inflationYear"] = store.state.analysis.inflationYear;
   template["batchTaskObject"] = batchTaskObject;
+  store.commit("analysis/updateBatchTaskObject", batchTaskObject);
 
   const MY_NAMESPACE = "1b671a64-40d5-491e-99b0-da01ff1f3341";
   const hash = uuidv5(JSON.stringify(template), MY_NAMESPACE);
@@ -479,6 +482,7 @@ export const loadHifTemplate = (model, store) => {
 
       var batchTaskObject = parameters.batchTaskObject;
       store.commit("analysis/updateBatchTaskObject", batchTaskObject);
+      store.commit("analysis/updateInflationYear",batchTaskObject.inflationYear);
 
       console.log(store.state.analysis.valuationsForHealthImpactFunctionGroups);
       //console.log(parameters.functions);

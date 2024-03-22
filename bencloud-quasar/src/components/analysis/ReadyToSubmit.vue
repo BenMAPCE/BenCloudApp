@@ -228,6 +228,7 @@ export default defineComponent({
       var batchTaskJSON = JSON.parse(JSON.stringify(store.state.analysis.batchTaskObject));
       batchTaskJSON['name'] = taskName.value;
       batchTaskJSON['gridDefinitionId'] = store.state.analysis.aggregationScale;
+      batchTaskJSON['inflationYear'] = store.state.analysis.inflationYear;
       store.commit("analysis/updateBatchTaskObject", batchTaskJSON);
       console.log("----- Batch task configuration -----")
       console.log(batchTaskJSON);

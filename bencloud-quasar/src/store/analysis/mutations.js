@@ -153,3 +153,7 @@ export function updateApplyYearsToAll (state, applyYearsToAll) {
 export function updateBatchTaskObject (state, batchTaskObject) {
     state.batchTaskObject = batchTaskObject;
 }
+
+export function updateInflationYear (state, inflationYear) {
+    state.inflationYear = inflationYear;
+}
