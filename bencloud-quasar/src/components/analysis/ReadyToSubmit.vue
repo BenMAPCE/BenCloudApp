@@ -131,9 +131,7 @@ export default defineComponent({
 
     const pollutantId = store.state.analysis.pollutantId;
     const pollutantFriendlyName = store.state.analysis.pollutantFriendlyName;
-    const prePolicyAirQualityId = store.state.analysis.prePolicyAirQualityId;
     const prePolicyAirQualityName = store.state.analysis.prePolicyAirQualityName;
-    const postPolicyAirQualityId = store.state.analysis.postPolicyAirQualityId;
     const postPolicyAirQualityName = store.state.analysis.postPolicyAirQualityName;
 
     const incidenceId = store.state.analysis.incidenceId;
@@ -142,6 +140,8 @@ export default defineComponent({
     const populationDatasetName = store.state.analysis.populationDatasetName;
     const valuationsForHealthImpactFunctionGroups =
       store.state.analysis.valuationsForHealthImpactFunctionGroups;
+    
+    const valuationSelection = store.state.analysis.valuationSelection;
 
     const healthEffects = store.state.analysis.healthEffects;
 
@@ -294,9 +294,7 @@ export default defineComponent({
     return {
       pollutantId,
       pollutantFriendlyName,
-      prePolicyAirQualityId,
       prePolicyAirQualityName,
-      postPolicyAirQualityId,
       postPolicyAirQualityName,
       incidenceId,
       incidenceName,
@@ -306,6 +304,7 @@ export default defineComponent({
       healthEffectsNames,
       healthImpactFunctions,
       valuationsForHealthImpactFunctionGroups,
+      valuationSelection,
       valuationFunctionCount,
       totalTaskCount,
       submitTask,

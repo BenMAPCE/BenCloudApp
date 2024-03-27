@@ -76,7 +76,9 @@ export const loadHealthImpactFunctionGroups = (store) => {
             "&scenarios=" +
             postPolicy + 
             "&incidencePrevalenceDataset=" +
-            store.state.analysis.incidenceId,
+            store.state.analysis.incidenceId +
+            "&valuationSelection=" +
+            store.state.analysis.valuationSelection,
           {
             params: {},
           }
@@ -84,7 +86,11 @@ export const loadHealthImpactFunctionGroups = (store) => {
         .then((response) => {
           data.value = response.data;
           store.commit("analysis/updateBatchTaskObject", data.value);
-          updateValuationFunctions(store, data.value);
+          //Only update the valuation function selections if user selected the EPA defaults
+          //Retain current function selections for templates and for the current config
+          if(store.state.analysis.valuationSelection == "Use EPA's current default values") {
+            updateValuationFunctions(store, data.value);
+          }
         });
     } catch (ex) {
       error.value = ex;

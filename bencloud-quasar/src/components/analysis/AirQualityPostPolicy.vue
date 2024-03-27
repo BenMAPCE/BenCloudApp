@@ -32,6 +32,7 @@ async setup(props, context) {
         console.log("watch: " + currentSelectedItems + " |" + prevSelectedItems)
         if (currentSelectedItems != prevSelectedItems) {
           var names = [];
+          var ids = [];
           rows.value.forEach(element => {
             if(currentSelectedItems.includes(element.value)) {
               var scenario = null;
@@ -41,16 +42,18 @@ async setup(props, context) {
               //if this element is already stored, there may be corresponding years stored
               if(!!scenario) {
                 names.push(scenario);
+                ids.push(element.value);
                 //if the element is not stored, the years value is empty for now
               } else {
                 var scenario = { name: element.label, years:[], popYears: []};
                 names.push(scenario);
+                ids.push(element.value);
               }
             }
           })
           store.commit("analysis/updatePostPolicyAirQuality",
           {
-            postPolicyAirQualityId: currentSelectedItems,
+            postPolicyAirQualityId: ids,
             postPolicyAirQualityName: names
           });
         }

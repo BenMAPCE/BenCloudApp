@@ -28,13 +28,23 @@ export default defineComponent({
   async setup(props, context) {
     const store = useStore();
     const rows = ref([]);
-    const selectedItem = ref("EPA Standard Variables");
+    const selectedItem = ref(store.state.analysis.valuationSelection);
 
     watch(
       () => selectedItem.value,
       (currentSelectedItem, prevSelectedItem) => {
         if (currentSelectedItem != prevSelectedItem) {
           console.log(rows)
+          store.commit("analysis/updateValuationSelection", currentSelectedItem);
+        }
+      }
+    );
+
+    watch(
+      () => store.state.analysis.valuationSelection,
+      (currentSelectedItem, prevSelectedItem) => {
+        if (currentSelectedItem != prevSelectedItem) {
+          selectedItem.value = store.state.analysis.valuationSelection;
         }
       }
     );
@@ -42,7 +52,7 @@ export default defineComponent({
     onBeforeMount(() => {
       (async () => {
         console.log("load valuation dataset options");
-        rows.value = ["EPA Standard Variables", "Custom Variables"];
+        rows.value = ["Select my own value functions", "Use EPA's current default values"];
       })();
     });
 

@@ -27,6 +27,7 @@ export default function () {
     batchTaskObject: null,
     inflationYear: null,
     useDecliningDR: false,
-    discountRate: 0
+    discountRate: 0,
+    valuationSelection: "Select my own value functions",
   }
 }

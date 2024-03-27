@@ -8,7 +8,7 @@
               <q-uploader
                 label="Upload your CSV"
                 accept=".csv"
-                :max-file-size="20000000"
+                :max-file-size="1000000000"
                 square
                 flat
                 @added="file_selected"

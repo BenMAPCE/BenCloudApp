@@ -117,6 +117,7 @@ export const createHifTemplate = (taskName, store) => {
   const incidenceName = store.state.analysis.incidenceName;
   const pollutantId = store.state.analysis.pollutantId;
   const pollutantFriendlyName = store.state.analysis.pollutantFriendlyName;
+  const valuationSelection = store.state.analysis.valuationSelection;
 
   const healthEffects = store.state.analysis.healthEffects;
 
@@ -188,6 +189,8 @@ export const createHifTemplate = (taskName, store) => {
     selectedHealthEffects.push(selectedHealthEffect);
   }
   template["healthEffects"] = selectedHealthEffects;
+
+  template["valuationSelection"] = valuationSelection;
 
   var functionsArray = [];
   var hifFunction = {};
@@ -425,6 +428,9 @@ export const loadHifTemplate = (model, store) => {
 
   console.log(parameters.healthEffects);
   store.commit("analysis/updateHealthEffects", parameters.healthEffects);
+
+  console.log(parameters.valuationSelection);
+  store.commit("analysis/updateValuationSelection", parameters.valuationSelection);
 
   const valuationFunctions = ref([]);
 

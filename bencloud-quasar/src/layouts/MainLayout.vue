@@ -1,6 +1,7 @@
 <template>
   <q-layout view="lHh Lpr lFf">
     <q-header elevated>
+      <EPAAccordion v-bind:showEpaHeaderFooter="showEpaHeaderFooter"></EPAAccordion>
       <EPAHeader v-bind:showEpaHeaderFooter="showEpaHeaderFooter"></EPAHeader>
       <div class="benmap-header">
         <q-toolbar>
@@ -34,6 +35,7 @@
 <script>
 import { defineComponent, onBeforeMount, ref } from "vue";
 import AppNavLinks from "src/components/navigation/AppNavLinks.vue";
+import EPAAccordion from "src/components/epa/EPAAccordion.vue";
 import EPAHeader from "src/components/epa/EPAHeader.vue";
 import EPAFooter from "src/components/epa/EPAFooter.vue";
 import axios from "axios";
@@ -82,6 +84,7 @@ export default defineComponent({
 
   components: {
     AppNavLinks,
+    EPAAccordion,
     EPAHeader,
     EPAFooter,
   },

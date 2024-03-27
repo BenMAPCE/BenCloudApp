@@ -55,14 +55,13 @@ import { ref, watch, onBeforeMount, onMounted } from "vue";
 import { useStore } from "vuex";
 import { useQuasar } from "quasar";
 
-import { loadHealthImpactFunctionGroups } from "../../composables/analysis/health-impact-function-groups";
-import { buildHealthImpactFunctionGroups } from "../../composables/analysis/health-impact-function-groups";
-import { updateValuationsForHealthImpactFunctionGroups } from "../../composables/analysis/valuations";
+import { loadHealthImpactFunctionGroups, buildHealthImpactFunctionGroups } from "../../composables/analysis/health-impact-function-groups";
 import {
   getValuationFunctionsForEndpointGroupId,
   loadValuationFunctions,
 } from "../../composables/analysis/valuation-functions";
 import ValueOfEffectsEditForm from "./ValueOfEffectsEditForm.vue";
+import analysis from "src/store/analysis";
 
 export default defineComponent({
   model: ref(null),
@@ -203,6 +202,25 @@ export default defineComponent({
       }
     );
 
+    watch(
+      () => store.state.analysis.valuationSelection,
+      (currentSelectedItem, prevSelectedItem) => {
+        if (currentSelectedItem != prevSelectedItem) {
+          (async () => {
+          console.log("loadHealthImpactFunctionGroups");
+          const response = await loadHealthImpactFunctionGroups(store).fetch(store);
+          rows.value = response.data.value;
+          console.log(rows.value);
+          rows.value = buildHealthImpactFunctionGroups(
+            response.data.value,
+            valuationFunctions,
+            store
+          );
+        })();
+        }
+      }
+    );
+
     function setSelectedValuationFunctions(valuationFunctionsSelected, row) {
       console.log("getSelectedValuationFunctions");
       console.log(valuationFunctionsSelected);
@@ -246,19 +264,19 @@ export default defineComponent({
         },
       })
         .onOk((valuationFunctionsSelected) => {
-          console.log("OK");
+          if(store.state.analysis.valuationSelection == "Use EPA's current default values") {
+            store.commit("analysis/updateValuationSelection", "Select my own value functions");
+          }
           console.log(row);
           console.log(valuationFunctionsSelected);
 
           var records = JSON.parse(JSON.stringify(valuationFunctionsSelected));
           var valuations = "";
           var valuationIds = [];
-          console.log(records.length);
           var valuationDisplay = "";
           
           var valuationFunctionsArray = [];
           for (var i = 0; i < records.length; i++) {
-            console.log(records[i].qualifier);
             valuationDisplay =
               records[i].endpoint_name +
               " | " +
@@ -297,8 +315,6 @@ export default defineComponent({
 
           store.commit("analysis/updateBatchTaskObject", batchTaskObject);
           console.log(store.state.analysis.batchTaskObject);
-          console.log(valuationIds);
-          console.log(row);
 
           var payload = {};
           payload.endpoint_group_id = row.endpoint_group_id;
@@ -308,10 +324,7 @@ export default defineComponent({
           console.log("... updateValuationsForHealthImpactFunctionGroups")
           store.commit("analysis/updateValuationsForHealthImpactFunctionGroups", payload);
 
-          //updateValuationsForHealthImpactFunctionGroups(store, row.endpoint_group_id, valuationIds);
-
           row.valuation = valuations;
-          console.log(row.valuation);
         })
         .onCancel(() => {
           // console.log('Cancel')
@@ -396,22 +409,26 @@ export default defineComponent({
   max-width: 250px;
   white-space: normal;
 }
+</style>
 
-td:first-child,
-th:first-child {
-  position: sticky;
-  left: 0;
-  z-index: 1;
-  -webkit-position: sticky;
-  background-color: #fff;
-}
+<style lang="sass">
+.valuation-table
 
-td:last-child,
-th:last-child {
-  position: sticky;
-  right: 0;
-  z-index: 1;
-  -webkit-position: sticky;
-  background-color: #fff;
-}
+  thead tr:first-child th:first-child,
+  td:first-child
+    position: sticky
+    -webkit-position: sticky
+    left: 0
+    z-index: 1
+    background-color: #fff
+    opacity: 1
+
+  thead tr:first-child th:last-child,
+  td:last-child
+    position: sticky
+    -webkit-position: sticky 
+    right: 0
+    z-index: 1
+    background-color: #fff
+    opacity: 1
 </style>

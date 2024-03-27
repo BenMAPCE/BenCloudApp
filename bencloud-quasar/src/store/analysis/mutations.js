@@ -165,3 +165,7 @@ export function updateUseDecliningDR (state, useDecliningDR) {
 export function updateDiscountRate (state, discountRate) {
     state.discountRate = discountRate;
 }
+
+export function updateValuationSelection (state, valuationSelection) {
+    state.valuationSelection = valuationSelection;
+}

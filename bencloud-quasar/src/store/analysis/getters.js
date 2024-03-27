@@ -102,8 +102,8 @@ export function airQualityLayers (state) {
   return state.airQualityLayers
 }
 
-export function aggegationScale (state) {
-  return state.aggegationScale;
+export function aggregationScale (state) {
+  return state.aggregationScale;
 }
 
 export function applyYearsToAll (state) {
@@ -114,3 +114,6 @@ export function batchTaskObject (state) {
   return state.batchTaskObject;
 }
 
+export function valuationSelection (state) {
+  return state.valuationSelection;
+}

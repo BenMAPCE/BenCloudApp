@@ -139,6 +139,8 @@ export default defineComponent({
     const valuationsForHealthImpactFunctionGroups =
       store.state.analysis.valuationsForHealthImpactFunctionGroups;
 
+    const valuationSelection = store.state.analysis.valuationSelection;
+
     const healthEffects = store.state.analysis.healthEffects;
 
     const healthEffectsIds = ref([]);
@@ -246,6 +248,7 @@ export default defineComponent({
       healthEffectsNames,
       healthImpactFunctions,
       valuationsForHealthImpactFunctionGroups,
+      valuationSelection,
       submitTask,
       saveTemplate,
       taskName,
