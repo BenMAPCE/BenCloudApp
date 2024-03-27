@@ -26,5 +26,7 @@ export default function () {
     applyYearsToAll: false,
     batchTaskObject: null,
     inflationYear: null,
+    useDecliningDR: false,
+    discountRate: 0
   }
 }

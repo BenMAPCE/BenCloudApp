@@ -9,6 +9,9 @@
     <Suspense>
       <InflationYear></InflationYear>
     </Suspense>
+    <Suspense>
+      <DiscountRate></DiscountRate>
+    </Suspense>
   </div>
   <div class="row">
     Select individual valuation functions via the edit(<q-icon class="edit-btn-note q-pt-xs" color="primary" name="mdi-pencil"></q-icon>) button in each row. Selected valuation functions will be run for each task (each Post-Policy/Year combination).
@@ -37,6 +40,7 @@ import ValueOfEffects from "../../components/analysis/ValueOfEffects.vue";
 import Aggregation from "../../components/analysis/Aggregation.vue";
 import ValuationSelection from "../../components/analysis/ValuationSelection.vue";
 import InflationYear from 'src/components/analysis/InflationYear.vue';
+import DiscountRate from 'src/components/analysis/DiscountRate.vue';
 
 export default defineComponent({
   name: 'WhatValueOfEffects',
@@ -44,7 +48,8 @@ export default defineComponent({
     ValueOfEffects,
     Aggregation,
     ValuationSelection,
-    InflationYear
+    InflationYear,
+    DiscountRate
   },
   setup(props, context) {
 

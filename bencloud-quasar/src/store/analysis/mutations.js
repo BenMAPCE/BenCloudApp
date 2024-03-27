@@ -157,3 +157,11 @@ export function updateBatchTaskObject (state, batchTaskObject) {
 export function updateInflationYear (state, inflationYear) {
     state.inflationYear = inflationYear;
 }
+
+export function updateUseDecliningDR (state, useDecliningDR) {
+    state.useDecliningDR = useDecliningDR;
+}
+
+export function updateDiscountRate (state, discountRate) {
+    state.discountRate = discountRate;
+}

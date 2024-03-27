@@ -243,6 +243,8 @@ export const createHifTemplate = (taskName, store) => {
   template["functions"] = functionsArray;
 
   batchTaskObject["inflationYear"] = store.state.analysis.inflationYear;
+  batchTaskObject["discountRate"] = store.state.analysis.discountRate;
+  batchTaskObject["useDecliningDR"] = store.state.analysis.useDecliningDR;
   template["batchTaskObject"] = batchTaskObject;
   store.commit("analysis/updateBatchTaskObject", batchTaskObject);
 
@@ -483,6 +485,8 @@ export const loadHifTemplate = (model, store) => {
       var batchTaskObject = parameters.batchTaskObject;
       store.commit("analysis/updateBatchTaskObject", batchTaskObject);
       store.commit("analysis/updateInflationYear",batchTaskObject.inflationYear);
+      store.commit("analysis/updateDiscountRate",batchTaskObject.discountRate);
+      store.commit("analysis/updateUseDecliningDR",batchTaskObject.useDecliningDR);
 
       console.log(store.state.analysis.valuationsForHealthImpactFunctionGroups);
       //console.log(parameters.functions);
