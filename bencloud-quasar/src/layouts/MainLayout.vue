@@ -11,7 +11,7 @@
 
           <div>
             <div style="text-align: right;"><q-icon :name="'mdi-account-circle'" size="20px" /> {{username}}</div>
-            <div style="text-align: right; color: #909090">UI v{{ '0.4.2' }} | API v{{ apiVersion }} | DB v{{ dbVersion }} {{ environment === 'Production' ? '' : '(' + environment + ')' }}</div>
+            <div style="text-align: right; color: #909090">UI v{{ '0.5.0' }} | API v{{ apiVersion }} | DB v{{ dbVersion }} {{ environment === 'Production' ? '' : '(' + environment + ')' }}</div>
           </div>
         </q-toolbar>
       </div>
