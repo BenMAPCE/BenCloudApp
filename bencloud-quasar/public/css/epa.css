@@ -1327,7 +1327,6 @@
   }
   .epa-css header .main-footer > .main-footer__inner {
     margin: 0 auto;
-    max-width: 35em;
     padding: 0 1em;
   }
   .epa-css header .main-nav > .nav__inner {
@@ -1707,7 +1706,6 @@
   }
   .epa-css nav .main-footer > .main-footer__inner {
     margin: 0 auto;
-    max-width: 35em;
     padding: 0 1em;
   }
   .epa-css nav .masthead {
@@ -1756,7 +1754,6 @@
   }
   .epa-css section .main-footer > .main-footer__inner {
     margin: 0 auto;
-    max-width: 35em;
     padding: 0 1em;
   }
   .epa-css section .main-nav > .nav__inner {
@@ -2238,8 +2235,8 @@
   }
   .epa-css footer .region-footer {
     background: url("https://www.epa.gov/sites/all/themes/epa/img/svg/box-seal.svg") 50% 100% no-repeat;
-    background-position: 0 0;
-    background-size: 5.8824em 5.8824em;
+    background-position: 1rem 0;
+    background-size: 100px 100px;
     font-family: "Merriweather", "Georgia", "Cambria", "Times New Roman", "Times", serif;
     font-weight: bold;
     min-height: 5.88em;
@@ -2252,7 +2249,9 @@
     padding: 0 1.6em;
   }
   .epa-css footer .region-footer .col__title {
-    font-size: 117.64%;
+    font-size: 1.95rem;
+    font-weight: 700;
+    line-height: 1.2;
     margin: 0 0 1.25em;
   }
   .epa-css footer .region-footer .menu {
@@ -2263,7 +2262,8 @@
   }
   .epa-css footer .region-footer .menu a {
     display: inline-block;
-    font-size: 88.23%;
+    font-size: 1.1rem;
+    font-weight: 700;
     line-height: 1.2;
     margin: 0;
     padding: 0;
@@ -2294,7 +2294,7 @@
   }
   .epa-css footer .region-footer .last-updated {
     font-family: "Source Sans Pro", "Helvetica Neue", "Helvetica", "Roboto", "Arial", sans-serif;
-    font-size: 70.58%;
+    font-size: .9em;
     font-weight: 500;
     padding: 0.8333em 0 0;
     text-transform: uppercase;
@@ -2635,7 +2635,6 @@
   }
   .epa-css footer.main-footer > .main-footer__inner {
     margin: 0 auto;
-    max-width: 35em;
     padding: 0 1em;
   }
   .epa-css footer.main-footer a {
@@ -2833,9 +2832,7 @@
     .epa-css header .main-content {
       max-width: 60em;
     }
-    .epa-css header .main-footer > .main-footer__inner {
-      max-width: 60em;
-    }
+
     .epa-css header.masthead {
       max-width: 100%;
       padding-left: 2rem;
@@ -2918,9 +2915,6 @@
     .epa-css nav .main-content {
       max-width: 60em;
     }
-    .epa-css nav .main-footer > .main-footer__inner {
-      max-width: 60em;
-    }
     .epa-css section .main-nav > .nav__inner {
       max-width: 60em;
     }
@@ -2931,9 +2925,6 @@
       max-width: 60em;
     }
     .epa-css section .secondary-nav {
-      max-width: 60em;
-    }
-    .epa-css section .main-footer > .main-footer__inner {
       max-width: 60em;
     }
     .epa-css section.main-content {
@@ -2954,9 +2945,6 @@
     .epa-css footer .main-content {
       max-width: 60em;
     }
-    .epa-css footer.main-footer > .main-footer__inner {
-      max-width: 60em;
-    }
   }
   @media print and (min-width: 35em) {
     .epa-css header .main-nav > .nav__inner {
@@ -2969,9 +2957,6 @@
       max-width: 60em;
     }
     .epa-css header .main-content {
-      max-width: 60em;
-    }
-    .epa-css header .main-footer > .main-footer__inner {
       max-width: 60em;
     }
     .epa-css header.masthead {
@@ -3052,9 +3037,6 @@
     .epa-css nav .main-content {
       max-width: 60em;
     }
-    .epa-css nav .main-footer > .main-footer__inner {
-      max-width: 60em;
-    }
     .epa-css section .main-nav > .nav__inner {
       max-width: 60em;
     }
@@ -3065,9 +3047,6 @@
       max-width: 60em;
     }
     .epa-css section .secondary-nav {
-      max-width: 60em;
-    }
-    .epa-css section .main-footer > .main-footer__inner {
       max-width: 60em;
     }
     .epa-css section.main-content {
@@ -3086,9 +3065,6 @@
       max-width: 60em;
     }
     .epa-css footer .main-content {
-      max-width: 60em;
-    }
-    .epa-css footer.main-footer > .main-footer__inner {
       max-width: 60em;
     }
   }
@@ -3213,7 +3189,7 @@
   }
   @media screen and (min-width: 55em) {
     .epa-css footer .region-footer {
-      padding-left: 11em;
+      padding-left: 15em;
       padding-top: 0px;
     }
   }
