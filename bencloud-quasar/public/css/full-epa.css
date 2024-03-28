@@ -1317,7 +1317,7 @@
       }
       footer .region-footer .last-updated {
           font-family: "Source Sans Pro", "Helvetica Neue", "Helvetica", "Roboto", "Arial", sans-serif;
-          font-size: 70.58%;
+          font-size: .9em;
           font-weight: 500;
           padding: 0.8333em 0 0;
           text-transform: uppercase

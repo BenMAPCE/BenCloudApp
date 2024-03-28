@@ -125,7 +125,7 @@
                   </li>
                 </ul>
                 <!-- JIM: WHAT SHOULD WE SET THIS DATE TO? -->
-                <p class="last-updated">Last updated on {Month day, YYYY}</p>
+                <p class="last-updated">Last updated on March 28, 2024</p>
               </div>
             </div>
           </div>
