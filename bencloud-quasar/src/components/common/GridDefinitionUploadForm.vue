@@ -15,7 +15,20 @@
                   @removed="file_removed"
                   bordered
                   hide-upload-btn
-                />
+                >
+                <template v-slot:header="scope">
+                  <div class="row no-wrap items-center q-pa-sm q-gutter-xs">
+                    <q-spinner v-if="scope.isUploading" class="q-uploader__spinner" />
+                    <div class="col">
+                      <div class="q-uploader__title">Upload your files</div>
+                      <div class="q-uploader__subtitle">{{ scope.uploadSizeLabel }} / {{ scope.uploadProgressLabel }}</div>
+                    </div>
+                    <q-btn v-if="scope.canAddFiles" type="a" icon="mdi-paperclip" @click="scope.pickFiles" square flat>
+                      <q-uploader-add-trigger />
+                    </q-btn>
+                  </div>
+                </template>
+              </q-uploader>
               </div>
             </div>
   
