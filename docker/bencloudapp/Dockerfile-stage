@@ -6,8 +6,8 @@ RUN mkdir -p /var/www
 COPY /bencloud-quasar/dist/spa/ /var/www/
 COPY ./docker/bencloudapp/nginx.conf /etc/nginx/
 
-RUN apk update \
-    && apk upgrade \
+RUN apk -y update \
+    && apk -y upgrade \
     && adduser -D -H -u 1000 -s /bin/bash www-data -G www-data
 
 COPY ./docker/bencloudapp/sites/default-stage.conf /etc/nginx/sites-available/default.conf
