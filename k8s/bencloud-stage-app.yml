@@ -74,11 +74,11 @@ metadata:
   name: bencloudapp-ingress
   namespace: benmap-stg
   annotations:
-    spec.ingressClassName: "nginx"
     app.gitlab.com/app: ${CI_PROJECT_PATH_SLUG}
     app.gitlab.com/env: ${CI_ENVIRONMENT_SLUG}
 #   nginx.ingress.kubernetes.io/from-to-www-redirect: "true"
 spec:
+  ingressClassName: "nginx"
   tls:
     - hosts:
         - stg.bencloud-stage.aws.epa.gov
