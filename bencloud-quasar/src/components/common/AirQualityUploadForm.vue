@@ -1,6 +1,6 @@
 <template>
   <div class="upload-air-quality">
-    <q-dialog class="upload-air-quality-dialog" ref="dialog" @hide="onDialogHide">
+    <q-dialog class="upload-air-quality-dialog" ref="dialog" @hide="onDialogHide" persistent>
       <q-card class="upload-card">
         <q-form @submit="onSubmit" class="q-gutter-md">
           <div class="row">

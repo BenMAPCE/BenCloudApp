@@ -1,5 +1,5 @@
 <template>
-  <q-dialog ref="dialog" @hide="onDialogHide">
+  <q-dialog ref="dialog" @hide="onDialogHide" persistent>
     <q-card class="value-of-effects-edit-card">
       <q-form class="q-gutter-md">
         <div class="q-pa-md">

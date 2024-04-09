@@ -1,6 +1,6 @@
 <template>
   <div class="download-incidence-dataset-dialog">
-    <q-dialog class="export-dialog" ref="dialog" @hide="onDialogHide">
+    <q-dialog class="export-dialog" ref="dialog" @hide="onDialogHide" persistent>
       <q-card class="export-card">
         <q-form @submit="onSubmit" class="q-gutter-md">
           <div class="row">
