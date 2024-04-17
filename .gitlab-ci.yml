@@ -10,7 +10,6 @@ stages:
   - image_build
   - image_scan
   - deploy_nonprod
-  - deploy_prod
 
 # Set K8s context of GitLab Agent
 .kube-dev-context:
@@ -41,7 +40,7 @@ build_dev_app:
 build_stage_app:
  stage: code_build
  only: 
-  - main
+  - tags
  image: node:16
  tags:
   - benmapstagegitlab
@@ -74,7 +73,7 @@ build_dev_image:
 build_stage_image:
  stage: image_build
  only:
-  - main
+  - tags
  tags:
   - benmapstagegitlab
  image:
@@ -91,7 +90,7 @@ prisma_cloud_compute_scan:
   stage: image_scan
   only: 
   - develop
-  - main
+  - tags
   tags:
     - twistcli
   variables:
@@ -128,7 +127,7 @@ deploy_testdev:
 deploy_staging:
  stage: deploy_nonprod
  only:
-  - main
+  - tags
  tags:
   - benmapstagegitlab
  when: manual
