@@ -1,6 +1,6 @@
 <template>
   <div class="upload-air-quality">
-    <q-dialog class="upload-air-quality-dialog" ref="dialog" @hide="onDialogHide">
+    <q-dialog class="upload-air-quality-dialog" ref="dialog" @hide="onDialogHide" persistent>
       <q-card class="upload-card">
         <q-form @submit="onSubmit" class="q-gutter-md">
           <div class="row">
@@ -15,7 +15,20 @@
                 @removed="file_removed"
                 bordered
                 hide-upload-btn
-              />
+              >
+                <template v-slot:header="scope">
+                  <div class="row no-wrap items-center q-pa-sm q-gutter-xs">
+                    <q-spinner v-if="scope.isUploading" class="q-uploader__spinner" />
+                    <div class="col">
+                      <div class="q-uploader__title">Upload your files</div>
+                      <div class="q-uploader__subtitle">{{ scope.uploadSizeLabel }} / {{ scope.uploadProgressLabel }}</div>
+                    </div>
+                    <q-btn v-if="scope.canAddFiles" type="a" icon="mdi-paperclip" @click="scope.pickFiles" square flat>
+                      <q-uploader-add-trigger />
+                    </q-btn>
+                  </div>
+                </template>
+              </q-uploader>
             </div>
           </div>
 
@@ -326,17 +339,36 @@ export default {
           headers: {
             "Content-Type": "multipart/form-data",
           },
+          validateStatus: function (status) {
+            return status < 500;
+          }
         })
         .then((response) => {
           //data.value = response.data;
-
           console.log(response.status);
           console.log(response.statusText);
           console.log(response.data.success);
           console.log(response.data.messages);
           
-
-          if (response.data.success === false) {
+          if(response.status === 200) {
+            this.$q
+              .dialog({
+                component: AirQualityUploadSuccessDialog,
+                parent: this,
+                persistent: true,
+                componentProps: {
+                  fileName: this.selected_file.name,
+                  parentDialog: this.$refs.dialog,
+                },
+              })
+              .onOk(() => {
+                console.log("OK");
+              })
+              .onCancel(() => {
+              })
+              .onDismiss(() => {
+              });
+          } else {
             console.log("BAD NEWS");
             if (response.data.messages.length > 0) {
               console.log("Show Errors");
@@ -360,24 +392,6 @@ export default {
                 .onDismiss(() => {
                });
             }
-          } else {
-            this.$q
-              .dialog({
-                component: AirQualityUploadSuccessDialog,
-                parent: this,
-                persistent: true,
-                componentProps: {
-                  fileName: this.selected_file.name,
-                  parentDialog: this.$refs.dialog,
-                },
-              })
-              .onOk(() => {
-                console.log("OK");
-              })
-              .onCancel(() => {
-              })
-              .onDismiss(() => {
-              });
           }
 
           self.$q.loading.hide();

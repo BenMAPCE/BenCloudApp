@@ -172,6 +172,7 @@ const columns = [
     format: (val) => `${val}`,
     align: "left",
     sortable: true,
+    style: "max-width: 200px; white-space: normal;"
   },
   {
     name: "ages",

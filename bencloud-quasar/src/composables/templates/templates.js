@@ -38,7 +38,7 @@ export const getTemplates = () => {
   return { fetch };
 };
 
-export const saveTemplate = (name, type, template, store) => {
+export const saveTemplate = (name, type, template, store, templateNotification) => {
   const data = ref(null);
   const error = ref(null);
   const response = ref(null);
@@ -51,16 +51,42 @@ export const saveTemplate = (name, type, template, store) => {
   taskConfig["type"] = type; 
   taskConfig["parameters"] = template; 
 
-  console.log(taskConfig);
-
   const fetch = async () => {
     loading.value = true;
     try {
       const result = await axios
-        .post(process.env.API_SERVER + "/api/task-configs", taskConfig)
+        .post(process.env.API_SERVER + "/api/task-configs", taskConfig,
+          {validateStatus: function (status) {
+            return status < 500;
+          }}
+        )
         .then((response) => {
-          data.value = response.data;
-          console.log(data.value);
+          if(response.status === 200) {
+            data.value = response.data;
+            console.log(data.value);
+            templateNotification({
+              spinner: false, // we reset the spinner setting so the icon can be displayed
+              message: "Template Saved!",
+              color: "green",
+              timeout: 2000, 
+            });
+          } else if(response.status === 409){
+            console.log("Unable to rename template: " + taskConfig.name);
+            templateNotification({
+              spinner: false, // we reset the spinner setting so the icon can be displayed
+              message: response.data.message,
+              color: "red",
+              timeout: 4000, 
+            });
+          }
+          else{
+            templateNotification({
+              spinner: false, // we reset the spinner setting so the icon can be displayed
+              message: "Unknown error creating template: " + taskConfig.name,
+              color: "red",
+              timeout: 4000, 
+            });
+          }
         });
     } catch (ex) {
       error.value = ex;
@@ -91,6 +117,7 @@ export const createHifTemplate = (taskName, store) => {
   const incidenceName = store.state.analysis.incidenceName;
   const pollutantId = store.state.analysis.pollutantId;
   const pollutantFriendlyName = store.state.analysis.pollutantFriendlyName;
+  const valuationSelection = store.state.analysis.valuationSelection;
 
   const healthEffects = store.state.analysis.healthEffects;
 
@@ -162,6 +189,8 @@ export const createHifTemplate = (taskName, store) => {
     selectedHealthEffects.push(selectedHealthEffect);
   }
   template["healthEffects"] = selectedHealthEffects;
+
+  template["valuationSelection"] = valuationSelection;
 
   var functionsArray = [];
   var hifFunction = {};
@@ -394,6 +423,9 @@ export const loadHifTemplate = (model, store) => {
 
   console.log(parameters.healthEffects);
   store.commit("analysis/updateHealthEffects", parameters.healthEffects);
+
+  console.log(parameters.valuationSelection);
+  store.commit("analysis/updateValuationSelection", parameters.valuationSelection);
 
   const valuationFunctions = ref([]);
 

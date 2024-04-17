@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pa-md">
+  <div class="q-pa-md col-12">
     <q-table
       :rows="rows"
       :columns="columns"
@@ -8,14 +8,22 @@
       :loading="loading"
       :filter="filter"
       binary-state-sort
+      :fullscreen="fullscreen"
       :visible-columns="visibleColumns"
+      class="valuation-table"
     >
       <template v-slot:top-right>
-        <q-input borderless dense debounce="300" v-model="filter" placeholder="Search">
+        <q-input borderless dense debounce="300" v-model="filter" placeholder="Search" style="margin-right: 15px;">
           <template v-slot:append>
             <q-icon name="mdi-magnify" />
           </template>
         </q-input>
+        <q-btn
+          dense
+          flat
+          :icon="fullscreen ? 'mdi-fullscreen-exit' : 'mdi-fullscreen'"
+          @click="fullscreen = !fullscreen"
+        />
       </template>
 
       <template v-slot:body-cell-edit="props">
@@ -47,14 +55,13 @@ import { ref, watch, onBeforeMount, onMounted } from "vue";
 import { useStore } from "vuex";
 import { useQuasar } from "quasar";
 
-import { loadHealthImpactFunctionGroups } from "../../composables/analysis/health-impact-function-groups";
-import { buildHealthImpactFunctionGroups } from "../../composables/analysis/health-impact-function-groups";
-import { updateValuationsForHealthImpactFunctionGroups } from "../../composables/analysis/valuations";
+import { loadHealthImpactFunctionGroups, buildHealthImpactFunctionGroups } from "../../composables/analysis/health-impact-function-groups";
 import {
   getValuationFunctionsForEndpointGroupId,
   loadValuationFunctions,
 } from "../../composables/analysis/valuation-functions";
 import ValueOfEffectsEditForm from "./ValueOfEffectsEditForm.vue";
+import analysis from "src/store/analysis";
 
 export default defineComponent({
   model: ref(null),
@@ -62,6 +69,7 @@ export default defineComponent({
 
   async setup(props, context) {
     const valuations = ref("");
+    const fullscreen = ref(false)
     const trial = ref("");
     const $q = useQuasar();
 
@@ -82,6 +90,7 @@ export default defineComponent({
       //      "health_function_id",
       //      "endpoint_group_id",
       //      "endpoint_id",
+      "edit",
       "location",
       "group_name",
       "author_year",
@@ -90,10 +99,16 @@ export default defineComponent({
       "race_ethnicity_gender",
       "incidence_prevalence",
       "valuation",
-      "edit",
     ];
 
     const columns = [
+      {
+        name: "edit",
+        align: "center",
+        label: "",
+        field: "edit",
+        sortable: false,
+      },
       {
         name: "health_function_id",
         align: "left",
@@ -172,13 +187,6 @@ export default defineComponent({
         field: "valuation",
         sortable: true,
       },
-      {
-        name: "edit",
-        align: "center",
-        label: "",
-        field: "edit",
-        sortable: false,
-      },
     ];
     watch(
       () => selectedItem.value,
@@ -190,6 +198,25 @@ export default defineComponent({
             incidenceId: currentSelectedItem,
             incidenceName: name,
           });
+        }
+      }
+    );
+
+    watch(
+      () => store.state.analysis.valuationSelection,
+      (currentSelectedItem, prevSelectedItem) => {
+        if (currentSelectedItem != prevSelectedItem) {
+          (async () => {
+          console.log("loadHealthImpactFunctionGroups");
+          const response = await loadHealthImpactFunctionGroups(store).fetch(store);
+          rows.value = response.data.value;
+          console.log(rows.value);
+          rows.value = buildHealthImpactFunctionGroups(
+            response.data.value,
+            valuationFunctions,
+            store
+          );
+        })();
         }
       }
     );
@@ -237,19 +264,19 @@ export default defineComponent({
         },
       })
         .onOk((valuationFunctionsSelected) => {
-          console.log("OK");
+          if(store.state.analysis.valuationSelection == "Use EPA's current default values") {
+            store.commit("analysis/updateValuationSelection", "Select my own value functions");
+          }
           console.log(row);
           console.log(valuationFunctionsSelected);
 
           var records = JSON.parse(JSON.stringify(valuationFunctionsSelected));
           var valuations = "";
           var valuationIds = [];
-          console.log(records.length);
           var valuationDisplay = "";
           
           var valuationFunctionsArray = [];
           for (var i = 0; i < records.length; i++) {
-            console.log(records[i].qualifier);
             valuationDisplay =
               records[i].endpoint_name +
               " | " +
@@ -288,8 +315,6 @@ export default defineComponent({
 
           store.commit("analysis/updateBatchTaskObject", batchTaskObject);
           console.log(store.state.analysis.batchTaskObject);
-          console.log(valuationIds);
-          console.log(row);
 
           var payload = {};
           payload.endpoint_group_id = row.endpoint_group_id;
@@ -299,10 +324,7 @@ export default defineComponent({
           console.log("... updateValuationsForHealthImpactFunctionGroups")
           store.commit("analysis/updateValuationsForHealthImpactFunctionGroups", payload);
 
-          //updateValuationsForHealthImpactFunctionGroups(store, row.endpoint_group_id, valuationIds);
-
           row.valuation = valuations;
-          console.log(row.valuation);
         })
         .onCancel(() => {
           // console.log('Cancel')
@@ -363,6 +385,7 @@ export default defineComponent({
       editItem,
       visibleColumns,
       editValueOfEffects,
+      fullscreen,
     };
   },
 });
@@ -386,4 +409,26 @@ export default defineComponent({
   max-width: 250px;
   white-space: normal;
 }
+</style>
+
+<style lang="sass">
+.valuation-table
+
+  thead tr:first-child th:first-child,
+  td:first-child
+    position: sticky
+    -webkit-position: sticky
+    left: 0
+    z-index: 1
+    background-color: #fff
+    opacity: 1
+
+  thead tr:first-child th:last-child,
+  td:last-child
+    position: sticky
+    -webkit-position: sticky 
+    right: 0
+    z-index: 1
+    background-color: #fff
+    opacity: 1
 </style>

@@ -1,6 +1,6 @@
 <template>
   <div class="upload-incidence">
-    <q-dialog class="upload-incidence-dialog" ref="dialog" @hide="onDialogHide">
+    <q-dialog class="upload-incidence-dialog" ref="dialog" @hide="onDialogHide" persistent>
       <q-card class="upload-card">
         <q-form @submit="onSubmit" class="q-gutter-md">
           <div class="row">
@@ -8,14 +8,27 @@
               <q-uploader
                 label="Upload your CSV"
                 accept=".csv"
-                :max-file-size="20000000"
+                :max-file-size="1000000000"
                 square
                 flat
                 @added="file_selected"
                 @removed="file_removed"
                 bordered
                 hide-upload-btn
-              />
+              >
+                <template v-slot:header="scope">
+                  <div class="row no-wrap items-center q-pa-sm q-gutter-xs">
+                    <q-spinner v-if="scope.isUploading" class="q-uploader__spinner" />
+                    <div class="col">
+                      <div class="q-uploader__title">Upload your files</div>
+                      <div class="q-uploader__subtitle">{{ scope.uploadSizeLabel }} / {{ scope.uploadProgressLabel }}</div>
+                    </div>
+                    <q-btn v-if="scope.canAddFiles" type="a" icon="mdi-paperclip" @click="scope.pickFiles" square flat>
+                      <q-uploader-add-trigger />
+                    </q-btn>
+                  </div>
+                </template>
+              </q-uploader>
             </div>
           </div>
 
@@ -38,49 +51,6 @@
               />
             </div>
           </div>
-
-          <!-- <div class="row">
-            <div class="col-12">
-              <q-input
-                filled
-                dense
-                v-model="aqYear"
-                label="*Year"
-                hint=""
-                lazy-rules
-                :rules="[val => (val > 1900 && val < 3000) || 'Please enter a valid year']"
-              />
-            </div>
-          </div> -->
-
-          <!-- <div class="row">
-            <div class="col-12">
-              <q-input
-                filled
-                dense
-                v-model="source"
-                label="*Source"
-                hint="Citation, web page, publishing organization, etc." 
-                lazy-rules
-                :rules="[(val) => (val && val.length > 0) || 'Please enter a source for this data']"               
-              />
-            </div>
-          </div> -->
-
-
-          <!-- <div class="row">
-            <div class="col-12">
-              <q-input
-                filled
-                dense
-                v-model="description"
-                label="Description"
-                :hint="descriptionHint"                
-              />
-            </div>
-          </div> -->
-
-          
 
           <div class="row">
             <div class="col-12">
@@ -122,14 +92,9 @@ export default {
     gridValue: 0,
     errorMessage: "",
     name: "",
-    // aqYear:"",
-    // source:"",
-    // dataType:"",
-    // description:"",
     filename:"",
     uploadDate: "",
     dashData: [],
-    // descriptionHint:"",
   }),
   
   components: {
@@ -142,18 +107,6 @@ export default {
     "ok",
     "hide",
   ],
-
-  watch: {
-    dataType(newValue, oldValue) {
-      if (newValue.toLowerCase()=="hybrid model") {
-        this.descriptionHint = "Please enter details about the hybrid model.";
-        console.log("newValue.toLowerCase()=='hybrid model'");
-      }
-      else{
-        this.descriptionHint = "";
-      }
-    },
-  },
 
   methods: {
     // following method is REQUIRED
@@ -245,7 +198,7 @@ export default {
       var self = this;
 
       this.$q.loading.show({
-        message: "Uploading Incidence Data. Please wait...",
+        message: "Uploading incidence data. Please wait...",
         boxClass: "bg-grey-2 text-grey-9",
         spinnerColor: "primary",
       });
@@ -368,13 +321,6 @@ export default {
 
     onChangeGridValue(value) {
       this.gridValue = value;
-    },
-
-    hybridSelected(value){
-      if(value.toLowerCase()=="hybrid model")
-      {
-        this.descriptionHint = "Please enter the description for this hybrid model.";
-      }
     }
   },
 };

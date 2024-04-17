@@ -1,6 +1,7 @@
 <template>
   <q-layout view="lHh Lpr lFf">
     <q-header elevated>
+      <EPAAccordion v-bind:showEpaHeaderFooter="showEpaHeaderFooter"></EPAAccordion>
       <EPAHeader v-bind:showEpaHeaderFooter="showEpaHeaderFooter"></EPAHeader>
       <div class="benmap-header">
         <q-toolbar>
@@ -8,7 +9,7 @@
             BenMAP - Benefits Mapping and Analysis Program
           </q-toolbar-title>
 
-          <div>UI v{{ '0.4.2' }} | API v{{ apiVersion }} | DB v{{ dbVersion }} {{ environment === 'Production' ? '' : '(' + environment + ')' }}</div>
+          <div>UI v{{ '0.5.0' }} | API v{{ apiVersion }} | DB v{{ dbVersion }} {{ environment === 'Production' ? '' : '(' + environment + ')' }}</div>
         </q-toolbar>
       </div>    </q-header>
 
@@ -24,7 +25,7 @@
 import { defineComponent, onBeforeMount, ref } from "vue";
 import EPAHeader from "src/components/epa/EPAHeader.vue";
 import EPAFooter from "src/components/epa/EPAFooter.vue";
-
+import EPAAccordion from "src/components/epa/EPAAccordion.vue";
 
 export default defineComponent({
   name: "MainLayoutPublic",
@@ -32,6 +33,7 @@ export default defineComponent({
   components: {
     EPAHeader,
     EPAFooter,
+    EPAAccordion,
   },
 
   setup() {

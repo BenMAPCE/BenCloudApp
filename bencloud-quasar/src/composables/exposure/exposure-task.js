@@ -119,7 +119,11 @@ export const submitExposureTask = (exposureTaskJSON, store) => {
 
     try {
       const {data:response} = await axios
-      .post(process.env.API_SERVER + "/api/batch-tasks", exposureTaskJSON)
+      .post(process.env.API_SERVER + "/api/batch-tasks", exposureTaskJSON,
+        {validateStatus: function (status) {
+          return status < 500;
+        }}
+      )
       .then((response) => {
         data.value = response.data;
         console.log(data.value);

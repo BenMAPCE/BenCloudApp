@@ -50,7 +50,7 @@
     <div class="task-results">
       <TaskResultsTabs v-bind:task_uuid_with_type="task_uuid_with_type" v-bind:task_name="task_name" 
         v-bind:valuation_task_uuid_with_type="valuation_task_uuid_with_type" v-bind:valuation_task_name="valuation_task_name"
-        v-bind:batch_task_id = "batch_task_id"
+        v-bind:batch_task_id = "batch_task_id" v-bind:valuation_grid_id = "valuation_grid_id" v-bind:valuation_grid_name = "valuation_grid_name"
         :key="componentKey"></TaskResultsTabs>
     </div>
 
@@ -90,6 +90,9 @@ export default defineComponent({
     const selected_scenario_year = ref([]);
     const batch_info = ref();
     const componentKey = ref(0);
+    const valuation_grid_id = ref(0);
+    const valuation_grid_name = ref("");
+
 
     const rows = ref([]);
 
@@ -182,7 +185,7 @@ export default defineComponent({
         for (var i = 0; i < tasks.length; i++) {
           if(tasks[i].batch_task_id == batch_task_id) {
             batch_task_name.value = tasks[i].batch_task_name
-            task_completed_date.value = tasks[i].batch_completed_date
+            task_completed_date.value = tasks[i].batch_completed_date            
             break
           }
         }
@@ -194,6 +197,8 @@ export default defineComponent({
               task_pre_policy.value = response.data.aq_baseline_name
               pollutant_name.value = response.data.pollutant_name
               batch_info.value = response.data
+              valuation_grid_id.value = response.data.valuation_grid_id
+              valuation_grid_name.value = response.data.valuation_grid_name
               var scenariosList = response.data.scenarios
               for(var i = 0; i < scenariosList.length; i++) {
                 scenario_names.value.push(scenariosList[i].scenario_name)
@@ -230,6 +235,8 @@ export default defineComponent({
       selected_scenario_name,
       selected_scenario_year,
       componentKey,
+      valuation_grid_id,
+      valuation_grid_name
     };
   },
 });

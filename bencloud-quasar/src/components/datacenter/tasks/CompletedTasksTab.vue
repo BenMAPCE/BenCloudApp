@@ -3,7 +3,7 @@
     <q-table
       :rows="rows"
       :columns="columns"
-      row-key="batch_task_name"
+      row-key="batch_task_id"
       :rows-per-page-options="[0]"
       v-model:pagination="pagination"
       :loading="loading"
@@ -118,7 +118,7 @@
           </q-td>
         </q-tr>
         <!-- We show the batch task details if "props.expand" is true -->
-        <q-tr v-for="row in props.row.tasks" :key="row.task_name"
+        <q-tr v-for="row in props.row.tasks" :key="row.task_uuid"
           v-show="props.expand"
           :props="props"
         >
@@ -326,13 +326,58 @@ export default defineComponent({
       console.log( "deleting " + process.env.API_SERVER + "/api/batch-tasks/" + props.row.batch_task_id);   
       // Delete (batch) task, reload the task list if successful, alert the user if unsuccessful
       axios
-      .delete(process.env.API_SERVER + "/api/batch-tasks/" + props.row.batch_task_id)
+      .delete(process.env.API_SERVER + "/api/batch-tasks/" + props.row.batch_task_id, 
+        {validateStatus: function (status) {
+          return status < 500;
+        }}
+      )
       .then((response) => {
         if(response.status === 204) {
           console.log("Successfully deleted task: " + props.row.batch_task_id);
           loadCompletedTasks();
+        } else if(response.status === 400){
+          console.log("Invalid id: " + props.row.batch_task_id);
+          $q.notify({
+            group: false, // required to be updateable
+            type: 'negative',
+            timeout: 6000, 
+            color: "red",
+            spinner: false, // we reset the spinner setting so the icon can be displayed
+            position: "top",
+            message: response.data.message,
+          });
+        } else if(response.status === 404){
+          console.log("Not found: " + props.row.batch_task_id);
+          $q.notify({
+            group: false, // required to be updateable
+            type: 'negative',
+            timeout: 6000, 
+            color: "red",
+            spinner: false, // we reset the spinner setting so the icon can be displayed
+            position: "top",
+            message: response.data.message,
+          });
+        } else if(response.status === 403){
+          console.log("Forbidden action on task: " + props.row.batch_task_id);
+          $q.notify({
+            group: false, // required to be updateable
+            type: 'negative',
+            timeout: 6000, 
+            color: "red",
+            spinner: false, // we reset the spinner setting so the icon can be displayed
+            position: "top",
+            message: response.data.message,
+          });
         } else {
-          alert("An error occurred, task was not deleted.")
+          $q.notify({
+            group: false, // required to be updateable
+            type: 'negative',
+            timeout: 6000, 
+            color: "red",
+            spinner: false, // we reset the spinner setting so the icon can be displayed
+            position: "top",
+            message: "Unknown error: " + response.status,
+          });
         }
         return response;
       });

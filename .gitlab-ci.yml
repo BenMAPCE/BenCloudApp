@@ -10,7 +10,6 @@ stages:
   - image_build
   - image_scan
   - deploy_nonprod
-  - deploy_prod
 
 # Set K8s context of GitLab Agent
 .kube-dev-context:
@@ -41,7 +40,7 @@ build_dev_app:
 build_stage_app:
  stage: code_build
  only: 
-  - main
+  - tags
  image: node:16
  tags:
   - benmapstagegitlab
@@ -74,7 +73,7 @@ build_dev_image:
 build_stage_image:
  stage: image_build
  only:
-  - main
+  - tags
  tags:
   - benmapstagegitlab
  image:
@@ -91,13 +90,13 @@ prisma_cloud_compute_scan:
   stage: image_scan
   only: 
   - develop
-  - main
+  - tags
   tags:
     - twistcli
   variables:
     GIT_STRATEGY: none
   script:
-    - 'export PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v22.12/authenticate | jq -r .token)'
+    - 'export PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v32.01/authenticate | jq -r .token)'
     - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker pull $CI_REGISTRY_IMAGE/bencloudapp:$CI_COMMIT_SHORT_SHA
@@ -128,7 +127,7 @@ deploy_testdev:
 deploy_staging:
  stage: deploy_nonprod
  only:
-  - main
+  - tags
  tags:
   - benmapstagegitlab
  when: manual

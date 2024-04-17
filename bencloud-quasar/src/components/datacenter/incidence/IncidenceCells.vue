@@ -15,9 +15,9 @@
         color="primary"
         icon-right="mdi-grid"
         class="export-to-csv-button"
-        label="Export to csv"
+        label="EXPORT TO CSV"
         no-caps
-        @click="exportIncidenceCells"
+        @click="showDownloadDialog"
       />
 
       <q-input
@@ -39,7 +39,11 @@
 import { defineComponent } from "vue";
 import { ref, unref, onMounted, watch, watchEffect } from "vue";
 import axios from "axios";
+import { useQuasar } from "quasar";
 import { useStore } from "vuex";
+import DownloadIncidenceDatasetDialog from "./DownloadIncidenceDatasetDialog.vue"
+
+var currentIncidenceDatasetId;
 
 export default defineComponent({
   model: ref(null),
@@ -77,11 +81,13 @@ export default defineComponent({
     let myFilter = unref(filter);
 
     const store = useStore();
+    const $q = useQuasar();
 
   watch(
     () => store.state.incidence.incidenceDatasetId,
     (incidenceDatasetId, prevIncidenceDatasetId) => {
       incidenceDatasetId = incidenceDatasetId;
+      currentIncidenceDatasetId = incidenceDatasetId;
       filter.value = "";
       pagination.value.sortBy = "";
       pagination.value.descending = false;
@@ -102,48 +108,6 @@ export default defineComponent({
       if (store.state.incidence.incidenceDatasetId != 0)
         loadIncidenceCells(props);
       
-    }
-
-    function exportIncidenceCells() {
-      console.log("exportIncidenceCells");
-
-      loading.value = true;
-
-      axios
-        .get(
-          process.env.API_SERVER + "/api/incidence/" +
-            store.state.incidence.incidenceDatasetId +
-            "/contents",
-          {
-            params: {
-              page: 1,
-              rowsPerPage: 9999999,
-            },
-            headers: { Accept: "text/csv", "Content-Type": "text/csv" },
-          }
-        )
-        .then((response) => {
-          let records = response.data.records;
-          let data = response.data;
-          //console.log(data);
-
-          console.log(response);
-
-          //console.log(response.headers['content-disposition']);
-
-          var fileName = response.headers["content-disposition"]
-            .split("filename=")[1]
-            .split(";")[0];
-
-          var hiddenElement = document.createElement("a");
-          hiddenElement.href = "data:text/csv;charset=utf-8," + encodeURI(data);
-          hiddenElement.target = "_blank";
-          hiddenElement.download = fileName;
-          hiddenElement.click();
-          hiddenElement.remove();
-
-          loading.value = false;
-        });
     }
 
     function loadIncidenceCells(props) {
@@ -194,6 +158,27 @@ export default defineComponent({
         });
     }
 
+    function showDownloadDialog() {
+      $q.dialog({
+        component: DownloadIncidenceDatasetDialog,
+        parent: this,
+        persistent: true,
+        componentProps: {
+          year: 0,
+          incidence_dataset_id: currentIncidenceDatasetId,
+        },
+      })
+        .onOk(() => {
+          console.log("Export OK");
+        })
+        .onCancel(() => {
+          // console.log('Cancel')
+        })
+        .onDismiss(() => {
+          // console.log('I am triggered on both OK and Cancel')
+        });
+    }
+
     onMounted(() => {
       // get initial data from server (1st page)
       onRequest({
@@ -208,8 +193,8 @@ export default defineComponent({
       loading,
       pagination,
       rows,
+      showDownloadDialog,
       onRequest,
-      exportIncidenceCells,
     };
   },
 });
@@ -219,100 +204,107 @@ const columns = [
     name: "grid_col",
     align: "left",
     label: "Column",
-    field: "grid_col",
+    field: "Column",
     sortable: true,
   },
   {
     name: "grid_row",
     align: "left",
     label: "Row",
-    field: "grid_row",
+    field: "Row",
+    sortable: true,
+  },
+  {
+    name: "year",
+    align: "left",
+    label: "Year",
+    field: "Year",
     sortable: true,
   },
   { name: "endpoint group", 
     align: "left", 
-    label: "Endpoint Group", 
-    field: "endpoint_group",
+    label: "Health Effect Group", 
+    field: "Health Effect Group",
     sortable: true,
   },
   { name: "endpoint", 
     align: "left", 
-    label: "Endpoint", 
-    field: "endpoint",
+    label: "Health Effect", 
+    field: "Health Effect",
     sortable: true,
   },
   { name: "race", 
     align: "left", 
     label: "Race", 
-    field: "race",
+    field: "Race",
     sortable: true,
   },
   { name: "gender", 
     align: "left", 
     label: "Gender", 
-    field: "gender",
+    field: "Gender",
     sortable: true,
   },
   { name: "ethnicity", 
     align: "left", 
     label: "Ethnicity", 
-    field: "ethnicity",
+    field: "Ethnicity",
     sortable: true,
   },
   {
     name: "start age",
     align: "left",
     label: "Start Age",
-    field: "start_age",
+    field: "Start Age",
     sortable: true,
   },
   {
     name: "end_age",
     align: "left",
     label: "End Age",
-    field: "end_age",
+    field: "End Age",
     sortable: true,
   },
   {
     name: "type",
     align: "left",
-    label: "Prevalence",
-    field: "type",
+    label: "Type",
+    field: "Type",
     sortable: true,
   },
   {
     name: "timeframe",
     align: "left",
     label: "Timeframe",
-    field: "timeframe",
+    field: "Timeframe",
     sortable: true,
   },
   {
     name: "units",
     align: "left",
     label: "Units",
-    field: "units",
+    field: "Units",
     sortable: true,
   },
   {
     name: "value",
     align: "left",
     label: "Value",
-    field: "value",
+    field: "Value",
     sortable: true,
   },
   {
     name: "distribution",
     align: "left",
     label: "Distribution",
-    field: "distribution",
+    field: "Distribution",
     sortable: true,
   },
   {
     name: "standard error",
     align: "left",
     label: "Standard Error",
-    field: "standard_error",
+    field: "Standard Error",
     sortable: true,
   },
   

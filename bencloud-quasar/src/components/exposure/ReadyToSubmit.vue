@@ -156,7 +156,7 @@ export default defineComponent({
       var template = createExposureTemplate(taskName.value, store);
 
       const templateNotification = $q.notify({
-        group: false, // required to be updatable
+        group: false, // required to be updateable
         timeout: 0, // we want to be in control when it gets dismissed
         spinner: true,
         position: "top",
@@ -168,28 +168,11 @@ export default defineComponent({
           templateName.value,
           "Exposure Analysis",
           template,
-          store
+          store,
+          templateNotification
         ).fetch();
 
         templateName.value = "";
-
-        if(!!response.data.value.message) {
-          // if there is an issue, display the error message
-          templateNotification({
-            spinner: false, // we reset the spinner setting so the icon can be displayed
-            message: response.data.value.message,
-            color: "red",
-            timeout: 4000, // we will timeout it in 4 seconds
-          });
-        } else {
-          // if the template was saved
-          templateNotification({
-            spinner: false, // we reset the spinner setting so the icon can be displayed
-            message: "Template Saved!",
-            color: "green",
-            timeout: 2000, // we will timeout it in 2 seconds
-          });
-        }
       })();
     }
 

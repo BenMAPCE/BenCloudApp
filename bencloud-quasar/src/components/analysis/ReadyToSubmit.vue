@@ -131,9 +131,7 @@ export default defineComponent({
 
     const pollutantId = store.state.analysis.pollutantId;
     const pollutantFriendlyName = store.state.analysis.pollutantFriendlyName;
-    const prePolicyAirQualityId = store.state.analysis.prePolicyAirQualityId;
     const prePolicyAirQualityName = store.state.analysis.prePolicyAirQualityName;
-    const postPolicyAirQualityId = store.state.analysis.postPolicyAirQualityId;
     const postPolicyAirQualityName = store.state.analysis.postPolicyAirQualityName;
 
     const incidenceId = store.state.analysis.incidenceId;
@@ -142,6 +140,8 @@ export default defineComponent({
     const populationDatasetName = store.state.analysis.populationDatasetName;
     const valuationsForHealthImpactFunctionGroups =
       store.state.analysis.valuationsForHealthImpactFunctionGroups;
+    
+    const valuationSelection = store.state.analysis.valuationSelection;
 
     const healthEffects = store.state.analysis.healthEffects;
 
@@ -184,7 +184,7 @@ export default defineComponent({
       var template = createHifTemplate(taskName.value, store);
 
       const templateNotification = $q.notify({
-        group: false, // required to be updatable
+        group: false, // required to be updateable
         timeout: 0, // we want to be in control when it gets dismissed
         spinner: true,
         position: "top",
@@ -196,28 +196,11 @@ export default defineComponent({
           templateName.value,
           "Health Impact Analysis",
           template,
-          store
+          store,
+          templateNotification
         ).fetch();
 
         templateName.value = "";
-
-        if(!!response.data.value.message) {
-          // if there is an issue, display the error message
-          templateNotification({
-            spinner: false, // we reset the spinner setting so the icon can be displayed
-            message: response.data.value.message,
-            color: "red",
-            timeout: 4000, // we will timeout it in 4 seconds
-          });
-        } else {
-          // if the template was saved
-          templateNotification({
-            spinner: false, // we reset the spinner setting so the icon can be displayed
-            message: "Template Saved!",
-            color: "green",
-            timeout: 2000, // we will timeout it in 2 seconds
-          });
-        }
       })();
     }
 
@@ -310,9 +293,7 @@ export default defineComponent({
     return {
       pollutantId,
       pollutantFriendlyName,
-      prePolicyAirQualityId,
       prePolicyAirQualityName,
-      postPolicyAirQualityId,
       postPolicyAirQualityName,
       incidenceId,
       incidenceName,
@@ -322,6 +303,7 @@ export default defineComponent({
       healthEffectsNames,
       healthImpactFunctions,
       valuationsForHealthImpactFunctionGroups,
+      valuationSelection,
       valuationFunctionCount,
       totalTaskCount,
       submitTask,
