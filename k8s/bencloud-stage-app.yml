@@ -29,7 +29,7 @@ spec:
     spec:
       containers:
       - name: ui
-        image:  registry.epa.gov/benmap/bencloudapp/bencloudapp:$CI_COMMIT_SHORT_SHA
+        image:  registry.epa.gov/benmap/bencloudapp/bencloudapp:$CI_COMMIT_TAG
         imagePullPolicy: Always
         livenessProbe:
          tcpSocket:
