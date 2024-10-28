@@ -1,5 +1,8 @@
 <template>
     <q-page>
+      <div class="col title-message">
+        Review Grid Definitions
+      </div>
       <div class="q-pa-md q-gutter-sm">
         <div class="row">
           <div class="col"></div>
@@ -18,12 +21,12 @@
             label="See Grid Definitions of all users"
           />
         </div>
-          <div class="col">
+          <!-- <div class="col">
             <GridDefinitionAdd
             >
               ></GridDefinitionAdd
             >
-          </div>
+          </div> -->
         </div>
   
         <div class="q-pa-md">
@@ -43,7 +46,7 @@
   import { ref, reactive } from "vue";
   import { watch, onBeforeMount } from "vue";
   
-  import GridDefinitionAdd from "../../../../components/common/GridDefinitionAdd.vue";
+  // import GridDefinitionAdd from "../../../../components/common/GridDefinitionAdd.vue";
   import GridDefinitions from "../../../../components/datacenter/grids/GridDefinitions.vue";
   import GridTabs from "src/components/datacenter/grids/GridTabs.vue";
   
@@ -58,7 +61,7 @@
     components: {
       GridTabs,
       GridDefinitions,
-      GridDefinitionAdd
+      // GridDefinitionAdd
   },
     setup(props, context) {
       const store = useStore();
@@ -75,6 +78,9 @@
   </script>
   
   <style lang="scss" scoped>
-
+  .title-message {
+    padding: 25px 20px 10px 20px;
+    font-size: 18px;
+  }
   </style>
   
