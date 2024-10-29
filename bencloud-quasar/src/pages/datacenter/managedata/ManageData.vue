@@ -25,7 +25,7 @@
           />
         </q-card-actions>
       </q-card>
-      <!-- <q-card class="my-card task-card">
+      <q-card class="my-card task-card">
         <q-card-section> View or upload grid definitions. </q-card-section>
         <q-card-actions vertical>
           <q-btn
@@ -36,7 +36,7 @@
             label="Review Grid Definitions"
           />
         </q-card-actions>
-      </q-card> -->
+      </q-card>
     </div>
   </q-page>
 </template>
