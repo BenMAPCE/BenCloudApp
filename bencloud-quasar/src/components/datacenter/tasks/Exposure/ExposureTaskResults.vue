@@ -18,6 +18,16 @@
         :visible-columns="visibleColumns"
         class="task-results"
       >
+
+      <template v-slot:body-cell="props">
+        <q-td
+          :props="props"
+         
+          :class="setClassName(props.row.hidden_sort_order)"
+        >
+          {{props.value}}
+        </q-td>
+      </template>
         <template v-slot:top="props">
           <q-space></q-space>
 
@@ -72,8 +82,8 @@ export default defineComponent({
     const pagination = ref({
       page: 1,
       rowsPerPage: 0,
-      sortBy: "endpoint",
-      descending: true,
+      sortBy: "hidden_sort_order",
+      descending: false,
     });
     const $q = useQuasar();
 
@@ -137,10 +147,22 @@ export default defineComponent({
       showDownloadDialog,
     };
   },
+  methods: {
+    setClassName(hiddenSortOrder) {
+      if(hiddenSortOrder.includes(" - Complement")) {
+        return 'complement-row';
+      } else if(hiddenSortOrder == "00. All: Reference (0-99)") {
+        return 'reference-row';
+      } else {
+        return '';
+      }
+    }
+  }
 });
 
 const visibleColumns = ref([
   //  "task_uuid",
+  // "hidden_sort_order"
   "population_group",
   "ages",
   // "race",
@@ -161,6 +183,14 @@ const columns = [
     label: "Task UUID",
     align: "left",
     field: (row) => row.task_uuid,
+    format: (val) => `${val}`,
+    sortable: true,
+  },
+  {
+    name: "hidden_sort_order",
+    label: "Hidden Sort Order",
+    align: "left",
+    field: (row) => row.hidden_sort_order,
     format: (val) => `${val}`,
     sortable: true,
   },
@@ -265,4 +295,11 @@ const columns = [
     text-align: right;
   }
 }
+.complement-row {
+    background-color:#f0f0f0 !important;
+}
+.reference-row {
+  background-color: #90EE90 !important;
+}
+
 </style>
