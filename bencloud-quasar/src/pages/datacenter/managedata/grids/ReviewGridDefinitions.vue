@@ -21,34 +21,45 @@
             label="See Grid Definitions of all users"
           />
         </div>
-          <!-- <div class="col">
+          <div class="col">
             <GridDefinitionAdd
             >
               ></GridDefinitionAdd
             >
-          </div> -->
+          </div>
         </div>
   
         <div class="q-pa-md">
           <GridDefinitions></GridDefinitions>
         </div>
         
-        <div class="q-pa-md">
+        <!-- <div class="q-pa-md">
           <GridTabs></GridTabs>
+        </div> -->
+
+        <div class= "q-pa-md">
+          <GridMap></GridMap>
         </div>
-  
-    </div>
+      </div>
+
+   
+    
     </q-page>
   </template>
   
   <script>
   import { defineComponent } from "vue";
+
+
   import { ref, reactive } from "vue";
   import { watch, onBeforeMount } from "vue";
   
   // import GridDefinitionAdd from "../../../../components/common/GridDefinitionAdd.vue";
   import GridDefinitions from "../../../../components/datacenter/grids/GridDefinitions.vue";
   import GridTabs from "src/components/datacenter/grids/GridTabs.vue";
+  import GridMap from "../../../../components/datacenter/grids/GridMap.vue";
+  import GridDefinitionAdd from "src/components/common/GridDefinitionAdd.vue";
+
   
   import { useStore } from "vuex";
   import { isAdmin } from "../../../../boot/auth.js";
@@ -59,13 +70,15 @@
     model: ref(null),
     name: "ReviewGrids",
     components: {
-      GridTabs,
+      
       GridDefinitions,
-      // GridDefinitionAdd
+      GridDefinitionAdd,
+      GridMap
   },
     setup(props, context) {
       const store = useStore();
 
+      
       onBeforeMount(() => {});
       return {
         showAll,
@@ -82,5 +95,7 @@
     padding: 25px 20px 10px 20px;
     font-size: 18px;
   }
+
+
   </style>
   
