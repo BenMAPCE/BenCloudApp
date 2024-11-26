@@ -168,6 +168,9 @@ export const buildHealthImpactFunctionGroups = (
       option.endpoint_name = functions[f].hifRecord.endpoint_name;
       option.age_range = functions[f].hifRecord.start_age + " - " + functions[f].hifRecord.end_age;
       option.end_age = functions[f].hifRecord.end_age;
+      option.metric_name = functions[f].hifRecord.metric_name;
+      option.seasonal_metric_name = functions[f].hifRecord.seasonal_metric_name;
+      option.metric_statistic_name = functions[f].hifRecord.metric_statistic_name;
       option.race_ethnicity_gender =
         functions[f].hifRecord.race_name +
         " / " +

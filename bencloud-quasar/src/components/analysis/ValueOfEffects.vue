@@ -3,6 +3,7 @@
     <q-table
       :rows="rows"
       :columns="columns"
+      row-key="name"
       :rows-per-page-options="[0]"
       v-model:pagination="pagination"
       :loading="loading"
@@ -12,7 +13,26 @@
       :visible-columns="visibleColumns"
       class="valuation-table"
     >
-      <template v-slot:top-right>
+
+      <template v-slot:top>
+
+        <q-select
+          v-model="visibleColumns"
+          multiple
+          outlined
+          dense
+          options-dense
+          :display-value="$q.lang.table.columns"
+          emit-value
+          map-options
+          :options="columns"
+          option-value="name"
+          options-cover
+          style="min-width: 150px"
+        ></q-select>
+
+        <q-space></q-space>
+
         <q-input borderless dense debounce="300" v-model="filter" placeholder="Search" style="margin-right: 15px;">
           <template v-slot:append>
             <q-icon name="mdi-magnify" />
@@ -86,108 +106,6 @@ export default defineComponent({
 
     const selectedItem = ref(store.state.analysis.incidenceId);
 
-    const visibleColumns = [
-      //      "health_function_id",
-      //      "endpoint_group_id",
-      //      "endpoint_id",
-      "edit",
-      "location",
-      "group_name",
-      "author_year",
-      "endpoint_name",
-      "age_range",
-      "race_ethnicity_gender",
-      "incidence_prevalence",
-      "valuation",
-    ];
-
-    const columns = [
-      {
-        name: "edit",
-        align: "center",
-        label: "",
-        field: "edit",
-        sortable: false,
-      },
-      {
-        name: "health_function_id",
-        align: "left",
-        label: "Health Function Id",
-        field: "health_function_id",
-        sortable: false,
-      },
-      {
-        name: "endpoint_group_id",
-        align: "left",
-        label: "Health Effect Group Id",
-        field: "endpoint_group_id",
-        sortable: false,
-      },
-      {
-        name: "endpoint_id",
-        align: "left",
-        label: "Health Effect Id",
-        field: "endpoint_id",
-        sortable: false,
-      },
-      {
-        name: "group_name",
-        align: "left",
-        label: "Group",
-        field: "group_name",
-        sortable: true,
-      },
-      {
-        name: "author_year",
-        align: "left",
-        label: "Author / Year",
-        field: "author_year",
-        sortable: true,
-      },
-      {
-        name: "endpoint_name",
-        align: "left",
-        label: "Health Effect",
-        field: "endpoint_name",
-        sortable: true,
-      },
-      {
-        name: "age_range",
-        align: "left",
-        label: "Age Range",
-        field: "age_range",
-        sortable: true,
-      },
-      {
-        name: "race_ethnicity_gender",
-        align: "left",
-        label: "Race / Ethnicity / Gender",
-        field: "race_ethnicity_gender",
-        sortable: true,
-      },
-      {
-        name: "location",
-        align: "left",
-        label: "Location",
-        field: "location",
-        sortable: true,
-        style: "max-width: 250px; white-space: normal;"
-      },
-      {
-        name: "incidence_prevalence",
-        align: "left",
-        label: "Incidence or Prevalence",
-        field: "incidence_prevalence",
-        sortable: true,
-      },
-      {
-        name: "valuation",
-        align: "left",
-        label: "Valuation",
-        field: "valuation",
-        sortable: true,
-      },
-    ];
     watch(
       () => selectedItem.value,
       (currentSelectedItem, prevSelectedItem) => {
@@ -370,6 +288,20 @@ export default defineComponent({
       //  selectedItem.value = store.state.analysis.incidenceId;
       //  console.log("- selectedItem: " + selectedItem.value);
       //}
+      visibleColumns.value = [
+        "edit",
+        "location",
+        "group_name",
+        "author_year",
+        "endpoint_name",
+        "age_range",
+        "race_ethnicity_gender",
+        // "metric_name",
+        // "seasonal_metric_name",
+        // "metric_statistic_name",
+        "incidence_prevalence",
+        "valuation",
+      ];
     })();
 
     return {
@@ -389,6 +321,133 @@ export default defineComponent({
     };
   },
 });
+
+const visibleColumns = ref([
+      //      "health_function_id",
+      //      "endpoint_group_id",
+      //      "endpoint_id",
+      "edit",
+      "location",
+      "group_name",
+      "author_year",
+      "endpoint_name",
+      "age_range",
+      "race_ethnicity_gender",
+      // "metric_name",
+      // "seasonal_metric_name",
+      // "metric_statistic_name",
+      "incidence_prevalence",
+      "valuation",
+    ]);
+
+    const columns = [
+      {
+        name: "edit",
+        align: "center",
+        label: "",
+        field: "edit",
+        sortable: false,
+      },
+      {
+        name: "health_function_id",
+        align: "left",
+        label: "Health Function Id",
+        field: "health_function_id",
+        sortable: false,
+      },
+      {
+        name: "endpoint_group_id",
+        align: "left",
+        label: "Health Effect Group Id",
+        field: "endpoint_group_id",
+        sortable: false,
+      },
+      {
+        name: "endpoint_id",
+        align: "left",
+        label: "Health Effect Id",
+        field: "endpoint_id",
+        sortable: false,
+      },
+      {
+        name: "group_name",
+        align: "left",
+        label: "Group",
+        field: "group_name",
+        sortable: true,
+      },
+      {
+        name: "author_year",
+        align: "left",
+        label: "Author / Year",
+        field: "author_year",
+        sortable: true,
+      },
+      {
+        name: "endpoint_name",
+        align: "left",
+        label: "Health Effect",
+        field: "endpoint_name",
+        sortable: true,
+      },
+      {
+        name: "age_range",
+        align: "left",
+        label: "Age Range",
+        field: "age_range",
+        sortable: true,
+      },
+      {
+        name: "race_ethnicity_gender",
+        align: "left",
+        label: "Race / Ethnicity / Gender",
+        field: "race_ethnicity_gender",
+        sortable: true,
+      },
+      {
+        name: "metric_name",
+        align: "left",
+        label: "Metric",
+        field: "metric_name",
+        sortable: true,
+      },
+      {
+        name: "seasonal_metric_name",
+        align: "left",
+        label: "Seasonal Metric",
+        field: "seasonal_metric_name",
+        sortable: true,
+      },
+      {
+        name: "metric_statistic_name",
+        align: "left",
+        label: "Metric Statistic",
+        field: "metric_statistic_name",
+        sortable: true,
+      },
+      {
+        name: "location",
+        align: "left",
+        label: "Location",
+        field: "location",
+        sortable: true,
+        style: "max-width: 250px; white-space: normal;"
+      },
+      {
+        name: "incidence_prevalence",
+        align: "left",
+        label: "Incidence or Prevalence",
+        field: "incidence_prevalence",
+        sortable: true,
+      },
+      {
+        name: "valuation",
+        align: "left",
+        label: "Valuation",
+        field: "valuation",
+        sortable: true,
+      },
+    ];
 </script>
 
 <style lang="scss" scoped>
