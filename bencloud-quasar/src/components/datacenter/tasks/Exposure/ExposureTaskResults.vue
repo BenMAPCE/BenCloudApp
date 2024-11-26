@@ -142,6 +142,13 @@ export default defineComponent({
       sortable: true,
     },
     {
+      name: "function_type",
+      label: "Function Type",
+      field: (row) => row.function_type === null ? '' : row.function_type,
+      format: (val) => `${val}`,
+      sortable: true,
+    },
+    {
       name: "baseline_aq",
       label: props.pollutant_name == "PM2.5" ? "Pre-policy Conc (μm/m3)" : "Pre-policy Conc (ppb)",
       field: (row) => row.baseline_aq.toLocaleString("en-US", { maximumFractionDigits: 4 }),
@@ -237,6 +244,7 @@ export default defineComponent({
       visibleColumns.value = [
         "population_group",
         "ages",
+        "function_type",
         "baseline_aq",
         "scenario_aq",
         "delta_aq",
@@ -279,6 +287,7 @@ const visibleColumns = ref([
   // "race",
   // "ethnicity",
   // "gender",
+  "function_type",
   "baseline_aq",
   "scenario_aq",
   "delta_aq",
