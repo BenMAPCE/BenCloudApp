@@ -38,10 +38,19 @@
               @click.stop="editRow(props)"
               icon="mdi-pencil"
             ></q-btn>
+            
           </template>
           <template v-if="col.name === 'user' && props.row.share_scope != 1 && !!props.row.user_id">
             {{props.row.user_id}}
           </template>
+          <template v-else-if="col.name === 'toggle'">
+        <q-toggle
+          size="lg"
+          v-model="props.row.visible"
+          color="blue"
+          @update:model-value="toggleLayerVisibility(props.row)"
+        />
+      </template>
         </q-td>
       </q-tr>
     </template>  
@@ -79,15 +88,17 @@ export default defineComponent({
     },
   },
   methods: {
-   
-  //might need later once maps are added to display the grid definitions
+    toggleLayerVisibility(row) {
+      const layerName = row.name; // assuming layer name is unique for each row
+      // Dispatch the action to update the visibility of this layer
+      this.$store.dispatch('grids/updateLayerVisibility', {
+        layerName: layerName,
+        isVisible: row.visible
+      });
+    }
+},
 
-    rowClicked(props) {
-      // this.selected = [];
-      // this.selected.push(props.row);
-      // this.$store.commit("grids/updateGridId", props.row.id);
-    },
-  },
+  
 
   data() {
     return {
@@ -267,7 +278,8 @@ const visibleColumns = ref([
   "id",
   "name",
   "col_count",
-  "row_count"
+  "row_count",
+  "toggle"
 ]);
 
 const columns = [
@@ -319,5 +331,12 @@ const columns = [
     field: "", 
     align: "left" 
   },
+  {
+    name: "toggle",
+    label: "Layer Visibility",
+    align: "center",
+    field: "",
+    sortable: false,
+  }
 ];
 </script>
