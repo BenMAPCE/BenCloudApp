@@ -5,8 +5,6 @@
 </template>
 
 <script>
-import { ref, onMounted, computed } from "vue";
-import { useStore } from "vuex"; // Import Vuex
 import Map from "ol/Map";
 import View from "ol/View";
 import TileLayer from "ol/layer/Tile";
@@ -21,177 +19,162 @@ import { defaults as defaultControls } from "ol/control";
 
 export default {
   name: "LayerControlMapWithZoomFilter",
-  setup() {
-    const mapContainer = ref(null);
-    const map = ref(null);
-    const store = useStore(); // Access Vuex store
-
-    const layers = ref({
-      state: null,
-      county: null,
-      nation: null,
-      grid12km: null,
-    });
-
-    // Compute visibility directly from Vuex
-    const layersVisible = computed(() => store.state.visibleLayers);
-
-    const initializeMap = () => {
-      const defaultView = {
+  data() {
+    return {
+      mapContainer: null,
+      map: null,
+      layers: {
+        state: null,
+        county: null,
+        nation: null,
+        grid12km: null,
+      },
+      defaultView: {
         center: fromLonLat([-98.5795, 39.8283]),
         zoom: 4.3,
-      };
-
-   
-      //Set styles for state, county, nation, and 12km
-      const stateStyle = (feature) => {
-        const stateName = feature.get('state_usps');
-
-        return new Style({
-
-          stroke: new Stroke({
-            color: '#434343',
-            width: 0.5,
-            lineJoin: 'bevel',
-          }),
-          fill: new Fill({
-            color: 'rgba(0, 0, 0, 0)',
-          }),
-          text: new Text({
-            font: '13px Arial',
-            text: stateName || '',
-            fill: new Fill({
-              color: '#767676',
-            }),
-            offsetY: -10, // Adjust placement
-          }),
+      },
+    };
+  },
+  computed: {
+    visibleLayers() {
+      return this.$store.state.grids.visibleLayers;
+    },
+  },
+  watch: {
+    visibleLayers: {
+      handler(newVal) {
+        Object.keys(this.layers).forEach((key) => {
+          if (this.layers[key]) {
+            this.layers[key].setVisible(newVal[key]);
+          }
         });
-      };
-
-
-      const countyStyle = (feature) => {
-        const countyName = feature.get('name');
+      },
+      deep: true,
+    },
+  },
+  methods: {
+    initializeMap() {
+      const stateStyle = (feature) => {
+        const stateName = feature.get("state_usps");
         return new Style({
           stroke: new Stroke({
-            color: '#a5a5a5',
+            color: "#434343",
             width: 0.5,
-            lineJoin: 'bevel', // Line join style
+            lineJoin: "bevel",
           }),
           fill: new Fill({
-            color: 'rgba(0, 0, 0, 0)',
+            color: "rgba(0, 0, 0, 0)",
           }),
           text: new Text({
-            font: '13px Arial',
-            text: countyName || '',
+            font: "13px Arial",
+            text: stateName || "",
             fill: new Fill({
-              color: '#323232',
+              color: "#767676",
             }),
             offsetY: -10,
           }),
         });
       };
 
-
+      const countyStyle = (feature) => {
+        const countyName = feature.get("name");
+        return new Style({
+          stroke: new Stroke({
+            color: "#a5a5a5",
+            width: 0.5,
+            lineJoin: "bevel",
+          }),
+          fill: new Fill({
+            color: "rgba(0, 0, 0, 0)",
+          }),
+          text: new Text({
+            font: "13px Arial",
+            text: countyName || "",
+            fill: new Fill({
+              color: "#323232",
+            }),
+            offsetY: -10,
+          }),
+        });
+      };
 
       const nationStyle = new Style({
         stroke: new Stroke({
-          color: '#232323',
+          color: "#232323",
           width: 2,
-          lineJoin: 'bevel',
+          lineJoin: "bevel",
         }),
         fill: new Fill({
-          color: 'rgba(0, 0, 0, 0)',
+          color: "rgba(0, 0, 0, 0)",
         }),
       });
+
       const grid12kmStyle = new Style({
         stroke: new Stroke({
-          color: '#000000',
-          width: 0.1, // Very thin stroke
+          color: "#000000",
+          width: 0.1,
         }),
         fill: new Fill({
-          color: 'rgba(0, 0, 0, 0)',
+          color: "rgba(0, 0, 0, 0)",
         }),
       });
 
-
-
-      // Create vector source for State, County, Nation layers
-      const stateSource = new VectorSource({
-        url: 'http://colo-wtest-1:8080/geoserver/benmap/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=benmap:us_state_usps&maxFeatures=1000000&outputFormat=application/json&srsName=EPSG:4326',
-        format: new GeoJSON({
-          featureProjection: 'EPSG:3857',
+      this.layers.state = new VectorLayer({
+        source: new VectorSource({
+          url: "http://colo-wtest-1:8080/geoserver/benmap/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=benmap:us_state_usps&maxFeatures=1000000&outputFormat=application/json&srsName=EPSG:4326",
+          format: new GeoJSON({ featureProjection: "EPSG:3857" }),
         }),
-      });
-
-      const countySource = new VectorSource({
-        url: 'http://colo-wtest-1:8080/geoserver/benmap/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=benmap:us_county&maxFeatures=1000000&outputFormat=application/json&srsName=EPSG:4326',
-        format: new GeoJSON({
-          featureProjection: 'EPSG:3857',
-        }),
-      });
-
-      const nationSource = new VectorSource({
-        url: 'http://colo-wtest-1:8080/geoserver/benmap/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=benmap:us_nation&maxFeatures=1000000&outputFormat=application/json&srsName=EPSG:4326',
-        format: new GeoJSON({
-          featureProjection: 'EPSG:3857',
-        }),
-      });
-      const grid12kmSource = new VectorSource({
-        url: 'http://colo-wtest-1:8080/geoserver/benmap/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=benmap:us_cmaq_12km_nation&maxFeatures=1000000&outputFormat=application/json&srsName=EPSG:4326',
-        format: new GeoJSON({
-          featureProjection: 'EPSG:3857',
-        }),
-      });
-
-      // Create vector layers for State, County, Nation
-      layers.value.state = new VectorLayer({
-        source: stateSource,
         style: stateStyle,
       });
 
-      layers.value.county = new VectorLayer({
-        source: countySource,
+      this.layers.county = new VectorLayer({
+        source: new VectorSource({
+          url: "http://colo-wtest-1:8080/geoserver/benmap/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=benmap:us_county&maxFeatures=1000000&outputFormat=application/json&srsName=EPSG:4326",
+          format: new GeoJSON({ featureProjection: "EPSG:3857" }),
+        }),
         style: countyStyle,
       });
 
-      layers.value.nation = new VectorLayer({
-        source: nationSource,
+      this.layers.nation = new VectorLayer({
+        source: new VectorSource({
+          url: "http://colo-wtest-1:8080/geoserver/benmap/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=benmap:us_nation&maxFeatures=1000000&outputFormat=application/json&srsName=EPSG:4326",
+          format: new GeoJSON({ featureProjection: "EPSG:3857" }),
+        }),
         style: nationStyle,
       });
 
-      layers.value.grid12km = new VectorLayer({
-        source: grid12kmSource,
+      this.layers.grid12km = new VectorLayer({
+        source: new VectorSource({
+          url: "http://colo-wtest-1:8080/geoserver/benmap/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=benmap:us_cmaq_12km_nation&maxFeatures=1000000&outputFormat=application/json&srsName=EPSG:4326",
+          format: new GeoJSON({ featureProjection: "EPSG:3857" }),
+        }),
         style: grid12kmStyle,
       });
 
-      // Base map layer
       const baseLayer = new TileLayer({
         source: new XYZ({
           urls: [
-            'https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}',
+            "https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}",
           ],
         }),
       });
 
-
-      // Initialize map
-      map.value = new Map({
-        target: mapContainer.value,
+      this.map = new Map({
+        target: this.mapContainer,
         layers: [
           baseLayer,
-          layers.value.state,
-          layers.value.county,
-          layers.value.nation,
-          layers.value.grid12km,
+          this.layers.state,
+          this.layers.county,
+          this.layers.nation,
+          this.layers.grid12km,
         ],
         view: new View({
-          center: defaultView.center,
-          zoom: defaultView.zoom,
+          center: this.defaultView.center,
+          zoom: this.defaultView.zoom,
         }),
         controls: defaultControls({ rotate: false }),
       });
 
-      // Add reset button
       const resetControl = new Control({
         element: document.createElement("button"),
       });
@@ -200,44 +183,16 @@ export default {
       resetControl.element.className = "reset-control ol-unselectable ol-control";
 
       resetControl.element.addEventListener("click", () => {
-        map.value.getView().setCenter(defaultView.center);
-        map.value.getView().setZoom(defaultView.zoom);
+        this.map.getView().setCenter(this.defaultView.center);
+        this.map.getView().setZoom(this.defaultView.zoom);
       });
 
-      map.value.addControl(resetControl);
-
-      // Set initial visibility
-      Object.keys(layers.value).forEach((key) => {
-        layers.value[key].setVisible(layersVisible.value[key]);
-      });
-    };
-
-    const toggleLayer = (layerType) => {
-      store.dispatch("updateLayerVisibility", {
-        layerName: layerType,
-        isVisible: !layersVisible.value[layerType],
-      });
-    };
-
-    onMounted(() => {
-      initializeMap();
-
-      // Watch visibility changes in Vuex and update layers
-      watch(
-        () => layersVisible.value,
-        (newVal) => {
-          Object.keys(layers.value).forEach((key) => {
-            layers.value[key].setVisible(newVal[key]);
-          });
-        },
-        { deep: true }
-      );
-    });
-
-    return {
-      mapContainer,
-      toggleLayer,
-    };
+      this.map.addControl(resetControl);
+    },
+  },
+  mounted() {
+    this.mapContainer = this.$refs.mapContainer;
+    this.initializeMap();
   },
 };
 </script>
@@ -249,25 +204,6 @@ export default {
   margin-top: 20px;
   border: 1px solid #ccc;
 }
-
-.layer-options {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
-label {
-  font-size: 1.2rem;
-  display: flex;
-  align-items: center;
-}
-
-input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  margin-right: 5px;
-}
-
 .reset-control {
   background: white;
   border: 1px solid #ccc;
@@ -276,8 +212,7 @@ input[type="checkbox"] {
   cursor: pointer;
   font-size: 1rem;
 }
-
 .reset-control:hover {
   background: #f0f0f0;
 }
-</style> -->
+</style>

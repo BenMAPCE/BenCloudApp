@@ -88,14 +88,32 @@ export default defineComponent({
     },
   },
   methods: {
-    toggleLayerVisibility(row) {
-      const layerName = row.name; // assuming layer name is unique for each row
-      // Dispatch the action to update the visibility of this layer
-      this.$store.dispatch('grids/updateLayerVisibility', {
-        layerName: layerName,
-        isVisible: row.visible
-      });
+  toggleLayerVisibility(row) {
+    // Map the row's ID to the layer name
+    const layerName = this.mapIdToLayerName(row.id);
+    if (!layerName) {
+      console.error(`Layer name not found for row ID: ${row.id}`);
+      return;
     }
+
+    // Dispatch the action to update the visibility of this layer
+    this.$store.dispatch("grids/updateLayerVisibility", {
+      layerName: layerName,
+      isVisible: row.visible,
+    });
+  },
+  
+  // Map ID to layer name based on gridmap
+  mapIdToLayerName(id) {
+    const gridmap = {
+      28: "grid12km",
+      18: "county",
+      19: "state",
+      20: "nation",
+      // Add more mappings as needed
+    };
+    return gridmap[id] || null;
+  },
 },
 
   
