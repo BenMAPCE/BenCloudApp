@@ -5,6 +5,7 @@
 </template>
 
 <script>
+import 'ol/ol.css';
 import Map from "ol/Map";
 import View from "ol/View";
 import TileLayer from "ol/layer/Tile";
@@ -181,6 +182,7 @@ export default {
           center: this.defaultView.center,
           zoom: this.defaultView.zoom,
         }),
+        theme: null,
         controls: defaultControls({ rotate: false }),
       });
 
@@ -206,21 +208,49 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 .map-container {
   width: 100%;
   height: 58vh;
   border: 1px solid #ccc;
 }
-.reset-control {
+
+
+.reset-control,
+.map-container .ol-zoom  button {
+  width: 40px;
+  height: 40px;
   background: white;
   border: 1px solid #ccc;
   border-radius: 5px;
-  padding: 5px 10px;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0; 
 }
-.reset-control:hover {
+
+.reset-control:hover,
+.map-container .ol-zoom button:hover {
+  border: 1px solid #000000;
+  border-radius: 5px;
   background: #f0f0f0;
+}
+
+.map-container .ol-zoom {
+  top: .5em;
+  left: .5em;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  background: transparent;
+}
+
+.ol-control.reset-control {
+  position: absolute;
+  top: 4em;
+  left: 0.35em; 
+  margin: 0;
 }
 </style>

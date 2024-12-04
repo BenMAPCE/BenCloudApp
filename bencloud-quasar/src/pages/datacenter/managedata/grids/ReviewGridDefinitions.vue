@@ -87,14 +87,14 @@
   }
   .split-layout {
   display: flex;
-  height: 80vh; 
+  height: auto;
 }
+
 
 .left-pane {
   width: 40%; 
   padding: 10px;
   border-right: 1px solid #ddd;
-  overflow-y: auto;
 }
 
 .right-pane {
@@ -102,6 +102,18 @@
   padding: 10px;
   position: relative;
 }
+
+@media (max-width: 1600px) {
+  .split-layout{
+    flex-direction: column;
+  }
+  .left-pane, .right-pane {
+    width: 100%; /* Full width when stacked */
+    border-right: none; /* Remove the border since it's vertical */
+  }
+
+}
+
 
   </style>
   
