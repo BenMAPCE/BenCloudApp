@@ -37,9 +37,7 @@
           <GridTabs></GridTabs>
         </div> -->
 
-        <div class= "q-pa-md">
-          <GridMap></GridMap>
-        </div>
+  
       </div>
 
    
@@ -57,7 +55,6 @@
   // import GridDefinitionAdd from "../../../../components/common/GridDefinitionAdd.vue";
   import GridDefinitions from "../../../../components/datacenter/grids/GridDefinitions.vue";
   import GridTabs from "src/components/datacenter/grids/GridTabs.vue";
-  import GridMap from "../../../../components/datacenter/grids/GridMap.vue";
   import GridDefinitionAdd from "src/components/common/GridDefinitionAdd.vue";
 
   
@@ -73,7 +70,6 @@
       
       GridDefinitions,
       GridDefinitionAdd,
-      GridMap
   },
     setup(props, context) {
       const store = useStore();
