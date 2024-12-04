@@ -39,7 +39,8 @@
   <q-tab-panels v-model="tab" animated v-if="task_type == 'E'">
     <q-tab-panel name="results"> 
       <div v-if="task_type === 'E'">
-        <ExposureTaskResults  v-bind:task_uuid="task_uuid" v-bind:task_name="task_name" v-bind:task_type="task_type" v-bind:batch_task_id="batch_task_id" :key="componentKey"></ExposureTaskResults>
+        <ExposureTaskResults  v-bind:task_uuid="task_uuid" v-bind:task_name="task_name" v-bind:task_type="task_type" v-bind:batch_task_id="batch_task_id" 
+          v-bind:pollutant_name="pollutant_name" :key="componentKey"></ExposureTaskResults>
       </div>
     </q-tab-panel>
   </q-tab-panels>
@@ -57,7 +58,7 @@ import ExposureTaskResults from "./Exposure/ExposureTaskResults.vue";
 export default defineComponent({
   model: ref(null),
   name: "TaskResultsTab",
-  props: ["task_uuid_with_type", "task_name", "valuation_task_uuid_with_type", "valuation_task_name", "batch_task_id","valuation_grid_id","valuation_grid_name"],
+  props: ["task_uuid_with_type", "task_name", "valuation_task_uuid_with_type", "valuation_task_name", "batch_task_id","valuation_grid_id","valuation_grid_name", "pollutant_name"],
 
   components: {
     HIFTaskResults,
@@ -73,6 +74,7 @@ export default defineComponent({
     const valuation_task_type = ref("");
     const valuation_task_name = ref("");
     const valuation_task_uuid = ref(null);
+    const pollutant_name = ref("");
     const componentKey = ref(0);
     const batch_task_id = ref(0);
     const currentTab = ref(store.state.datacenter.resultsTab);
@@ -90,6 +92,7 @@ export default defineComponent({
         task_uuid.value = props.task_uuid_with_type.substring(2)
         batch_task_id.value = props.batch_task_id
         task_name.value = props.task_name
+        pollutant_name.value = props.pollutant_name
         valuation_task_type.value = props.valuation_task_uuid_with_type.substring(0,1)
         valuation_task_uuid.value = props.valuation_task_uuid_with_type.substring(2)
         valuation_task_name.value = props.valuation_task_name

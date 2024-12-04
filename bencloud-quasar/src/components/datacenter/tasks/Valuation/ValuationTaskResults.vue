@@ -217,7 +217,7 @@ const columns = [
     name: "point_estimate",
     label: "Valuation Point Estimate",
     field: (row) =>
-      row.point_estimate.toLocaleString("en-US", { maximumFractionDigits: 4 }),
+      row.point_estimate.toLocaleString("en-US", { maximumFractionDigits: 2 }),
     sort: (a, b, rowA, rowB) => parseFloat(rowA.point_estimate) - parseFloat(rowB.point_estimate),
     sortable: true,
   },
@@ -225,7 +225,7 @@ const columns = [
     name: "standard_deviation",
     label: "Standard Deviation",
     field: (row) =>
-      row.standard_deviation.toLocaleString("en-US", { maximumFractionDigits: 4 }),
+      row.standard_deviation.toLocaleString("en-US", { maximumFractionDigits: 2 }),
     sort: (a, b, rowA, rowB) => parseFloat(rowA.standard_deviation) - parseFloat(rowB.standard_deviation),
     sortable: true,
   },
