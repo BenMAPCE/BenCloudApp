@@ -4,7 +4,6 @@
       Review Grid Definitions
     </div>
     <div class="q-pa-md q-gutter-sm split-layout">
-      <!-- Left Pane: Grid Definitions -->
       <div class="left-pane">
         <div class="row q-mb-md">
           <div class="col">
@@ -88,18 +87,18 @@
   }
   .split-layout {
   display: flex;
-  height: 80vh; /* Full height of the viewport */
+  height: 80vh; 
 }
 
 .left-pane {
-  width: 40%; /* Adjust width as needed */
+  width: 40%; 
   padding: 10px;
   border-right: 1px solid #ddd;
   overflow-y: auto;
 }
 
 .right-pane {
-  width: 60%; /* Adjust width as needed */
+  width: 60%; 
   padding: 10px;
   position: relative;
 }

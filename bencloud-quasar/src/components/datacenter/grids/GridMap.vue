@@ -43,16 +43,14 @@ export default {
   watch: {
   visibleLayers: {
     handler(newVal) {
-      // Iterate through all defined layers
       Object.keys(this.layers).forEach((key) => {
         if (this.layers[key]) {
-          // Set visibility based on Vuex state
           this.layers[key].setVisible(newVal.includes(key));
         }
       });
     },
-    immediate: true, // Ensure it runs immediately after the component is mounted
-    deep: true, // Track changes in the array
+    immediate: true,
+    deep: true, 
   },
 },
   methods: {
