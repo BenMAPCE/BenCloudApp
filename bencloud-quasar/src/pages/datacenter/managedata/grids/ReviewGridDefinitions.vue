@@ -1,49 +1,43 @@
 <template>
-    <q-page>
-      <div class="col title-message">
-        Review Grid Definitions
-      </div>
-      <div class="q-pa-md q-gutter-sm">
-        <div class="row">
-          <div class="col"></div>
-        </div>
-        <div class="row">
+  <q-page>
+    <div class="col title-message">
+      Review Grid Definitions
+    </div>
+    <div class="q-pa-md q-gutter-sm split-layout">
+      <!-- Left Pane: Grid Definitions -->
+      <div class="left-pane">
+        <div class="row q-mb-md">
           <div class="col">
-            <Suspense>
-            </Suspense>
+            <Suspense></Suspense>
           </div>
-  
           <div class="col" v-if="isAdmin">
-          <q-toggle
-            size="lg"
-            v-model="showAll"
-            color="blue"
-            label="See Grid Definitions of all users"
-          />
-        </div>
+            <q-toggle
+              size="lg"
+              v-model="showAll"
+              color="blue"
+              label="See Grid Definitions of all users"
+            />
+          </div>
           <div class="col">
-            <GridDefinitionAdd
-            >
-              ></GridDefinitionAdd
-            >
+            <GridDefinitionAdd />
           </div>
         </div>
-  
         <div class="q-pa-md">
-          <GridDefinitions></GridDefinitions>
-        </div>
-        
-        <!-- <div class="q-pa-md">
-          <GridTabs></GridTabs>
-        </div> -->
 
-  
+          <GridDefinitions />
+        </div>
       </div>
 
-   
-    
-    </q-page>
-  </template>
+
+      <div class="right-pane">
+        <div class="q-pa-md">
+          <GridMap />
+        </div>
+      </div>
+    </div>
+  </q-page>
+</template>
+
   
   <script>
   import { defineComponent } from "vue";
@@ -56,6 +50,7 @@
   import GridDefinitions from "../../../../components/datacenter/grids/GridDefinitions.vue";
   import GridTabs from "src/components/datacenter/grids/GridTabs.vue";
   import GridDefinitionAdd from "src/components/common/GridDefinitionAdd.vue";
+  import GridMap from "src/components/datacenter/grids/GridMap.vue";
 
   
   import { useStore } from "vuex";
@@ -67,9 +62,9 @@
     model: ref(null),
     name: "ReviewGrids",
     components: {
-      
       GridDefinitions,
       GridDefinitionAdd,
+      GridMap,
   },
     setup(props, context) {
       const store = useStore();
@@ -91,7 +86,23 @@
     padding: 25px 20px 10px 20px;
     font-size: 18px;
   }
+  .split-layout {
+  display: flex;
+  height: 80vh; /* Full height of the viewport */
+}
 
+.left-pane {
+  width: 40%; /* Adjust width as needed */
+  padding: 10px;
+  border-right: 1px solid #ddd;
+  overflow-y: auto;
+}
+
+.right-pane {
+  width: 60%; /* Adjust width as needed */
+  padding: 10px;
+  position: relative;
+}
 
   </style>
   

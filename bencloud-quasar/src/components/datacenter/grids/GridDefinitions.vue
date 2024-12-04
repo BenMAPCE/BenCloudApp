@@ -38,10 +38,19 @@
               @click.stop="editRow(props)"
               icon="mdi-pencil"
             ></q-btn>
+            
           </template>
           <template v-if="col.name === 'user' && props.row.share_scope != 1 && !!props.row.user_id">
             {{props.row.user_id}}
           </template>
+          <template v-else-if="col.name === 'toggle'">
+        <q-toggle
+          size="lg"
+          v-model="props.row.visible"
+          color="blue"
+          @update:model-value="toggleLayerVisibility(props.row)"
+        />
+      </template>
         </q-td>
       </q-tr>
     </template>  
@@ -79,15 +88,37 @@ export default defineComponent({
     },
   },
   methods: {
-   
-  //might need later once maps are added to display the grid definitions
+  toggleLayerVisibility(row) {
+    // Map the row's ID to the layer name
+    const layerName = this.mapIdToLayerName(row.id);
+    if (!layerName) {
+      console.error(`Layer name not found for row ID: ${row.id}`);
+      return;
+    }
 
-    rowClicked(props) {
-      // this.selected = [];
-      // this.selected.push(props.row);
-      // this.$store.commit("grids/updateGridId", props.row.id);
-    },
+
+    if (row.visible) {
+      this.$store.commit('grids/addVisibleLayer', layerName);
+    } else {
+      this.$store.commit('grids/removeVisibleLayer', layerName);
+    }
+    console.log(this.$store.state.grids.visibleLayers);
   },
+  
+  // Map ID to layer name based on gridmap
+  mapIdToLayerName(id) {
+    const gridmap = {
+      28: "grid12km",
+      18: "county",
+      19: "state",
+      20: "nation",
+      // Add more mappings as needed
+    };
+    return gridmap[id] || null;
+  },
+},
+
+  
 
   data() {
     return {
@@ -267,7 +298,8 @@ const visibleColumns = ref([
   "id",
   "name",
   "col_count",
-  "row_count"
+  "row_count",
+  "toggle"
 ]);
 
 const columns = [
@@ -319,5 +351,12 @@ const columns = [
     field: "", 
     align: "left" 
   },
+  {
+    name: "toggle",
+    label: "Layer Visibility",
+    align: "center",
+    field: "",
+    sortable: false,
+  }
 ];
 </script>
