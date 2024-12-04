@@ -7,10 +7,10 @@ export function updateGridAddedDate ({ commit }, newDate) {
 }
 
 
-export function updateLayerVisibility({ commit }, { layerName, isVisible }) {
-    if (isVisible) {
-      commit('addVisibleLayer', layerName);
-    } else {
-      commit('removeVisibleLayer', layerName);
-    }
-  }
+// export function updateLayerVisibility({ commit }, { layerName, isVisible }) {
+//     if (isVisible) {
+//       commit('addVisibleLayer', layerName);
+//     } else {
+//       commit('removeVisibleLayer', layerName);
+//     }
+//   }

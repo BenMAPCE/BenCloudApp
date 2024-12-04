@@ -41,17 +41,20 @@ export default {
     },
   },
   watch: {
-    visibleLayers: {
-      handler(newVal) {
-        Object.keys(this.layers).forEach((key) => {
-          if (this.layers[key]) {
-            this.layers[key].setVisible(newVal[key]);
-          }
-        });
-      },
-      deep: true,
+  visibleLayers: {
+    handler(newVal) {
+      // Iterate through all defined layers
+      Object.keys(this.layers).forEach((key) => {
+        if (this.layers[key]) {
+          // Set visibility based on Vuex state
+          this.layers[key].setVisible(newVal.includes(key));
+        }
+      });
     },
+    immediate: true, // Ensure it runs immediately after the component is mounted
+    deep: true, // Track changes in the array
   },
+},
   methods: {
     initializeMap() {
       const stateStyle = (feature) => {
@@ -126,6 +129,8 @@ export default {
         }),
         style: stateStyle,
       });
+      this.layers.state.setVisible(false);
+
 
       this.layers.county = new VectorLayer({
         source: new VectorSource({
@@ -134,6 +139,8 @@ export default {
         }),
         style: countyStyle,
       });
+      this.layers.county.setVisible(false);
+
 
       this.layers.nation = new VectorLayer({
         source: new VectorSource({
@@ -142,6 +149,8 @@ export default {
         }),
         style: nationStyle,
       });
+      this.layers.nation.setVisible(false);
+
 
       this.layers.grid12km = new VectorLayer({
         source: new VectorSource({
@@ -150,6 +159,8 @@ export default {
         }),
         style: grid12kmStyle,
       });
+      this.layers.grid12km.setVisible(false);
+
 
       const baseLayer = new TileLayer({
         source: new XYZ({
@@ -200,8 +211,7 @@ export default {
 <style scoped>
 .map-container {
   width: 100%;
-  height: 500px;
-  margin-top: 20px;
+  height: 58vh;
   border: 1px solid #ccc;
 }
 .reset-control {

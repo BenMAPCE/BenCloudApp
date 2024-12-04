@@ -96,11 +96,13 @@ export default defineComponent({
       return;
     }
 
-    // Dispatch the action to update the visibility of this layer
-    this.$store.dispatch("grids/updateLayerVisibility", {
-      layerName: layerName,
-      isVisible: row.visible,
-    });
+
+    if (row.visible) {
+      this.$store.commit('grids/addVisibleLayer', layerName);
+    } else {
+      this.$store.commit('grids/removeVisibleLayer', layerName);
+    }
+    console.log(this.$store.state.grids.visibleLayers);
   },
   
   // Map ID to layer name based on gridmap

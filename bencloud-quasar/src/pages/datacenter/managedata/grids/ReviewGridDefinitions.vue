@@ -88,7 +88,7 @@
   }
   .split-layout {
   display: flex;
-  height: 100vh; /* Full height of the viewport */
+  height: 80vh; /* Full height of the viewport */
 }
 
 .left-pane {
