@@ -73,32 +73,36 @@ export default {
             fill: new Fill({
               color: "#767676",
             }),
-            offsetY: -10,
           }),
         });
       };
 
-      const countyStyle = (feature) => {
-        const countyName = feature.get("name");
-        return new Style({
-          stroke: new Stroke({
-            color: "#a5a5a5",
-            width: 0.5,
-            lineJoin: "bevel",
-          }),
+      const countyStyle = (feature, resolution) => {
+  const zoom = this.map.getView().getZoom(); // Get the current zoom level
+  const countyName = feature.get("name");
+
+  // Only show text for zoom levels above 4
+  const showText = zoom > 5;
+  return new Style({
+    stroke: new Stroke({
+      color: "#a5a5a5",
+      width: 0.5,
+      lineJoin: "bevel",
+    }),
+    fill: new Fill({
+      color: "rgba(0, 0, 0, 0)",
+    }),
+    text: showText
+      ? new Text({
+          font: "13px Arial",
+          text: countyName || "",
           fill: new Fill({
-            color: "rgba(0, 0, 0, 0)",
+            color: "#323232",
           }),
-          text: new Text({
-            font: "13px Arial",
-            text: countyName || "",
-            fill: new Fill({
-              color: "#323232",
-            }),
-            offsetY: -10,
-          }),
-        });
-      };
+        })
+      : null, 
+  });
+};
 
       const nationStyle = new Style({
         stroke: new Stroke({
