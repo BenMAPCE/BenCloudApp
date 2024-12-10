@@ -6,8 +6,8 @@
             <div class="row">
               <div class="col-12">
                 <q-uploader
-                  label="Upload your CSV"
-                  accept=".csv"
+                  label="Upload your zipped shape file"
+                  accept=".zip"
                   :max-file-size="20000000"
                   square
                   flat
