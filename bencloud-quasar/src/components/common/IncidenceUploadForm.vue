@@ -76,8 +76,8 @@
 
 <script>
 import GridDefinitions from "../datacenter/airquality/GridDefinitions.vue";
-import AirQualityUploadErrorsDialog from "./AirQualityUploadErrorsDialog.vue";
-import AirQualityUploadSuccessDialog from "./AirQualityUploadSuccessDialog.vue";
+import IncidenceUploadErrorsDialog from "./IncidenceUploadErrorsDialog.vue";
+import IncidenceUploadSuccessDialog from "./IncidenceUploadSuccessDialog.vue";
 
 import { useQuasar } from "quasar";
 import { useStore } from "vuex";
@@ -223,7 +223,7 @@ export default {
 
               this.$q
                 .dialog({
-                  component: AirQualityUploadErrorsDialog,
+                  component: IncidenceUploadErrorsDialog,
                   parent: this,
                   persistent: true,
                   componentProps: {
@@ -243,7 +243,7 @@ export default {
           } else {
             this.$q
               .dialog({
-                component: AirQualityUploadSuccessDialog,
+                component: IncidenceUploadSuccessDialog,
                 parent: this,
                 persistent: true,
                 componentProps: {

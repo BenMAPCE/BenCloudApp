@@ -44,7 +44,7 @@
                   filled
                   dense
                   v-model="name"
-                  label="*File Name"
+                  label="*Descriptive Name"
                   hint=""
                   lazy-rules
                   :rules="[(val) => (val && val.length > 0) || 'Please enter a name']"
@@ -69,9 +69,8 @@
   </template>
   
   <script>
-  import AirQualityUploadErrorsDialog from "./AirQualityUploadErrorsDialog.vue";
-  import AirQualityUploadSuccessDialog from "./AirQualityUploadSuccessDialog.vue";
-  
+  import GridDefinitionUploadErrorsDialog from "./GridDefinitionUploadErrorsDialog.vue";
+  import GridDefinitionUploadSuccessDialog from "./GridDefinitionUploadSuccessDialog.vue";
   import { useQuasar } from "quasar";
   import { useStore } from "vuex";
   
@@ -154,7 +153,6 @@
       },
   
       onSubmit() {
-        console.log(this.pollutantValue);
         var hasErrors = false;
         this.errorMessage = "";
   
@@ -165,12 +163,7 @@
             this.errorMessage + (hasErrors ? ", " : "") + "Name is required";
           hasErrors = true;
         }
-  
-        if (this.gridValue === 0) {
-          this.errorMessage =
-            this.errorMessage + (hasErrors ? ", " : "") + "Grid is required";
-          hasErrors = true;
-        }
+
   
         if (this.selected_file === "") {
           this.errorMessage =
@@ -190,7 +183,6 @@
         const fileData = new FormData();
         fileData.append("file", this.selected_file);
         fileData.append("name", this.name);
-        fileData.append("gridId", this.gridValue);
         fileData.append("filename", this.selected_file.name);
         console.log(fileData);
         fileData.append("uploadDate",localISOTime)
@@ -224,7 +216,7 @@
   
                 this.$q
                   .dialog({
-                    component: AirQualityUploadErrorsDialog,
+                    component: GridDefinitionUploadErrorsDialog,
                     parent: this,
                     persistent: true,
                     componentProps: {
@@ -244,7 +236,7 @@
             } else {
               this.$q
                 .dialog({
-                  component: AirQualityUploadSuccessDialog,
+                  component: GridDefinitionUploadSuccessDialog,
                   parent: this,
                   persistent: true,
                   componentProps: {
