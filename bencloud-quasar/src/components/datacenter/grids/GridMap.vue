@@ -42,67 +42,73 @@ export default {
     },
   },
   watch: {
-  visibleLayers: {
-    handler(newVal) {
-      Object.keys(this.layers).forEach((key) => {
-        if (this.layers[key]) {
-          this.layers[key].setVisible(newVal.includes(key));
-        }
-      });
+    visibleLayers: {
+      handler(newVal) {
+        Object.keys(this.layers).forEach((key) => {
+          if (this.layers[key]) {
+            this.layers[key].setVisible(newVal.includes(key));
+          }
+        });
+      },
+      immediate: true,
+      deep: true,
     },
-    immediate: true,
-    deep: true, 
   },
-},
   methods: {
     initializeMap() {
       const stateStyle = (feature) => {
+        const zoom = this.map.getView().getZoom();
         const stateName = feature.get("state_usps");
+
+        const showText = zoom > 4;
+
         return new Style({
           stroke: new Stroke({
             color: "#434343",
+            width: 0.8,
+            lineJoin: "bevel",
+          }),
+          fill: new Fill({
+            color: "rgba(0, 0, 0, 0)",
+          }),
+          text: showText
+            ? new Text({
+            font: "14px Arial",
+            text: stateName || "",
+            fill: new Fill({
+              color: "#414141",
+            }),
+          })
+          : null,
+        });
+      };
+
+      const countyStyle = (feature, resolution) => {
+        const zoom = this.map.getView().getZoom(); // Get the current zoom level
+        const countyName = feature.get("name");
+
+        // Only show text for zoom levels above 7
+        const showText = zoom > 7;
+        return new Style({
+          stroke: new Stroke({
+            color: "#595959",
             width: 0.5,
             lineJoin: "bevel",
           }),
           fill: new Fill({
             color: "rgba(0, 0, 0, 0)",
           }),
-          text: new Text({
-            font: "13px Arial",
-            text: stateName || "",
-            fill: new Fill({
-              color: "#767676",
-            }),
-          }),
+          text: showText
+            ? new Text({
+              font: "13px Arial",
+              text: countyName || "",
+              fill: new Fill({
+                color: "#3f3f3f",
+              }),
+            })
+            : null,
         });
       };
-
-      const countyStyle = (feature, resolution) => {
-  const zoom = this.map.getView().getZoom(); // Get the current zoom level
-  const countyName = feature.get("name");
-
-  // Only show text for zoom levels above 4
-  const showText = zoom > 5;
-  return new Style({
-    stroke: new Stroke({
-      color: "#a5a5a5",
-      width: 0.5,
-      lineJoin: "bevel",
-    }),
-    fill: new Fill({
-      color: "rgba(0, 0, 0, 0)",
-    }),
-    text: showText
-      ? new Text({
-          font: "13px Arial",
-          text: countyName || "",
-          fill: new Fill({
-            color: "#323232",
-          }),
-        })
-      : null, 
-  });
-};
 
       const nationStyle = new Style({
         stroke: new Stroke({
@@ -117,7 +123,7 @@ export default {
 
       const grid12kmStyle = new Style({
         stroke: new Stroke({
-          color: "#000000",
+          color: "#3f3f3f",
           width: 0.1,
         }),
         fill: new Fill({
@@ -221,7 +227,7 @@ export default {
 
 
 .reset-control,
-.map-container .ol-zoom  button {
+.map-container .ol-zoom button {
   width: 40px;
   height: 40px;
   background: white;
@@ -232,7 +238,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0; 
+  padding: 0;
 }
 
 .reset-control:hover,
@@ -254,7 +260,7 @@ export default {
 .ol-control.reset-control {
   position: absolute;
   top: 4em;
-  left: 0.35em; 
+  left: 0.35em;
   margin: 0;
 }
 </style>
