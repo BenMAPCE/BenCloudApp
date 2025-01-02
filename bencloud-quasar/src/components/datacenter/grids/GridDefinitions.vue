@@ -101,16 +101,18 @@ export default defineComponent({
       },
     }).onOk(async (submittedName) => {
       try {
-        if (!submittedName || submittedName.trim() === "") {
+        if (!submittedName.filename || submittedName.filename.trim() === "") {
           throw new Error("Grid name cannot be empty.");
         }
 
-        const newName = submittedName.trim();
+        const newName = submittedName.filename.trim();
+        const templateData = new FormData();
+        templateData.append("newName", newName);
 
         // Make the API call to update the grid name after confirmation
         const response = await axios.put(
           `${process.env.API_SERVER}/api/grid-definitions/${props.row.id}`,
-          { name: newName }
+          templateData
         );
 
         if (response && response.status === 200) {
