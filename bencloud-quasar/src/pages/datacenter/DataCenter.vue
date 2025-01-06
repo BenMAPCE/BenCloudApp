@@ -287,9 +287,9 @@ export default defineComponent({
   flex: 1.2;
   max-width: 400px;
   border-right: 1.3px solid #999999;
-  padding-right: 10px;
-  padding-left: 10px;
-  margin-right: 30px;
+  padding-right: 40px;
+  padding-left: 20px;
+  margin-right: 40px;
 
 }
 

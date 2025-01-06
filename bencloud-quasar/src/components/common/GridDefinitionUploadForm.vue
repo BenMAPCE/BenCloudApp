@@ -95,17 +95,7 @@
       "hide",
     ],
   
-    watch: {
-      dataType(newValue, oldValue) {
-        if (newValue.toLowerCase()=="hybrid model") {
-          this.descriptionHint = "Please enter details about the hybrid model.";
-          console.log("newValue.toLowerCase()=='hybrid model'");
-        }
-        else{
-          this.descriptionHint = "";
-        }
-      },
-    },
+    
   
     methods: {
       // following method is REQUIRED
