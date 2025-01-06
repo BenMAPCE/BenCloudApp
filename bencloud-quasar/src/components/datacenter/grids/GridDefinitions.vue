@@ -90,14 +90,13 @@ export default defineComponent({
   methods: {
     async editRow(props) {
   try {
-    const FileNameChangeForm = await import('../../common/FileNameChangeForm.vue');
+    const GridNameChangeForm = await import('../../common/GridNameChangeForm.vue');
 
     // Open the dialog and properly wait for the user's response
     const result = await this.$q.dialog({
       component: FileNameChangeForm.default,
-      parent: this,
-      props: {
-        currentName: props.row.name,
+      componentProps: {  // Changed from props to componentProps
+        currentName: props.row.name
       },
     }).onOk(async (submittedName) => {
       try {
