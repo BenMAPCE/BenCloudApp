@@ -78,7 +78,7 @@ export default {
     onSubmit() {
       this.errorMessage = "";
 
-      if (!this.newDescription) {
+      if (!this.newDescription || this.newDescription.trim() === "") {
         this.errorMessage = "Descriptive name is required.";
         return;
       }
@@ -88,7 +88,7 @@ export default {
         return;
       }
 
-      this.$emit("ok", this.newDescription);
+      this.$emit("ok", { newDescription: this.newDescription });
       this.hide();
     },
     onCancelClick() {

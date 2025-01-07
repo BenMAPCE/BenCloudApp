@@ -100,11 +100,11 @@ export default defineComponent({
       },
     }).onOk(async (submittedName) => {
       try {
-        if (!submittedName.filename || submittedName.filename.trim() === "") {
+        if (!submittedName || !submittedName.newDescription || submittedName.newDescription.trim() === "") {
           throw new Error("Grid name cannot be empty.");
         }
 
-        const newName = submittedName.filename.trim();
+        const newName = submittedName.newDescription.trim();
         const templateData = new FormData();
         templateData.append("newName", newName);
 
