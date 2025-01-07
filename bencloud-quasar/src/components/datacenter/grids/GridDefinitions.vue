@@ -152,7 +152,7 @@ export default defineComponent({
               console.log("oldValue: " + oldValue);
               var newValue = oldValue - 1;
               console.log("newValue: " + newValue);
-              this.$store.commit("grids/updateGridReloadValue", newValue)
+              this.$store.commit("grids/updateGridForceReloadValue", newValue)
             } else if(response.status === 403){
               console.log("Forbidden action on grid definition: " + props.row.name);
               this.$q.notify({
