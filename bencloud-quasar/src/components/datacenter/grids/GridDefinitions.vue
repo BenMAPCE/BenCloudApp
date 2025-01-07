@@ -90,14 +90,13 @@ export default defineComponent({
   methods: {
     async editRow(props) {
   try {
-    const FileNameChangeForm = await import('../../common/FileNameChangeForm.vue');
+    const GridNameChangeForm = await import('../../common/GridNameChangeForm.vue');
 
     // Open the dialog and properly wait for the user's response
     const result = await this.$q.dialog({
-      component: FileNameChangeForm.default,
-      parent: this,
-      props: {
-        currentName: props.row.name,
+      component: GridNameChangeForm.default,
+      componentProps: {  // Changed from props to componentProps
+        currentName: props.row.name
       },
     }).onOk(async (submittedName) => {
       try {
@@ -134,7 +133,7 @@ export default defineComponent({
 },
 
     deleteRow(props) {
-      // Prompt user to confirm drid definition deletion
+      // Prompt user to confirm grid definition deletion
       if(confirm("Are you sure you wish to permanently delete " + props.row.name + "?")){
         // Delete grid, reload the grid list if successful, alert the user if unsuccessful       
         axios

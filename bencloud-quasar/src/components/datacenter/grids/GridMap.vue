@@ -76,7 +76,7 @@ export default {
             font: "14px Arial",
             text: stateName || "",
             fill: new Fill({
-              color: "#414141",
+              color: "#3f3f3f",
             }),
           })
           : null,
@@ -92,7 +92,7 @@ export default {
         return new Style({
           stroke: new Stroke({
             color: "#595959",
-            width: 0.5,
+            width: 0.4,
             lineJoin: "bevel",
           }),
           fill: new Fill({
