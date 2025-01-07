@@ -281,6 +281,7 @@ export default defineComponent({
   display: flex;
   gap: 24px;
   height: 100%;
+  flex-wrap: wrap; /* Allow wrapping for smaller screens */
 }
 
 .task-section {
@@ -290,7 +291,6 @@ export default defineComponent({
   padding-right: 40px;
   padding-left: 20px;
   margin-right: 40px;
-
 }
 
 .categories-section {
@@ -300,6 +300,7 @@ export default defineComponent({
 .categories-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
+  gap: 16px; /* Add gap between cards */
 }
 
 .category-header {
@@ -392,5 +393,29 @@ export default defineComponent({
 .q-card-actions.q-px-none {
   padding-left: 0;
   padding-right: 0;
+}
+
+/* Media queries for responsiveness */
+@media (max-width: 768px) {
+  .page-layout {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .task-section {
+    max-width: 100%;
+    border-right: none;
+    padding-right: 0;
+    padding-left: 0;
+    margin-right: 0;
+  }
+
+  .categories-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .data-card {
+    max-width: 100%;
+  }
 }
 </style>
