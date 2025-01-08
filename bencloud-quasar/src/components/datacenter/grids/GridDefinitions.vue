@@ -90,27 +90,28 @@ export default defineComponent({
   methods: {
     async editRow(props) {
   try {
-    const FileNameChangeForm = await import('../../common/FileNameChangeForm.vue');
+    const GridNameChangeForm = await import('../../common/GridNameChangeForm.vue');
 
     // Open the dialog and properly wait for the user's response
     const result = await this.$q.dialog({
-      component: FileNameChangeForm.default,
-      parent: this,
-      props: {
-        currentName: props.row.name,
+      component: GridNameChangeForm.default,
+      componentProps: {  // Changed from props to componentProps
+        currentName: props.row.name
       },
     }).onOk(async (submittedName) => {
       try {
-        if (!submittedName || submittedName.trim() === "") {
+        if (!submittedName || !submittedName.newDescription || submittedName.newDescription.trim() === "") {
           throw new Error("Grid name cannot be empty.");
         }
 
-        const newName = submittedName.trim();
+        const newName = submittedName.newDescription.trim();
+        const templateData = new FormData();
+        templateData.append("newName", newName);
 
         // Make the API call to update the grid name after confirmation
         const response = await axios.put(
           `${process.env.API_SERVER}/api/grid-definitions/${props.row.id}`,
-          { name: newName }
+          templateData
         );
 
         if (response && response.status === 200) {
@@ -132,7 +133,7 @@ export default defineComponent({
 },
 
     deleteRow(props) {
-      // Prompt user to confirm drid definition deletion
+      // Prompt user to confirm grid definition deletion
       if(confirm("Are you sure you wish to permanently delete " + props.row.name + "?")){
         // Delete grid, reload the grid list if successful, alert the user if unsuccessful       
         axios
@@ -151,7 +152,7 @@ export default defineComponent({
               console.log("oldValue: " + oldValue);
               var newValue = oldValue - 1;
               console.log("newValue: " + newValue);
-              this.$store.commit("grids/updateGridReloadValue", newValue)
+              this.$store.commit("grids/updateGridForceReloadValue", newValue)
             } else if(response.status === 403){
               console.log("Forbidden action on grid definition: " + props.row.name);
               this.$q.notify({

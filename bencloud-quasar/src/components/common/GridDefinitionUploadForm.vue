@@ -95,17 +95,7 @@
       "hide",
     ],
   
-    watch: {
-      dataType(newValue, oldValue) {
-        if (newValue.toLowerCase()=="hybrid model") {
-          this.descriptionHint = "Please enter details about the hybrid model.";
-          console.log("newValue.toLowerCase()=='hybrid model'");
-        }
-        else{
-          this.descriptionHint = "";
-        }
-      },
-    },
+    
   
     methods: {
       // following method is REQUIRED
@@ -308,23 +298,6 @@
         // we just need to hide the dialog
         this.hide();
       },
-  
-      onRejected(rejectedEntries) {
-      },
-  
-      onChangePollutantValue(value) {
-        this.pollutantValue = value;
-      },
-      onChangeGridValue(value) {
-        this.gridValue = value;
-      },
-  
-      hybridSelected(value){
-        if(value.toLowerCase()=="hybrid model")
-        {
-          this.descriptionHint = "Please enter the description for this hybrid model.";
-        }
-      }
     },
   };
   </script>
