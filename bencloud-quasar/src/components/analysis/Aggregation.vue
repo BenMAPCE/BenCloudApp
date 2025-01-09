@@ -30,16 +30,28 @@ export default defineComponent({
     const rows = ref([]);
     const gridOptions = [
       {
-        name: 'Nation',
+        name: 'Nation (2010)',
         id: 20
       }, 
       {
-        name: 'State',
+        name: 'Nation (2020)',
+        id: 70
+      },
+      {
+        name: 'State (2010)',
         id: 19
       },
       {
-        name: 'County',
+        name: 'State (2020)',
+        id: 69
+      },
+      {
+        name: 'County (2010)',
         id: 18
+      },
+      {
+        name: 'County (2020)',
+        id: 68
       },
       {
         name: 'CMAQ 12km Nation',
@@ -48,6 +60,7 @@ export default defineComponent({
     ]
     const selectedItem = ref();
     var id = null;
+    var defaultValue = "";
 
 
     watch(
@@ -66,24 +79,42 @@ export default defineComponent({
 
     onBeforeMount(() => {
       (async () => {
-        gridOptions.forEach(element => {
+        //Hard-coded default value for 2020 testing. Show different grid definitions when different pop dataset is selected. 
+        const gridOptionsFlt = gridOptions.filter(element=>{
+          if (store.state.analysis.populationDatasetId == 50 || store.state.analysis.populationDatasetId == 51 || store.state.analysis.populationDatasetId == 52){
+            defaultValue = "County (2020)";
+            return element.id===70 || element.id===69 || element.id===68 || element.id===28;
+          }
+          else{
+            defaultValue = "County (2010)";
+            return element.id===20 || element.id===19 || element.id===18 || element.id===28;
+          }
+        })      
+        
+        gridOptionsFlt.forEach(element => {
           rows.value.push(element.name);
         })
+
+        //set default or already selected values
+        console.log("... " + store.state.analysis.aggregationScale);
+        if (store.state.analysis.aggregationScale != null) {
+          id = store.state.analysis.aggregationScale;
+          gridOptions.forEach(element => {
+            if(element.id === id && rows.value.includes(element.name)) {
+              selectedItem.value = element.name;            
+            }
+            else{
+              selectedItem.value=defaultValue;
+            }
+          })
+        } else {
+          selectedItem.value= defaultValue;          
+        }
       })();
     });
 
     onMounted(() => {
-      console.log("... " + store.state.analysis.aggregationScale);
-      if (store.state.analysis.aggregationScale != null) {
-        id = store.state.analysis.aggregationScale;
-        gridOptions.forEach(element => {
-          if(element.id === id) {
-            selectedItem.value = element.name;
-          }
-        })
-      } else {
-        selectedItem.value = rows.value[2]; //default to county
-      }
+      
       
     })();
 
