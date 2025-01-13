@@ -30,6 +30,7 @@ export default defineComponent({
     const store = useStore();
     const rows = ref([]);
     const selectedItems = ref(store.state.exposure.exposureFunctionGroupId);
+    var defaultValue = 4; //Hard-coded to default exposure function group All available options (2020)
 
     watch(
       () => selectedItems.value,
@@ -38,9 +39,12 @@ export default defineComponent({
         if (currentSelectedItems != prevSelectedItems) {
           var efItems = [];
           var efItem = {};
-          var group = rows.value.find((opt) => opt.id === currentSelectedItems)
-          efItem = { exposureGroupId: group.id, exposureGroupName: group.name };
-          store.commit("exposure/updateExposureFunctionGroup", efItem);
+          var group = rows.value.find((opt) => opt.id === currentSelectedItems);
+          if(group!=undefined && group!=null){
+            efItem = { exposureGroupId: group.id, exposureGroupName: group.name };
+            store.commit("exposure/updateExposureFunctionGroup", efItem);
+          }
+          
         }
       }
     );
@@ -64,8 +68,12 @@ export default defineComponent({
             console.log(ex)
         }
 
+        
         if (store.state.exposure.exposureFunctionGroupId != null) {
           selectedItems.value = store.state.exposure.exposureFunctionGroupId;
+        }
+        else{
+          selectedItems.value= defaultValue; //Hard-coded to default exposure function group All available options (2020)
         }
       })();
     });
