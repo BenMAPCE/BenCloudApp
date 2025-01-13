@@ -127,8 +127,8 @@ export default {
 }
 
 .success-list-card {
-  max-width: 500px; // Reduced width of the dialog
-  width: 90%; // Ensures some responsiveness
+  max-width: 500px; 
+  width: 90%; 
   margin: auto;
 }
 </style>
