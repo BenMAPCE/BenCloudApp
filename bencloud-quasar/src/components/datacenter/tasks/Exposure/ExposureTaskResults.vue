@@ -164,14 +164,14 @@ export default defineComponent({
     },
     {
       name: "delta_aq",
-      label: props.pollutant_name == "PM2.5" ? "Change in AQ (μm/m3)" : "Change in AQ (ppb)",
+      label: props.pollutant_name == "PM2.5" ? "Pollutant Reduction (μm/m3)" : "Pollutant Reduction (ppb)",
       field: (row) => row.delta_aq.toLocaleString("en-US", { maximumFractionDigits: 2 }),
       sort: (a, b, rowA, rowB) => parseFloat(rowA.delta_aq) - parseFloat(rowB.delta_aq),
       sortable: true,
     },
     {
       name: "delta_aq_percent",
-      label: "Change in AQ (%)",
+      label: "Pollutant Reduction (%)",
       field: (row) => row.delta_aq_percent.toLocaleString("en-US", { maximumFractionDigits: 2 }),
       sort: (a, b, rowA, rowB) => parseFloat(rowA.delta_aq_percent) - parseFloat(rowB.delta_aq_percent),
       sortable: true,
@@ -190,18 +190,6 @@ export default defineComponent({
         row.percent_of_population.toLocaleString("en-US", { maximumFractionDigits: 2 }),
       sort: (a, b, rowA, rowB) => parseFloat(rowA.percent_of_population) - parseFloat(rowB.percent_of_population),
       sortable: true,
-    },
-    {
-      name: "formatted_results_2sf",
-      label: "Formatted Results (2 sig. figs.)",
-      field: "formatted_results_2sf",
-      sortable: false
-    },
-    {
-      name: "formatted_results_3sf",
-      label: "Formatted Results (3 sig. figs.)",
-      field: "formatted_results_3sf",
-      sortable: false
     },
   ]);
 
@@ -294,7 +282,6 @@ const visibleColumns = ref([
   "delta_aq_percent",
   "population",
   // "percent_of_population",
-  // "result"
 ]);
 </script>
 
