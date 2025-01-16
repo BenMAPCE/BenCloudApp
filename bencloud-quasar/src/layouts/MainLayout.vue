@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
+  <q-layout view="lhh Lpr lFf">
     <q-header elevated>
       <EPAAccordion v-bind:showEpaHeaderFooter="showEpaHeaderFooter"></EPAAccordion>
       <EPAHeader v-bind:showEpaHeaderFooter="showEpaHeaderFooter"></EPAHeader>
