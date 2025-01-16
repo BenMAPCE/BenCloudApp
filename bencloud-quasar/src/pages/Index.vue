@@ -1,250 +1,210 @@
 <template>
   <q-page>
-    <div class="q-pa-sm q-gutter-sm">
-      <p class="description">
-        What would you like to do?
-      </p>
-      <div>
-        <p class="prompt"> Start a new analysis</p>
-        <div class="home-options">
-          <q-btn flat
-                no-caps
-                color="primary"
-                push
-                @click="$router.replace('analysis')"
-                label="Analyze Health Impacts of Air Pollutants"
-              />
+    <div class="q-pa-md">
+      <h1 class="text-h4 q-mb-lg">What would you like to do?</h1>
+      
+      <div class="row q-col-gutter-md">
+        <!-- Start New Analysis Section -->
+        <div class="col-12 col-md-6">
+          <q-card class="analysis-card">
+            <q-card-section>
+              <h2 class="text-h5 q-mb-md text-grey-8">Start a new analysis</h2>
+              
+              <div class="q-gutter-y-md">
+                <q-item 
+                  clickable
+                  v-ripple
+                  @click="$router.replace('analysis')"
+                  class="analysis-item"
+                >
+                  
+                  <q-item-section>
+                    Analyze Health Impacts of Air Pollutants
+                  </q-item-section>
+                </q-item>
+
+                <q-item 
+                  clickable
+                  v-ripple
+                  @click="$router.replace('exposure')"
+                  class="analysis-item"
+                >
+                  
+                  <q-item-section>
+                    Analyze Exposure to Air Pollutants
+                  </q-item-section>
+                </q-item>
+              </div>
+            </q-card-section>
+          </q-card>
         </div>
-        <div class="home-options">
-          <q-btn flat
-              no-caps
-              color="primary"
-              push
-              @click="$router.replace('exposure')"
-              label="Analyze Exposure to Air Pollutants"
-            />
-        </div>
-      </div>
-      <div>
-        <div class="home-template" id="template">
-          <p class="prompt">Start from a template</p>
-          <div v-if="options.length === 0" class="home-options">Set up a new analysis and save your favorite configurations as templates. They'll show up here for you to use as a starting point in the future.</div>
-          <div v-if="options.length > 0" id="list" class="home-options">
-            <ul>
-              <li v-for="option in options" :key="option.id">
-                <q-btn flat
-                  no-caps
-                  color="primary"
-                  push
-                  @click="startAnalysisFromTemplate(option)">
-                  <div>{{ option.name }} for {{ option.type }}</div>
-                </q-btn>
-                <q-btn
-                  dense
-                  round
-                  flat
-                  color="grey"
-                  @click="editTemplate(option)"
-                  icon="mdi-pencil"
-                ></q-btn>
-                <q-btn
-                  dense
-                  round
-                  flat
-                  color="grey"
-                  @click="deleteTemplate(option)"
-                  icon="mdi-delete"
-                ></q-btn>
-              </li>
-            </ul>
-          </div>
-          
+
+        <!-- Templates Section -->
+        <div class="col-12 col-md-6">
+          <q-card class="template-card">
+            <q-card-section>
+              <h2 class="text-h5 q-mb-md text-grey-8">Start from a template</h2>
+              
+              <div v-if="options.length === 0" class="text-grey-7">
+                Set up a new analysis and save your favorite configurations as templates. They'll show up here for you to use as a starting point in the future.
+              </div>
+              
+              <div v-else class="q-gutter-y-sm">
+                <q-item
+                  v-for="option in options"
+                  :key="option.id"
+                  class="template-item"
+                >
+                  <q-item-section clickable @click="startAnalysisFromTemplate(option)">
+                    <q-item-label>{{ option.name }}</q-item-label>
+                    <q-item-label caption>{{ option.type }}</q-item-label>
+                  </q-item-section>
+
+                  <q-item-section side>
+                    <div class="row items-center">
+                      <q-btn
+                        flat
+                        round
+                        dense
+                        icon="mdi-pencil"
+                        color="grey-7"
+                        @click="editTemplate(option)"
+                      />
+                      <q-btn
+                        flat
+                        round
+                        dense
+                        icon="mdi-delete"
+                        color="grey-7"
+                        @click="deleteTemplate(option)"
+                      />
+                    </div>
+                  </q-item-section>
+                </q-item>
+              </div>
+            </q-card-section>
+          </q-card>
         </div>
       </div>
     </div>
   </q-page>
-</template>  
+</template>
 
 <script>
-import { defineComponent, ref, onMounted, onBeforeMount } from "vue";
-import AppTopNavigation from "../components/navigation/AppTopNavigation.vue";
-import { getTemplates, loadHifTemplate, loadExposureTemplate } from "../composables/templates/templates";
+import { defineComponent, ref, onMounted } from "vue";
 import { useStore } from "vuex";
-import axios from "axios";
 import { useQuasar } from "quasar";
+import { getTemplates, loadHifTemplate, loadExposureTemplate } from "../composables/templates/templates";
 import EditTemplateDialog from "./EditTemplateDialog.vue";
 
 export default defineComponent({
   name: "PageIndex",
-  components: {},
 
-  setup(props, context) {
+  setup() {
     const store = useStore();
     const options = ref([]);
     const $q = useQuasar();
 
-    const template = document.getElementById('template');
-
     function displayTemplates() {
-      (async () => {
-        console.log("loadTemplates");
-        const response = await getTemplates().fetch();
-        options.value.length = 0;
-        for(var i = 0; i < response.data.value.length; i++) {
-          options.value.push(response.data.value[i]);
-        }
-      })();
+      getTemplates()
+        .fetch()
+        .then((response) => {
+          options.value = response.data.value;
+        });
     }
 
     function editTemplate(template) {
-
       $q.dialog({
         component: EditTemplateDialog,
-        parent: this,
-        persistent: false,
         componentProps: {
           templateId: template.id,
           templateName: template.name,
-        },
-        data:{
-          newName: template.name,
         }
       })
       .onOk(() => {
-        // console.log('OK')
         displayTemplates();
-      })
-      .onCancel(() => {
-        // console.log('Cancel')
-      })
-      .onDismiss(() => {
-        // console.log('I am triggered on both OK and Cancel')
-        //displayTemplates();
       });
-
     }
 
     function deleteTemplate(template) {
-      // Prompt user to confirm template deletion
-      if(confirm("Are you sure you wish to permanently delete " + template.name + "?")){
-        // Delete template, reload the page if successful, alert the user if unsuccessful       
+      $q.dialog({
+        title: 'Confirm Deletion',
+        message: `Are you sure you want to delete "${template.name}"?`,
+        cancel: true,
+        persistent: true
+      }).onOk(() => {
         axios
-          .delete(process.env.API_SERVER + "/api/task-configs/" + template.id, 
-            {validateStatus: function (status) {
-              return status < 500;
-            }}
-          )
+          .delete(`${process.env.API_SERVER}/api/task-configs/${template.id}`)
           .then((response) => {
-            if(response.status === 204) {
+            if (response.status === 204) {
               displayTemplates();
-              console.log("Successfully deleted template: " + template.name);
-            } else if(response.status === 403){
-              console.log("Forbidden action on template: " + template.name);
-              this.$q.notify({
-                group: false, // required to be updateable
-                type: 'negative',
-                timeout: 6000, 
-                color: "red",
-                spinner: false, // we reset the spinner setting so the icon can be displayed
-                position: "top",
-                message: response.data.message,
+              $q.notify({
+                type: 'positive',
+                message: 'Template deleted successfully'
               });
-              this.$emit('ok')
-            } else {
-              this.$q.notify({
-                group: false, // required to be updateable
-                type: 'negative',
-                timeout: 6000, 
-                color: "red",
-                spinner: false, // we reset the spinner setting so the icon can be displayed
-                position: "top",
-                message: "Unknown error: " + response.status,
-              });
-              this.$emit('ok')
             }
+          })
+          .catch((error) => {
+            $q.notify({
+              type: 'negative',
+              message: error.response?.data?.message || 'Failed to delete template'
+            });
           });
+      });
+    }
+
+    async function startAnalysisFromTemplate(template) {
+      if (template.type === "Health Impact Analysis") {
+        await loadHifTemplate(template, store);
+        this.$router.replace('/analysis');
+      } else if (template.type === "Exposure Analysis") {
+        await loadExposureTemplate(template, store);
+        this.$router.replace('/exposure');
       }
-    }
-
-    function startAnalysisFromTemplate(template) {
-     (async () => {
-        if(template.type === "Health Impact Analysis") {
-          loadHifTemplate(template, store);
-          while (store.state.analysis.healthImpactFunctions.length === 0) {
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-          }
-          this.$router.replace('/analysis')
-        } else if(template.type === "Exposure Analysis") {
-          loadExposureTemplate(template, store);
-          this.$router.replace('/exposure')
-        }
-      })();
-
-    }
-
-    function goToReviewAnalysisFromTemplate() {
-      (async () => {
-        loadHifTemplate(template, store);
-
-        while (store.state.analysis.healthImpactFunctions.length === 0) {
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-        }
-        store.commit("analysis/updateStepNumber", 7);
-
-        this.$router.replace("/analysis");
-      })();
-
     }
 
     onMounted(() => {
       displayTemplates();
       store.commit("analysis/updateStepNumber", 1);
-    })
+    });
 
     return {
       options,
       startAnalysisFromTemplate,
       editTemplate,
-      deleteTemplate 
+      deleteTemplate
     };
-    
-  },
+  }
 });
 </script>
 
 <style scoped>
-  .description {
-    font-size: 24px;
-    font-weight: 400;
-  }
+.analysis-card,
+.template-card {
+  height: 100%;
+}
 
-  .prompt {
-    font-size: 24px;
-    color: grey;
-    font-weight: 400;
-    margin-bottom: 0;
-    margin-top: 20px;
-  }
+.analysis-item {
+  border-radius: 8px;
+  transition: background-color 0.3s;
+}
 
-  .home-options {
-    padding-left: 30px;
-    padding-top: 10px;
-  }
+.analysis-item:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
 
-  .home-options > ul {
-    list-style-type: none;
-    padding: 0;
-    margin-top: 0;
-  }
+.template-item {
+  border-radius: 8px;
+  background: white;
+}
 
-  @media (min-width: 1200px) {
-    .description, .prompt {
-      font-size: 32px;
-    }
+.template-item:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
 
-    .home-options {
-      padding-left: 50px;
-      padding-top: 20px;
-    }
+@media (max-width: 903px) {
+  .template-item {
+    flex-direction: column;
   }
+}
 </style>
