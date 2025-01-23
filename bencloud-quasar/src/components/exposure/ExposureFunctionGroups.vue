@@ -30,7 +30,7 @@ export default defineComponent({
     const store = useStore();
     const rows = ref([]);
     const selectedItems = ref(store.state.exposure.exposureFunctionGroupId);
-    var defaultValue = 4; //Hard-coded to default exposure function group All available options (2020)
+    var defaultValue = 2; //Hard-coded to default exposure function group All available options (2020)
 
     watch(
       () => selectedItems.value,

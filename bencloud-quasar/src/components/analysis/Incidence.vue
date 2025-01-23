@@ -49,15 +49,30 @@ export default defineComponent({
       (async () => {
         console.log("loadPopulationOptions");
         const response = await loadIncidence().fetch();
-        rows.value = response.data.value;
+        const epaDefaults = {
+          name: "Best EPA Match",
+          id: -1
+        };
+
+        rows.value.push(epaDefaults);
+
+        response.data.value.forEach(function(row) {
+          if(row.share_scope == 0) {
+            rows.value.push(row);
+          }
+        })
+
         console.log("before: " + store.state.analysis.incidenceId);
       })();
     });
 
     onMounted(() => {
       console.log("... " + store.state.analysis.incidenceId);
-      if (store.state.analysis.incidenceId != null) {
+      if (store.state.analysis.incidenceId != null && store.state.analysis.incidenceId >= 5) {
         selectedItem.value = store.state.analysis.incidenceId;
+        console.log("- selectedItem: " + selectedItem.value);
+      } else {
+        selectedItem.value = -1;
         console.log("- selectedItem: " + selectedItem.value);
       }
     })();
