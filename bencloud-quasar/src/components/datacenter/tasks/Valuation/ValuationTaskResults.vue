@@ -215,7 +215,7 @@ const columns = [
   },
   {
     name: "point_estimate",
-    label: "Valuation Point Estimate",
+    label: "Valuation Point Estimate (2020$)",
     field: (row) =>
       row.point_estimate.toLocaleString("en-US", { maximumFractionDigits: 2 }),
     sort: (a, b, rowA, rowB) => parseFloat(rowA.point_estimate) - parseFloat(rowB.point_estimate),
@@ -261,13 +261,13 @@ const columns = [
   },
   {
     name: "formatted_results_2sf",
-    label: "Formatted Results (2 sig. figs.)",
+    label: "Formatted Results (2020$, 2 sig. figs.)",
     field: "formatted_results_2sf",
     sortable: false
   },
   {
     name: "formatted_results_3sf",
-    label: "Formatted Results (3 sig. figs.)",
+    label: "Formatted Results (2020$, 3 sig. figs.)",
     field: "formatted_results_3sf",
     sortable: false
   },
