@@ -135,7 +135,10 @@ export default defineComponent({
     const postPolicyAirQualityName = store.state.analysis.postPolicyAirQualityName;
 
     const incidenceId = store.state.analysis.incidenceId;
-    const incidenceName = store.state.analysis.incidenceName;
+    var incidenceName = store.state.analysis.incidenceName;
+    if(incidenceId == -1) {
+      incidenceName = "Best EPA Match";
+    }
     const populationDatasetId = store.state.analysis.populationDatasetId;
     const populationDatasetName = store.state.analysis.populationDatasetName;
     const valuationsForHealthImpactFunctionGroups =
