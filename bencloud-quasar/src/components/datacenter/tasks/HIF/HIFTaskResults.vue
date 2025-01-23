@@ -86,6 +86,17 @@ export default defineComponent({
         const response = await getHIFTaskResults(props.task_uuid).fetch();
         rows.value = JSON.parse(JSON.stringify(unref(response.data)));
         loading.value = false;
+
+        rows.value.some(function(row) {
+          if( row.incidence_prevalence === "County, race-stratified" || 
+              row.incidence_prevalence === "County, ethnicity-stratified" || 
+              row.incidence_prevalence === "County, ethnicity-adjusted race-stratified"
+            ) {
+              visibleColumns.value.push("race");
+              visibleColumns.value.push("ethnicity");
+              return;
+            }
+        })
       })();
     }
 
