@@ -86,6 +86,17 @@ export default defineComponent({
         const response = await getHIFTaskResults(props.task_uuid).fetch();
         rows.value = JSON.parse(JSON.stringify(unref(response.data)));
         loading.value = false;
+
+        rows.value.some(function(row) {
+          if( row.incidence_prevalence === "County, race-stratified" || 
+              row.incidence_prevalence === "County, ethnicity-stratified" || 
+              row.incidence_prevalence === "County, ethnicity-adjusted race-stratified"
+            ) {
+              visibleColumns.value.push("race");
+              visibleColumns.value.push("ethnicity");
+              return;
+            }
+        })
       })();
     }
 
@@ -120,6 +131,7 @@ export default defineComponent({
         "ages",
         "study",
         "qualifier",
+        //"incidence_prevalence",
         "delta_aq",
         "point_estimate",
         "population",
@@ -155,6 +167,7 @@ const visibleColumns = ref([
   //"metric",
   //"seasonal_metric",
   //"metric_statistic",
+  //"incidence_prevalence",
   "delta_aq",
   //"baseline_aq",
   //"scenario_aq",
@@ -249,6 +262,13 @@ const columns = [
     name: "metric_statistic",
     label: "Annual Statistic",
     field: "metric_statistic",
+    sortable: true,
+  },
+  {
+    name: "incidence_prevalence",
+    align: "left",
+    label: "Incidence or Prevalence",
+    field: "incidence_prevalence",
     sortable: true,
   },
   {

@@ -40,7 +40,7 @@
             :display-value="$q.lang.table.columns"
             emit-value
             map-options
-            :options="columns"
+            :options="selectableColumns"
             option-value="name"
             options-cover
             style="min-width: 150px"
@@ -164,14 +164,14 @@ export default defineComponent({
     },
     {
       name: "delta_aq",
-      label: props.pollutant_name == "PM2.5" ? "Change in AQ (μm/m3)" : "Change in AQ (ppb)",
+      label: props.pollutant_name == "PM2.5" ? "Pollutant Reduction (μm/m3)" : "Pollutant Reduction (ppb)",
       field: (row) => row.delta_aq.toLocaleString("en-US", { maximumFractionDigits: 2 }),
       sort: (a, b, rowA, rowB) => parseFloat(rowA.delta_aq) - parseFloat(rowB.delta_aq),
       sortable: true,
     },
     {
       name: "delta_aq_percent",
-      label: "Change in AQ (%)",
+      label: "Pollutant Reduction (%)",
       field: (row) => row.delta_aq_percent.toLocaleString("en-US", { maximumFractionDigits: 2 }),
       sort: (a, b, rowA, rowB) => parseFloat(rowA.delta_aq_percent) - parseFloat(rowB.delta_aq_percent),
       sortable: true,
@@ -190,18 +190,6 @@ export default defineComponent({
         row.percent_of_population.toLocaleString("en-US", { maximumFractionDigits: 2 }),
       sort: (a, b, rowA, rowB) => parseFloat(rowA.percent_of_population) - parseFloat(rowB.percent_of_population),
       sortable: true,
-    },
-    {
-      name: "formatted_results_2sf",
-      label: "Formatted Results (2 sig. figs.)",
-      field: "formatted_results_2sf",
-      sortable: false
-    },
-    {
-      name: "formatted_results_3sf",
-      label: "Formatted Results (3 sig. figs.)",
-      field: "formatted_results_3sf",
-      sortable: false
     },
   ]);
 
@@ -261,6 +249,7 @@ export default defineComponent({
       filter,
       loading,
       pagination,
+      selectableColumns,
       visibleColumns,
       loadExposureResults,
       showDownloadDialog,
@@ -294,8 +283,107 @@ const visibleColumns = ref([
   "delta_aq_percent",
   "population",
   // "percent_of_population",
-  // "result"
 ]);
+
+
+
+const selectableColumns = [
+  {
+    name: "task_uuid",
+    label: "Task UUID",
+    align: "left",
+    field: (row) => row.task_uuid,
+    format: (val) => `${val}`,
+    sortable: true,
+  },
+  {
+    name: "population_group",
+    label: "Population Group",
+    align: "left",
+    field: (row) => row.population_group,
+    format: (val) => `${val}`,
+    align: "left",
+    sortable: true,
+    style: "max-width: 200px; white-space: normal;"
+  },
+  {
+    name: "ages",
+    label: "Ages",
+    align: "left",
+    field: (row) => row.start_age + "-" + row.end_age,
+    format: (val) => `${val}`,
+    align: "right",
+    sortable: true,
+  },
+  {
+    name: "race",
+    label: "Race",
+    field: "race",
+    sortable: true,
+  },
+  {
+    name: "ethnicity",
+    label: "Ethnicity",
+    field: "ethnicity",
+    sortable: true,
+  },
+  {
+    name: "gender",
+    label: "Gender",
+    field: "gender",
+    sortable: true,
+  },
+  {
+    name: "function_type",
+    label: "Function Type",
+    field: (row) => row.function_type === null ? '' : row.function_type,
+    format: (val) => `${val}`,
+    sortable: true,
+  },
+  {
+    name: "baseline_aq",
+    label: "Pre-policy Conc (μm/m3)",
+    field: (row) => row.baseline_aq.toLocaleString("en-US", { maximumFractionDigits: 2 }),
+    sort: (a, b, rowA, rowB) => parseFloat(rowA.baseline_aq) - parseFloat(rowB.baseline_aq),
+    sortable: true,
+  },
+  {
+    name: "scenario_aq",
+    label: "Post-policy Conc (μm/m3)",
+    field: (row) => row.scenario_aq.toLocaleString("en-US", { maximumFractionDigits: 2 }),
+    sort: (a, b, rowA, rowB) => parseFloat(rowA.scenario_aq) - parseFloat(rowB.scenario_aq),
+    sortable: true,
+  },
+  {
+    name: "delta_aq",
+    label: "Pollutant Reduction (μm/m3)",
+    field: (row) => row.delta_aq.toLocaleString("en-US", { maximumFractionDigits: 2 }),
+    sort: (a, b, rowA, rowB) => parseFloat(rowA.delta_aq) - parseFloat(rowB.delta_aq),
+    sortable: true,
+  },
+  {
+    name: "delta_aq_percent",
+    label: "Pollutant Reduction (%)",
+    field: (row) => row.delta_aq_percent.toLocaleString("en-US", { maximumFractionDigits: 2 }),
+    sort: (a, b, rowA, rowB) => parseFloat(rowA.delta_aq_percent) - parseFloat(rowB.delta_aq_percent),
+    sortable: true,
+  },
+  {
+    name: "population",
+    label: "Population Exposed",
+    field: (row) => row.subgroup_population.toLocaleString("en-US", { maximumFractionDigits: 2 }),
+    sort: (a, b, rowA, rowB) => parseFloat(rowA.subgroup_population) - parseFloat(rowB.subgroup_population),
+    sortable: true,
+  },
+  {
+    name: "percent_of_population",
+    label: "Percent of Group Population",
+    field: (row) =>
+      row.percent_of_population.toLocaleString("en-US", { maximumFractionDigits: 2 }),
+    sort: (a, b, rowA, rowB) => parseFloat(rowA.percent_of_population) - parseFloat(rowB.percent_of_population),
+    sortable: true,
+  },
+];
 </script>
 
 <style lang="scss">

@@ -3,7 +3,7 @@ export default function () {
     pollutantFriendlyName: "",
     pollutantName: "",
     pollutantId: null,
-    incidenceId: null,
+    incidenceId: -1,
     incidenceName: "",
     populationDatasetId: null,
     populationDatasetName: "",
