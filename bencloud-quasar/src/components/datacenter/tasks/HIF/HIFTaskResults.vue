@@ -88,11 +88,16 @@ export default defineComponent({
         loading.value = false;
 
         rows.value.some(function(row) {
-          if( row.incidence_prevalence === "County, race-stratified" || 
-              row.incidence_prevalence === "County, ethnicity-stratified" || 
-              row.incidence_prevalence === "County, ethnicity-adjusted race-stratified"
+          if( row.race !== "ALL"
             ) {
               visibleColumns.value.push("race");
+              return;
+            }
+        })
+
+        rows.value.some(function(row) {
+          if( row.ethnicity !== "ALL"
+            ) {
               visibleColumns.value.push("ethnicity");
               return;
             }
