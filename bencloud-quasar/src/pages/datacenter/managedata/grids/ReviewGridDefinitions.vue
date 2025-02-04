@@ -103,13 +103,13 @@
   position: relative;
 }
 
-@media (max-width: 1600px) {
+@media (max-width: 940px) {
   .split-layout{
     flex-direction: column;
   }
   .left-pane, .right-pane {
-    width: 100%; /* Full width when stacked */
-    border-right: none; /* Remove the border since it's vertical */
+    width: 100%; 
+    border-right: none; 
   }
 
 }
