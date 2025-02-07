@@ -64,8 +64,8 @@
             </div>
           </div>
 
-<!-- Health -->
-<div class="category">
+          <!-- Health -->
+          <div class="category">
             <h3 class="category-header">Health</h3>
             <div class="category-cards">
               <q-card v-for="(card, index) in healthCards" 
@@ -73,6 +73,7 @@
                      flat 
                      class="data-card">
                 <q-card-actions vertical class="q-px-none">
+                  <div class="full-width relative-position">
                   <q-btn
                     color="primary"
                     class="full-width"
@@ -82,6 +83,10 @@
                     @click="card.route && $router.replace(card.route)"
                     :label="card.label"
                   />
+                  <q-tooltip v-if="!card.route" anchor="top middle" self="bottom middle">
+                    In Development
+                  </q-tooltip>
+                  </div>
                 </q-card-actions>
                 <q-card-section class="q-px-none">
                   <p class="description" :class="{ 'clamp-text': !card.showFull }">
@@ -109,6 +114,7 @@
                      flat 
                      class="data-card">
                 <q-card-actions vertical class="q-px-none">
+                  <div class="full-width relative-position">
                   <q-btn
                     color="primary"
                     class="full-width"
@@ -118,6 +124,10 @@
                     @click="card.route && $router.replace(card.route)"
                     :label="card.label"
                   />
+                  <q-tooltip v-if="!card.route" anchor="top middle" self="bottom middle">
+                    In Development
+                  </q-tooltip>
+                  </div>
                 </q-card-actions>
                 <q-card-section class="q-px-none">
                   <p class="description" :class="{ 'clamp-text': !card.showFull }">
@@ -146,6 +156,7 @@
                      flat 
                      class="data-card">
                 <q-card-actions vertical class="q-px-none">
+                  <div class="full-width relative-position">
                   <q-btn
                     color="primary"
                     class="full-width"
@@ -155,6 +166,10 @@
                     @click="card.route && $router.replace(card.route)"
                     :label="card.label"
                   />
+                  <q-tooltip v-if="!card.route" anchor="top middle" self="bottom middle">
+                    In Development
+                  </q-tooltip>
+                  </div>
                 </q-card-actions>
                 <q-card-section class="q-px-none">
                   <p class="description" :class="{ 'clamp-text': !card.showFull }">
