@@ -52,7 +52,7 @@
             key="task_completed_date"
             :props="props"
           >
-          {{ props.row.batch_completed_date }}
+          {{ convertToUserTimezone(props.row.batch_completed_date) }}
           </q-td>
           <q-td
             key="task_elapsed_time"
@@ -149,7 +149,7 @@
             key="task_completed_date"
             :props="props"
           >
-            {{ row.task_completed_date }}
+            {{ convertToUserTimezone(row.task_completed_date) }}
           </q-td>
           <q-td
             key="task_elapsed_time"
@@ -423,6 +423,14 @@ export default defineComponent({
         });
     }
 
+    function convertToUserTimezone(dateString) {
+      const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const formattedDate = date.formatDate(dateString, 'YYYY-MM-DD HH:mm:ss', {
+        timeZone: userTimezone
+      });
+      return `${formattedDate} (${userTimezone})`;
+    }
+
     onBeforeMount(() => {
       (async () => {
         try {
@@ -469,7 +477,8 @@ export default defineComponent({
       showOptions,
       onValueChange,
       loadCompletedTasks,
-      completedTasksRefreshInterval
+      completedTasksRefreshInterval,
+      convertToUserTimezone
     };
   },
 
