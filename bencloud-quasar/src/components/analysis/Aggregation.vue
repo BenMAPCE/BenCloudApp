@@ -81,7 +81,7 @@ export default defineComponent({
       (async () => {
         //Hard-coded default value for 2020 testing. Show different grid definitions when different pop dataset is selected. 
         const gridOptionsFlt = gridOptions.filter(element=>{
-          if (store.state.analysis.populationDatasetId == 50 || store.state.analysis.populationDatasetId == 51 || store.state.analysis.populationDatasetId == 52){
+          if (store.state.analysis.populationDatasetId == 50 || store.state.analysis.populationDatasetId == 51 || store.state.analysis.populationDatasetId == 52 || store.state.analysis.populationDatasetId == 53){
             defaultValue = "County (2020)";
             return element.id===70 || element.id===69 || element.id===68 || element.id===28;
           }
