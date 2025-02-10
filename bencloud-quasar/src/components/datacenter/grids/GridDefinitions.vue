@@ -339,6 +339,7 @@ export default defineComponent({
             for(let i = 0; i < rowsPerPage; i++) {
               if(!!data[(loadPage-1)*rowsPerPage + i]) {
                 rows.value[i] = data[(loadPage-1)*rowsPerPage + i];
+                rows.value[i].visible = false; // Set default state to false
               }
             }
 
@@ -391,8 +392,6 @@ const rows = [];
 const visibleColumns = ref([
   "id",
   "name",
-  "col_count",
-  "row_count",
   "toggle",
   "edit",
   "actions"
@@ -415,24 +414,7 @@ const columns = [
     field: (row) => row.name,
     format: (val) => `${val}`,
     sortable: true,
-  },
-  {
-    name: "col_count",
-    required: true,
-    label: "Columns",
-    align: "left",
-    field: (row) => row.col_count,
-    format: (val) => `${val}`,
-    sortable: true,
-  },
-  {
-    name: "row_count",
-    required: true,
-    label: "Rows",
-    align: "left",
-    field: (row) => row.row_count,
-    format: (val) => `${val}`,
-    sortable: true,
+    style: 'white-space: normal; word-break: break-word;' // Ensure wrapping for long names
   },
   
   { 
@@ -449,10 +431,11 @@ const columns = [
   },
   {
     name: "toggle",
-    label: "Layer Visibility",
+    label: "View Layer",
     align: "center",
     field: "",
     sortable: false,
   }
 ];
 </script>
+
