@@ -88,18 +88,16 @@ export default defineComponent({
         loading.value = false;
 
         rows.value.some(function(row) {
-          if( row.race !== "ALL"
-            ) {
+          if( row.race !== "ALL") {
               visibleColumns.value.push("race");
-              return;
+              return true;
             }
         })
 
         rows.value.some(function(row) {
-          if( row.ethnicity !== "ALL"
-            ) {
+          if( row.ethnicity !== "ALL") {
               visibleColumns.value.push("ethnicity");
-              return;
+              return true;
             }
         })
       })();
