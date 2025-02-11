@@ -364,13 +364,10 @@ export default {
       var self = this;
 
       self.$q.loading.show({
-        message: "Downloading results. Please wait...",
+        message: "Submitting export request. Please wait...",
         boxClass: "bg-grey-2 text-grey-9",
         spinnerColor: "primary",
       });
-
-      
-      // console.log(this.batch_task_id + "|" + include_hif + "|" + include_vf + "|" + include_exp);
 
       var gridList = "";
       for (var i = 0; i < this.grid.length; i++){
@@ -378,6 +375,44 @@ export default {
       }
       gridList = gridList.substring(0, gridList.length - 1)
 
+      var downloadUrl = process.env.API_SERVER + "/api/batch-tasks/" + this.batch_task_id + "/export";
+
+      var payload = {
+        gridId: gridList,
+        includeHealthImpact: include_hif,
+        includeValuation: include_vf,
+        includeExposure: include_exp,
+        exportType: this.include,
+        taskUuid: this.task_uuid,
+        uuidType: this.task_type,
+      };
+
+      axios
+        .post(downloadUrl, payload)
+        .then((response) => {
+          self.$q.notify({
+            type: "positive",
+            message: "Export request submitted successfully. You can monitor the progress in the task manager.",
+            actions: [
+              {
+                label: "Go to Task Manager",
+                handler: () => {
+                  this.$router.push('/datacenter/manage-tasks')
+                },
+              },
+            ],
+          });
+        })
+        .catch((error) => {
+          self.errorMessage = "An error occurred while submitting the export request.";
+        })
+        .finally(() => {
+          self.$q.loading.hide();
+          self.hide();
+        });
+
+      // Commented out the old GET request code
+      /*
       var downloadUrl = "";
       if (this.include=="all"){
         downloadUrl = process.env.API_SERVER +
@@ -423,8 +458,6 @@ export default {
         }
       }
 
-      
-
       axios
         .get(downloadUrl, {
           headers: { Accept: "application/zip", "Content-Type": "application/zip" },
@@ -464,6 +497,7 @@ export default {
           self.$q.loading.hide();
           self.hide();
         });
+      */
     },
 
     onCancelClick() {

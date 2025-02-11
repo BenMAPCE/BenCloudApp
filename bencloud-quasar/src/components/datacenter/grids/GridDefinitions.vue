@@ -1,3 +1,4 @@
+
 <template>
   <q-table
     :rows="rows"
@@ -204,9 +205,12 @@ export default defineComponent({
   mapIdToLayerName(id) {
     const gridmap = {
       28: "grid12km",
-      18: "county",
+      18: "county2010",
       19: "state",
       20: "nation",
+      70: "nation",
+      69: "state",
+      68: "county2020"
     };
     return gridmap[id] || null;
   },
@@ -390,7 +394,6 @@ export default defineComponent({
 const rows = [];
 
 const visibleColumns = ref([
-  "id",
   "name",
   "toggle",
   "edit",
@@ -398,14 +401,7 @@ const visibleColumns = ref([
 ]);
 
 const columns = [
-  {
-    name: "id",
-    label: "ID",
-    align: "left",
-    field: (row) => row.id,
-    format: (val) => `${val}`,
-    sortable: true,
-  },
+  
   {
     name: "name",
     required: true,
@@ -438,4 +434,3 @@ const columns = [
   }
 ];
 </script>
-
