@@ -26,7 +26,8 @@ export default {
       map: null,
       layers: {
         state: null,
-        county: null,
+        county2010: null,
+        county2020: null,
         nation: null,
         grid12km: null,
       },
@@ -141,14 +142,23 @@ export default {
       this.layers.state.setVisible(false);
 
 
-      this.layers.county = new VectorLayer({
+      this.layers.county2010 = new VectorLayer({
         source: new VectorSource({
           url: "http://colo-wtest-1:8080/geoserver/benmap/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=benmap:us_county&maxFeatures=1000000&outputFormat=application/json&srsName=EPSG:4326",
           format: new GeoJSON({ featureProjection: "EPSG:3857" }),
         }),
         style: countyStyle,
       });
-      this.layers.county.setVisible(false);
+      this.layers.county2010.setVisible(false);
+
+      this.layers.county2020 = new VectorLayer({
+        source: new VectorSource({
+          url: "http://colo-wtest-1:8080/geoserver/benmap/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=benmap%3Aus_county_2020&maxFeatures=1000000&outputFormat=application/json&srsName=EPSG:4326",
+          format: new GeoJSON({ featureProjection: "EPSG:3857" }),
+        }),
+        style: countyStyle,
+      });
+      this.layers.county2020.setVisible(false);
 
 
       this.layers.nation = new VectorLayer({
@@ -184,7 +194,8 @@ export default {
         layers: [
           baseLayer,
           this.layers.state,
-          this.layers.county,
+          this.layers.county2010,
+          this.layers.county2020,
           this.layers.nation,
           this.layers.grid12km,
         ],
