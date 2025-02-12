@@ -388,7 +388,7 @@ export default {
       };
 
       axios
-        .post(downloadUrl, payload)
+        .post(downloadUrl, payload, {headers: { "Content-Type": "application/x-www-form-urlencoded" }})
         .then((response) => {
           self.$q.notify({
             type: "positive",
