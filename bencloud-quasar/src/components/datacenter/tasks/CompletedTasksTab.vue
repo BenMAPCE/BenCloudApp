@@ -88,13 +88,24 @@
           >
             <q-btn-dropdown color="primary" label="" dense>
               <q-list>
-                <q-item v-if="props.row.batch_task_user_id == userId && props.row.batch_task_name.startsWith('Result export:')" dense clickable v-close-popup @click="onClickDownloadExport(props)">
+                <q-item
+                  v-if="props.row.batch_task_name.startsWith('Result export:')"
+                  dense
+                  clickable
+                  v-close-popup
+                  @click="downloadExportedResults(props)"
+                >
                   <q-item-section>
                     <q-item-label>Download Exported Results</q-item-label>
                   </q-item-section>
                 </q-item>
-
-                <q-item v-else-if="props.row.batch_task_user_id == userId" dense clickable v-close-popup @click="onClickViewExport(props)">
+                <q-item
+                  v-else-if="props.row.batch_task_user_id == userId"
+                  dense
+                  clickable
+                  v-close-popup
+                  @click="onClickViewExport(props)"
+                >
                   <q-item-section>
                     <q-item-label>View/Export Results</q-item-label>
                   </q-item-section>
@@ -114,13 +125,24 @@
 
                 <q-separator light style="color: red"></q-separator>
 
-                <q-item v-if="props.row.batch_task_name.startsWith('Result export:')" dense clickable v-close-popup @click="onClickPromptDeleteExport(props)">
+                <q-item
+                  v-if="props.row.batch_task_name.startsWith('Result export:')"
+                  dense
+                  clickable
+                  v-close-popup
+                  @click="onClickPromptDelete(props)"
+                >
                   <q-item-section>
                     <q-item-label dense>Delete this Export</q-item-label>
                   </q-item-section>
                 </q-item>
-
-                <q-item v-else dense clickable v-close-popup @click="onClickPromptDelete(props)">
+                <q-item
+                  v-else
+                  dense
+                  clickable
+                  v-close-popup
+                  @click="onClickPromptDelete(props)"
+                >
                   <q-item-section>
                     <q-item-label dense>Delete</q-item-label>
                   </q-item-section>
@@ -247,8 +269,10 @@ setup(props, context) {
   const fab2 = ref(true);
 
   const stringOptions = [
-    "Download Exported Results",
-    "Delete this Export",
+    "View/Export Results",
+    "View Configuration Details",
+    "Use as a template for new analysis",
+    "Delete",
   ];
 
   const task_uuid = ref(0)
@@ -441,58 +465,26 @@ setup(props, context) {
     return `${formattedDate} (${userTimezone})`;
   }
 
-  function onClickDownloadExport(props) {
-    const batchTaskId = props.row.batch_task_id;
-    if (!batchTaskId) {
+  async function downloadExportedResults(props) {
+    const fileId = props.row.batch_task_id;
+    try {
+      const response = await axios.get(`${process.env.API_SERVER}/api/files/${fileId}`, {
+        responseType: 'blob'
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `exported_results_${fileId}.zip`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      console.error('Error downloading exported results:', error);
       $q.notify({
-        type: "negative",
-        message: "Invalid file ID.",
+        type: 'negative',
+        message: 'Failed to download exported results'
       });
-      return;
     }
-    axios
-      .get(process.env.API_SERVER + "/api/files/" + batchTaskId, {
-        responseType: 'blob',
-      })
-      .then((response) => {
-        const url = window.URL.createObjectURL(new Blob([response.data]));
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', 'exported_results.zip');
-        document.body.appendChild(link);
-        link.click();
-      })
-      .catch((error) => {
-        $q.notify({
-          type: "negative",
-          message: "An error occurred while downloading the export.",
-        });
-      });
-  }
-
-  function onClickPromptDeleteExport(props) {
-    if(confirm("Are you sure you wish to permanently delete " + props.row.batch_task_name + "?")){
-      deleteExport(props);
-    }
-  }
-
-  function deleteExport(props) {
-    axios
-    .delete(process.env.API_SERVER + "/api/batch-tasks/" + props.row.batch_task_id, 
-      {validateStatus: function (status) {
-        return status < 500;
-      }}
-    )
-    .then((response) => {
-      if(response.status === 204) {
-        loadCompletedTasks();
-      } else {
-        $q.notify({
-          type: 'negative',
-          message: "An error occurred while deleting the export.",
-        });
-      }
-    });
   }
 
   onBeforeMount(() => {
@@ -543,8 +535,7 @@ setup(props, context) {
     loadCompletedTasks,
     completedTasksRefreshInterval,
     convertToUserTimezone,
-    onClickDownloadExport,
-    onClickPromptDeleteExport
+    downloadExportedResults
   };
 },
 
