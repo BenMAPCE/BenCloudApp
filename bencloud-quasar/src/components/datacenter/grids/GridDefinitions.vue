@@ -112,21 +112,18 @@ export default defineComponent({
         // Make the API call to update the grid name after confirmation
         const response = await axios.put(
           `${process.env.API_SERVER}/api/grid-definitions/${props.row.id}`,
-          templateData,
-          {validateStatus: function (status) {
-            return true;
-          }}
+          templateData
         );
 
-        if (response && response.status === 200) {
+        if (response.status === 200) {
           this.$q.notify({ type: "positive", message: "Grid name updated successfully!" });
           props.row.name = newName;
         } else {
-          throw new Error(response?.data?.message || "Update failed, please try again.");
+          throw new Error("Update failed, please try again.");
         }
       } catch (apiError) {
         console.error("API Error:", apiError.message);
-        this.$q.notify({ type: "negative", message: apiError.message });
+        this.$q.notify({ type: "negative", message: apiError?.response?.data?.message || apiError.message });
       }
     });
 

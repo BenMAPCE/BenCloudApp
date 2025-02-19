@@ -118,6 +118,7 @@ export default defineComponent({
             // For non-302 errors with no message, display a generic error pop up 
           }
         }     
+        return Promise.reject(error);
       }
     )
 
