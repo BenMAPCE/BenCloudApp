@@ -45,12 +45,17 @@ export default defineComponent({
         console.log("watch: " + currentSelectedItem + " | " + prevSelectedItem)
         if (currentSelectedItem != prevSelectedItem) {
           console.log("currentSelectedItem: " + currentSelectedItem)
-          var name = rows.value.find((opt) => opt.value === currentSelectedItem).label;
+          var selectedRow = rows.value.find((opt) => opt.value === currentSelectedItem);
+          var name = selectedRow.label;
+          var gridId = selectedRow.gridId;
+          var gridName = selectedRow.gridName;
 
           store.commit("analysis/updatePrePolicyAirQuality",
           {
             prePolicyAirQualityId: currentSelectedItem,
-            prePolicyAirQualityName: name
+            prePolicyAirQualityName: name,
+            prePolicyGridDefinitionId: gridId,
+            prePolicyGridDefinitionName: gridName
           });
         }
       });

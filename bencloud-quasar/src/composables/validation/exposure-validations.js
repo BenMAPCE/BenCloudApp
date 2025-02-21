@@ -19,12 +19,28 @@ export const postPolicyAirQualityIdHasValue = (store) => {
 
     var isValid = true;
 
-    if (store.state.exposure.postPolicyAirQualityId.length) {
-        if (store.state.exposure.postPolicyAirQualityId === 0) {
+    if (store.state.exposure.postPolicyAirQualityId) {
+        if (store.state.exposure.postPolicyAirQualityId.length === 0) {
             isValid = false;
         }
     } else {
         isValid = false;
+    }
+
+    return isValid
+}
+
+export const airQualityGridDefinitionIdsMatch = (store) => {
+
+    var isValid = true;
+
+    if (store.state.exposure.prePolicyGridDefinitionId && 
+        store.state.exposure.postPolicyGridDefinitionId &&
+        store.state.exposure.prePolicyGridDefinitionId !== 0 &&
+        store.state.exposure.postPolicyGridDefinitionId.length > 0) {
+
+        isValid = store.state.exposure.postPolicyGridDefinitionId.every(
+            (id) => id === store.state.exposure.prePolicyGridDefinitionId);
     }
 
     return isValid

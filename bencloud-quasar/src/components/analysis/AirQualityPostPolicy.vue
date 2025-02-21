@@ -33,6 +33,8 @@ async setup(props, context) {
         if (currentSelectedItems != prevSelectedItems) {
           var names = [];
           var ids = [];
+          var gridIds = [];
+          var gridNames = [];
           rows.value.forEach(element => {
             if(currentSelectedItems.includes(element.value)) {
               var scenario = null;
@@ -49,12 +51,16 @@ async setup(props, context) {
                 names.push(scenario);
                 ids.push(element.value);
               }
+              gridIds.push(element.gridId);
+              gridNames.push(element.gridName);
             }
           })
           store.commit("analysis/updatePostPolicyAirQuality",
           {
             postPolicyAirQualityId: ids,
-            postPolicyAirQualityName: names
+            postPolicyAirQualityName: names,
+            postPolicyGridDefinitionId: gridIds,
+            postPolicyGridDefinitionName: gridNames
           });
         }
       });
