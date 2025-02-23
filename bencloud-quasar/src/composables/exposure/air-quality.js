@@ -47,6 +47,8 @@ export const convertAirQualityLayers = (data) => {
           option = {};
           option.value = records[i].id;
           option.label = records[i].name;
+          option.gridId = records[i].grid_definition_id
+          option.gridName = records[i].grid_definition_name
           console.log(option)
           options.push(option);
       }

@@ -32,6 +32,8 @@ async setup(props, context) {
         console.log("watch: " + currentSelectedItems + " |" + prevSelectedItems)
         if (currentSelectedItems != prevSelectedItems) {
           var names = [];
+          var gridIds = [];
+          var gridNames = [];
           rows.value.forEach(element => {
             if(currentSelectedItems.includes(element.value)) {
               var scenario = null;
@@ -46,12 +48,16 @@ async setup(props, context) {
                 var scenario = { name: element.label, years:[], popYears: []};
                 names.push(scenario);
               }
+              gridIds.push(element.gridId);
+              gridNames.push(element.gridName);
             }
           })
           store.commit("exposure/updatePostPolicyAirQuality",
           {
             postPolicyAirQualityId: currentSelectedItems,
-            postPolicyAirQualityName: names
+            postPolicyAirQualityName: names,
+            postPolicyGridDefinitionId: gridIds,
+            postPolicyGridDefinitionName: gridNames
           });
         }
       });
