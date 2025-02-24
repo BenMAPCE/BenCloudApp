@@ -45,6 +45,22 @@ export const prePolicyAirQualityIdHasValue = (store) => {
     return isValid
 }
 
+export const airQualityGridDefinitionIdsMatch = (store) => {
+
+    var isValid = true;
+
+    if (store.state.analysis.prePolicyGridDefinitionId && 
+        store.state.analysis.postPolicyGridDefinitionId &&
+        store.state.analysis.prePolicyGridDefinitionId !== 0 &&
+        store.state.analysis.postPolicyGridDefinitionId.length > 0) {
+
+        isValid = store.state.analysis.postPolicyGridDefinitionId.every(
+            (id) => id === store.state.analysis.prePolicyGridDefinitionId);
+    }
+
+    return isValid
+}
+
 export const populationDatasetIdHasValue = (store) => {
 
     var isValid = true;

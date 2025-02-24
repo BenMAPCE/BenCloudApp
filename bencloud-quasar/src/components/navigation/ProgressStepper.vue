@@ -84,6 +84,7 @@ import ReviewAndSubmit from "src/pages/analysis/ReviewAndSubmit.vue";
 import { pollutantIdHasValue } from "../../composables/validation/analysis-validations";
 import { prePolicyAirQualityIdHasValue } from "../../composables/validation/analysis-validations";
 import { postPolicyAirQualityIdHasValue } from "../../composables/validation/analysis-validations";
+import { airQualityGridDefinitionIdsMatch } from "../../composables/validation/analysis-validations";
 import { populationDatasetIdHasValue } from "../../composables/validation/analysis-validations";
 import { populationYearsHaveValue } from "../../composables/validation/analysis-validations";
 import { incidenceIdHasValue } from "../../composables/validation/analysis-validations";
@@ -105,6 +106,7 @@ export default {
 
     const stepHasError = reactive(ref(false));
     const atStep = reactive(ref(null));
+    const validationEvent = ref(0);
     const step = ref(1);
 
     provide(
@@ -114,6 +116,10 @@ export default {
     provide(
       "atStep",
       computed(() => atStep)
+    );
+    provide(
+      "validationEvent",
+      validationEvent
     );
 
     onMounted(() => {
@@ -150,7 +156,8 @@ export default {
       if (step == 3) {
         if (
           prePolicyAirQualityIdHasValue(store) &&
-          postPolicyAirQualityIdHasValue(store)
+          postPolicyAirQualityIdHasValue(store) &&
+          airQualityGridDefinitionIdsMatch(store)
         ) {
           stepHasError.value = false;
           thisStepper.next();
@@ -202,7 +209,8 @@ export default {
         stepHasError.value = false;
         thisStepper.next();  
       }
-}
+      validationEvent.value++;
+    }
     return {
       step,
       stepHasError,
