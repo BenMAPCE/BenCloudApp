@@ -466,15 +466,17 @@ setup(props, context) {
   }
 
   async function downloadExportedResults(props) {
-    const fileId = props.row.batch_task_id;
+    const batchTaskId = props.row.batch_task_id;
     try {
-      const response = await axios.get(`${process.env.API_SERVER}/api/files/${fileId}`, {
+      const response = await axios.get(`${process.env.API_SERVER}/api/task-complete/${batchTaskId}`);
+      const fileId = response.data.filestoreId; // Directly fetch the file ID from the response
+      const fileResponse = await axios.get(`${process.env.API_SERVER}/api/files/${fileId}`, {
         responseType: 'blob'
       });
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const url = window.URL.createObjectURL(new Blob([fileResponse.data]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `exported_results_${fileId}.zip`);
+      link.setAttribute('download', `${props.row.batch_task_name.replace(/ /g, '_')}.zip`);
       document.body.appendChild(link);
       link.click();
       link.remove();
