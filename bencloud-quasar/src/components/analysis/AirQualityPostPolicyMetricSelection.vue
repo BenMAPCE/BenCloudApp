@@ -67,10 +67,13 @@ export default defineComponent({
             " | " +
             prevSelectedItem
         );
-        if(selectedScenario.value != null && !store.state.analysis.postPolicyAirQualityName.includes(selectedScenario.value)) {
+        if(selectedScenario.value != null && !store.state.analysis.postPolicyAirQualityName.some(element => element.name === selectedScenario.value)) {
           selectedScenario.value = null;
         }
         loadPostPolicyScenarios(true);
+        if (selectedScenario.value === null && scenarios.value.length >= 1) {
+          selectedScenario.value = scenarios.value[0];
+        }
       }
     );
 

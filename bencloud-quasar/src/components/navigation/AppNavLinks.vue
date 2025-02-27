@@ -3,6 +3,7 @@
     clickable
     tag="a"
     :href="link"
+    :target="openInNewTab ? '_blank' : '_self'"
     manual-focus
   >
     <q-item-section
@@ -46,6 +47,11 @@ export default defineComponent({
     icon: {
       type: String,
       default: ''
+    },
+
+    openInNewTab: {
+      type: Boolean,
+      default: false
     }
   }
 })
