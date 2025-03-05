@@ -1,4 +1,3 @@
-
 <template>
   <q-table
     :rows="rows"
@@ -183,12 +182,11 @@ export default defineComponent({
     },
 
   toggleLayerVisibility(row) {
-    const layerName = this.mapIdToLayerName(row.id);
+    const layerName = this.mapIdToLayerName(row.id, row.table_name);
     if (!layerName) {
       console.error(`Layer name not found for row ID: ${row.id}`);
       return;
     }
-
 
     if (row.visible) {
       this.$store.commit('grids/addVisibleLayer', layerName);
@@ -198,8 +196,9 @@ export default defineComponent({
     console.log(this.$store.state.grids.visibleLayers);
   },
   
-  // Map ID to layer name based on gridmap
-  mapIdToLayerName(id) {
+  // Map ID to layer name based on gridmap or use table_name if not found
+  // Can probably remove this and just use table_name directly once 2010 grids are deleted
+  mapIdToLayerName(id, tableName) {
     const gridmap = {
       28: "grid12km",
       18: "county2010",
@@ -209,7 +208,8 @@ export default defineComponent({
       69: "state",
       68: "county2020"
     };
-    return gridmap[id] || null;
+    return gridmap[id] || tableName.replace(/^grids\./, '');
+
   },
 },
 

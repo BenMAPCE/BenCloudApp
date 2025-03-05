@@ -19,6 +19,7 @@ import { Style, Stroke, Fill, Text } from "ol/style";
 import Control from "ol/control/Control";
 import { defaults as defaultControls } from "ol/control";
 import { ref } from "vue";
+import axios from "axios";
 
 export default {
   name: "LayerControlMapWithZoomFilter",
@@ -122,9 +123,10 @@ export default {
       }
     },
     
-    initializeMap() {
+    async initializeMap() {
       const stateStyle = (feature) => {
         const zoom = this.map ? this.map.getView().getZoom() : 4;
+        //labels disabled for now
         const stateName = feature.get("state_usps");
         const showText = zoom > 4;
 
@@ -174,7 +176,6 @@ export default {
         }),
       });
 
-      // Create layers with identifiers
       this.layers.state = new VectorLayer({
         source: new VectorSource({
           url: "http://colo-wtest-1:8080/geoserver/benmap/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=benmap%3Aus_state&maxFeatures=1000000&outputFormat=application/json&srsName=EPSG:4326",
@@ -292,6 +293,60 @@ export default {
           console.log('Map load end. All layers loaded.');
         }
       });
+
+      // Load layers from GeoServer
+      await this.loadGeoServerLayers();
+    },
+
+    async loadGeoServerLayers() {
+      try {
+        // const workspaceName = 'benmap_bw'; 
+        // const storeName = 'benmap'; 
+        // const response = await axios.get(`http://localhost:8080/geoserver/rest/workspaces/${workspaceName}/datastores/${storeName}/featuretypes`, 
+        
+        const workspaceName = 'benmap'; 
+        const storeName = 'benmap_grids'; 
+        const response = await axios.get(`http://colo-wtest-1:8080/geoserver/rest/workspaces/${workspaceName}/datastores/${storeName}/featuretypes`, {
+          auth: {
+            username: 'admin',
+            password: 'geoserver'
+          }
+        });
+
+        const featureTypesData = response.data.featureTypes.featureType;
+        console.log('Loaded feature types from GeoServer:', featureTypesData);
+
+        featureTypesData.forEach(featureTypeData => {
+          const featureTypeName = featureTypeData.name;
+          // const featureTypeUrl = `http://localhost:8080/geoserver/${workspaceName}/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=${featureTypeName}&outputFormat=application/json&srsName=EPSG:4326`;
+          const featureTypeUrl = `http://colo-wtest-1:8080/geoserver/${workspaceName}/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=${featureTypeName}&outputFormat=application/json&srsName=EPSG:4326`;
+
+          const vectorLayer = new VectorLayer({
+            source: new VectorSource({
+              url: featureTypeUrl,
+              format: new GeoJSON({ featureProjection: "EPSG:3857" }),
+            }),
+            style: new Style({
+              stroke: new Stroke({
+                color: "#000000",
+                width: 1,
+              }),
+              fill: new Fill({
+                color: "rgba(0, 0, 0, 0)",
+              }),
+            }),
+            properties: {
+              id: featureTypeName,
+            }
+          });
+
+          vectorLayer.setVisible(false);
+          this.map.addLayer(vectorLayer);
+          this.layers[featureTypeName] = vectorLayer;
+        });
+      } catch (error) {
+        console.error("Failed to load feature types from GeoServer:", error);
+      }
     },
   },
   mounted() {
