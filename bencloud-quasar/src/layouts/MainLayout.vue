@@ -46,12 +46,14 @@ const linksList = [
     caption: "",
     icon: "mdi-home",
     link: "/#/",
+    openInNewTab: false
   },
   {
     title: "Data Center",
     caption: "",
     icon: "mdi-chart-box-outline",
     link: "/#/datacenter",
+    openInNewTab: false
   },
   // {
   //   title: "Settings",
@@ -70,12 +72,14 @@ const linksList = [
     caption: "",
     icon: "mdi-help",
     link: "https://www.epa.gov/benmap/benmap-cloud",
+    openInNewTab: true
   },
   {
     title: "Feedback",
     caption: "",
     icon: "mdi-comment-text-outline",
     link: "https://www.epa.gov/benmap/forms/contact-us-about-benmap",
+    openInNewTab: true
   },
 ];
 

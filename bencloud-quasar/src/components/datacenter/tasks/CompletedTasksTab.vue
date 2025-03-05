@@ -89,7 +89,18 @@
             <q-btn-dropdown color="primary" label="" dense>
               <q-list>
                 <q-item
-                  v-if="props.row.batch_task_name.startsWith('Result export:')"
+                  v-if="props.row.batch_task_name.startsWith('Grid import:')"
+                  dense
+                  clickable
+                  v-close-popup
+                  @click="viewGridDefinitions()"
+                >
+                  <q-item-section>
+                    <q-item-label>View Grids</q-item-label>
+                  </q-item-section>
+                </q-item>
+                <q-item
+                  v-else-if="props.row.batch_task_name.startsWith('Result export:')"
                   dense
                   clickable
                   v-close-popup
@@ -469,7 +480,7 @@ setup(props, context) {
     const batchTaskId = props.row.batch_task_id;
     try {
       const response = await axios.get(`${process.env.API_SERVER}/api/task-complete/${batchTaskId}`);
-      const fileId = response.data.filestoreId; // Directly fetch the file ID from the response
+      const fileId = response.data.filestoreId; 
       const fileResponse = await axios.get(`${process.env.API_SERVER}/api/files/${fileId}`, {
         responseType: 'blob'
       });
@@ -487,6 +498,10 @@ setup(props, context) {
         message: 'Failed to download exported results'
       });
     }
+  }
+
+  function viewGridDefinitions() {
+    this.$router.push({ path: '/datacenter/review-grids' });
   }
 
   onBeforeMount(() => {
@@ -537,7 +552,8 @@ setup(props, context) {
     loadCompletedTasks,
     completedTasksRefreshInterval,
     convertToUserTimezone,
-    downloadExportedResults
+    downloadExportedResults,
+    viewGridDefinitions
   };
 },
 
