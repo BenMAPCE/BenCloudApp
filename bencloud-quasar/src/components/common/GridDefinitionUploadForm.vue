@@ -28,6 +28,14 @@
                     </q-btn>
                   </div>
                 </template>
+                <template v-slot:list="scope">
+                  <div class="q-uploader__list scroll">
+                    <div v-if="scope.files.length === 0" class="q-uploader__no-files">
+                      *Please upload your grid as a ZIP folder containing the following: .shp, .shx, .dbf, and .prj files.
+                    </div>
+                    <q-uploader-file v-for="file in scope.files" :key="file.name" :file="file" />
+                  </div>
+                </template>
               </q-uploader>
               </div>
             </div>
