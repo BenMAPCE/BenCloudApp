@@ -128,7 +128,7 @@ export default defineComponent({
         "study", 
         "metric",
         "qualifier",
-        "ages", 
+        "val_ages", 
         "point_estimate"
       ];
       loadValuationResults(props.task_uuid);
@@ -153,7 +153,7 @@ const visibleColumns = ref([
   "study",
   "metric",
   "qualifier",
-  "ages",
+  "val_ages",
   "point_estimate",
   //"standard_deviation",
   //"race",
@@ -206,9 +206,18 @@ const columns = [
   },
   {
     name: "ages",
-    label: "Ages",
+    label: "HIF Ages",
     align: "left",
     field: (row) => row.start_age + "-" + row.end_age,
+    format: (val) => `${val}`,
+    align: "right",
+    sortable: true,
+  },
+  {
+    name: "val_ages",
+    label: "Valuation Ages",
+    align: "left",
+    field: (row) => row.valuation_start_age + "-" + row.valuation_end_age,
     format: (val) => `${val}`,
     align: "right",
     sortable: true,
