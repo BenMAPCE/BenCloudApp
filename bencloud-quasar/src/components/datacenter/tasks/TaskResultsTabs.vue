@@ -9,7 +9,7 @@
     narrow-indicator
   >
     <div class="tabs q-pl-sm" v-if="task_type != 'E'">
-      <q-tab name="results" class="hif-results" label="HIF Results" @click="changeTabs('results')" />
+      <q-tab name="results" class="hif-results" label="Health Results" @click="changeTabs('results')" />
       <q-tab name="valuation-results" class="valuation-results" label="Valuation Results" @click="changeTabs('valuation-results')" />
     </div>
     <div class="q-pl-sm" v-if="task_type == 'E'">
