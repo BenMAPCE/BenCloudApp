@@ -1,11 +1,28 @@
 <template>
-  <div class="header-text">
-    How do you want to value the health effects? (Choice applies to all tasks in a batch run)
-  </div>
   <div class="row">
-    <Suspense>
-      <ValuationSelection></ValuationSelection>
-    </Suspense>
+    <div class="col-sm-12 col-md-6">
+      <div class="row header-text">
+        How do you want to value the health effects?<br>(Choice applies to all tasks in a batch run)
+      </div>
+      <div class="row">
+        <Suspense>
+          <ValuationSelection></ValuationSelection>
+        </Suspense>
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <div class="row prompt">
+        At what scale do you want to value the effects?
+      </div>
+      <div class="row" v-if="stepHasError && atStep.value == 6">
+        Please select an aggregation scale
+      </div>
+      <div class="row">
+        <Suspense>
+          <Aggregation></Aggregation>
+        </Suspense>
+      </div>
+    </div>
   </div>
   <div class="row">
     Select individual valuation functions via the edit(<q-icon class="edit-btn-note q-pt-xs" color="primary" name="mdi-pencil"></q-icon>) button in each row. Selected valuation functions will be run for each task (each Post-Policy/Year combination).
@@ -13,17 +30,6 @@
   <div class="row">
     <Suspense>
       <ValueOfEffects></ValueOfEffects>
-    </Suspense>
-  </div>
-  <div class="row prompt">
-    At what scale do you want to value the effects?
-  </div>
-  <div class="row" v-if="stepHasError && atStep.value == 6">
-    Please select an aggregation scale
-  </div>
-  <div class="row">
-    <Suspense>
-      <Aggregation></Aggregation>
     </Suspense>
   </div>
 </template>
