@@ -17,7 +17,7 @@
     "@fortawesome/vue-fontawesome": "^3.0.0-5",
     "@mdi/js": "^5.9.55",
     "@quasar/extras": "^1.16.1",
-    "axios": "^0.28.1",
+    "axios": "^1.8.2",
     "core-js": "^3.6.5",
     "ol": "^10.2.1",
     "print-js": "^1.6.0",
