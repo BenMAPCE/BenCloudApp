@@ -29,7 +29,7 @@
     </q-step>
 
     <q-step :name="6" title="Value of effects?" :done="step > 6" prefix="6">
-      <div style="float: right;clear: both;margin-right: 250px;">
+      <div style="float: right;clear: both;margin-right: 50px;">
         <q-btn
           color="black"
           @click="validatePreviousStep(this.$refs.stepper, step)"
