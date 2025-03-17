@@ -13,6 +13,7 @@
                   flat
                   @added="file_selected"
                   @removed="file_removed"
+                  @rejected="file_rejected"
                   bordered
                   hide-upload-btn
                 >
@@ -31,7 +32,7 @@
                 <template v-slot:list="scope">
                   <div class="q-uploader__list scroll">
                     <div v-if="scope.files.length === 0" class="q-uploader__no-files">
-                      *Please upload your grid as a ZIP folder containing the following: .shp, .shx, .dbf, and .prj files.
+                      {{ this.errorMessage || '*Please upload your grid as a ZIP folder containing the following: .shp, .shx, .dbf, and .prj files.' }}
                     </div>
                     <q-uploader-file v-for="file in scope.files" :key="file.name" :file="file" />
                   </div>
@@ -68,9 +69,9 @@
             </div>
           </q-form>
   
-          <q-card-section class="error-card" v-if="this.errorMessage != ''">
+          <!-- <q-card-section class="error-card" v-if="this.errorMessage != ''">
             {{ this.errorMessage }}
-          </q-card-section>
+          </q-card-section> -->
         </q-card>
       </q-dialog>
     </div>
@@ -293,6 +294,7 @@
       },
   
       file_selected: function (file) {
+        this.errorMessage = ""; // Clear any previous error messages
         this.selected_file = file[0];
         this.check_if_document_upload = true;
       },
@@ -300,6 +302,10 @@
       file_removed: function (file) {
         this.selected_file = "";
         this.check_if_document_upload = false;
+      },
+  
+      file_rejected: function (rejectedFiles) {
+        this.errorMessage = "Invalid file format. Please upload a ZIP file containing .shp, .shx, .dbf, and .prj files.";
       },
   
       onCancelClick() {
