@@ -338,7 +338,7 @@ export default {
                 width: 1,
               }),
               fill: new Fill({
-                color: "rgba(0, 0, 0, 0.1)",
+                color: "rgba(0, 0, 0, 0)",
               }),
             }),
             properties: {
@@ -357,7 +357,6 @@ export default {
   },
   mounted() {
     this.mapContainer = this.$refs.mapContainer;
-    console.log('Using GeoServer Base URL:', process.env.GEOSERVER_BASE_URL);
     this.initializeMap();
   },
 };
