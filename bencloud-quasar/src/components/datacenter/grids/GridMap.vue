@@ -124,6 +124,9 @@ export default {
     },
     
     async initializeMap() {
+      const geoServerBaseUrl = process.env.GEOSERVER_BASE_URL;
+      const workspaceName = process.env.GEOSERVER_WORKSPACE_NAME;
+
       const stateStyle = (feature) => {
         const zoom = this.map ? this.map.getView().getZoom() : 4;
         //labels disabled for now
@@ -178,7 +181,7 @@ export default {
 
       this.layers.state = new VectorLayer({
         source: new VectorSource({
-          url: "http://colo-wtest-1:8080/geoserver/benmap/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=benmap%3Aus_state&maxFeatures=1000000&outputFormat=application/json&srsName=EPSG:4326",
+          url: `${geoServerBaseUrl}/${workspaceName}/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=${workspaceName}:us_state&maxFeatures=1000000&outputFormat=application/json&srsName=EPSG:4326`,
           format: new GeoJSON({ featureProjection: "EPSG:3857" }),
         }),
         style: stateStyle,
@@ -190,7 +193,7 @@ export default {
 
       this.layers.county2010 = new VectorLayer({
         source: new VectorSource({
-          url: "http://colo-wtest-1:8080/geoserver/benmap/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=benmap:us_county&maxFeatures=1000000&outputFormat=application/json&srsName=EPSG:4326",
+          url: `${geoServerBaseUrl}/${workspaceName}/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=${workspaceName}:us_county&maxFeatures=1000000&outputFormat=application/json&srsName=EPSG:4326`,
           format: new GeoJSON({ featureProjection: "EPSG:3857" }),
         }),
         style: countyStyle,
@@ -202,7 +205,7 @@ export default {
 
       this.layers.county2020 = new VectorLayer({
         source: new VectorSource({
-          url: "http://colo-wtest-1:8080/geoserver/benmap/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=benmap%3Aus_county_2020&maxFeatures=1000000&outputFormat=application/json&srsName=EPSG:4326",
+          url: `${geoServerBaseUrl}/${workspaceName}/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=${workspaceName}:us_county_2020&maxFeatures=1000000&outputFormat=application/json&srsName=EPSG:4326`,
           format: new GeoJSON({ featureProjection: "EPSG:3857" }),
         }),
         style: countyStyle,
@@ -214,7 +217,7 @@ export default {
 
       this.layers.nation = new VectorLayer({
         source: new VectorSource({
-          url: "http://colo-wtest-1:8080/geoserver/benmap/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=benmap:us_nation&maxFeatures=1000000&outputFormat=application/json&srsName=EPSG:4326",
+          url: `${geoServerBaseUrl}/${workspaceName}/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=${workspaceName}:us_nation&maxFeatures=1000000&outputFormat=application/json&srsName=EPSG:4326`,
           format: new GeoJSON({ featureProjection: "EPSG:3857" }),
         }),
         style: nationStyle,
@@ -226,7 +229,7 @@ export default {
 
       this.layers.grid12km = new VectorLayer({
         source: new VectorSource({
-          url: "http://colo-wtest-1:8080/geoserver/benmap/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=benmap:us_cmaq_12km_nation&maxFeatures=1000000&outputFormat=application/json&srsName=EPSG:4326",
+          url: `${geoServerBaseUrl}/${workspaceName}/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=${workspaceName}:us_cmaq_12km_nation&maxFeatures=1000000&outputFormat=application/json&srsName=EPSG:4326`,
           format: new GeoJSON({ featureProjection: "EPSG:3857" }),
         }),
         style: grid12kmStyle,
@@ -300,16 +303,16 @@ export default {
 
     async loadGeoServerLayers() {
       try {
-        // const workspaceName = 'benmap_bw'; 
-        // const storeName = 'benmap'; 
-        // const response = await axios.get(`http://localhost:8080/geoserver/rest/workspaces/${workspaceName}/datastores/${storeName}/featuretypes`, 
-        
-        const workspaceName = 'benmap'; 
-        const storeName = 'benmap_grids'; 
-        const response = await axios.get(`http://colo-wtest-1:8080/geoserver/rest/workspaces/${workspaceName}/datastores/${storeName}/featuretypes`, {
+        const geoServerBaseUrl = process.env.GEOSERVER_BASE_URL;
+        const workspaceName = process.env.GEOSERVER_WORKSPACE_NAME;
+        const storeName = process.env.GEOSERVER_STORE_NAME;
+        const username = process.env.GEOSERVER_USERNAME;
+        const password = process.env.GEOSERVER_PASSWORD;
+
+        const response = await axios.get(`${geoServerBaseUrl}/rest/workspaces/${workspaceName}/datastores/${storeName}/featuretypes`, {
           auth: {
-            username: 'admin',
-            password: 'geoserver'
+            username: username,
+            password: password
           }
         });
 
@@ -318,13 +321,16 @@ export default {
 
         featureTypesData.forEach(featureTypeData => {
           const featureTypeName = featureTypeData.name;
-          // const featureTypeUrl = `http://localhost:8080/geoserver/${workspaceName}/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=${featureTypeName}&outputFormat=application/json&srsName=EPSG:4326`;
-          const featureTypeUrl = `http://colo-wtest-1:8080/geoserver/${workspaceName}/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=${featureTypeName}&outputFormat=application/json&srsName=EPSG:4326`;
+          const featureTypeProjection = featureTypeData.srs || 'EPSG:4326'; // Default to EPSG:4326 if not specified
+          const featureTypeUrl = `${geoServerBaseUrl}/${workspaceName}/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=${featureTypeName}&outputFormat=application/json&srsName=${featureTypeProjection}`;
 
           const vectorLayer = new VectorLayer({
             source: new VectorSource({
               url: featureTypeUrl,
-              format: new GeoJSON({ featureProjection: "EPSG:3857" }),
+              format: new GeoJSON({
+                dataProjection: featureTypeProjection,
+                featureProjection: 'EPSG:3857' // Reproject to map projection
+              }),
             }),
             style: new Style({
               stroke: new Stroke({
@@ -332,7 +338,7 @@ export default {
                 width: 1,
               }),
               fill: new Fill({
-                color: "rgba(0, 0, 0, 0)",
+                color: "rgba(0, 0, 0, 0.1)",
               }),
             }),
             properties: {
@@ -351,6 +357,7 @@ export default {
   },
   mounted() {
     this.mapContainer = this.$refs.mapContainer;
+    console.log('Using GeoServer Base URL:', process.env.GEOSERVER_BASE_URL);
     this.initializeMap();
   },
 };
