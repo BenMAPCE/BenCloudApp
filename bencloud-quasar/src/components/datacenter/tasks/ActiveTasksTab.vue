@@ -178,7 +178,7 @@ export default defineComponent({
     const timer = ref(null);
 
     let myFilter = unref(filter);
-    let activeTasksRefreshInterval = null;
+    let activeTasksRefreshTimeout = null;
 
     watch(
       () => showAllTasks.value,
@@ -194,7 +194,7 @@ export default defineComponent({
     );
 
     function loadActiveTasks() {
-
+      disableAutoRefresh();
       loading.value = true;
 
       (async () => {
@@ -207,27 +207,26 @@ export default defineComponent({
         }
 
         loading.value = false;
+
+        enableAutoRefresh();
       })();
 
     }
 
     function enableAutoRefresh() {
-    
-      activeTasksRefreshInterval = setInterval(function () {
+      activeTasksRefreshTimeout = setTimeout(function () {
         loadActiveTasks()   
       }.bind(this), 5000); 
 
     }
 
     function disableAutoRefresh() {
-      clearInterval(activeTasksRefreshInterval);
+      clearTimeout(activeTasksRefreshTimeout);
     }
 
     onMounted(() => {
       console.log(props.autoRefresh)
       loadActiveTasks();
-      enableAutoRefresh()
-
     });
 
     onBeforeUnmount(() => {
@@ -333,7 +332,7 @@ export default defineComponent({
       loadActiveTasks,
       onClickCancelOneTask,
       onClickCancelBatchTask,
-      activeTasksRefreshInterval,
+      activeTasksRefreshTimeout,
       progress1,
       visibleColumns
     };
