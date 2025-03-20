@@ -271,7 +271,7 @@ setup(props, context) {
   const pagination = ref({
     page: 1,
     rowsPerPage: 0,
-    sortBy: 'task_submitted_date',
+    sortBy: 'task_completed_date',
     descending: true,
   });
 
@@ -566,7 +566,6 @@ const visibleColumns = ref([
 //"task_uuid",
 "task_name",
 //"task_type",
-"task_submitted_date",
 //"task_started_date",
 "task_completed_date",
 "task_elapsed_time",
