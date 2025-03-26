@@ -272,7 +272,7 @@ setup(props, context) {
     page: 1,
     rowsPerPage: 0,
     sortBy: 'task_completed_date',
-    descending: true,
+    descending: false,
   });
 
   const optionSelected = ref(null);
@@ -288,11 +288,10 @@ setup(props, context) {
 
   const task_uuid = ref(0)
 
-  let completedTasksRefreshTimeout = null;
+  let completedTasksRefreshInterval = null;
 
   function loadCompletedTasks() {
-    // console.log("loadCompletedTasks()")
-    disableAutoRefresh();
+
     loading.value = true;
 
     (async () => {
@@ -304,8 +303,6 @@ setup(props, context) {
         rows.value.push(unref(response.data).data[i])
       }
       loading.value = false;
-
-      enableAutoRefresh();
     })();
 
   }
@@ -326,15 +323,15 @@ setup(props, context) {
   );
 
   function enableAutoRefresh() {
-    completedTasksRefreshTimeout = setTimeout(function () {
+  
+    completedTasksRefreshInterval = setInterval(function () {
       loadCompletedTasks()   
     }.bind(this), 5000); 
-    // console.log("enableAutoRefresh() "+completedTasksRefreshTimeout);
+
   }
 
   function disableAutoRefresh() {
-    // console.log("disableAutoRefresh() "+completedTasksRefreshTimeout);
-    clearTimeout(completedTasksRefreshTimeout);
+    clearInterval(completedTasksRefreshInterval);
   }
 
   function onValueChange(props, val) {
@@ -524,6 +521,7 @@ setup(props, context) {
 
   onMounted(() => {
     loadCompletedTasks()
+    enableAutoRefresh()
   });
 
   onBeforeUnmount(() => {
@@ -552,7 +550,7 @@ setup(props, context) {
     showOptions,
     onValueChange,
     loadCompletedTasks,
-    completedTasksRefreshTimeout,
+    completedTasksRefreshInterval,
     convertToUserTimezone,
     downloadExportedResults,
     viewGridDefinitions
@@ -568,6 +566,7 @@ const visibleColumns = ref([
 //"task_uuid",
 "task_name",
 //"task_type",
+"task_submitted_date",
 //"task_started_date",
 "task_completed_date",
 "task_elapsed_time",
