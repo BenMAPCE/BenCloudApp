@@ -13,6 +13,7 @@
                 flat
                 @added="file_selected"
                 @removed="file_removed"
+                @rejected="file_rejected"
                 bordered
                 hide-upload-btn
               >
@@ -443,6 +444,26 @@ export default {
     file_removed: function (file) {
       this.selected_file = "";
       this.check_if_document_upload = false;
+    },
+
+    file_rejected: function(rejections){
+      rejections.forEach(rejection=>{
+        if(rejection.failedPropValidation === 'max-file-size'){
+          this.$q.notify({
+            type: 'negative',
+            position: 'top',
+            message: 'File ' + rejection.file.name + ' exceeds 20MB limit!'
+          });
+          //console.log('Size limit reach.');
+        }
+        else{
+          this.$q.notify({
+            type: 'negative',
+            position: 'top',
+            message: 'File ' + rejection.file.name + ' is rejected.'
+          });
+        }
+      });    
     },
 
     onCancelClick() {
