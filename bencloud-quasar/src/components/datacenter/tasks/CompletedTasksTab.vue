@@ -272,7 +272,7 @@ setup(props, context) {
     page: 1,
     rowsPerPage: 0,
     sortBy: 'task_completed_date',
-    descending: true,
+    descending: false,
   });
 
   const optionSelected = ref(null);

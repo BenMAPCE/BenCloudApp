@@ -13,6 +13,7 @@
                 flat
                 @added="file_selected"
                 @removed="file_removed"
+                @rejected = "file_rejected"
                 bordered
                 hide-upload-btn
               >
@@ -309,6 +310,29 @@ export default {
     file_removed: function (file) {
       this.selected_file = "";
       this.check_if_document_upload = false;
+    },
+
+    file_rejected:function(rejectedFiles){
+      rejectedFiles.forEach(rejection=>{
+          if(rejection.failedPropValidation === 'max-file-size'){
+            this.$q.notify({
+              type: 'negative',
+              position:'top',
+              message:'File size exceeds 1G limit!'
+            });
+            this.errorMessage = "File " + rejection.file.name + " exceeds 1G limit!";
+            //console.log('size limit reach.');
+          }
+          else{
+            this.$q.notify({
+              type: 'negative',
+              position:'top',
+              message:'Invalid file format.'
+            });
+            this.errorMessage = "Invalid file format. Please check your csv file.";
+            //console.log('Invalid file format.');
+          }
+        })
     },
 
     onCancelClick() {

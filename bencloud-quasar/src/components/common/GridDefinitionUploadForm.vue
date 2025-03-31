@@ -305,7 +305,27 @@
       },
   
       file_rejected: function (rejectedFiles) {
-        this.errorMessage = "Invalid file format. Please upload a ZIP file containing .shp, .shx, .dbf, and .prj files.";
+        rejectedFiles.forEach(rejection=>{
+          if(rejection.failedPropValidation === 'max-file-size'){
+            this.$q.notify({
+              type: 'negative',
+              position:'top',
+              message:'File size exceeds 20MB limit!'
+            });
+            this.errorMessage = "File " + rejection.file.name + " exceeds 20MB limit!";
+            //console.log('Size limit reach.');
+          }
+          else{
+            this.$q.notify({
+              type: 'negative',
+              position:'top',
+              message:'Invalid file format!'
+            });
+            this.errorMessage = "Invalid file format. Please upload a ZIP file containing .shp, .shx, .dbf, and .prj files.";
+          }
+        })
+        
+        
       },
   
       onCancelClick() {
