@@ -321,7 +321,7 @@ export default {
 
         featureTypesData.forEach(featureTypeData => {
           const featureTypeName = featureTypeData.name;
-          const featureTypeProjection = featureTypeData.srs || 'EPSG:4326'; // Default to EPSG:4326 if not specified
+          const featureTypeProjection = featureTypeData.srs || 'EPSG:4269'; 
           const featureTypeUrl = `${geoServerBaseUrl}/${workspaceName}/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=${featureTypeName}&outputFormat=application/json&srsName=${featureTypeProjection}`;
 
           const vectorLayer = new VectorLayer({
