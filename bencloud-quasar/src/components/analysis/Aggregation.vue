@@ -28,6 +28,7 @@ export default defineComponent({
   async setup(props, context) {
     const store = useStore();
     const rows = ref([]);
+    const doNotAggregateId = store.state.analysis.prePolicyGridDefinitionId;
     const gridOptions = [
       {
         name: 'Nation (2010)',
@@ -56,6 +57,10 @@ export default defineComponent({
       {
         name: 'CMAQ 12km Nation',
         id: 28
+      },
+      {
+        name: 'Do not aggregate',
+        id: doNotAggregateId
       }
     ]
     const selectedItem = ref();
@@ -83,11 +88,11 @@ export default defineComponent({
         const gridOptionsFlt = gridOptions.filter(element=>{
           if (store.state.analysis.populationDatasetId == 50 || store.state.analysis.populationDatasetId == 51 || store.state.analysis.populationDatasetId == 52 || store.state.analysis.populationDatasetId == 53){
             defaultValue = "County (2020)";
-            return element.id===70 || element.id===69 || element.id===68 || element.id===28;
+            return element.id===70 || element.id===69 || element.id===68 || element.id===28 || element.id===doNotAggregateId;
           }
           else{
             defaultValue = "County (2010)";
-            return element.id===20 || element.id===19 || element.id===18 || element.id===28;
+            return element.id===20 || element.id===19 || element.id===18 || element.id===28 || element.id===doNotAggregateId;
           }
         })      
         

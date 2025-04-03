@@ -1,6 +1,6 @@
 <template>
       <div class="col refresh-message">
-        Tasks are auto-refreshed every 5 seconds
+        Task list will update automatically
       </div>
 
       <div class="col" v-if="isAdmin">
