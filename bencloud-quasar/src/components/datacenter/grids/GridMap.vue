@@ -321,15 +321,16 @@ export default {
 
         featureTypesData.forEach(featureTypeData => {
           const featureTypeName = featureTypeData.name;
-          const featureTypeProjection = featureTypeData.srs || 'EPSG:4269'; 
+          const featureTypeProjection = 'EPSG:3857'; // Reproject to EPSG:3857
+          console.log('Feature Type Data:', featureTypeData); 
           const featureTypeUrl = `${geoServerBaseUrl}/${workspaceName}/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=${featureTypeName}&outputFormat=application/json&srsName=${featureTypeProjection}`;
 
           const vectorLayer = new VectorLayer({
             source: new VectorSource({
               url: featureTypeUrl,
               format: new GeoJSON({
-                dataProjection: featureTypeProjection,
-                featureProjection: 'EPSG:3857' // Reproject to map projection
+                dataProjection: featureTypeProjection, // Set dataProjection to EPSG:3857
+                featureProjection: featureTypeProjection 
               }),
             }),
             style: new Style({
