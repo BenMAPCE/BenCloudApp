@@ -44,6 +44,8 @@ spec:
         env:
           - name: REDEPLOY_META
             value: $CI_JOB_ID-$CI_COMMIT_SHA
+          - name: DEFENDER_APP_ID
+            value: "$DEFENDER_APP_ID"
         ports:
         - containerPort: 80
       imagePullSecrets:
