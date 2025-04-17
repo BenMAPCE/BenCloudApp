@@ -7,13 +7,13 @@ stages:
   - deploy_nonprod
 
 # Set K8s context of GitLab Agent
-.kube-dev-context:
-  before_script:
-  - kubectl config use-context "$KUBE_DEV_CONTEXT";
+#.kube-dev-context:
+#  before_script:
+#  - kubectl config use-context "$KUBE_DEV_CONTEXT";
 
-.kube-stg-context:
-  before_script:
-  - kubectl config use-context "$KUBE_STG_CONTEXT";
+#.kube-stg-context:
+#  before_script:
+#  - kubectl config use-context "$KUBE_STG_CONTEXT";
 
 build_dev_app:
  stage: code_build
