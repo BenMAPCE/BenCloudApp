@@ -128,6 +128,11 @@ export default {
       type: String,
       default: "",
     },
+    visible_columns: {
+      type: String,
+      default: "",
+    },
+    
     
   },
 
@@ -136,6 +141,7 @@ export default {
     const batch_task_id = ref(0);
     const task_uuid = ref("");
     const task_type = ref("");
+    const visible_columns = ref("");
 
     const gridOptions = ref([]);
     const grid = ref([]);
@@ -385,6 +391,7 @@ export default {
         exportType: this.include,
         taskUuid: this.task_uuid,
         uuidType: this.task_type,
+        visibleColumns: this.visible_columns,
       };
 
       axios
