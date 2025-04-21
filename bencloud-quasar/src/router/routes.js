@@ -68,6 +68,19 @@ const routes = [
   },
 
   {
+    path: "/admin/manage-banner",
+    component: () => import("layouts/MainLayout.vue"),
+    children: [
+      {
+        path: "",
+        component: () => import("src/pages/datacenter/admin/ManageBanner.vue"),
+        meta: { requiresUser: true, requiresAdmin: true },
+      },
+    ],
+  },
+
+
+  {
     path: "/language",
     component: () => import("layouts/MainLayout.vue"),
     children: [

@@ -26,6 +26,7 @@ import { defineComponent, onBeforeMount, ref } from "vue";
 import EPAHeader from "src/components/epa/EPAHeader.vue";
 import EPAFooter from "src/components/epa/EPAFooter.vue";
 import EPAAccordion from "src/components/epa/EPAAccordion.vue";
+import axios from "axios";
 
 export default defineComponent({
   name: "MainLayoutPublic",

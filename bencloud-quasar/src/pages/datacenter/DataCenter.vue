@@ -1,8 +1,8 @@
 <template>
   <q-page class="q-pa-md">
     <div class="page-layout">
-      <!-- Task Queue Section -->
-      <div class="task-section">
+      <!-- Task Queue and Admin Section -->
+      <div class="task-admin-section">
         <h3 class="category-header">Task Queue</h3>
         <q-card flat class="task-card">
           <q-card-actions vertical class="q-px-none">
@@ -20,6 +20,27 @@
             </p>
           </q-card-section>
         </q-card>
+
+        <div v-if="isAdmin">
+          <h3 class="category-header">Admin</h3>
+          <q-card flat class="admin-card">
+            <q-card-actions vertical class="q-px-none">
+              <q-btn
+                color="primary"
+                class="full-width"
+                push
+                @click="$router.replace('/admin/manage-banner')"
+                label="Manage Banner"
+              />
+            </q-card-actions>
+            <q-card-section class="q-px-none">
+              <p class="description admin-description">
+                Manage the notification banner that is shown to all users.
+              </p>
+            </q-card-section>
+          </q-card>
+        </div>
+
       </div>
 
       <div class="vertical-divider"></div>
@@ -198,6 +219,7 @@
 
 <script>
 import { defineComponent, ref, reactive } from 'vue';
+import { isAdmin } from "../../boot/auth.js";
 
 export default defineComponent({
   name: 'DataCenter',
@@ -285,6 +307,7 @@ export default defineComponent({
       populationCards,
       valuationCards,
       healthCards,
+      isAdmin,
       toggleDescription
     };
   }
@@ -299,7 +322,7 @@ export default defineComponent({
   flex-wrap: wrap; 
 }
 
-.task-section {
+.task-admin-section {
   flex: 1.2;
   max-width: 400px;
   border-right: 1.3px solid #999999;
@@ -332,6 +355,7 @@ export default defineComponent({
 }
 
 .task-card,
+.admin-card,
 .data-card {
   border: 1px solid transparent;
   box-shadow: none;
@@ -354,6 +378,7 @@ export default defineComponent({
   max-width: calc(100% - 20px);
 }
 
+.admin-description,
 .task-description {
   max-width: 100%;
   white-space: normal;
@@ -416,7 +441,7 @@ export default defineComponent({
     gap: 16px;
   }
 
-  .task-section {
+  .task-admin-section {
     max-width: 100%;
     border-right: none;
     padding-right: 0;
@@ -438,7 +463,7 @@ export default defineComponent({
     justify-content: left;
   }
 
-  .task-section {
+  .task-admin-section {
     max-width: 350px;
   }
 

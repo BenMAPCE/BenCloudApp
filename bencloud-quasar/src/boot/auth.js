@@ -9,6 +9,8 @@ export default boot(async ({ router, store }) => {
   console.log("----- in auth.js -----");
   console.log(store);
 
+  const adminPermission = "admin";
+
   // Before routing to each path
   router.beforeEach(async (to, from) => {
   try {
@@ -20,7 +22,13 @@ export default boot(async ({ router, store }) => {
         .get(process.env.API_SERVER + "/api/user")
         .then((response) => {
           isUser = response.data.isUser;
-          isAdmin = response.data.isAdmin;
+          isAdmin.value = response.data.isAdmin;
+          store.commit("auth/updateUser", "response.data.uid");
+          if (isAdmin.value) {
+            store.commit("auth/addPermission", adminPermission);
+          } else {
+            store.commit("auth/removePermission", adminPermission);
+          }
           if(!!response) {
             status = response.status;
           } else if (!!error) {
@@ -54,7 +62,13 @@ export default boot(async ({ router, store }) => {
           .get(process.env.API_SERVER + "/api/user")
           .then((response) => {
             isUser = response.data.isUser;
-            isAdmin = response.data.isAdmin;
+            isAdmin.value = response.data.isAdmin;
+            store.commit("auth/updateUser", response.data.uid);
+            if (isAdmin.value) {
+              store.commit("auth/addPermission", adminPermission);
+            } else {
+              store.commit("auth/removePermission", adminPermission);
+            }
           })
       } catch(ex) {
         console.log(ex)
@@ -78,7 +92,7 @@ export default boot(async ({ router, store }) => {
     if (process.env.AUTH_ENABLED) {
       console.log("Auth enabled");
 
-      if (to.meta.requiresAuth) {
+      if (to.meta.requiresUser) {
         store.commit("auth/updateRedirectPath", to.path);
 
         if (store.state.auth.user) {
@@ -86,8 +100,8 @@ export default boot(async ({ router, store }) => {
           if (to.meta.requiresAdmin) {
             if (
               // needs to be fixed
-              store.state.auth.user.permissions &&
-              store.state.auth.user.permissions.includes("admin")
+              store.state.auth.permissions &&
+              store.state.auth.permissions.includes(adminPermission)
             ) {
               console.log("on to next");
               next();
@@ -102,7 +116,7 @@ export default boot(async ({ router, store }) => {
           } else if (
             to.path === "/" ||
             to.path === "/login" ||
-            to.path === "/register"
+            to.path === "/requestaccess"
           ) {
             next();
           } else {

@@ -249,10 +249,11 @@ import { defineComponent } from "vue";
 import { ref, unref, onMounted, onBeforeMount, onBeforeUnmount, watch, watchEffect } from "vue";
 import axios from "axios";
 import { useStore } from "vuex";
-import { useQuasar, date } from "quasar";
+import { useQuasar } from "quasar";
 
 import { getCompletedTasks } from "../../../composables/tasks/completed-tasks";
 import { showAllTasks } from "../tasks/ManageTasksTabs.vue";
+import { convertToUserTimezone } from "src/composables/common/time";
 
 export default defineComponent({
 model: ref(null),
@@ -469,14 +470,6 @@ setup(props, context) {
         loading.value = false;
         $q.loading.hide();
       });
-  }
-
-  function convertToUserTimezone(dateString) {
-    const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const formattedDate = date.formatDate(dateString, 'YYYY-MM-DD HH:mm:ss', {
-      timeZone: userTimezone
-    });
-    return `${formattedDate} (${userTimezone})`;
   }
 
   async function downloadExportedResults(props) {
