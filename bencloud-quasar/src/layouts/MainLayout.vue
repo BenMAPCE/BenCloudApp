@@ -25,6 +25,7 @@
     </q-header>
 
     <q-page-container class="page-view">
+      <Banner></Banner>
       <router-view />
     </q-page-container>
 
@@ -38,6 +39,7 @@ import AppNavLinks from "src/components/navigation/AppNavLinks.vue";
 import EPAAccordion from "src/components/epa/EPAAccordion.vue";
 import EPAHeader from "src/components/epa/EPAHeader.vue";
 import EPAFooter from "src/components/epa/EPAFooter.vue";
+import Banner from "src/components/common/Banner.vue"
 import axios from "axios";
 
 const linksList = [
@@ -91,6 +93,7 @@ export default defineComponent({
     EPAAccordion,
     EPAHeader,
     EPAFooter,
+    Banner,
   },
 
   setup() {

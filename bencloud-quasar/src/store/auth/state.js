@@ -1,7 +1,7 @@
 export default function () {
   return {
     user: "",
-    permission: [],
+    permissions: [],
     redirectPath: ""
     //
   }

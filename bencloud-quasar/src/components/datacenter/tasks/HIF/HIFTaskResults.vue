@@ -114,7 +114,8 @@ export default defineComponent({
           task_type: props.task_type,
           batch_task_id: props.batch_task_id,
           valuation_grid_id: props.valuation_grid_id,
-          valuation_grid_name: props.valuation_grid_name
+          valuation_grid_name: props.valuation_grid_name,
+          visible_columns: visibleColumns.value.toString()
         },
       })
         .onOk(() => {
@@ -163,6 +164,7 @@ const visibleColumns = ref([
   "ages",
   "study",
   "qualifier",
+  //"beta",
   //"location",
   //"race",
   //"ethnicity",
@@ -175,7 +177,11 @@ const visibleColumns = ref([
   //"baseline_aq",
   //"scenario_aq",
   "point_estimate",
+  //"mean",
   //"standard_deviation",
+  //"variance",
+  //"pct_2_5",
+  //"pct_97_5",
   "population",
   "baseline",
   //"percent_of_baseline",
@@ -187,6 +193,22 @@ const columns = [
     label: "Task UUID",
     align: "left",
     field: (row) => row.task_uuid,
+    format: (val) => `${val}`,
+    sortable: true,
+  },
+  {
+    name: "column",
+    label: "Column",
+    align: "left",
+    field: (row) => row.column,
+    format: (val) => `${val}`,
+    sortable: true,
+  },
+  {
+    name: "row",
+    label: "Row",
+    align: "left",
+    field: (row) => row.row,
     format: (val) => `${val}`,
     sortable: true,
   },
@@ -222,6 +244,13 @@ const columns = [
     align: "left",
     style:
       "inline-size: 150px; min-width: 400px; max-width: 400px; overflow-wrap: break-word; word-break: break-word; white-space: pre-wrap;",
+    sortable: true,
+  },
+  {
+    name: "beta",
+    label: "Beta",
+    field: (row) => row.beta.toLocaleString("en-US", { maximumFractionDigits: 2 }),
+    sort: (a, b, rowA, rowB) => parseFloat(rowA.beta) - parseFloat(rowB.beta),
     sortable: true,
   },
   {
@@ -296,11 +325,43 @@ const columns = [
     sortable: true,
   },
   {
+    name: "mean",
+    label: "Mean",
+    field: (row) =>
+      row.mean.toLocaleString("en-US", { maximumFractionDigits: 2 }),
+    sort: (a, b, rowA, rowB) => parseFloat(rowA.mean) - parseFloat(rowB.mean),
+    sortable: true,
+  },
+  {
     name: "standard_deviation",
     label: "Standard Deviation",
     field: (row) =>
       row.standard_deviation.toLocaleString("en-US", { maximumFractionDigits: 2 }),
     sort: (a, b, rowA, rowB) => parseFloat(rowA.standard_deviation) - parseFloat(rowB.standard_deviation),
+    sortable: true,
+  },
+  {
+    name: "variance",
+    label: "Variance",
+    field: (row) =>
+      row.variance.toLocaleString("en-US", { maximumFractionDigits: 2 }),
+    sort: (a, b, rowA, rowB) => parseFloat(rowA.variance) - parseFloat(rowB.variance),
+    sortable: true,
+  },
+  {
+    name: "pct_2_5",
+    label: "2.5 Percentile",
+    field: (row) =>
+      row.pct_2_5.toLocaleString("en-US", { maximumFractionDigits: 2 }),
+    sort: (a, b, rowA, rowB) => parseFloat(rowA.pct_2_5) - parseFloat(rowB.pct_2_5),
+    sortable: true,
+  },
+  {
+    name: "pct_97_5",
+    label: "97.5 Percentile",
+    field: (row) =>
+      row.pct_97_5.toLocaleString("en-US", { maximumFractionDigits: 2 }),
+    sort: (a, b, rowA, rowB) => parseFloat(rowA.pct_97_5) - parseFloat(rowB.pct_97_5),
     sortable: true,
   },
   {
