@@ -176,11 +176,11 @@ const SessionManager = (function() {
         class: 'custom-session-expired-modal'
       }).onOk(() => {
         
-        // Remove overlay
-        const existingOverlay = document.getElementById('session-expired-overlay');
-        if (existingOverlay) {
-          document.body.removeChild(existingOverlay);
-        }
+        // // Remove overlay
+        // const existingOverlay = document.getElementById('session-expired-overlay');
+        // if (existingOverlay) {
+        //   document.body.removeChild(existingOverlay);
+        // }
         
         // Redirect
         window.location.href = WAAUrl;
