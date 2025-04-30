@@ -1,11 +1,10 @@
 import { Notify, Dialog } from 'quasar';
-import router from '../router';
+import router from '../../router';
 import axios from 'axios'; 
-const env = require('../../.quasar.env.json');
+const env = require('../../../.quasar.env.json');
 
 const SESSION_TIMEOUT = env[process.env.NODE_ENV].SESSION_TIMEOUT * 1000; // Convert to ms
 const SESSION_WARNING = env[process.env.NODE_ENV].SESSION_WARNING * 1000; // Convert to ms
-const WAAUrl = env[process.env.NODE_ENV].WAAUrl; // Get WAAUrl from environment
 
 // Create a singleton session manager
 const SessionManager = (function() {
@@ -183,7 +182,7 @@ const SessionManager = (function() {
         // }
         
         // Redirect
-        window.location.href = WAAUrl;
+        window.location.href = "/";
       });
     }, SESSION_TIMEOUT);
   }

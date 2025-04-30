@@ -1,7 +1,7 @@
 import { route } from 'quasar/wrappers'
 import { createRouter, createMemoryHistory, createWebHistory, createWebHashHistory } from 'vue-router'
 import routes from './routes'
-import { startSessionTimer } from '../utils/sessionManager'
+import { startSessionTimer } from '../composables/common/sessionManager'
 
 /*
  * If not building with SSR mode, you can
