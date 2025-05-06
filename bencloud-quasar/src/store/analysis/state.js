@@ -30,5 +30,6 @@ export default function () {
     applyYearsToAll: false,
     batchTaskObject: null,
     valuationSelection: "Select my own value functions",
+    hifResultColumns: "ages,study,qualifier,delta_aq,point_estimate,population,baseline",
   }
 }

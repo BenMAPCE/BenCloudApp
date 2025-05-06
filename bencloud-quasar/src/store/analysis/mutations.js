@@ -161,3 +161,7 @@ export function updateBatchTaskObject (state, batchTaskObject) {
 export function updateValuationSelection (state, valuationSelection) {
     state.valuationSelection = valuationSelection;
 }
+
+export function updateHifResultColumns (state, hifResultColumns) {
+    state.hifResultColumns = hifResultColumns;
+}
