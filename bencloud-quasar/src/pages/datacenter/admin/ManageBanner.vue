@@ -13,7 +13,7 @@
             left-label
           />
           <div class="description">
-            If enabled, the banner will display to all users untill dismissed.
+            If enabled, the banner will display to all users until dismissed.
           </div>
           <div class="description">
             If disabled, no banner will be shown.
