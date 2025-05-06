@@ -53,6 +53,7 @@
 <script>
 import { defineComponent } from "vue";
 import { ref, unref, watch, onBeforeMount, onUpdated, onMounted } from "vue";
+import { useStore } from "vuex";
 import { useQuasar, date } from "quasar";
 import { getHIFTaskResults } from "../../../../composables/tasks/task-results";
 import DownloadTaskResultsDialog from "../DownloadTaskResultsDialog.vue";
@@ -66,7 +67,7 @@ export default defineComponent({
   setup(props, context) {
     //const task_type = ref("");
     //const task_uuid = ref(null);
-
+    const store = useStore();
     const filter = ref("");
     const loading = ref(false);
     const pagination = ref({
@@ -78,6 +79,16 @@ export default defineComponent({
     const $q = useQuasar();
 
     const rows = ref([]);
+
+    watch(
+      () => visibleColumns.value,
+      (currentSelectedItems, prevSelectedItems) => {
+        console.log("watch: " + currentSelectedItems + " | " + prevSelectedItems)
+        if (currentSelectedItems != prevSelectedItems) {
+          var columnsString = currentSelectedItems.join();
+          store.commit("analysis/updateHifResultColumns", columnsString);
+        }
+      });
 
     function loadHIFResults() {
       loading.value = true;
@@ -115,7 +126,7 @@ export default defineComponent({
           batch_task_id: props.batch_task_id,
           valuation_grid_id: props.valuation_grid_id,
           valuation_grid_name: props.valuation_grid_name,
-          visible_columns: visibleColumns.value.toString()
+          visible_columns: store.state.analysis.hifResultColumns
         },
       })
         .onOk(() => {
@@ -193,22 +204,6 @@ const columns = [
     label: "Task UUID",
     align: "left",
     field: (row) => row.task_uuid,
-    format: (val) => `${val}`,
-    sortable: true,
-  },
-  {
-    name: "column",
-    label: "Column",
-    align: "left",
-    field: (row) => row.column,
-    format: (val) => `${val}`,
-    sortable: true,
-  },
-  {
-    name: "row",
-    label: "Row",
-    align: "left",
-    field: (row) => row.row,
     format: (val) => `${val}`,
     sortable: true,
   },

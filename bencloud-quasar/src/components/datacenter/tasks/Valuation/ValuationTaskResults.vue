@@ -53,6 +53,7 @@
 <script>
 import { defineComponent } from "vue";
 import { ref, unref, watch, onBeforeMount, onUpdated, onMounted } from "vue";
+import { useStore } from "vuex";
 import { useQuasar, date } from "quasar";
 import { getValuationTaskResults } from "../../../../composables/tasks/task-results";
 import DownloadTaskResultsDialog from "../DownloadTaskResultsDialog.vue";
@@ -66,7 +67,7 @@ export default defineComponent({
   setup(props, context) {
     //const task_type = ref("");
     //const task_uuid = ref(null);
-
+    const store = useStore();
     const filter = ref("");
     const loading = ref(false);
     const pagination = ref({
@@ -107,7 +108,8 @@ export default defineComponent({
           task_type: props.valuation_task_type,
           batch_task_id: props.batch_task_id,
           valuation_grid_id:props.valuation_grid_id,
-          valuation_grid_name: props.valuation_grid_name
+          valuation_grid_name: props.valuation_grid_name,
+          visible_columns: store.state.analysis.hifResultColumns
         },
       })
         .onOk(() => {
