@@ -208,22 +208,6 @@ const columns = [
     sortable: true,
   },
   {
-    name: "column",
-    label: "Column",
-    align: "left",
-    field: (row) => row.column,
-    format: (val) => `${val}`,
-    sortable: true,
-  },
-  {
-    name: "row",
-    label: "Row",
-    align: "left",
-    field: (row) => row.row,
-    format: (val) => `${val}`,
-    sortable: true,
-  },
-  {
     name: "endpoint",
     label: "Health Effect",
     align: "left",
