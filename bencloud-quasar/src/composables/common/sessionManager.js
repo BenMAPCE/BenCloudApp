@@ -1,5 +1,4 @@
 import { Notify, Dialog } from 'quasar';
-import router from '../../router';
 import axios from 'axios'; 
 const env = require('../../../.quasar.env.json');
 
@@ -16,12 +15,7 @@ const SessionManager = (function() {
   let isSessionExpired = false;
   let debounceTimer = null;
   let isInitialized = false;
-  
-  // User activity events to monitor
-  const userActivityEvents = [
-    'mousedown', 'mousemove', 'keypress', 
-    'scroll', 'touchstart', 'click'
-  ];
+  let axiosInterceptor = null;
   
   function clearAllTimers() {
     clearTimeout(warningTimeout);
@@ -35,7 +29,7 @@ const SessionManager = (function() {
     }
   }
   
-  function handleUserActivity() {
+  function handleNetworkActivity() {
     // Don't reset if session expired or warning is showing
     if (isSessionExpired || warningDialog) {
       return;
@@ -48,20 +42,27 @@ const SessionManager = (function() {
     }, 1000); // 1-second debounce
   }
   
-  function setupEventListeners() {
-    // Remove any existing listeners first to prevent duplicates
-    removeEventListeners();
+  function setupAxiosInterceptor() {
+    // Remove any existing interceptor first to prevent duplicates
+    removeAxiosInterceptor();
     
-    // Add new listeners
-    userActivityEvents.forEach(event => {
-      document.addEventListener(event, handleUserActivity, { passive: true });
-    });
+    // Add request interceptor to reset session on network activity
+    axiosInterceptor = axios.interceptors.request.use(
+      (config) => {
+        handleNetworkActivity();
+        return config;
+      },
+      (error) => {
+        return Promise.reject(error);
+      }
+    );
   }
   
-  function removeEventListeners() {
-    userActivityEvents.forEach(event => {
-      document.removeEventListener(event, handleUserActivity);
-    });
+  function removeAxiosInterceptor() {
+    if (axiosInterceptor !== null) {
+      axios.interceptors.request.eject(axiosInterceptor);
+      axiosInterceptor = null;
+    }
   }
   
   function resetSession() {
@@ -99,8 +100,6 @@ const SessionManager = (function() {
           const response = await axios.get(`${env[process.env.NODE_ENV].API_SERVER}/api/user`);
           console.log('Session extension API call successful');
           
-          // Reset the session
-          resetSession();
           Notify.create({ type: 'positive', message: 'Session extended!' });
         } catch (error) {
           console.error('Session extension API call failed:', error);
@@ -137,7 +136,7 @@ const SessionManager = (function() {
       isSessionExpired = true;
       
       // Clean up
-      removeEventListeners();
+      removeAxiosInterceptor();
       
       if (warningDialog) {
         warningDialog.hide();
@@ -200,7 +199,7 @@ const SessionManager = (function() {
         console.log('Initializing session manager');
         isInitialized = true;
         isSessionExpired = false;
-        setupEventListeners();
+        setupAxiosInterceptor();
         resetSession();
         
         // Return cleanup function
@@ -211,7 +210,7 @@ const SessionManager = (function() {
         console.log('Destroying session manager');
         isInitialized = false;
         isSessionExpired = false;
-        removeEventListeners();
+        removeAxiosInterceptor();
         clearAllTimers();
       },
       
