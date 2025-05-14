@@ -99,6 +99,6 @@ spec:
           pathType: Prefix
           backend:
            service:
-            name: bencloud-geoserver-service # bencloud-app-service
+            name: bencloud-app-service
             port: 
              number: 443
