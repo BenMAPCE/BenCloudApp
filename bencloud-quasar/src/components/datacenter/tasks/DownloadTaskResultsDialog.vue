@@ -389,10 +389,13 @@ export default {
         includeValuation: include_vf,
         includeExposure: include_exp,
         exportType: this.include,
-        taskUuid: this.task_uuid,
-        uuidType: this.task_type,
         visibleColumns: this.visible_columns,
       };
+
+      if (this.include === "currents") {
+        payload.taskUuid = this.task_uuid;
+        payload.uuidType = this.task_type;
+      }
 
       axios
         .post(downloadUrl, payload, {headers: { "Content-Type": "application/x-www-form-urlencoded" }})
