@@ -24,9 +24,11 @@
       </div>
     </div>
   </div>
-  <div class="row q-mt-xl"> 
+  
+  <div class="row q-mt-xl header-text"> 
     Step 3 (Optional): Select individual valuation functions via the edit(<q-icon class="edit-btn-note q-pt-xs" color="primary" name="mdi-pencil"></q-icon>) button in each row. Selected valuation functions will be run for each task (each Post-Policy/Year combination).
   </div>
+  
   <div class="row">
     <Suspense>
       <ValueOfEffects></ValueOfEffects>

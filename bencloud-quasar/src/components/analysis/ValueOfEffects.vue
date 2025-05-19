@@ -1,4 +1,12 @@
 <template>
+  <div style="margin-top: -75px; margin-left: 10px;">
+    <q-btn
+          color="green"
+          @click="clearValuation(rows)"
+          label="Clear Selection"
+          class="q-ml-sm button"
+        />
+  </div>
   <div class="q-pa-md col-12">
     <q-table
       :rows="rows"
@@ -143,6 +151,33 @@ export default defineComponent({
       console.log("getSelectedValuationFunctions");
       console.log(valuationFunctionsSelected);
       console.log(row.endpoint_group_id);
+    }
+
+    function clearValuation(rows) {
+      store.commit("analysis/updateValuationSelection", "Select my own value functions");
+      
+      var valuationFunctionsArray = [];
+
+      var batchTaskObject = JSON.parse(JSON.stringify(store.state.analysis.batchTaskObject));
+      for(var i = 0; i < batchTaskObject.batchHifGroups.length; i++) {
+        for(var j = 0; j < batchTaskObject.batchHifGroups[i].hifs.length; j++) {
+            batchTaskObject.batchHifGroups[i].hifs[j]['valuationFunctions'] = valuationFunctionsArray;
+        }
+      }
+
+      store.commit("analysis/updateBatchTaskObject", batchTaskObject);
+
+      for(var i = 0; i < rows.length; i++) {
+        var payload = {};
+        payload.endpoint_group_id = rows[i].endpoint_group_id;
+        payload.health_function_id = rows[i].health_function_id;
+        payload.valuation_ids = [];
+
+        console.log("... updateValuationsForHealthImpactFunctionGroups")
+        store.commit("analysis/updateValuationsForHealthImpactFunctionGroups", payload);
+
+        rows[i].valuation = valuations;
+      }
     }
 
     function editItem(row) {
@@ -318,6 +353,7 @@ export default defineComponent({
       visibleColumns,
       editValueOfEffects,
       fullscreen,
+      clearValuation,
     };
   },
 });
