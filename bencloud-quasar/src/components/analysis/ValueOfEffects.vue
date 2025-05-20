@@ -1,5 +1,5 @@
 <template>
-  <div style="margin-top: -75px; margin-left: 10px;">
+  <div class="clear-valuation-btn">
     <q-btn
           color="green"
           @click="clearValuation(rows)"
@@ -7,7 +7,7 @@
           class="q-ml-sm button"
         />
   </div>
-  <div class="q-pa-md col-12">
+  <div class="q-pa-md q-mt-xs col-12">
     <q-table
       :rows="rows"
       :columns="columns"
@@ -503,6 +503,10 @@ const visibleColumns = ref([
 .location-column {
   max-width: 250px;
   white-space: normal;
+}
+
+.clear-valuation-btn {
+  margin-left: 10px
 }
 </style>
 
