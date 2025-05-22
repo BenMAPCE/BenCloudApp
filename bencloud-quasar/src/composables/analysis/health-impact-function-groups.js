@@ -178,12 +178,14 @@ export const buildHealthImpactFunctionGroups = (
         " / " +
         functions[f].hifRecord.gender_name;
 
-      if (functions[f].incidenceName === null) {
-        option.incidence_prevalence = "";
-      } else {
-        option.incidence_prevalence = functions[f].incidenceName;
+      if (functions[f].incidenceName != null) {
+        option.incidence_prevalence = functions[f].incidenceName;        
+      } else if (functions[f].prevalenceName != null) {
+        option.incidence_prevalence = functions[f].prevalenceName;
       }
-
+      else {
+        option.incidence_prevalence = "";
+      }
   
       // load valuations
       //console.log("--- 001")
