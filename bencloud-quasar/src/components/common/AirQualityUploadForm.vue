@@ -352,7 +352,29 @@ export default {
           console.log(response.data.messages);
           
           if(response.status === 200) {
-            this.$q
+            if(response.data.success === false){
+              if (response.data.messages.length > 0){
+                console.log("Show Errors");
+                this.$q
+                .dialog({component: AirQualityUploadErrorsDialog,
+                  parent: this,
+                  persistent: true,
+                  componentProps: {
+                    errorList: response.data.messages,
+                    fileName: this.selected_file.name,
+                  },
+                })
+                .onOk(() => {
+                  console.log("OK");
+                })
+                .onCancel(() => {
+                })
+                .onDismiss(() => {
+                });
+              }
+            }
+            else{
+              this.$q
               .dialog({
                 component: AirQualityUploadSuccessDialog,
                 parent: this,
@@ -369,6 +391,8 @@ export default {
               })
               .onDismiss(() => {
               });
+            }
+            
           } else {
             console.log("BAD NEWS");
             if (response.data.messages.length > 0) {
