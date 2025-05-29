@@ -176,7 +176,7 @@ export default defineComponent({
         console.log("... updateValuationsForHealthImpactFunctionGroups")
         store.commit("analysis/updateValuationsForHealthImpactFunctionGroups", payload);
 
-        rows[i].valuation = valuations;
+        rows[i].valuation = "";
       }
     }
 
