@@ -343,6 +343,9 @@ export default defineComponent({
                 rows.value[i].visible = false; // Set default state to false
               }
             }
+            window.dispatchEvent(new CustomEvent('layers-added', { 
+              detail: rows.value.map(r => r.table_name.replace(/^grids\./, ''))
+            }))
 
             // don't forget to update local pagination object
             pagination.value.page = loadPage;

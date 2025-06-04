@@ -123,7 +123,7 @@ export default {
       }
     },
     
-    async initializeMap() {
+    initializeMap() {
       const geoServerBaseUrl = process.env.GEOSERVER_BASE_URL;
       const workspaceName = process.env.GEOSERVER_WORKSPACE_NAME;
 
@@ -296,33 +296,19 @@ export default {
           console.log('Map load end. All layers loaded.');
         }
       });
-
-      // Load layers from GeoServer
-      await this.loadGeoServerLayers();
     },
 
-    async loadGeoServerLayers() {
+    loadGeoServerLayers(event) {
       try {
         const geoServerBaseUrl = process.env.GEOSERVER_BASE_URL;
         const workspaceName = process.env.GEOSERVER_WORKSPACE_NAME;
-        const storeName = process.env.GEOSERVER_STORE_NAME;
-        const username = process.env.GEOSERVER_USERNAME;
-        const password = process.env.GEOSERVER_PASSWORD;
 
-        const response = await axios.get(`${geoServerBaseUrl}/rest/workspaces/${workspaceName}/datastores/${storeName}/featuretypes`, {
-          auth: {
-            username: username,
-            password: password
-          }
-        });
+        const featureTypeNames = event.detail;
+        console.log('Loaded feature types:', featureTypeNames);
 
-        const featureTypesData = response.data.featureTypes.featureType;
-        console.log('Loaded feature types from GeoServer:', featureTypesData);
-
-        featureTypesData.forEach(featureTypeData => {
-          const featureTypeName = featureTypeData.name;
+        featureTypeNames.forEach(featureTypeName => {
           const featureTypeProjection = 'EPSG:3857'; // Reproject to EPSG:3857
-          console.log('Feature Type Data:', featureTypeData); 
+          console.log('Feature Type Name:', featureTypeName); 
           const featureTypeUrl = `${geoServerBaseUrl}/${workspaceName}/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=${featureTypeName}&outputFormat=application/json&srsName=${featureTypeProjection}`;
 
           const vectorLayer = new VectorLayer({
@@ -352,13 +338,17 @@ export default {
           this.layers[featureTypeName] = vectorLayer;
         });
       } catch (error) {
-        console.error("Failed to load feature types from GeoServer:", error);
+        console.error("Failed to load feature types:", error);
       }
     },
   },
   mounted() {
     this.mapContainer = this.$refs.mapContainer;
     this.initializeMap();
+    window.addEventListener('layers-added', this.loadGeoServerLayers);
+  },
+  unmouunted() {
+    window.removeEventListener('layers-added', this.loadGeoServerLayers);
   },
 };
 </script>
