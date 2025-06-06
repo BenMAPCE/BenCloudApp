@@ -30,17 +30,33 @@ export const getGridDefinitions = () => {
     return { fetch }
 }
 
-export const buildGridDefinitionOptions = (data) => {
+export const buildGridDefinitionOptions = (data, populationDatasetId) => {
+
+    var gridsExcluded = [];
+
+    //exclude 2010 or 2020 grids based on population dataset year
+    if(populationDatasetId == 50 || populationDatasetId == 51 || populationDatasetId == 52 || populationDatasetId == 53) {
+        gridsExcluded.push(18);
+        gridsExcluded.push(19);
+        gridsExcluded.push(20);
+    } else {
+        gridsExcluded.push(68);
+        gridsExcluded.push(69);
+        gridsExcluded.push(70);
+    }
 
     var records = JSON.parse(JSON.stringify(data));
     var options = [];
     var option = {};
 
       for (var i = 0; i < records.length; i++){
-          option = {};
-          option.value = records[i].id;
-          option.label = records[i].name;
-          options.push(option);
+        if(!gridsExcluded.includes(records[i].id)) {
+            option = {};
+            option.value = records[i].id;
+            option.label = records[i].name;
+            options.push(option);
+        }
+          
       }
 
       return options;

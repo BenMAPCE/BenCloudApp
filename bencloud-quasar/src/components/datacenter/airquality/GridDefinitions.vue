@@ -46,8 +46,14 @@ export default defineComponent({
     axios
       .get(process.env.API_SERVER + "/api/grid-definitions")
       .then((response) => {
-        this.options = response.data;
         console.log(response.data);
+        var gridOptions = [];
+        for (let i = 0; i < response.data.length; i++) {
+          if(response.data[i].archive == 0) {
+            gridOptions.push(response.data[i]);
+          }
+        }
+        this.options = gridOptions;
       });
   },
 });
