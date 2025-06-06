@@ -137,6 +137,7 @@ export default {
   },
 
   setup(props) {
+    const store = useStore();
     const name = ref("");
     const batch_task_id = ref(0);
     const task_uuid = ref("");
@@ -216,7 +217,7 @@ export default {
       //get all grid definitions to list  
       (async () => {
           const response = await getGridDefinitions().fetch();
-          gridOptions.value = buildGridDefinitionOptions(unref(response.data))
+          gridOptions.value = buildGridDefinitionOptions(unref(response.data), store.state.analysis.populationDatasetId)
         })()
     });
 
