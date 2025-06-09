@@ -26,7 +26,9 @@
   </div>
   
   <div class="row q-mt-lg header-text"> 
-    Step 3 (Optional): Select individual valuation functions via the edit(<q-icon class="edit-btn-note q-pt-xs" color="primary" name="mdi-pencil"></q-icon>) button in each row. Selected valuation functions will be run for each task (each Post-Policy/Year combination).
+    <span>
+      Step 3 (Optional): Select individual valuation functions via the edit(<q-icon class="edit-btn-note" color="primary" name="mdi-pencil"></q-icon>) button in each row. Selected valuation functions will be run for each task (each Post-Policy/Year combination).
+    </span>
   </div>
   
   <div class="row q-mt-sm">
