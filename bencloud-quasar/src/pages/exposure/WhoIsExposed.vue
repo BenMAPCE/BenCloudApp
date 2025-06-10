@@ -1,5 +1,5 @@
 <template>
-  <div v-if="stepHasError && atStep.value == 3">
+  <div v-if="stepHasError && atStep.value == 3" class="text-negative">
     Please make all selections
   </div>
   <div class="q-pa-md">
