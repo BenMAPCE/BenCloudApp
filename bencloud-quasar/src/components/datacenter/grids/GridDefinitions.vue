@@ -40,9 +40,6 @@
             ></q-btn>
             
           </template>
-          <template v-if="col.name === 'user' && props.row.share_scope != 1 && !!props.row.user_id">
-            {{props.row.user_id}}
-          </template>
           <template v-else-if="col.name === 'toggle'">
         <q-toggle
           size="lg"
@@ -412,8 +409,16 @@ const columns = [
     sortable: true,
     style: 'white-space: normal; word-break: break-word;' // Ensure wrapping for long names
   },
-  
-  { 
+  {
+    name: "user",
+    label: "User",
+    align: "left",
+    field: (row) => row.share_scope != 1 && !!row.user_id ? row.user_id : "",
+    format: (val) => `${val}`,
+    sortable: true,
+    style: 'white-space: normal; word-break: break-word;' // Ensure wrapping for long names
+  },
+  {
     name: "actions", 
     label: "", 
     field: "", 
