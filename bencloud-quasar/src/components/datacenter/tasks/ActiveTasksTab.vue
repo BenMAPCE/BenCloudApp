@@ -40,7 +40,7 @@
             key="task_status_message"
             :props="props"
           >
-            {{ props.row.batch_started_date }}
+            {{ convertUserTimezoneInStatusMessage(props.row.batch_started_date) }}
           </q-td>
           <q-td
             key="user"
@@ -83,7 +83,7 @@
             key="task_status_message"
             :props="props"
           >
-            {{ row.task_status_message ? row.task_status_message : "Pending" }}
+            {{ row.task_status_message ? convertUserTimezoneInStatusMessage(row.task_status_message) : "Pending" }}
           </q-td>
           <q-td
             key="user"
@@ -146,6 +146,7 @@ import { useStore } from "vuex";
 import { getActiveTasks } from "../../../composables/tasks/active-tasks";
 import ActiveTaskStatus from "./ActiveTaskStatus.vue";
 import { showAllTasks } from "../tasks/ManageTasksTabs.vue";
+import { convertToUserTimezone } from "src/composables/common/time";
 
 export default defineComponent({
   model: ref(null),
@@ -178,7 +179,7 @@ export default defineComponent({
     const timer = ref(null);
 
     let myFilter = unref(filter);
-    let activeTasksRefreshInterval = null;
+    let activeTasksRefreshTimeout = null;
 
     watch(
       () => showAllTasks.value,
@@ -194,7 +195,7 @@ export default defineComponent({
     );
 
     function loadActiveTasks() {
-
+      disableAutoRefresh();
       loading.value = true;
 
       (async () => {
@@ -207,27 +208,26 @@ export default defineComponent({
         }
 
         loading.value = false;
+
+        enableAutoRefresh();
       })();
 
     }
 
     function enableAutoRefresh() {
-    
-      activeTasksRefreshInterval = setInterval(function () {
+      activeTasksRefreshTimeout = setTimeout(function () {
         loadActiveTasks()   
       }.bind(this), 5000); 
 
     }
 
     function disableAutoRefresh() {
-      clearInterval(activeTasksRefreshInterval);
+      clearTimeout(activeTasksRefreshTimeout);
     }
 
     onMounted(() => {
       console.log(props.autoRefresh)
       loadActiveTasks();
-      enableAutoRefresh()
-
     });
 
     onBeforeUnmount(() => {
@@ -322,6 +322,18 @@ export default defineComponent({
       });
     }
 
+    function convertUserTimezoneInStatusMessage(statusMessage) {
+      const prefixes = ["Completed at ", "Started at "]
+      const i = prefixes.findIndex(s => statusMessage.startsWith(s));
+
+      console.log(statusMessage)
+      if ( i === -1) {
+        return statusMessage;
+      }
+
+      return prefixes[i] + convertToUserTimezone(statusMessage.substring(prefixes[i].length));
+    }
+
     return {
       columns,
       filter,
@@ -333,9 +345,10 @@ export default defineComponent({
       loadActiveTasks,
       onClickCancelOneTask,
       onClickCancelBatchTask,
-      activeTasksRefreshInterval,
+      activeTasksRefreshTimeout,
       progress1,
-      visibleColumns
+      visibleColumns,
+      convertUserTimezoneInStatusMessage
     };
   },
 });

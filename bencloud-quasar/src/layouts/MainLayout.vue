@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
+  <q-layout view="lhh Lpr lFf">
     <q-header elevated>
       <EPAAccordion v-bind:showEpaHeaderFooter="showEpaHeaderFooter"></EPAAccordion>
       <EPAHeader v-bind:showEpaHeaderFooter="showEpaHeaderFooter"></EPAHeader>
@@ -11,7 +11,7 @@
 
           <div>
             <div style="text-align: right;"><q-icon :name="'mdi-account-circle'" size="20px" /> {{username}}</div>
-            <div style="text-align: right; color: #909090">UI v{{ '0.5.0' }} | API v{{ apiVersion }} | DB v{{ dbVersion }} {{ environment === 'Production' ? '' : '(' + environment + ')' }}</div>
+            <div style="text-align: right; color: #909090">UI v{{ '0.6.0' }} | API v{{ apiVersion }} | DB v{{ dbVersion }} {{ environment === 'Production' ? '' : '(' + environment + ')' }}</div>
           </div>
         </q-toolbar>
       </div>
@@ -25,6 +25,7 @@
     </q-header>
 
     <q-page-container class="page-view">
+      <Banner></Banner>
       <router-view />
     </q-page-container>
 
@@ -38,6 +39,7 @@ import AppNavLinks from "src/components/navigation/AppNavLinks.vue";
 import EPAAccordion from "src/components/epa/EPAAccordion.vue";
 import EPAHeader from "src/components/epa/EPAHeader.vue";
 import EPAFooter from "src/components/epa/EPAFooter.vue";
+import Banner from "src/components/common/Banner.vue"
 import axios from "axios";
 
 const linksList = [
@@ -46,12 +48,14 @@ const linksList = [
     caption: "",
     icon: "mdi-home",
     link: "/#/",
+    openInNewTab: false
   },
   {
     title: "Data Center",
     caption: "",
     icon: "mdi-chart-box-outline",
     link: "/#/datacenter",
+    openInNewTab: false
   },
   // {
   //   title: "Settings",
@@ -70,12 +74,14 @@ const linksList = [
     caption: "",
     icon: "mdi-help",
     link: "https://www.epa.gov/benmap/benmap-cloud",
+    openInNewTab: true
   },
   {
     title: "Feedback",
     caption: "",
     icon: "mdi-comment-text-outline",
     link: "https://www.epa.gov/benmap/forms/contact-us-about-benmap",
+    openInNewTab: true
   },
 ];
 
@@ -87,6 +93,7 @@ export default defineComponent({
     EPAAccordion,
     EPAHeader,
     EPAFooter,
+    Banner,
   },
 
   setup() {
@@ -118,6 +125,7 @@ export default defineComponent({
             // For non-302 errors with no message, display a generic error pop up 
           }
         }     
+        return Promise.reject(error);
       }
     )
 

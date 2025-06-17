@@ -53,6 +53,7 @@
 <script>
 import { defineComponent } from "vue";
 import { ref, unref, watch, onBeforeMount, onUpdated, onMounted } from "vue";
+import { useStore } from "vuex";
 import { useQuasar, date } from "quasar";
 import { getValuationTaskResults } from "../../../../composables/tasks/task-results";
 import DownloadTaskResultsDialog from "../DownloadTaskResultsDialog.vue";
@@ -66,7 +67,7 @@ export default defineComponent({
   setup(props, context) {
     //const task_type = ref("");
     //const task_uuid = ref(null);
-
+    const store = useStore();
     const filter = ref("");
     const loading = ref(false);
     const pagination = ref({
@@ -107,7 +108,8 @@ export default defineComponent({
           task_type: props.valuation_task_type,
           batch_task_id: props.batch_task_id,
           valuation_grid_id:props.valuation_grid_id,
-          valuation_grid_name: props.valuation_grid_name
+          valuation_grid_name: props.valuation_grid_name,
+          visible_columns: store.state.analysis.hifResultColumns
         },
       })
         .onOk(() => {
@@ -126,8 +128,9 @@ export default defineComponent({
         "endpoint", 
         "name", 
         "study", 
+        "metric",
         "qualifier",
-        "ages", 
+        "val_ages", 
         "point_estimate"
       ];
       loadValuationResults(props.task_uuid);
@@ -150,8 +153,9 @@ const visibleColumns = ref([
   "endpoint",
   "name",
   "study",
+  "metric",
   "qualifier",
-  "ages",
+  "val_ages",
   "point_estimate",
   //"standard_deviation",
   //"race",
@@ -187,6 +191,13 @@ const columns = [
     sortable: true,
   },
   {
+    name: "metric",
+    label: "Metric",
+    field: (row) => row.metric,
+    align: "left",
+    sortable: true,
+  },
+  {
     name: "qualifier",
     label: "Qualifier",
     field: (row) => row.qualifier,
@@ -197,7 +208,7 @@ const columns = [
   },
   {
     name: "ages",
-    label: "Ages",
+    label: "HIF Ages",
     align: "left",
     field: (row) => row.start_age + "-" + row.end_age,
     format: (val) => `${val}`,
@@ -205,10 +216,19 @@ const columns = [
     sortable: true,
   },
   {
+    name: "val_ages",
+    label: "Valuation Ages",
+    align: "left",
+    field: (row) => row.valuation_start_age + "-" + row.valuation_end_age,
+    format: (val) => `${val}`,
+    align: "right",
+    sortable: true,
+  },
+  {
     name: "point_estimate",
-    label: "Valuation Point Estimate",
+    label: "Valuation Point Estimate (2020$)",
     field: (row) =>
-      row.point_estimate.toLocaleString("en-US", { maximumFractionDigits: 4 }),
+      row.point_estimate.toLocaleString("en-US", { maximumFractionDigits: 2 }),
     sort: (a, b, rowA, rowB) => parseFloat(rowA.point_estimate) - parseFloat(rowB.point_estimate),
     sortable: true,
   },
@@ -216,7 +236,7 @@ const columns = [
     name: "standard_deviation",
     label: "Standard Deviation",
     field: (row) =>
-      row.standard_deviation.toLocaleString("en-US", { maximumFractionDigits: 4 }),
+      row.standard_deviation.toLocaleString("en-US", { maximumFractionDigits: 2 }),
     sort: (a, b, rowA, rowB) => parseFloat(rowA.standard_deviation) - parseFloat(rowB.standard_deviation),
     sortable: true,
   },
@@ -252,13 +272,13 @@ const columns = [
   },
   {
     name: "formatted_results_2sf",
-    label: "Formatted Results (2 sig. figs.)",
+    label: "Formatted Results (2020$, 2 sig. figs.)",
     field: "formatted_results_2sf",
     sortable: false
   },
   {
     name: "formatted_results_3sf",
-    label: "Formatted Results (3 sig. figs.)",
+    label: "Formatted Results (2020$, 3 sig. figs.)",
     field: "formatted_results_3sf",
     sortable: false
   },

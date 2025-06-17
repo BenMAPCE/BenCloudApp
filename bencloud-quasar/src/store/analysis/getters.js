@@ -117,3 +117,7 @@ export function batchTaskObject (state) {
 export function valuationSelection (state) {
   return state.valuationSelection;
 }
+
+export function hifResultColumns (state) {
+  return state.hifResultColumns;
+}

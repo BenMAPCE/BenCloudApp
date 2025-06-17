@@ -1,6 +1,7 @@
 import { route } from 'quasar/wrappers'
 import { createRouter, createMemoryHistory, createWebHistory, createWebHashHistory } from 'vue-router'
 import routes from './routes'
+import { startSessionTimer } from '../composables/common/sessionManager'
 
 /*
  * If not building with SSR mode, you can
@@ -24,6 +25,19 @@ export default route(function (/* { store, ssrContext } */) {
     // quasar.conf.js -> build -> vueRouterMode
     // quasar.conf.js -> build -> publicPath
     history: createHistory(process.env.MODE === 'ssr' ? void 0 : process.env.VUE_ROUTER_BASE)
+  })
+
+  // Global navigation guard
+  Router.beforeEach((to, from, next) => {
+    console.log('Global navigation guard triggered.');
+
+    // Initialize or reset the session timer
+    if (to.meta.requiresAuth !== false) {
+      console.log('Initializing or resetting session timer.');
+      startSessionTimer();
+    }
+
+    next(); // Proceed to the next route
   })
 
   return Router

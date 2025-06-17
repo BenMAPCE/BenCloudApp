@@ -38,10 +38,16 @@
               @click.stop="editRow(props)"
               icon="mdi-pencil"
             ></q-btn>
+            
           </template>
-          <template v-if="col.name === 'user' && props.row.share_scope != 1 && !!props.row.user_id">
-            {{props.row.user_id}}
-          </template>
+          <template v-else-if="col.name === 'toggle'">
+        <q-toggle
+          size="lg"
+          v-model="props.row.visible"
+          color="blue"
+          @update:model-value="toggleLayerVisibility(props.row)"
+        />
+      </template>
         </q-td>
       </q-tr>
     </template>  
@@ -79,15 +85,132 @@ export default defineComponent({
     },
   },
   methods: {
-   
-  //might need later once maps are added to display the grid definitions
+    async editRow(props) {
+  try {
+    const GridNameChangeForm = await import('../../common/GridNameChangeForm.vue');
 
-    rowClicked(props) {
-      // this.selected = [];
-      // this.selected.push(props.row);
-      // this.$store.commit("grids/updateGridId", props.row.id);
+    // Open the dialog and properly wait for the user's response
+    const result = await this.$q.dialog({
+      component: GridNameChangeForm.default,
+      componentProps: {  // Changed from props to componentProps
+        currentName: props.row.name
+      },
+    }).onOk(async (submittedName) => {
+      try {
+        if (!submittedName || !submittedName.newDescription || submittedName.newDescription.trim() === "") {
+          throw new Error("Grid name cannot be empty.");
+        }
+
+        const newName = submittedName.newDescription.trim();
+        const templateData = new FormData();
+        templateData.append("newName", newName);
+
+        // Make the API call to update the grid name after confirmation
+        const response = await axios.put(
+          `${process.env.API_SERVER}/api/grid-definitions/${props.row.id}`,
+          templateData
+        );
+
+        if (response.status === 200) {
+          this.$q.notify({ type: "positive", message: "Grid name updated successfully!" });
+          props.row.name = newName;
+        } else {
+          throw new Error("Update failed, please try again.");
+        }
+      } catch (apiError) {
+        console.error("API Error:", apiError.message);
+        this.$q.notify({ type: "negative", message: apiError?.response?.data?.message || apiError.message });
+      }
+    });
+
+  } catch (error) {
+    console.error("Error during dialog interaction:", error.message);
+    this.$q.notify({ type: "negative", message: error.message });
+  }
+},
+
+    deleteRow(props) {
+      // Prompt user to confirm grid definition deletion
+      if(confirm("Are you sure you wish to permanently delete " + props.row.name + "?")){
+        // Delete grid, reload the grid list if successful, alert the user if unsuccessful       
+        axios
+          .delete(process.env.API_SERVER + "/api/grid-definitions/" + props.row.id, 
+            {validateStatus: function (status) {
+              return status < 500;
+            }}
+          )
+          .then((response) => {
+            if(response.status === 204) {
+              trackCurrentPage = this.pagination.page;
+              console.log("Successfully deleted grid-definition: " + props.row.name);
+
+              // Reload list
+              var oldValue =  this.$store.state.grids.gridForceReloadValue
+              console.log("oldValue: " + oldValue);
+              var newValue = oldValue - 1;
+              console.log("newValue: " + newValue);
+              this.$store.commit("grids/updateGridForceReloadValue", newValue)
+            } else if(response.status === 403){
+              console.log("Forbidden action on grid definition: " + props.row.name);
+              this.$q.notify({
+                group: false, // required to be updateable
+                type: 'negative',
+                timeout: 6000, 
+                color: "red",
+                spinner: false, // we reset the spinner setting so the icon can be displayed
+                position: "top",
+                message: response.data.message,
+              });
+              this.$emit('ok')
+            } else {
+              this.$q.notify({
+                group: false, // required to be updateable
+                type: 'negative',
+                timeout: 6000, 
+                color: "red",
+                spinner: false, // we reset the spinner setting so the icon can be displayed
+                position: "top",
+                message: "Unknown error: " + response.status,
+              });
+              this.$emit('ok')
+            }
+          });
+      }
     },
+
+  toggleLayerVisibility(row) {
+    const layerName = this.mapIdToLayerName(row.id, row.table_name);
+    if (!layerName) {
+      console.error(`Layer name not found for row ID: ${row.id}`);
+      return;
+    }
+
+    if (row.visible) {
+      this.$store.commit('grids/addVisibleLayer', layerName);
+    } else {
+      this.$store.commit('grids/removeVisibleLayer', layerName);
+    }
+    console.log(this.$store.state.grids.visibleLayers);
   },
+  
+  // Map ID to layer name based on gridmap or use table_name if not found
+  // Can probably remove this and just use table_name directly once 2010 grids are deleted
+  mapIdToLayerName(id, tableName) {
+    const gridmap = {
+      28: "grid12km",
+      18: "county2010",
+      19: "state",
+      20: "nation",
+      70: "nation",
+      69: "state",
+      68: "county2020"
+    };
+    return gridmap[id] || tableName.replace(/^grids\./, '');
+
+  },
+},
+
+  
 
   data() {
     return {
@@ -214,8 +337,12 @@ export default defineComponent({
             for(let i = 0; i < rowsPerPage; i++) {
               if(!!data[(loadPage-1)*rowsPerPage + i]) {
                 rows.value[i] = data[(loadPage-1)*rowsPerPage + i];
+                rows.value[i].visible = false; // Set default state to false
               }
             }
+            window.dispatchEvent(new CustomEvent('layers-added', { 
+              detail: rows.value.map(r => r.table_name.replace(/^grids\./, ''))
+            }))
 
             // don't forget to update local pagination object
             pagination.value.page = loadPage;
@@ -264,21 +391,14 @@ export default defineComponent({
 const rows = [];
 
 const visibleColumns = ref([
-  "id",
   "name",
-  "col_count",
-  "row_count"
+  "toggle",
+  "edit",
+  "actions"
 ]);
 
 const columns = [
-  {
-    name: "id",
-    label: "ID",
-    align: "left",
-    field: (row) => row.id,
-    format: (val) => `${val}`,
-    sortable: true,
-  },
+  
   {
     name: "name",
     required: true,
@@ -287,27 +407,18 @@ const columns = [
     field: (row) => row.name,
     format: (val) => `${val}`,
     sortable: true,
+    style: 'white-space: normal; word-break: break-word;' // Ensure wrapping for long names
   },
   {
-    name: "col_count",
-    required: true,
-    label: "Columns",
+    name: "user",
+    label: "User",
     align: "left",
-    field: (row) => row.col_count,
+    field: (row) => row.share_scope != 1 && !!row.user_id ? row.user_id : "",
     format: (val) => `${val}`,
     sortable: true,
+    style: 'white-space: normal; word-break: break-word;' // Ensure wrapping for long names
   },
   {
-    name: "row_count",
-    required: true,
-    label: "Rows",
-    align: "left",
-    field: (row) => row.row_count,
-    format: (val) => `${val}`,
-    sortable: true,
-  },
-  
-  { 
     name: "actions", 
     label: "", 
     field: "", 
@@ -319,5 +430,12 @@ const columns = [
     field: "", 
     align: "left" 
   },
+  {
+    name: "toggle",
+    label: "View Layer",
+    align: "center",
+    field: "",
+    sortable: false,
+  }
 ];
 </script>

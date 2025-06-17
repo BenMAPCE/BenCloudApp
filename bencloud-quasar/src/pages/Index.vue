@@ -236,4 +236,15 @@ export default defineComponent({
     padding: 0;
     margin-top: 0;
   }
+
+  @media (min-width: 1200px) {
+    .description, .prompt {
+      font-size: 32px;
+    }
+
+    .home-options {
+      padding-left: 50px;
+      padding-top: 20px;
+    }
+  }
 </style>

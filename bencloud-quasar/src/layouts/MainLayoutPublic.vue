@@ -9,7 +9,7 @@
             BenMAP - Benefits Mapping and Analysis Program
           </q-toolbar-title>
 
-          <div>UI v{{ '0.5.0' }} | API v{{ apiVersion }} | DB v{{ dbVersion }} {{ environment === 'Production' ? '' : '(' + environment + ')' }}</div>
+          <div>UI v{{ '0.6.0' }} | API v{{ apiVersion }} | DB v{{ dbVersion }} {{ environment === 'Production' ? '' : '(' + environment + ')' }}</div>
         </q-toolbar>
       </div>    </q-header>
 
@@ -26,6 +26,7 @@ import { defineComponent, onBeforeMount, ref } from "vue";
 import EPAHeader from "src/components/epa/EPAHeader.vue";
 import EPAFooter from "src/components/epa/EPAFooter.vue";
 import EPAAccordion from "src/components/epa/EPAAccordion.vue";
+import axios from "axios";
 
 export default defineComponent({
   name: "MainLayoutPublic",

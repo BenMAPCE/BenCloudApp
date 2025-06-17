@@ -13,6 +13,7 @@
                 flat
                 @added="file_selected"
                 @removed="file_removed"
+                @rejected="file_rejected"
                 bordered
                 hide-upload-btn
               >
@@ -351,7 +352,29 @@ export default {
           console.log(response.data.messages);
           
           if(response.status === 200) {
-            this.$q
+            if(response.data.success === false){
+              if (response.data.messages.length > 0){
+                console.log("Show Errors");
+                this.$q
+                .dialog({component: AirQualityUploadErrorsDialog,
+                  parent: this,
+                  persistent: true,
+                  componentProps: {
+                    errorList: response.data.messages,
+                    fileName: this.selected_file.name,
+                  },
+                })
+                .onOk(() => {
+                  console.log("OK");
+                })
+                .onCancel(() => {
+                })
+                .onDismiss(() => {
+                });
+              }
+            }
+            else{
+              this.$q
               .dialog({
                 component: AirQualityUploadSuccessDialog,
                 parent: this,
@@ -368,6 +391,8 @@ export default {
               })
               .onDismiss(() => {
               });
+            }
+            
           } else {
             console.log("BAD NEWS");
             if (response.data.messages.length > 0) {
@@ -443,6 +468,26 @@ export default {
     file_removed: function (file) {
       this.selected_file = "";
       this.check_if_document_upload = false;
+    },
+
+    file_rejected: function(rejections){
+      rejections.forEach(rejection=>{
+        if(rejection.failedPropValidation === 'max-file-size'){
+          this.$q.notify({
+            type: 'negative',
+            position: 'top',
+            message: 'File ' + rejection.file.name + ' exceeds 20MB limit!'
+          });
+          //console.log('Size limit reach.');
+        }
+        else{
+          this.$q.notify({
+            type: 'negative',
+            position: 'top',
+            message: 'File ' + rejection.file.name + ' is rejected.'
+          });
+        }
+      });    
     },
 
     onCancelClick() {

@@ -135,7 +135,10 @@ export default defineComponent({
     const postPolicyAirQualityName = store.state.analysis.postPolicyAirQualityName;
 
     const incidenceId = store.state.analysis.incidenceId;
-    const incidenceName = store.state.analysis.incidenceName;
+    var incidenceName = store.state.analysis.incidenceName;
+    if(incidenceId == -1) {
+      incidenceName = "Best EPA Match";
+    }
     const populationDatasetId = store.state.analysis.populationDatasetId;
     const populationDatasetName = store.state.analysis.populationDatasetName;
     const valuationsForHealthImpactFunctionGroups =
@@ -157,10 +160,16 @@ export default defineComponent({
     var batchTaskId = null;
     var valuationFunctionCount = null;
     var totalTaskCount = null;
+    var batchTaskObject = JSON.parse(JSON.stringify(store.state.analysis.batchTaskObject));
 
-    valuationsForHealthImpactFunctionGroups.forEach(e => {
-      valuationFunctionCount += e.valuation_ids.length;
-    })
+
+    for(var i = 0; i < batchTaskObject.batchHifGroups.length; i++) {
+      for(var j = 0; j < batchTaskObject.batchHifGroups[i].hifs.length; j++) {
+        for(var k = 0; k < batchTaskObject.batchHifGroups[i].hifs[j].valuationFunctions.length; k++) {
+          valuationFunctionCount++;
+        }
+      }
+    }
 
     postPolicyAirQualityName.forEach(e => {
       totalTaskCount += e.years.length;

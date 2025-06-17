@@ -6,13 +6,14 @@
             <div class="row">
               <div class="col-12">
                 <q-uploader
-                  label="Upload your CSV"
-                  accept=".csv"
+                  label="Upload your zipped shape file"
+                  accept=".zip"
                   :max-file-size="20000000"
                   square
                   flat
                   @added="file_selected"
                   @removed="file_removed"
+                  @rejected="file_rejected"
                   bordered
                   hide-upload-btn
                 >
@@ -26,6 +27,14 @@
                     <q-btn v-if="scope.canAddFiles" type="a" icon="mdi-paperclip" @click="scope.pickFiles" square flat>
                       <q-uploader-add-trigger />
                     </q-btn>
+                  </div>
+                </template>
+                <template v-slot:list="scope">
+                  <div class="q-uploader__list scroll">
+                    <div v-if="scope.files.length === 0" class="q-uploader__no-files">
+                      {{ this.errorMessage || '*Please upload your grid as a ZIP folder containing the following: .shp, .shx, .dbf, and .prj files.' }}
+                    </div>
+                    <q-uploader-file v-for="file in scope.files" :key="file.name" :file="file" />
                   </div>
                 </template>
               </q-uploader>
@@ -44,7 +53,7 @@
                   filled
                   dense
                   v-model="name"
-                  label="*File Name"
+                  label="*Descriptive Name"
                   hint=""
                   lazy-rules
                   :rules="[(val) => (val && val.length > 0) || 'Please enter a name']"
@@ -60,18 +69,17 @@
             </div>
           </q-form>
   
-          <q-card-section class="error-card" v-if="this.errorMessage != ''">
+          <!-- <q-card-section class="error-card" v-if="this.errorMessage != ''">
             {{ this.errorMessage }}
-          </q-card-section>
+          </q-card-section> -->
         </q-card>
       </q-dialog>
     </div>
   </template>
   
   <script>
-  import AirQualityUploadErrorsDialog from "./AirQualityUploadErrorsDialog.vue";
-  import AirQualityUploadSuccessDialog from "./AirQualityUploadSuccessDialog.vue";
-  
+  import GridDefinitionUploadErrorsDialog from "./GridDefinitionUploadErrorsDialog.vue";
+  import GridDefinitionUploadSuccessDialog from "./GridDefinitionUploadSuccessDialog.vue";
   import { useQuasar } from "quasar";
   import { useStore } from "vuex";
   
@@ -96,17 +104,7 @@
       "hide",
     ],
   
-    watch: {
-      dataType(newValue, oldValue) {
-        if (newValue.toLowerCase()=="hybrid model") {
-          this.descriptionHint = "Please enter details about the hybrid model.";
-          console.log("newValue.toLowerCase()=='hybrid model'");
-        }
-        else{
-          this.descriptionHint = "";
-        }
-      },
-    },
+    
   
     methods: {
       // following method is REQUIRED
@@ -154,7 +152,6 @@
       },
   
       onSubmit() {
-        console.log(this.pollutantValue);
         var hasErrors = false;
         this.errorMessage = "";
   
@@ -165,12 +162,7 @@
             this.errorMessage + (hasErrors ? ", " : "") + "Name is required";
           hasErrors = true;
         }
-  
-        if (this.gridValue === 0) {
-          this.errorMessage =
-            this.errorMessage + (hasErrors ? ", " : "") + "Grid is required";
-          hasErrors = true;
-        }
+
   
         if (this.selected_file === "") {
           this.errorMessage =
@@ -190,7 +182,6 @@
         const fileData = new FormData();
         fileData.append("file", this.selected_file);
         fileData.append("name", this.name);
-        fileData.append("gridId", this.gridValue);
         fileData.append("filename", this.selected_file.name);
         console.log(fileData);
         fileData.append("uploadDate",localISOTime)
@@ -224,7 +215,7 @@
   
                 this.$q
                   .dialog({
-                    component: AirQualityUploadErrorsDialog,
+                    component: GridDefinitionUploadErrorsDialog,
                     parent: this,
                     persistent: true,
                     componentProps: {
@@ -244,7 +235,7 @@
             } else {
               this.$q
                 .dialog({
-                  component: AirQualityUploadSuccessDialog,
+                  component: GridDefinitionUploadSuccessDialog,
                   parent: this,
                   persistent: true,
                   componentProps: {
@@ -303,6 +294,7 @@
       },
   
       file_selected: function (file) {
+        this.errorMessage = ""; // Clear any previous error messages
         this.selected_file = file[0];
         this.check_if_document_upload = true;
       },
@@ -312,27 +304,34 @@
         this.check_if_document_upload = false;
       },
   
+      file_rejected: function (rejectedFiles) {
+        rejectedFiles.forEach(rejection=>{
+          if(rejection.failedPropValidation === 'max-file-size'){
+            this.$q.notify({
+              type: 'negative',
+              position:'top',
+              message:'File size exceeds 20MB limit!'
+            });
+            this.errorMessage = "File " + rejection.file.name + " exceeds 20MB limit!";
+            //console.log('Size limit reach.');
+          }
+          else{
+            this.$q.notify({
+              type: 'negative',
+              position:'top',
+              message:'Invalid file format!'
+            });
+            this.errorMessage = "Invalid file format. Please upload a ZIP file containing .shp, .shx, .dbf, and .prj files.";
+          }
+        })
+        
+        
+      },
+  
       onCancelClick() {
         // we just need to hide the dialog
         this.hide();
       },
-  
-      onRejected(rejectedEntries) {
-      },
-  
-      onChangePollutantValue(value) {
-        this.pollutantValue = value;
-      },
-      onChangeGridValue(value) {
-        this.gridValue = value;
-      },
-  
-      hybridSelected(value){
-        if(value.toLowerCase()=="hybrid model")
-        {
-          this.descriptionHint = "Please enter the description for this hybrid model.";
-        }
-      }
     },
   };
   </script>

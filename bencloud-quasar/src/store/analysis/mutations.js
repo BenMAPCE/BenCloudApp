@@ -49,6 +49,8 @@ export function updateHealthImpactFunctions(state, healthImpactFunctions) {
 export function updatePrePolicyAirQuality(state, prePolicyAirQuality) {
     state.prePolicyAirQualityId = prePolicyAirQuality.prePolicyAirQualityId;
     state.prePolicyAirQualityName = prePolicyAirQuality.prePolicyAirQualityName;
+    state.prePolicyGridDefinitionId = prePolicyAirQuality.prePolicyGridDefinitionId;
+    state.prePolicyGridDefinitionName = prePolicyAirQuality.prePolicyGridDefinitionName;
 }
 
 export function updatePrePolicyAirQualityId(state, prePolicyAirQualityId) {
@@ -66,6 +68,8 @@ export function updatePrePolicyAirQualityMetricId(state, metricId) {
 export function updatePostPolicyAirQuality(state, postPolicyAirQuality) {
     state.postPolicyAirQualityId = postPolicyAirQuality.postPolicyAirQualityId;
     state.postPolicyAirQualityName = postPolicyAirQuality.postPolicyAirQualityName;
+    state.postPolicyGridDefinitionId = postPolicyAirQuality.postPolicyGridDefinitionId;
+    state.postPolicyGridDefinitionName = postPolicyAirQuality.postPolicyGridDefinitionName;
 }
 
 export function updatePostPolicyAirQualityId(state, postPolicyAirQualityId) {
@@ -156,4 +160,8 @@ export function updateBatchTaskObject (state, batchTaskObject) {
 
 export function updateValuationSelection (state, valuationSelection) {
     state.valuationSelection = valuationSelection;
+}
+
+export function updateHifResultColumns (state, hifResultColumns) {
+    state.hifResultColumns = hifResultColumns;
 }

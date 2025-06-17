@@ -15,6 +15,10 @@
       <p class="label">Pre-policy: </p>
       <p>{{ task_pre_policy }}</p>  
     </div>
+    <div v-if="task_uuid_with_type.substring(0,1) === 'E'" class="info task-metric">
+      <p class="label"> Metric: </p>
+      <p>{{ task_metric }}</p>  
+    </div>
     <div class="info task-completed-date">
       <p class="label">Completed: </p>
       <p>{{ task_completed_date }}</p>  
@@ -50,7 +54,7 @@
     <div class="task-results">
       <TaskResultsTabs v-bind:task_uuid_with_type="task_uuid_with_type" v-bind:task_name="task_name" 
         v-bind:valuation_task_uuid_with_type="valuation_task_uuid_with_type" v-bind:valuation_task_name="valuation_task_name"
-        v-bind:batch_task_id = "batch_task_id" v-bind:valuation_grid_id = "valuation_grid_id" v-bind:valuation_grid_name = "valuation_grid_name"
+        v-bind:batch_task_id = "batch_task_id" v-bind:valuation_grid_id = "valuation_grid_id" v-bind:valuation_grid_name = "valuation_grid_name" v-bind:pollutant_name = "pollutant_name"
         :key="componentKey"></TaskResultsTabs>
     </div>
 
@@ -80,6 +84,7 @@ export default defineComponent({
     const batch_task_id = route.params.batch_task_id;
     const pollutant_name = ref("");
     const task_pre_policy = ref("");
+    const task_metric = ref("");
     const batch_task_name = ref("NO TASK NAME")
     const task_name = ref("");
     const valuation_task_name = ref("");
@@ -195,6 +200,7 @@ export default defineComponent({
             .get(process.env.API_SERVER + "/api/batch-tasks/" + batch_task_id + "/scenarios")
             .then((response) => {
               task_pre_policy.value = response.data.aq_baseline_name
+              task_metric.value = response.data.task_metric_name
               pollutant_name.value = response.data.pollutant_name
               batch_info.value = response.data
               valuation_grid_id.value = response.data.valuation_grid_id
@@ -230,6 +236,7 @@ export default defineComponent({
       batch_task_name,
       pollutant_name,
       task_pre_policy,
+      task_metric,
       scenario_names,
       scenario_years,
       selected_scenario_name,

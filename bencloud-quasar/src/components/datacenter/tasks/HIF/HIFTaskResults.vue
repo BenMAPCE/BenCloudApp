@@ -53,6 +53,7 @@
 <script>
 import { defineComponent } from "vue";
 import { ref, unref, watch, onBeforeMount, onUpdated, onMounted } from "vue";
+import { useStore } from "vuex";
 import { useQuasar, date } from "quasar";
 import { getHIFTaskResults } from "../../../../composables/tasks/task-results";
 import DownloadTaskResultsDialog from "../DownloadTaskResultsDialog.vue";
@@ -66,7 +67,7 @@ export default defineComponent({
   setup(props, context) {
     //const task_type = ref("");
     //const task_uuid = ref(null);
-
+    const store = useStore();
     const filter = ref("");
     const loading = ref(false);
     const pagination = ref({
@@ -79,6 +80,16 @@ export default defineComponent({
 
     const rows = ref([]);
 
+    watch(
+      () => visibleColumns.value,
+      (currentSelectedItems, prevSelectedItems) => {
+        console.log("watch: " + currentSelectedItems + " | " + prevSelectedItems)
+        if (currentSelectedItems != prevSelectedItems) {
+          var columnsString = currentSelectedItems.join();
+          store.commit("analysis/updateHifResultColumns", columnsString);
+        }
+      });
+
     function loadHIFResults() {
       loading.value = true;
 
@@ -86,6 +97,20 @@ export default defineComponent({
         const response = await getHIFTaskResults(props.task_uuid).fetch();
         rows.value = JSON.parse(JSON.stringify(unref(response.data)));
         loading.value = false;
+
+        rows.value.some(function(row) {
+          if( row.race !== "ALL") {
+              visibleColumns.value.push("race");
+              return true;
+            }
+        })
+
+        rows.value.some(function(row) {
+          if( row.ethnicity !== "ALL") {
+              visibleColumns.value.push("ethnicity");
+              return true;
+            }
+        })
       })();
     }
 
@@ -100,7 +125,8 @@ export default defineComponent({
           task_type: props.task_type,
           batch_task_id: props.batch_task_id,
           valuation_grid_id: props.valuation_grid_id,
-          valuation_grid_name: props.valuation_grid_name
+          valuation_grid_name: props.valuation_grid_name,
+          visible_columns: store.state.analysis.hifResultColumns
         },
       })
         .onOk(() => {
@@ -120,6 +146,7 @@ export default defineComponent({
         "ages",
         "study",
         "qualifier",
+        //"incidence_prevalence",
         "delta_aq",
         "point_estimate",
         "population",
@@ -148,6 +175,7 @@ const visibleColumns = ref([
   "ages",
   "study",
   "qualifier",
+  //"beta",
   //"location",
   //"race",
   //"ethnicity",
@@ -155,11 +183,16 @@ const visibleColumns = ref([
   //"metric",
   //"seasonal_metric",
   //"metric_statistic",
+  //"incidence_prevalence",
   "delta_aq",
   //"baseline_aq",
   //"scenario_aq",
   "point_estimate",
+  //"mean",
   //"standard_deviation",
+  //"variance",
+  //"pct_2_5",
+  //"pct_97_5",
   "population",
   "baseline",
   //"percent_of_baseline",
@@ -209,6 +242,13 @@ const columns = [
     sortable: true,
   },
   {
+    name: "beta",
+    label: "Beta",
+    field: (row) => row.beta.toLocaleString("en-US", { maximumFractionDigits: 2 }),
+    sort: (a, b, rowA, rowB) => parseFloat(rowA.beta) - parseFloat(rowB.beta),
+    sortable: true,
+  },
+  {
     name: "location",
     label: "Study Location",
     field: "location",
@@ -252,53 +292,92 @@ const columns = [
     sortable: true,
   },
   {
+    name: "incidence_prevalence",
+    align: "left",
+    label: "Incidence or Prevalence",
+    field: "incidence_prevalence",
+    sortable: true,
+  },
+  {
     name: "delta_aq",
     label: "Change in AQ",
-    field: (row) => row.delta_aq.toLocaleString("en-US", { maximumFractionDigits: 4 }),
+    field: (row) => row.delta_aq.toLocaleString("en-US", { maximumFractionDigits: 2 }),
     sort: (a, b, rowA, rowB) => parseFloat(rowA.delta_aq) - parseFloat(rowB.delta_aq),
     sortable: true,
   },
   {
     name: "baseline_aq",
     label: "Pre-policy AQ",
-    field: (row) => row.baseline_aq.toLocaleString("en-US", { maximumFractionDigits: 4 }),
+    field: (row) => row.baseline_aq.toLocaleString("en-US", { maximumFractionDigits: 2 }),
     sort: (a, b, rowA, rowB) => parseFloat(rowA.baseline_aq) - parseFloat(rowB.baseline_aq),
     sortable: true,
   },
   {
     name: "scenario_aq",
     label: "Post-policy AQ",
-    field: (row) => row.scenario_aq.toLocaleString("en-US", { maximumFractionDigits: 4 }),
+    field: (row) => row.scenario_aq.toLocaleString("en-US", { maximumFractionDigits: 2 }),
     sort: (a, b, rowA, rowB) => parseFloat(rowA.scenario_aq) - parseFloat(rowB.scenario_aq),
+    sortable: true,
+  },
+  {
+    name: "mean",
+    label: "Mean",
+    field: (row) =>
+      row.mean.toLocaleString("en-US", { maximumFractionDigits: 2 }),
+    sort: (a, b, rowA, rowB) => parseFloat(rowA.mean) - parseFloat(rowB.mean),
     sortable: true,
   },
   {
     name: "standard_deviation",
     label: "Standard Deviation",
     field: (row) =>
-      row.standard_deviation.toLocaleString("en-US", { maximumFractionDigits: 4 }),
+      row.standard_deviation.toLocaleString("en-US", { maximumFractionDigits: 2 }),
     sort: (a, b, rowA, rowB) => parseFloat(rowA.standard_deviation) - parseFloat(rowB.standard_deviation),
+    sortable: true,
+  },
+  {
+    name: "variance",
+    label: "Variance",
+    field: (row) =>
+      row.variance.toLocaleString("en-US", { maximumFractionDigits: 2 }),
+    sort: (a, b, rowA, rowB) => parseFloat(rowA.variance) - parseFloat(rowB.variance),
+    sortable: true,
+  },
+  {
+    name: "pct_2_5",
+    label: "2.5 Percentile",
+    field: (row) =>
+      row.pct_2_5.toLocaleString("en-US", { maximumFractionDigits: 2 }),
+    sort: (a, b, rowA, rowB) => parseFloat(rowA.pct_2_5) - parseFloat(rowB.pct_2_5),
+    sortable: true,
+  },
+  {
+    name: "pct_97_5",
+    label: "97.5 Percentile",
+    field: (row) =>
+      row.pct_97_5.toLocaleString("en-US", { maximumFractionDigits: 2 }),
+    sort: (a, b, rowA, rowB) => parseFloat(rowA.pct_97_5) - parseFloat(rowB.pct_97_5),
     sortable: true,
   },
   {
     name: "point_estimate",
     label: "Change in Incidence (Cases)",
     field: (row) =>
-      row.point_estimate.toLocaleString("en-US", { maximumFractionDigits: 4 }),
+      row.point_estimate.toLocaleString("en-US", { maximumFractionDigits: 2 }),
     sort: (a, b, rowA, rowB) => parseFloat(rowA.point_estimate) - parseFloat(rowB.point_estimate),
     sortable: true,
   },
   {
     name: "population",
     label: "Population Exposed",
-    field: (row) => row.population.toLocaleString("en-US", { maximumFractionDigits: 4 }),
+    field: (row) => row.population.toLocaleString("en-US", { maximumFractionDigits: 2 }),
     sort: (a, b, rowA, rowB) => parseFloat(rowA.population) - parseFloat(rowB.population),
     sortable: true,
   },
   {
     name: "baseline",
     label: "Baseline Incidence",
-    field: (row) => row.baseline.toLocaleString("en-US", { maximumFractionDigits: 4 }),
+    field: (row) => row.baseline.toLocaleString("en-US", { maximumFractionDigits: 2 }),
     sort: (a, b, rowA, rowB) => parseFloat(rowA.baseline) - parseFloat(rowB.baseline),
     sortable: true,
   },
@@ -306,7 +385,7 @@ const columns = [
     name: "percent_of_baseline",
     label: "Percent of Baseline",
     field: (row) =>
-      row.percent_of_baseline.toLocaleString("en-US", { maximumFractionDigits: 4 }),
+      row.percent_of_baseline.toLocaleString("en-US", { maximumFractionDigits: 2 }),
     sort: (a, b, rowA, rowB) => parseFloat(rowA.percent_of_baseline) - parseFloat(rowB.percent_of_baseline),
     sortable: true,
   },

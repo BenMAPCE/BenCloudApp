@@ -13,6 +13,7 @@
                 flat
                 @added="file_selected"
                 @removed="file_removed"
+                @rejected = "file_rejected"
                 bordered
                 hide-upload-btn
               >
@@ -76,8 +77,8 @@
 
 <script>
 import GridDefinitions from "../datacenter/airquality/GridDefinitions.vue";
-import AirQualityUploadErrorsDialog from "./AirQualityUploadErrorsDialog.vue";
-import AirQualityUploadSuccessDialog from "./AirQualityUploadSuccessDialog.vue";
+import IncidenceUploadErrorsDialog from "./IncidenceUploadErrorsDialog.vue";
+import IncidenceUploadSuccessDialog from "./IncidenceUploadSuccessDialog.vue";
 
 import { useQuasar } from "quasar";
 import { useStore } from "vuex";
@@ -223,7 +224,7 @@ export default {
 
               this.$q
                 .dialog({
-                  component: AirQualityUploadErrorsDialog,
+                  component: IncidenceUploadErrorsDialog,
                   parent: this,
                   persistent: true,
                   componentProps: {
@@ -243,7 +244,7 @@ export default {
           } else {
             this.$q
               .dialog({
-                component: AirQualityUploadSuccessDialog,
+                component: IncidenceUploadSuccessDialog,
                 parent: this,
                 persistent: true,
                 componentProps: {
@@ -309,6 +310,29 @@ export default {
     file_removed: function (file) {
       this.selected_file = "";
       this.check_if_document_upload = false;
+    },
+
+    file_rejected:function(rejectedFiles){
+      rejectedFiles.forEach(rejection=>{
+          if(rejection.failedPropValidation === 'max-file-size'){
+            this.$q.notify({
+              type: 'negative',
+              position:'top',
+              message:'File size exceeds 1G limit!'
+            });
+            this.errorMessage = "File " + rejection.file.name + " exceeds 1G limit!";
+            //console.log('size limit reach.');
+          }
+          else{
+            this.$q.notify({
+              type: 'negative',
+              position:'top',
+              message:'Invalid file format.'
+            });
+            this.errorMessage = "Invalid file format. Please check your csv file.";
+            //console.log('Invalid file format.');
+          }
+        })
     },
 
     onCancelClick() {
