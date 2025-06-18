@@ -44,6 +44,8 @@ spec:
         env:
           - name: REDEPLOY_META
             value: $CI_JOB_ID-$CI_COMMIT_SHA
+          - name: DEFENDER_APP_ID
+            value: "$DEFENDER_APP_ID"
         ports:
         - containerPort: 80
       imagePullSecrets:
@@ -76,7 +78,6 @@ metadata:
   annotations:
     app.gitlab.com/app: ${CI_PROJECT_PATH_SLUG}
     app.gitlab.com/env: ${CI_ENVIRONMENT_SLUG}
-#   nginx.ingress.kubernetes.io/from-to-www-redirect: "true"
 spec:
   ingressClassName: "nginx"
   tls:
@@ -87,6 +88,13 @@ spec:
     - host: stg.bencloud-stage.aws.epa.gov
       http:
         paths:
+        - path: /geoserver
+          pathType: Prefix
+          backend:
+           service:
+            name: bencloud-geoserver-service
+            port: 
+             number: 443
         - path: /
           pathType: Prefix
           backend:
