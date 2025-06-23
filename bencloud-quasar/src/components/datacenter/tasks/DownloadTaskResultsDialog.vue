@@ -132,6 +132,10 @@ export default {
       type: String,
       default: "",
     },
+    task_pop_id: {
+      type: String,
+      default: "",
+    },
     
     
   },
@@ -217,7 +221,7 @@ export default {
       //get all grid definitions to list  
       (async () => {
           const response = await getGridDefinitions().fetch();
-          gridOptions.value = buildGridDefinitionOptions(unref(response.data), store.state.analysis.populationDatasetId)
+          gridOptions.value = buildGridDefinitionOptions(unref(response.data), props.task_pop_id)
         })()
     });
 
