@@ -62,7 +62,7 @@ export default defineComponent({
   model: ref(null),
   name: "ValuationTaskResults",
 
-  props: ["valuation_task_uuid", "valuation_task_name", "valuation_task_type", "batch_task_id","valuation_grid_id", "valuation_grid_name"],
+  props: ["valuation_task_uuid", "valuation_task_name", "valuation_task_type", "batch_task_id", "valuation_grid_id", "valuation_grid_name", "task_pop_id"],
 
   setup(props, context) {
     //const task_type = ref("");
@@ -109,6 +109,7 @@ export default defineComponent({
           batch_task_id: props.batch_task_id,
           valuation_grid_id:props.valuation_grid_id,
           valuation_grid_name: props.valuation_grid_name,
+          task_pop_id: props.task_pop_id,
           visible_columns: store.state.analysis.hifResultColumns
         },
       })

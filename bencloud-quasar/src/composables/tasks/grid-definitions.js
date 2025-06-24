@@ -39,7 +39,7 @@ export const buildGridDefinitionOptions = (data, populationDatasetId) => {
         gridsExcluded.push(18);
         gridsExcluded.push(19);
         gridsExcluded.push(20);
-    } else {
+    } else if(populationDatasetId == 40) {
         gridsExcluded.push(68);
         gridsExcluded.push(69);
         gridsExcluded.push(70);

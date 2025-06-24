@@ -21,14 +21,14 @@
     <q-tab-panel name="results"> 
       <div v-if="task_type === 'H'">
         <HIFTaskResults  v-bind:task_uuid="task_uuid" v-bind:task_name="task_name" v-bind:task_type="task_type" 
-        v-bind:batch_task_id="batch_task_id" v-bind:valuation_grid_id = "valuation_grid_id" v-bind:valuation_grid_name = "valuation_grid_name" :key="componentKey"></HIFTaskResults>
+        v-bind:batch_task_id="batch_task_id" v-bind:valuation_grid_id = "valuation_grid_id" v-bind:valuation_grid_name = "valuation_grid_name" v-bind:task_pop_id = "task_pop_id" :key="componentKey"></HIFTaskResults>
       </div>
     </q-tab-panel>
 
     <q-tab-panel name="valuation-results">
       <div v-if="valuation_task_type === 'V'">
         <ValuationTaskResults  v-bind:valuation_task_uuid="valuation_task_uuid" v-bind:valuation_task_name="valuation_task_name" v-bind:valuation_task_type="valuation_task_type" 
-        v-bind:batch_task_id="batch_task_id" v-bind:valuation_grid_id = "valuation_grid_id" v-bind:valuation_grid_name = "valuation_grid_name" :key="componentKey"></ValuationTaskResults>
+        v-bind:batch_task_id="batch_task_id" v-bind:valuation_grid_id = "valuation_grid_id" v-bind:valuation_grid_name = "valuation_grid_name" v-bind:task_pop_id = "task_pop_id" :key="componentKey"></ValuationTaskResults>
       </div>
       <div v-if="valuation_task_type === ''">
         No valuation results for the selected post-policy
@@ -40,7 +40,7 @@
     <q-tab-panel name="results"> 
       <div v-if="task_type === 'E'">
         <ExposureTaskResults  v-bind:task_uuid="task_uuid" v-bind:task_name="task_name" v-bind:task_type="task_type" v-bind:batch_task_id="batch_task_id" 
-          v-bind:pollutant_name="pollutant_name" :key="componentKey"></ExposureTaskResults>
+          v-bind:pollutant_name="pollutant_name" v-bind:task_pop_id = "task_pop_id" :key="componentKey"></ExposureTaskResults>
       </div>
     </q-tab-panel>
   </q-tab-panels>
@@ -58,7 +58,7 @@ import ExposureTaskResults from "./Exposure/ExposureTaskResults.vue";
 export default defineComponent({
   model: ref(null),
   name: "TaskResultsTab",
-  props: ["task_uuid_with_type", "task_name", "valuation_task_uuid_with_type", "valuation_task_name", "batch_task_id","valuation_grid_id","valuation_grid_name", "pollutant_name"],
+  props: ["task_uuid_with_type", "task_name", "valuation_task_uuid_with_type", "valuation_task_name", "task_pop_id", "batch_task_id","valuation_grid_id","valuation_grid_name", "pollutant_name"],
 
   components: {
     HIFTaskResults,
@@ -80,6 +80,7 @@ export default defineComponent({
     const currentTab = ref(store.state.datacenter.resultsTab);
     const valuation_grid_name = ref("");
     const valuation_grid_id = ref(0);
+    const task_pop_id = ref("");
 
     onBeforeMount(() => {
 
@@ -98,6 +99,7 @@ export default defineComponent({
         valuation_task_name.value = props.valuation_task_name
         valuation_grid_name.value = props.valuation_grid_name
         valuation_grid_id.value = props.valuation_grid_id
+        task_pop_id.value = props.task_pop_id
         componentKey.value += 1;
     
     })

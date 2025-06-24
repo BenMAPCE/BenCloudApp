@@ -53,7 +53,7 @@
     
     <div class="task-results">
       <TaskResultsTabs v-bind:task_uuid_with_type="task_uuid_with_type" v-bind:task_name="task_name" 
-        v-bind:valuation_task_uuid_with_type="valuation_task_uuid_with_type" v-bind:valuation_task_name="valuation_task_name"
+        v-bind:valuation_task_uuid_with_type="valuation_task_uuid_with_type" v-bind:valuation_task_name="valuation_task_name" v-bind:task_pop_id="task_pop_id"
         v-bind:batch_task_id = "batch_task_id" v-bind:valuation_grid_id = "valuation_grid_id" v-bind:valuation_grid_name = "valuation_grid_name" v-bind:pollutant_name = "pollutant_name"
         :key="componentKey"></TaskResultsTabs>
     </div>
@@ -89,6 +89,7 @@ export default defineComponent({
     const task_name = ref("");
     const valuation_task_name = ref("");
     const task_completed_date = ref(null);
+    const task_pop_id = ref("");
     const scenario_names = ref([]);
     const scenario_years = ref([]);
     const selected_scenario_name = ref([]);
@@ -190,7 +191,8 @@ export default defineComponent({
         for (var i = 0; i < tasks.length; i++) {
           if(tasks[i].batch_task_id == batch_task_id) {
             batch_task_name.value = tasks[i].batch_task_name
-            task_completed_date.value = tasks[i].batch_completed_date            
+            task_completed_date.value = tasks[i].batch_completed_date
+            task_pop_id.value = tasks[i].pop_id               
             break
           }
         }
@@ -232,6 +234,7 @@ export default defineComponent({
       valuation_task_uuid_with_type,
       valuation_task_name,
       task_completed_date,
+      task_pop_id,
       batch_task_id,
       batch_task_name,
       pollutant_name,

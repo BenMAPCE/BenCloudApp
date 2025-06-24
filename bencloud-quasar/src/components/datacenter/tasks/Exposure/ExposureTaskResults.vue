@@ -71,7 +71,7 @@ export default defineComponent({
   model: ref(null),
   name: "ExposureTaskResults",
 
-  props: ["task_uuid", "task_name", "task_type", "batch_task_id", "pollutant_name"],
+  props: ["task_uuid", "task_name", "task_type", "batch_task_id", "pollutant_name", "task_pop_id"],
 
   setup(props, context) {
     //const task_type = ref("");
@@ -215,6 +215,7 @@ export default defineComponent({
           task_name: props.task_name,
           task_type: props.task_type,
           batch_task_id: props.batch_task_id,
+          task_pop_id: props.task_pop_id,
         },
       })
         .onOk(() => {
