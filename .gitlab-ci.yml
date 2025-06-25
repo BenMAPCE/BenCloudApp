@@ -84,7 +84,7 @@ add_dev_defender:
   variables:
     IMAGE: $CI_REGISTRY_IMAGE/bencloudapp
     IMAGE_TAG: $CI_COMMIT_SHORT_SHA
-    ENTRYPOINT_COMMAND: ""
+    ENTRYPOINT_COMMAND: "/opt/entrypoint.sh"
   script:
     - mkdir -p /kaniko/.docker
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
@@ -103,7 +103,7 @@ add_stage_defender:
   variables:
     IMAGE: $CI_REGISTRY_IMAGE/bencloudapp
     IMAGE_TAG: $CI_COMMIT_TAG
-    ENTRYPOINT_COMMAND: ""
+    ENTRYPOINT_COMMAND: "/opt/entrypoint.sh"
   script:
     - mkdir -p /kaniko/.docker
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json

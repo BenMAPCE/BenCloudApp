@@ -1,4 +1,3 @@
-#FROM nginx:alpine
 FROM nginx:stable-bullseye
 
 WORKDIR /var/www
@@ -12,7 +11,10 @@ RUN apt-get -y update \
     && adduser -D -H -u 1000 -s /bin/bash www-data -G www-data
 
 COPY ./docker/bencloudapp/sites/default-stage.conf /etc/nginx/sites-available/default.conf
+COPY ./docker/bencloudapp/entrypoint.sh /opt/entrypoint.sh
+RUN chmod +x /opt/entrypoint.sh
 
-CMD nginx
+ENTRYPOINT ["/opt/entrypoint.sh"]
+CMD ["nginx"]
 
 EXPOSE 80
