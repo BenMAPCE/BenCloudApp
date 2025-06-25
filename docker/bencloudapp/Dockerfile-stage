@@ -11,12 +11,5 @@ RUN apt-get -y update \
     && adduser -D -H -u 1000 -s /bin/bash www-data -G www-data
 
 COPY ./docker/bencloudapp/sites/default-stage.conf /etc/nginx/sites-available/default.conf
-COPY ./docker/bencloudapp/entrypoint.sh /opt/entrypoint.sh
-RUN chmod +x /opt/entrypoint.sh
-
-ENTRYPOINT ["/opt/entrypoint.sh"]
-
-STOPSIGNAL SIGQUIT
-CMD ["nginx" "-g" "daemon off;"]
 
 EXPOSE 80
