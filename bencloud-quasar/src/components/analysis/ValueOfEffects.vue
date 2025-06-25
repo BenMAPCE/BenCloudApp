@@ -20,6 +20,7 @@
       :fullscreen="fullscreen"
       :visible-columns="visibleColumns"
       class="valuation-table"
+      :sort-method="hifsort"
     >
 
       <template v-slot:top>
@@ -109,7 +110,8 @@ export default defineComponent({
 
     const pagination = ref({
       page: 1,
-      rowsPerPage: 0,
+      rowsPerPage: 0,   
+      sortBy: "group_name"
     });
 
     const selectedItem = ref(store.state.analysis.incidenceId);
@@ -356,6 +358,37 @@ export default defineComponent({
       clearValuation,
     };
   },
+  methods:{
+    hifsort(rows, sortBy, descending) {
+      return [...rows].sort((a,b)=>{
+        if(sortBy){
+          if(sortBy==="group_name"){
+            // 1 sort by group_name
+            if (a.group_name < b.group_name) return descending ? 1 : -1;
+            if (a.group_name > b.group_name) return descending ? -1 : 1;
+
+            // 2 sort by endpoint_name
+            if (a.endpoint_name < b.endpoint_name) return descending ? 1 : -1;
+            if (a.endpoint_name > b.endpoint_name) return descending ? -1 : 1;
+
+            // 3 sort by author_year
+            if (a.author_year < b.author_year) return descending ? 1 : -1;
+            if (a.author_year > b.author_year) return descending ? -1 : 1;
+
+            // 4 sort by age_range
+            if (a.age_range < b.age_range) return descending ? 1 : -1;
+            if (a.age_range > b.age_range) return descending ? -1 : 1;
+          }
+          else{
+            if (a[sortBy] < b[sortBy]) return descending ? 1 : -1;
+          }        
+          
+          //a==b
+          return 0;
+        }            
+      })      
+    } 
+  }
 });
 
 const visibleColumns = ref([
