@@ -1,9 +1,6 @@
 <template>
   <div class="review-and-submit">
     <div class="row">
-      <p>Review And Submit</p>
-    </div>
-    <div class="row">
       <q-card class="choices-card">
         <div class="row odd choices">
           <div class="title">Pollutant</div>
