@@ -45,7 +45,7 @@
       <ValueOfEffects></ValueOfEffects>
     </q-step>
 
-    <q-step :name="7" title="Review &amp; Submit" :done="step > 7" prefix="7">
+    <q-step :name="7" title="Review &amp; submit" :done="step > 7" prefix="7">
       <ReviewAndSubmit></ReviewAndSubmit>
     </q-step>
 
