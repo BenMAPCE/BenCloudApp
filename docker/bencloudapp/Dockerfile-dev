@@ -12,4 +12,6 @@ RUN apt-get -y update \
 
 COPY ./docker/bencloudapp/sites/default-dev.conf /etc/nginx/sites-available/default.conf
 
+CMD nginx
+
 EXPOSE 80
