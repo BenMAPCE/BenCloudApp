@@ -13,7 +13,8 @@ RUN apt-get -y update \
 COPY ./docker/bencloudapp/sites/default-dev.conf /etc/nginx/sites-available/default.conf
 
 ENTRYPOINT ["nginx", "-g", "daemon off;"]
-CMD [] # Empty CMD if no default arguments are needed beyond the ENTRYPOINT. 
+CMD [""] 
+# Empty CMD if no default arguments are needed beyond the ENTRYPOINT. 
 
 # CMD nginx
 
