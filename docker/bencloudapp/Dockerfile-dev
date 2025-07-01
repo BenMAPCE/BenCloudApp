@@ -13,7 +13,7 @@ RUN apt-get -y update \
 COPY ./docker/bencloudapp/sites/default-dev.conf /etc/nginx/sites-available/default.conf
 
 ENTRYPOINT ["nginx", "-g", "daemon off;"]
-CMD ["-c", "/etc/nginx/nginx.conf"]
+CMD ["tail", "-f", "/dev/null"]
 
 # CMD nginx
 
