@@ -12,9 +12,8 @@ RUN apt-get -y update \
 
 COPY ./docker/bencloudapp/sites/default-dev.conf /etc/nginx/sites-available/default.conf
 
-ENTRYPOINT ["nginx", "-g", "daemon off;"]
-CMD ["tail", "-f", "/dev/null"]
-
-# CMD nginx
-
+ENTRYPOINT ["/docker-entrypoint.sh"]
 EXPOSE 80
+STOPSIGNAL SIGQUIT
+CMD ["nginx", "-g", "daemon off;"]
+# CMD nginx
