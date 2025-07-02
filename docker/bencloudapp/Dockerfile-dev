@@ -15,5 +15,5 @@ COPY ./docker/bencloudapp/sites/default-dev.conf /etc/nginx/sites-available/defa
 ENTRYPOINT ["/docker-entrypoint.sh"]
 EXPOSE 80
 STOPSIGNAL SIGQUIT
-CMD ["nginx", "-g", "daemon off;"]
-# CMD nginx
+CMD ["nginx"]
+
