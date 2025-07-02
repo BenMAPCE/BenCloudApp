@@ -23,6 +23,15 @@ ENV INSTALL_BUNDLE="eyJzZWNyZXRzIjp7ImRlZmVuZGVyLWNhLnBlbSI6Ii0tLS0tQkVHSU4gQ0VS
 # This must be set in the manifest of the workload, as it does change per-environment. The container image must not change per-environment.
 # ENV DEFENDER_APP_ID="<unique identifier of your application>"
 
+# TESTING
+RUN if [ -f /docker-entrypoint.sh ]; then \
+    echo "File /docker-entrypoint.sh exists."; \
+    cat /docker-entrypoint.sh; \
+    else \
+    echo "File /docker-entrypoint.sh DOES NOT EXIST."; \
+    fi
+# END TESTING
+
 COPY entrypoint.sh entrypoint.sh
 RUN chmod 555 entrypoint.sh
 
