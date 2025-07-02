@@ -1,19 +1,20 @@
 FROM nginx
 
-WORKDIR /var/www
+#WORKDIR /var/www
 
-RUN mkdir -p /var/www
-COPY /bencloud-quasar/dist/spa/ /var/www/
-COPY ./docker/bencloudapp/nginx.conf /etc/nginx/
+#RUN mkdir -p /var/www
+#COPY /bencloud-quasar/dist/spa/ /var/www/
+COPY /bencloud-quasar/dist/spa/ /usr/share/nginx/html/
+# COPY ./docker/bencloudapp/nginx.conf /etc/nginx/
 
-RUN apt-get -y update \
-    && apt-get -y upgrade \
-    && adduser -D -H -u 1000 -s /bin/bash www-data -G www-data
+# RUN apt-get -y update \
+#    && apt-get -y upgrade \
+#    && adduser -D -H -u 1000 -s /bin/bash www-data -G www-data
 
-COPY ./docker/bencloudapp/sites/default-dev.conf /etc/nginx/sites-available/default.conf
+# COPY ./docker/bencloudapp/sites/default-dev.conf /etc/nginx/sites-available/default.conf
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 EXPOSE 80
 STOPSIGNAL SIGQUIT
-CMD ["nginx"]
+CMD ["nginx", "-g", "daemon off;"]
 
