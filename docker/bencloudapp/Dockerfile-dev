@@ -15,15 +15,8 @@ COPY /bencloud-quasar/dist/spa/ /usr/share/nginx/html/
 
 RUN chmod 555 /docker-entrypoint.sh
 
-# TESTING
-RUN if [ -f /docker-entrypoint.sh ]; then \
-    echo "File /docker-entrypoint.sh exists."; \
-    cat /docker-entrypoint.sh; \
-    else \
-    echo "File /docker-entrypoint.sh DOES NOT EXIST."; \
-    fi
-# END TESTING
-
+# Attempt to work around defender issue
+RUN sed -i 's/exec "\$@"/nginx -g daemon off;/g' docker-entrypoint.sh
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 EXPOSE 80
