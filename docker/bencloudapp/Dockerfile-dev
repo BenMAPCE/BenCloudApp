@@ -16,7 +16,7 @@ COPY /bencloud-quasar/dist/spa/ /usr/share/nginx/html/
 RUN chmod 555 /docker-entrypoint.sh
 
 # Attempt to work around defender issue
-RUN sed -i 's/exec "\$@"/nginx -g daemon off;/g' docker-entrypoint.sh
+RUN sed -i 's/exec "\$@"/nginx -g "daemon off;"/g' docker-entrypoint.sh
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 EXPOSE 80
