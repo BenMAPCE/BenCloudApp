@@ -13,6 +13,7 @@ COPY /bencloud-quasar/dist/spa/ /usr/share/nginx/html/
 
 # COPY ./docker/bencloudapp/sites/default-dev.conf /etc/nginx/sites-available/default.conf
 
+RUN chmod 555 /docker-entrypoint.sh
 ENTRYPOINT ["/docker-entrypoint.sh"]
 EXPOSE 80
 STOPSIGNAL SIGQUIT
