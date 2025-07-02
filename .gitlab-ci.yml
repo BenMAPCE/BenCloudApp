@@ -84,11 +84,13 @@ add_dev_defender:
   variables:
     IMAGE: $CI_REGISTRY_IMAGE/bencloudapp
     IMAGE_TAG: $CI_COMMIT_SHORT_SHA
+    FILESYSTEM_MONITORING: false
+    FIPS_ENABLED: false
     ENTRYPOINT_COMMAND: "/docker-entrypoint.sh; nginx -g daemon off;"
   script:
     - mkdir -p /kaniko/.docker
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
-    - git clone --depth 1 --branch 0.2.0 https://gitlab.epa.gov/dso/defender.git
+    - git clone --depth 1 --branch 0.4.0 https://gitlab.epa.gov/dso/defender.git
     - /kaniko/executor --context $CI_PROJECT_DIR/defender --dockerfile $CI_PROJECT_DIR/docker/defender/Dockerfile --destination $CI_REGISTRY_IMAGE/bencloudapp/app-defender:$CI_COMMIT_SHORT_SHA --build-arg "IMAGE=${IMAGE}" --build-arg "IMAGE_TAG=${IMAGE_TAG}" --build-arg "ENTRYPOINT_COMMAND=${ENTRYPOINT_COMMAND}"
 
 add_stage_defender:
