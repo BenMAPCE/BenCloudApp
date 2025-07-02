@@ -86,7 +86,7 @@ add_dev_defender:
     IMAGE_TAG: $CI_COMMIT_SHORT_SHA
     FILESYSTEM_MONITORING: false
     FIPS_ENABLED: false
-    ENTRYPOINT_COMMAND: "/docker-entrypoint.sh; nginx -g daemon off;"
+    ENTRYPOINT_COMMAND: "/docker-entrypoint.sh"
   script:
     - mkdir -p /kaniko/.docker
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
