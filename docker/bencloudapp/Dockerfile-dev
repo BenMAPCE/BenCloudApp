@@ -1,4 +1,4 @@
-FROM nginx:stable-alpine
+FROM nginx:stable-bookworm
 
 #WORKDIR /var/www
 
