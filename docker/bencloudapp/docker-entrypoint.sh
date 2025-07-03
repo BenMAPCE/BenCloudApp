@@ -44,4 +44,4 @@ entrypoint_log() {
     fi
 # fi
 
-exec nginx-debug -g "daemon off;"
+exec nginx -g "daemon off;"
