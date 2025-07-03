@@ -12,14 +12,14 @@ COPY /bencloud-quasar/dist/spa/ /usr/share/nginx/html/
 #    && adduser -D -H -u 1000 -s /bin/bash www-data -G www-data
 
 # COPY ./docker/bencloudapp/sites/default-dev.conf /etc/nginx/sites-available/default.conf
-COPY ./docker/bencloudapp/docker-entrypoint.sh /docker-entrypoint.sh
-RUN chmod 555 /docker-entrypoint.sh
+# COPY ./docker/bencloudapp/docker-entrypoint.sh /docker-entrypoint.sh
+# RUN chmod 555 /docker-entrypoint.sh
 
 # Attempt to work around defender issue
 # RUN sed -i 's/exec "\$@"/nginx -g "daemon off;"/g' docker-entrypoint.sh
 
-ENTRYPOINT ["/docker-entrypoint.sh"]
-EXPOSE 80
-STOPSIGNAL SIGQUIT
-CMD ["nginx", "-g", "daemon off;"]
+# ENTRYPOINT ["/docker-entrypoint.sh"]
+# EXPOSE 80
+# STOPSIGNAL SIGQUIT
+# CMD ["nginx", "-g", "daemon off;"]
 
