@@ -21,7 +21,7 @@
       <WhoIsExposed></WhoIsExposed>
     </q-step>
 
-    <q-step :name="4" title="Review &amp; Submit" :done="step > 4" prefix="4">
+    <q-step :name="4" title="Review &amp; submit" :done="step > 4" prefix="4">
       <ReviewAndSubmit></ReviewAndSubmit>
     </q-step>
 
