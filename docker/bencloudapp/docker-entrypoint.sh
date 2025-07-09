@@ -3,7 +3,7 @@
 
 set -e
 
-echo "Starting BenMAP GeoServer docker-entrypoint.sh..."
+echo "Starting BenMAP UI docker-entrypoint.sh..."
 
 entrypoint_log() {
     if [ -z "${NGINX_ENTRYPOINT_QUIET_LOGS:-}" ]; then
