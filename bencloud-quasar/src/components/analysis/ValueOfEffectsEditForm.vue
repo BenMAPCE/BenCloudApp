@@ -11,9 +11,11 @@
           </div>
 
           <div class="row">
-            <div class="col">Author / Year</div>
+            <div class="col">Author / Year</div>            
             <div class="col">
-              {{ row.author_year }}
+              <a :href="row.access_url" target="_blank" rel="noopener">
+                {{ row.author_year }}
+              </a>
             </div>
           </div>
 
@@ -44,6 +46,16 @@
               {{ row.incidence_prevalence }}
             </div>
           </div>
+
+          <div class="row">
+            <div class="col">Hero ID</div>
+            <div class="col">
+              <a :href="row.epa_hero_url" target="_blank" rel="noopener">
+                {{ row.hero_id }}
+              </a>
+            </div>
+          </div>
+
         </div>
 
         <q-select

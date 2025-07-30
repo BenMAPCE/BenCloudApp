@@ -186,6 +186,9 @@ export const buildHealthImpactFunctionGroups = (
       else {
         option.incidence_prevalence = "";
       }
+      option.hero_id = functions[f].hifRecord.hero_id;
+      option.epa_hero_url = functions[f].hifRecord.epa_hero_url;
+      option.access_url = functions[f].hifRecord.access_url;
   
       // load valuations
       //console.log("--- 001")
