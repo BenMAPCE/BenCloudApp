@@ -291,7 +291,7 @@ export default defineComponent({
         description: 'Concentration-response functions to calculate the change in the number of adverse health outcomes.',
         showFull: false,
         hasOverflow: false,
-        route: null
+        route: '/datacenter/review-hif'
       }
       
     ]);
