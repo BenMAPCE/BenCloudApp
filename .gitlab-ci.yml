@@ -12,7 +12,8 @@ build_dev_app:
   - develop
  image: node:16
  tags:
-  - benmapdevgitlab
+#    - benmapdevgitlab
+    - devsecops-instance
  script:
   - cd bencloud-quasar
   - npm install -g @quasar/cli
@@ -45,7 +46,8 @@ build_dev_image:
  only:
   - develop
  tags:
-  - benmapdevgitlab
+#    - benmapdevgitlab
+    - devsecops-instance
  image:
   name: gcr.io/kaniko-project/executor:debug
   entrypoint: [""]
@@ -77,7 +79,8 @@ add_dev_defender:
   only: 
     - develop
   tags:
-    - benmapdevgitlab
+#    - benmapdevgitlab
+    - devsecops-instance
   image:
     name: registry.epa.gov/dso/kaniko-plus:89b76f7b
     entrypoint: [""]
@@ -167,7 +170,8 @@ deploy_testdev:
  only:
   - develop
  tags:
-  - benmapdevgitlab
+#    - benmapdevgitlab
+    - devsecops-instance
  when: manual
  image: dtzar/helm-kubectl
  script:
