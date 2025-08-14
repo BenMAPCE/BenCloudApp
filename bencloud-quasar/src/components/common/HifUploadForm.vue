@@ -35,7 +35,7 @@
 
           <div class="row">
             <div class="col-12 hif-name">
-              Add HIF Dataset
+              Add {{ pollutantFriendlyName }} HIF Group
             </div>
           </div>
 
@@ -44,8 +44,8 @@
               <q-input
                 filled
                 dense
-                v-model="name"
-                label="*File Name"
+                v-model="hifGroupName"
+                label="*Group Name"
                 hint=""
                 lazy-rules
                 :rules="[(val) => (val && val.length > 0) || 'Please enter a name']"
@@ -58,14 +58,29 @@
               <q-input
                 filled
                 dense
-                v-model="hifDatasetName"
-                label="*HIF Dataset Name"
+                v-model="description"
+                label="*Description"
                 hint=""
                 lazy-rules
-                :rules="[(val) => (val && val.length > 0) || 'Please enter a name']"
+                :rules="[(val) => (val && val.length > 0) || 'Please enter a description']"
               />
             </div>
           </div>
+
+          <!-- <div class="row">
+            <div class="col-12">
+              <q-input
+                filled
+                dense
+                label="*Pollutant"
+                :value="pollutantFriendlyName"
+                disable
+                :rules="[(val) => (val && val.length > 0) || 'Please enter a pollutant name']"
+              />
+            </div>
+          </div> -->
+
+          <input type="hidden" name="pollutantId" :value="pollutantId" />
 
           <div class="row justify-center">
             <q-card-actions>
@@ -101,12 +116,24 @@ export default {
     errorMessage: "",
     name: "",
     filename:"",
-    hifDatasetName: "",
+    hifGroupName: "",
+    description: "",
     uploadDate: "",
     dashData: [],
   }),
   
   components: {
+  },
+
+  props: {
+    pollutantId: {
+      type: Number,
+      default: 0,
+    },
+    pollutantFriendlyName: {
+      type: String,
+      default: "None",
+    },
   },
 
 
@@ -137,8 +164,8 @@ export default {
 
     onUploadClick() {
       console.log("onUploadClick");
-      console.log(this.name);
-      console.log(this.hifDatasetName);
+      console.log(this.hifGroupName);
+      console.log(this.description);
 
       // on OK, it is REQUIRED to
       // emit "ok" event (with optional payload)
@@ -167,15 +194,21 @@ export default {
 
       console.log(this.selected_file);
 
-      if (this.name === "") {
+      if (this.hifGroupName === "") {
         this.errorMessage =
-          this.errorMessage + (hasErrors ? ", " : "") + "Name is required";
+          this.errorMessage + (hasErrors ? ", " : "") + "Health impact function group name is required";
         hasErrors = true;
       }
 
-      if (this.hifDatasetName === "") {
+      if (this.description === "") {
         this.errorMessage =
-          this.errorMessage + (hasErrors ? ", " : "") + "HIF dataset name is required";
+          this.errorMessage + (hasErrors ? ", " : "") + "Description is required";
+        hasErrors = true;
+      }
+
+      if (this.pollutantId === 0) {
+        this.errorMessage =
+          this.errorMessage + (hasErrors ? ", " : "") + "Pollutant is required";
         hasErrors = true;
       }
 
@@ -197,7 +230,9 @@ export default {
       const url = process.env.API_SERVER + "/api/health-impact-function-data";
       const fileData = new FormData();
       fileData.append("file", this.selected_file);
-      fileData.append("name", this.name);
+      fileData.append("hifGroupName", this.hifGroupName);
+      fileData.append("description", this.description);
+      fileData.append("pollutantId", this.pollutantId);
       fileData.append("filename", this.selected_file.name);
       console.log(fileData);
       fileData.append("uploadDate",localISOTime)

@@ -7,7 +7,7 @@
       <div class="row">
         <div class="col">
           <Suspense>
-            <Pollutants updateState></Pollutants>
+            <Pollutants updateState isAirQuality></Pollutants>
           </Suspense>
         </div>
 

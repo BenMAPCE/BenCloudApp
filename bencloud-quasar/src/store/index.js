@@ -8,6 +8,7 @@ import app from './app'
 import analysis from './analysis'
 import auth from './auth'
 import exposure from './exposure'
+import hif from './hif'
 import incidence from './incidence'
 import datacenter from './datacenter'
 import grids from './grids'
@@ -29,6 +30,7 @@ export default store(function (/* { ssrContext } */) {
       analysis,
       auth,
       exposure,
+      hif,
       incidence,
       datacenter,
       grids

@@ -1,6 +1,6 @@
 <template>
   <q-btn no-caps push color="primary" ref="btn" @click="alert">
-    ADD HIF DATASET</q-btn
+    ADD HEALTH IMPACT FUNCTION GROUP</q-btn
   >
 </template>
 
@@ -16,7 +16,19 @@ export default defineComponent({
   name: "HifAdd",
   components: {},
 
-  setup() {
+  props: {
+    pollutantId: {
+      type: Number,
+      default: 0,
+    },
+    pollutantFriendlyName: {
+      type: String,
+      default: "None",
+    },
+
+  },
+
+  setup(props) {
     const $q = useQuasar();
     const store = useStore();
 
@@ -25,10 +37,14 @@ export default defineComponent({
         component: HifUploadForm,
         parent: this,
         persistent: true,
+        componentProps: {
+          pollutantFriendlyName: props.pollutantFriendlyName,
+          pollutantId: props.pollutantId,
+        },
       })
         .onOk(() => {
-          console.log("Upload Incidence OK");
-          store.commit("incidence/updateIncidenceAddedDate", new Date());
+          console.log("Upload HIF OK");
+          store.commit("hif/updateHifAddedDate", new Date());
         })
         .onCancel(() => {
           // console.log('Cancel')

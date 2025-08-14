@@ -9,6 +9,7 @@
     :filter="filter"
     @request="onRequest"
     binary-state-sort
+    v-if="pollutantId != 0 && hifGroupId != 0"
     v-model:selected="selected"
     :visible-columns="visibleColumns"
   >
@@ -16,11 +17,11 @@
     <template v-slot:body="props">
       <q-tr class="cursor-pointer" :props="props" @click.exact="rowClicked(props)">
         <q-td v-for="col in props.cols" :key="col.name" :props="props">
-          <template v-if="col.name === 'epa_hero_url'">
-            <a :href="props.row.epa_hero_url" target="_blank">EPA Hero URL</a>
+          <template v-if="col.name === 'hero_id'">
+            <a :href="props.row.epa_hero_url" target="_blank">{{ props.row.hero_id }}</a>
           </template>
-          <template v-if="col.name === 'access_url'">
-            <a :href="props.row.access_url" target="_blank">Access URL</a>
+          <template v-if="col.name === 'author'">
+            <a :href="props.row.access_url" target="_blank">{{ props.row.author_year }}</a>
           </template>
           <template v-if="col.name === 'actions' && props.row.share_scope != 1">
             <q-btn
@@ -29,21 +30,11 @@
               flat
               color="grey"
               @click.stop="deleteRow(props)"
-              icon="mdi-delete"
+              icon="mdi-archive"
             ></q-btn>
           </template>
           <template v-else>
             {{col.value}}
-          </template>
-          <template v-if="col.name === 'edit' && props.row.share_scope != 1">
-            <q-btn
-              dense
-              round
-              flat
-              color="grey"
-              @click.stop="editRow(props)"
-              icon="mdi-pencil"
-            ></q-btn>
           </template>
           <template v-if="col.name === 'user' && props.row.share_scope != 1 && !!props.row.user_id">
             {{props.row.user_id}}
@@ -52,7 +43,24 @@
       </q-tr>
     </template>  
     
-    <template v-slot:top-right>
+    <template v-slot:top>
+      <q-select
+        v-model="visibleColumns"
+        multiple
+        outlined
+        dense
+        options-dense
+        :display-value="$q.lang.table.columns"
+        emit-value
+        map-options
+        :options="columns"
+        option-value="name"
+        options-cover
+        style="min-width: 150px"
+      ></q-select>
+
+      <q-space></q-space>
+
       <q-input borderless dense debounce="300" v-model="filter" placeholder="Search">
         <template v-slot:append>
           <q-icon name="mdi-magnify" />
@@ -76,6 +84,14 @@ var numLayers = null;
 export default defineComponent({
   model: ref(null),
   name: "HifDatasets",
+  computed: {
+    pollutantId() {
+      return this.$store.state.hif.pollutantId;
+    },
+    hifGroupId() {
+      return this.$store.state.hif.hifGroupId;
+    },
+  },
 
   props: {
     hifDatasetName: {
@@ -86,7 +102,7 @@ export default defineComponent({
   methods: {
     deleteRow(props) {
       // Prompt user to confirm hif dataset deletion
-      if(confirm("Are you sure you wish to permanently delete " + props.row.name + "?")){
+      if(confirm("Are you sure you wish to archive " + props.row.author_year + "?")){
         // Delete AQ layer, reload the hif dataset list if successful, alert the user if unsuccessful       
         axios
           .delete(process.env.API_SERVER + "/api/health-impact-function/" + props.row.id, 
@@ -167,9 +183,45 @@ export default defineComponent({
     let myFilter = unref(filter);
 
     watch(
-      () => store.state.incidence.incidenceDatasetAddedDate,
-      (incidenceDatasetAddedDate, prevIncidenceDatasetAddedDate) => {
-          console.log("--- updated Incidence Dataset")
+      () => store.state.hif.pollutantId,
+      (pollutantId, prevPollutantId) => {
+        console.log("--- changed pollutant")
+        pollutantId = pollutantId;
+        filter.value = "";
+        pagination.value.sortBy = "endpoint_name";
+        pagination.value.descending = false;
+        pagination.value.page = 1;
+        pagination.value.rowsNumber = 0;
+        console.log("resetting table.....");
+        onRequest({
+          filter: "",
+          pagination: pagination.value,
+          rows: [],
+        });
+    })
+
+    watch(
+      () => store.state.hif.hifGroupId,
+      (hifGroupId, prevPollutantId) => {
+        console.log("--- changed HIF Group")
+        hifGroupId = hifGroupId;
+        filter.value = "";
+        pagination.value.sortBy = "endpoint_name";
+        pagination.value.descending = false;
+        pagination.value.page = 1;
+        pagination.value.rowsNumber = 0;
+        console.log("resetting table.....");
+        onRequest({
+          filter: "",
+          pagination: pagination.value,
+          rows: [],
+        });
+    })
+
+    watch(
+      () => store.state.hif.hifLayerAddedDate,
+      (hifLayerAddedDate, prevHifLayerAddedDate) => {
+          console.log("--- updated Health Impact Function")
           onRequest({
             pagination: pagination.value,
             filter: undefined,
@@ -216,8 +268,9 @@ export default defineComponent({
 
     function onRequest(props) {
       console.log("on onRequest()");
+      if (store.state.hif.pollutantId != 0 && store.state.hif.hifGroupId) {
         loadHealthImpactFunctions(props);
-
+      }
     }
 
     function loadHealthImpactFunctions(props) {
@@ -236,53 +289,47 @@ export default defineComponent({
     
         axios
           .get(process.env.API_SERVER + "/api/health-impact-functions"
-          // , {
-          //   params: {
-          //     page: page,
-          //     rowsPerPage: ++numLayers,
-          //     sortBy: sortBy,
-          //     descending: descending,
-          //     filter: filter,
-          //     showAll: showAll.value,
-          //   },
-          // }
+          , {
+            params: {
+              page: page,
+              rowsPerPage: rowsPerPage,
+              sortBy: sortBy,
+              descending: descending,
+              filter: filter,
+              pollutantId: store.state.hif.pollutantId,
+              hifGroupId: store.state.hif.hifGroupId,
+              showAll: showAll.value,
+            },
+          }
         )
           .then((response) => {
+            let records = response.data.records;
             let data = response.data;
 
-            rows.value = data;
+            records.forEach(function(hif){
+              hif.age_range = hif.start_age + " - " + hif.end_age;
+              hif.author_year = hif.author + " / " + hif.function_year;
+              hif.race_ethnicity_gender = hif.race_name + " / " + hif.ethnicity_name + " / " + hif.gender_name;
+            })
+
+            rows.value = records;
 
             console.log("----- return -----");
-            console.log(data);
+            console.log(records);
 
             store.commit("incidence/updateIncidenceDatasetId", 0);
 
-            // let loadPage = 1;
-            // for(let i = 0; i < data.length; i++) {
-            //   if(data[i].name === layer) {
-            //     loadPage = Math.floor((i/rowsPerPage) + 1);
-            //     break;
-            //   }
-            // }
-
-            // rows.value = [];
-            // let rowCount = 0;
-            // for(let i = 0; i < rowsPerPage; i++) {
-            //   if(!!data[(loadPage-1)*rowsPerPage + i]) {
-            //     rows.value[i] = data[(loadPage-1)*rowsPerPage + i];
-            //   }
-            // }
 
             // // don't forget to update local pagination object
-            // pagination.value.page = loadPage;
-            // pagination.value.rowsPerPage = rowsPerPage;
-            // pagination.value.sortBy = sortBy;
-            // pagination.value.descending = descending;
-            // pagination.value.rowsNumber = data.filteredRecordsCount;
+            pagination.value.page = page;
+            pagination.value.rowsPerPage = rowsPerPage;
+            pagination.value.sortBy = sortBy;
+            pagination.value.descending = descending;
+            pagination.value.rowsNumber = data.filteredRecordsCount;
 
             // // ...and turn of loading indicator
-            // loading.value = false;
-            // trackCurrentPage = null;
+            loading.value = false;
+            trackCurrentPage = null;
           });
       }
     
@@ -320,17 +367,22 @@ export default defineComponent({
 const rows = [];
 
 const visibleColumns = ref([
-  "id",
+  // "id",
+  // "pollutant",  
+  "endpoint_name",
   "endpoint_group_name",
   "author",
-  "race_name",
-  "gender_name",
-  "ethnicity_name",
+  "age_range",
+  "race_ethnicity_gender",
+  "metric",
+  "location",
+  // "qualifier",
+  // "reference",
+  // "function_text",
+  // "baseline_function_text",
+  // "beta",
   "hero_id",
-  "epa_hero_url",
-  "access_url",
-  "actions",
-  "edit"
+  "actions"
 ]);
 
 const columns = [
@@ -343,68 +395,169 @@ const columns = [
     sortable: true,
   },
   {
+    name: "pollutant",
+    align: "left",
+    label: "Pollutant",
+    field: "pollutant",
+    sortable: true,
+  },
+  {
+    name: "endpoint_name",
+    align: "left",
+    label: "Health Effect",
+    field: "endpoint_name",
+    sortable: true,
+  },
+  {
     name: "endpoint_group_name",
     align: "left",
-    label: "Endpoint Group",
+    label: "Health Effect Group",
     field: "endpoint_group_name",
     sortable: true,
   },
   {
     name: "author",
     align: "left",
-    label: "Author",
-    field: "author",
+    label: "Author / Year",
+    field: "",
     sortable: true,
   },
   {
-    name: "race_name",
+    name: "age_range",
     align: "left",
-    label: "Race",
-    field: "race_name",
+    label: "Age Range",
+    field: "age_range",
     sortable: true,
   },
   {
-    name: "gender_name",
+    name: "race_ethnicity_gender",
     align: "left",
-    label: "Gender",
-    field: "gender_name",
+    label: "Race / Ethnicity / Gender",
+    field: "race_ethnicity_gender",
     sortable: true,
   },
   {
-    name: "ethnicity_name",
+    name: "metric",
     align: "left",
-    label: "Ethnicity",
-    field: "ethnicity_name",
+    label: "Metric",
+    field: "metric",
+    sortable: true,
+  },
+  {
+    name: "location",
+    align: "left",
+    label: "Location",
+    field: "location",
+    sortable: true,
+  },
+  {
+    name: "qualifier",
+    align: "left",
+    label: "Qualifier",
+    field: "qualifier",
+    sortable: true,
+  },
+  {
+    name: "reference",
+    align: "left",
+    label: "Reference",
+    field: "reference",
+    sortable: true,
+  },
+  {
+    name: "function_text",
+    align: "left",
+    label: "Function",
+    field: "function_text",
+    sortable: true,
+  },
+  {
+    name: "baseline_function_text",
+    align: "left",
+    label: "Baseline Function",
+    field: "baseline_function_text",
+    sortable: true,
+  },
+  {
+    name: "beta",
+    align: "left",
+    label: "Beta",
+    field: "beta",
+    sortable: true,
+  },
+  {
+    name: "dist_beta",
+    align: "left",
+    label: "Distribution Beta",
+    field: "dist_beta",
+    sortable: true,
+  },
+  {
+    name: "p1_beta",
+    align: "left",
+    label: "Parameter 1 Beta",
+    field: "pq_beta",
+    sortable: true,
+  },
+  {
+    name: "p2_beta",
+    align: "left",
+    label: "Parameter 2 Beta",
+    field: "p2_beta",
+    sortable: true,
+  },
+  {
+    name: "val_a",
+    align: "left",
+    label: "A",
+    field: "val_a",
+    sortable: true,
+  },
+  {
+    name: "name_a",
+    align: "left",
+    label: "Name A",
+    field: "name_a",
+    sortable: true,
+  },
+  {
+    name: "val_b",
+    align: "left",
+    label: "B",
+    field: "val_b",
+    sortable: true,
+  },
+  {
+    name: "name_b",
+    align: "left",
+    label: "Name B",
+    field: "name_b",
+    sortable: true,
+  },
+  {
+    name: "val_c",
+    align: "left",
+    label: "C",
+    field: "val_c",
+    sortable: true,
+  },
+  {
+    name: "name_c",
+    align: "left",
+    label: "Name C",
+    field: "name_c",
     sortable: true,
   },
   {
     name: "hero_id",
     align: "left",
-    label: "Hero ID",
-    field: "hero_id",
+    label: "HERO ID",
+    field: "",
     sortable: true,
-  },
-  {
-    name: "epa_hero_url",
-    align: "left",
-    label: "EPA Hero URL",
-    field: "",
-  },
-  {
-    name: "access_url",
-    align: "left",
-    label: "Access",
-    field: "",
   },
   { 
     name: "actions", 
-    label: "", 
-    field: "", 
-    align: "left" 
-  },
-  { 
-    name: "edit", 
-    label: "", 
+    label: "Archive", 
     field: "", 
     align: "left" 
   },
