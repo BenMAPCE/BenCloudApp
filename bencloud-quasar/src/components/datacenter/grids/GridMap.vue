@@ -309,16 +309,57 @@ export default {
         featureTypeNames.forEach(featureTypeName => {
           const featureTypeProjection = 'EPSG:3857'; // Reproject to EPSG:3857
           console.log('Feature Type Name:', featureTypeName); 
-          const featureTypeUrl = `${geoServerBaseUrl}/${workspaceName}/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=${featureTypeName}&outputFormat=application/json&srsName=${featureTypeProjection}`;
+
+          const geojsonFormat = new GeoJSON();
+
+          const vectorSource = new VectorSource({
+            loader: (extent, resolution, projection) => {
+              vectorSource.dispatchEvent('featuresloadstart');
+
+              const maxFeatures = 10000;
+              let startIndex = 0;
+
+              const loadPage = () => {
+                const url = `${geoServerBaseUrl}/${workspaceName}/ows?service=WFS&version=1.0.0` +
+                  `&request=GetFeature&typeName=${featureTypeName}` +
+                  `&maxFeatures=${maxFeatures}&startIndex=${startIndex}` +
+                  `&outputFormat=application/json&srsName=${featureTypeProjection}`;
+
+                  fetch(url)
+                  .then(resp => resp.text())
+                  .then(text => {
+                    try {
+                      const features = geojsonFormat.readFeatures(text, {
+                        dataProjection: featureTypeProjection,
+                        featureProjection: featureTypeProjection
+                      });
+
+                      if (features.length > 0) {
+                        vectorSource.addFeatures(features);
+                        console.log(`Loaded ${features.length} features starting at ${startIndex}`);
+                        startIndex += features.length;
+                        loadPage();
+                      } else {
+                        console.log('All features loaded');
+                        vectorSource.dispatchEvent('featuresloadend');
+                      }
+                    } catch (err) {
+                      console.error('Error parsing GeoJSON', err);
+                      vectorSource.dispatchEvent('featuresloaderror');
+                    }
+                  })
+                  .catch(err => {
+                    console.error(`Error fetching WFS page starting at ${startIndex}`, err);
+                    vectorSource.dispatchEvent('featuresloaderror');
+                  });
+                };
+
+                loadPage();
+              }
+            });
 
           const vectorLayer = new VectorLayer({
-            source: new VectorSource({
-              url: featureTypeUrl,
-              format: new GeoJSON({
-                dataProjection: featureTypeProjection, // Set dataProjection to EPSG:3857
-                featureProjection: featureTypeProjection 
-              }),
-            }),
+            source: vectorSource,
             style: new Style({
               stroke: new Stroke({
                 color: "#000000",
