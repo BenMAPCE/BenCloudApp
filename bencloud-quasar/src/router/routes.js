@@ -176,7 +176,7 @@ const routes = [
       },
     ],
   },
-    {
+  {
     path: "/datacenter/review-hif",
     component: () => import("layouts/MainLayout.vue"),
     children: [
@@ -184,6 +184,18 @@ const routes = [
         path: "",
         component: () =>
           import("src/pages/datacenter/managedata/HIF/ReviewHif.vue"),
+        meta: { requiresUser: true, requiresAdmin: false },
+      },
+    ],
+  },
+  {
+    path: "/datacenter/review-valuation",
+    component: () => import("layouts/MainLayout.vue"),
+    children: [
+      {
+        path: "",
+        component: () =>
+          import("src/pages/datacenter/managedata/valuation/ReviewValuation.vue"),
         meta: { requiresUser: true, requiresAdmin: false },
       },
     ],
