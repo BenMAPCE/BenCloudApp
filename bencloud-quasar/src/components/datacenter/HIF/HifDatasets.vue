@@ -427,14 +427,14 @@ const columns = [
     align: "left",
     label: "Age Range",
     field: "age_range",
-    sortable: true,
+    sortable: false,
   },
   {
     name: "race_ethnicity_gender",
     align: "left",
     label: "Race / Ethnicity / Gender",
     field: "race_ethnicity_gender",
-    sortable: true,
+    sortable: false,
   },
   {
     name: "metric",
@@ -496,7 +496,7 @@ const columns = [
     name: "p1_beta",
     align: "left",
     label: "Parameter 1 Beta",
-    field: "pq_beta",
+    field: "p1_beta",
     sortable: true,
   },
   {
