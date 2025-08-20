@@ -18,3 +18,7 @@ export function hifGroupName (state) {
 export function hifLayerAddedDate (state) {
   return state.hifLayerAddedDate
 }
+
+export function hifForceReloadValue (state) {
+  return state.hifForceReloadValue
+}

@@ -284,11 +284,11 @@ export default {
           } else {
             this.$q
               .dialog({
-                component: IncidenceUploadSuccessDialog,
+                component: HifUploadSuccessDialog,
                 parent: this,
                 persistent: true,
                 componentProps: {
-                  fileName: this.selected_file.name,
+                  hifGroupName: this.hifGroupName,
                   parentDialog: this.$refs.dialog,
                 },
               })
@@ -303,12 +303,12 @@ export default {
 
           self.$q.loading.hide();
 
-          var oldValue =  this.$store.state.incidence.incidenceForceReloadValue
+          var oldValue =  this.$store.state.incidence.hifForceReloadValue
           console.log("oldValue: " + oldValue);
           var newValue = oldValue + 1;
           console.log("newValue: " + newValue);
           layerName = this.name;
-          this.$store.commit("incidence/updateIncidenceForceReloadValue", newValue)
+          this.$store.commit("incidence/updateHifForceReloadValue", newValue)
 
           //self.hide();
           //self.$emit("ok");

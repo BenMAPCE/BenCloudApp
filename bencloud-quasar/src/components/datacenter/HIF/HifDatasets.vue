@@ -173,7 +173,7 @@ export default defineComponent({
     const filter = ref("");
     const loading = ref(false);
     const pagination = ref({
-      sortBy: "name",
+      sortBy: "endpoint_group_name",
       descending: false,
       page: 1,
       rowsPerPage: 25,

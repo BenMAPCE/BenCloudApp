@@ -19,3 +19,7 @@ export function updateHifLayerAddedDate (state, newDate) {
     state.hifLayerAddedDate = newDate;
 }
 
+export function updateHifForceReloadValue (state, newValue) {
+    state.hifForceReloadValue = newValue;
+}
+

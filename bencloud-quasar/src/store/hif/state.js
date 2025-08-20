@@ -4,6 +4,7 @@ export default function () {
     pollutantFriendlyName: "",
     hifGroupId: 0,
     hifGroupName: "",
-    hifLayerAddedDate : null
+    hifLayerAddedDate : null,
+    hifForceReloadValue: 1
   }
 }
