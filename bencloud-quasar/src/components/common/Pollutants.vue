@@ -31,6 +31,14 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    isAirQuality: {
+      type: Boolean,
+      default: false,
+    },
+    isHif: {
+      type: Boolean,
+      default: false,
+    },
   },
 
     // setup (props, context) {
@@ -57,17 +65,22 @@ export default defineComponent({
     );
 
     function changePollutantValue(value) {
-      if (props.updateState) {
+      if (props.updateState && props.isAirQuality) {
         store.commit("airquality/updatePollutantId", value.id);
         store.commit("airquality/updatePollutantFriendlyName", value.friendly_name);
+      } else if (props.updateState && props.isHif) {
+        store.commit("hif/updatePollutantId", value.id);
+        store.commit("hif/updatePollutantFriendlyName", value.friendly_name);
       }
       emit("changePollutantValue", value);
     }
 
     onBeforeMount(() => {
-      if (props.updateState) {
+      if (props.updateState && props.isAirQuality) {
         store.commit("airquality/updatePollutantId", 0);
         store.commit("airquality/updateAirQualityLayerId", 0);
+      } else if (props.updateState && props.Hif) {
+        store.commit("hif/updatePollutantId", 0);
       }
 
       (async () => {

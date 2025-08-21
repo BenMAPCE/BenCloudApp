@@ -267,7 +267,7 @@ export default defineComponent({
         description: 'Functions to calculate the economic value of changes in incidence of adverse health outcomes.',
         showFull: false,
         hasOverflow: false,
-        route: null
+        route: '/datacenter/review-valuation'
       },
       {
         label: 'Inflation Datasets',
@@ -291,7 +291,7 @@ export default defineComponent({
         description: 'Concentration-response functions to calculate the change in the number of adverse health outcomes.',
         showFull: false,
         hasOverflow: false,
-        route: null
+        route: '/datacenter/review-hif'
       }
       
     ]);
