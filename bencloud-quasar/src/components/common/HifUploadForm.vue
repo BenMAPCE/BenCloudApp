@@ -239,7 +239,7 @@ export default {
       var self = this;
 
       this.$q.loading.show({
-        message: "Uploading incidence data. Please wait...",
+        message: "Uploading health impact function data. Please wait...",
         boxClass: "bg-grey-2 text-grey-9",
         spinnerColor: "primary",
       });
@@ -303,12 +303,12 @@ export default {
 
           self.$q.loading.hide();
 
-          var oldValue =  this.$store.state.incidence.hifForceReloadValue
+          var oldValue =  this.$store.state.hif.hifForceReloadValue
           console.log("oldValue: " + oldValue);
           var newValue = oldValue + 1;
           console.log("newValue: " + newValue);
           layerName = this.name;
-          this.$store.commit("incidence/updateHifForceReloadValue", newValue)
+          this.$store.commit("hif/updateHifForceReloadValue", newValue)
 
           //self.hide();
           //self.$emit("ok");

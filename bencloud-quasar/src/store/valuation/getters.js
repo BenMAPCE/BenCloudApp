@@ -10,3 +10,7 @@ export function healthEffectGroupName (state) {
 export function healthEffectGroupAddedDate (state) {
   return state.healthEffectGroupAddedDate
 }
+
+export function valuationForceReloadValue (state) {
+  return state.valuationForceReloadValue
+}

@@ -2,6 +2,7 @@ export default function () {
   return {
     healthEffectGroupId: 0,
     healthEffectGroupName: "",
-    healthEffectGroupAddedDate : null
+    healthEffectGroupAddedDate : null,
+    valuationForceReloadValue: 1
   }
 }

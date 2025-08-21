@@ -81,6 +81,7 @@ setup(props, context) {
     const selectedHifGroupId = reactive(ref(0));
     const selectedHifGroupName = ref("OOPS");
 
+
     watch(
       () => store.state.hif.pollutantId,
       (pollutantId, prevPollutantId) => {
@@ -111,7 +112,10 @@ setup(props, context) {
       console.log("!!!!!!!!!!!!!!!!!!");
     }
 
-  onBeforeMount(() => {});
+  onBeforeMount(() => {
+    store.commit("hif/updatePollutantId", 0);
+    store.commit("hif/updatePollutantFriendlyName", "");
+  });
 
   return {
     currentPollutantId,

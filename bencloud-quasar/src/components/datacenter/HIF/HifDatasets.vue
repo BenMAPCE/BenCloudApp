@@ -29,7 +29,7 @@
               round
               flat
               color="grey"
-              @click.stop="deleteRow(props)"
+              @click.stop="archiveRow(props)"
               icon="mdi-archive"
             ></q-btn>
           </template>
@@ -100,29 +100,29 @@ export default defineComponent({
     },
   },
   methods: {
-    deleteRow(props) {
-      // Prompt user to confirm hif dataset deletion
+    archiveRow(props) {
+      // Prompt user to confirm hif archive
       if(confirm("Are you sure you wish to archive " + props.row.author_year + "?")){
-        // Delete AQ layer, reload the hif dataset list if successful, alert the user if unsuccessful       
+        // Archive the health impact function  
         axios
-          .delete(process.env.API_SERVER + "/api/health-impact-function/" + props.row.id, 
+          .post(process.env.API_SERVER + "/api/health-impact-function/" + props.row.id, 
             {validateStatus: function (status) {
               return status < 500;
             }}
           )
           .then((response) => {
-            if(response.status === 204) {
+            if(response.status === 200) {
               trackCurrentPage = this.pagination.page;
-              console.log("Successfully deleted health impact function: " + props.row.name);
+              console.log("Successfully archived health impact function: " + props.row.author_year);
 
               // Reload list
-              var oldValue =  this.$store.state.incidence.incidenceForceReloadValue
+              var oldValue =  this.$store.state.hif.hifForceReloadValue;
               console.log("oldValue: " + oldValue);
               var newValue = oldValue - 1;
               console.log("newValue: " + newValue);
-              this.$store.commit("incidence/updateIncidenceForceReloadValue", newValue)
+              this.$store.commit("hif/updateHifForceReloadValue", newValue)
             } else if(response.status === 403){
-              console.log("Forbidden action on incidence dataset: " + props.row.name);
+              console.log("Forbidden action on HIF: " + props.row.author_year);
               this.$q.notify({
                 group: false, // required to be updateable
                 type: 'negative',
@@ -151,11 +151,6 @@ export default defineComponent({
 
    
     
-    rowClicked(props) {
-      this.selected = [];
-      this.selected.push(props.row);
-      this.$store.commit("incidence/updateIncidenceDatasetId", props.row.id);
-    },
   },
 
   data() {
@@ -173,7 +168,7 @@ export default defineComponent({
     const filter = ref("");
     const loading = ref(false);
     const pagination = ref({
-      sortBy: "endpoint_group_name",
+      sortBy: "endpoint_name",
       descending: false,
       page: 1,
       rowsPerPage: 25,
@@ -229,15 +224,15 @@ export default defineComponent({
     })
 
     watch(
-      () => store.state.incidence.incidenceForceReloadValue,
+      () => store.state.hif.hifForceReloadValue,
       (newValue, oldValue) => {
         if(newValue > oldValue) {
-          console.log("--- added Incidence Dataset");
+          console.log("--- added HIF");
         } else if(newValue < oldValue) {
-          console.log("--- deleted Incidence Dataset");
+          console.log("--- archived HIF");
         }
         filter.value = "";
-        pagination.value.sortBy = "name";
+        pagination.value.sortBy = "endpoint_name";
         pagination.value.descending = pagination.value.descending;
         pagination.value.rowsNumber = 0;
         onRequest({
@@ -252,11 +247,9 @@ export default defineComponent({
         console.log("Show all layers: " + showAll.value);
         if(showAll.value && !visibleColumns.value.includes("user")) {
           visibleColumns.value.push("user");
-          //visibleColumns.value.push("edit");
         }
         if(!showAll.value && visibleColumns.value.includes("user")) {
           visibleColumns.value.pop("user");
-          //visibleColumns.value.pop("edit");
         }
         onRequest({
           filter: "",
@@ -411,7 +404,7 @@ const columns = [
   {
     name: "endpoint_group_name",
     align: "left",
-    label: "Health Effect Group",
+    label: "Health Effect Category",
     field: "endpoint_group_name",
     sortable: true,
   },
@@ -453,7 +446,7 @@ const columns = [
   {
     name: "qualifier",
     align: "left",
-    label: "Qualifier",
+    label: "Risk Model Details",
     field: "qualifier",
     sortable: true,
   },
@@ -495,7 +488,7 @@ const columns = [
   {
     name: "p1_beta",
     align: "left",
-    label: "Parameter 1 Beta",
+    label: "Standard Error",
     field: "p1_beta",
     sortable: true,
   },
@@ -552,6 +545,13 @@ const columns = [
     name: "hero_id",
     align: "left",
     label: "HERO ID",
+    field: "",
+    sortable: true,
+  },
+  {
+    name: "user",
+    align: "left",
+    label: "User",
     field: "",
     sortable: true,
   },
