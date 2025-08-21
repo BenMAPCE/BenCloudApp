@@ -280,16 +280,22 @@ const columns = [
     field: "metric",
     sortable: true,
   },
-  {
-    name: "seasonal_metric",
-    label: "Seasonal Metric",
-    field: "seasonal_metric",
-    sortable: true,
-  },
+  // {
+  //   name: "seasonal_metric",
+  //   label: "Seasonal Metric",
+  //   field: "seasonal_metric",
+  //   sortable: true,
+  // },
   {
     name: "metric_statistic",
     label: "Annual Statistic",
     field: "metric_statistic",
+    sortable: true,
+  },
+  {
+    name: "timing",
+    label: "Timing",
+    field: "timing",
     sortable: true,
   },
   {

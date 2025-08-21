@@ -55,7 +55,6 @@
               </a>
             </div>
           </div>
-
         </div>
 
         <q-select
