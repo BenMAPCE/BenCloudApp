@@ -327,13 +327,21 @@ const columns = [
     sortable: true,
   },
   {
-    name: "mean",
-    label: "Mean",
+    name: "point_estimate",
+    label: "Change in Incidence (Cases)",
     field: (row) =>
-      row.mean.toLocaleString("en-US", { maximumFractionDigits: 2 }),
-    sort: (a, b, rowA, rowB) => parseFloat(rowA.mean) - parseFloat(rowB.mean),
+      row.point_estimate.toLocaleString("en-US", { maximumFractionDigits: 2 }),
+    sort: (a, b, rowA, rowB) => parseFloat(rowA.point_estimate) - parseFloat(rowB.point_estimate),
     sortable: true,
   },
+  // {
+  //   name: "mean",
+  //   label: "Mean",
+  //   field: (row) =>
+  //     row.mean.toLocaleString("en-US", { maximumFractionDigits: 2 }),
+  //   sort: (a, b, rowA, rowB) => parseFloat(rowA.mean) - parseFloat(rowB.mean),
+  //   sortable: true,
+  // },
   {
     name: "standard_deviation",
     label: "Standard Deviation",
@@ -364,14 +372,6 @@ const columns = [
     field: (row) =>
       row.pct_97_5.toLocaleString("en-US", { maximumFractionDigits: 2 }),
     sort: (a, b, rowA, rowB) => parseFloat(rowA.pct_97_5) - parseFloat(rowB.pct_97_5),
-    sortable: true,
-  },
-  {
-    name: "point_estimate",
-    label: "Change in Incidence (Cases)",
-    field: (row) =>
-      row.point_estimate.toLocaleString("en-US", { maximumFractionDigits: 2 }),
-    sort: (a, b, rowA, rowB) => parseFloat(rowA.point_estimate) - parseFloat(rowB.point_estimate),
     sortable: true,
   },
   {
