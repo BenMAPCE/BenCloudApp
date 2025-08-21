@@ -1,6 +1,6 @@
 <template>
-  <div class="upload-hif">
-    <q-dialog class="upload-hif-dialog" ref="dialog" @hide="onDialogHide" persistent>
+  <div class="upload-valuation">
+    <q-dialog class="upload-valuation-dialog" ref="dialog" @hide="onDialogHide" persistent>
       <q-card class="upload-card">
         <q-form @submit="onSubmit" class="q-gutter-md">
           <div class="row">
@@ -34,7 +34,7 @@
           </div>
 
           <div class="row">
-            <div class="col-12 hif-name">
+            <div class="col-12 valuation-name">
               Add Valuation Functions
             </div>
           </div>
@@ -44,7 +44,7 @@
               <q-input
                 filled
                 dense
-                v-model="hifGroupName"
+                v-model="healthEffectGroupName"
                 label="*Health Effect Group Name"
                 hint=""
                 lazy-rules
@@ -84,8 +84,8 @@
 </template>
 
 <script>
-import HifUploadErrorsDialog from "./HifUploadErrorsDialog.vue";
-import HifUploadSuccessDialog from "./HifUploadSuccessDialog.vue";
+import ValuationUploadErrorsDialog from "./ValuationUploadErrorsDialog.vue";
+import ValuationUploadSuccessDialog from "./ValuationUploadSuccessDialog.vue";
 
 import { useQuasar } from "quasar";
 import { useStore } from "vuex";
@@ -100,7 +100,7 @@ export default {
     errorMessage: "",
     name: "",
     filename:"",
-    hifGroupName: "",
+    healthEffectGroupName: "",
     description: "",
     uploadDate: "",
     dashData: [],
@@ -137,7 +137,7 @@ export default {
 
     onUploadClick() {
       console.log("onUploadClick");
-      console.log(this.hifGroupName);
+      console.log(this.healthEffectGroupName);
       console.log(this.description);
 
       // on OK, it is REQUIRED to
@@ -167,9 +167,9 @@ export default {
 
       console.log(this.selected_file);
 
-      if (this.hifGroupName === "") {
+      if (this.healthEffectGroupName === "") {
         this.errorMessage =
-          this.errorMessage + (hasErrors ? ", " : "") + "Health impact function group name is required";
+          this.errorMessage + (hasErrors ? ", " : "") + "Health effect group name is required";
         hasErrors = true;
       }
 
@@ -194,10 +194,10 @@ export default {
       var tzoffset = (new Date()).getTimezoneOffset() * 60000
       var localISOTime = (new Date(Date.now() - tzoffset)).toISOString();
 
-      const url = process.env.API_SERVER + "/api/health-impact-function-data";
+      const url = process.env.API_SERVER + "/api/valuation-function-data";
       const fileData = new FormData();
       fileData.append("file", this.selected_file);
-      fileData.append("hifGroupName", this.hifGroupName);
+      fileData.append("healthEffectGroupName", this.healthEffectGroupName);
       fileData.append("description", this.description);
       fileData.append("filename", this.selected_file.name);
       console.log(fileData);
@@ -205,7 +205,7 @@ export default {
       var self = this;
 
       this.$q.loading.show({
-        message: "Uploading incidence data. Please wait...",
+        message: "Uploading valuation function data. Please wait...",
         boxClass: "bg-grey-2 text-grey-9",
         spinnerColor: "primary",
       });
@@ -230,7 +230,7 @@ export default {
 
               this.$q
                 .dialog({
-                  component: HifUploadErrorsDialog,
+                  component: ValuationUploadErrorsDialog,
                   parent: this,
                   persistent: true,
                   componentProps: {
@@ -250,11 +250,11 @@ export default {
           } else {
             this.$q
               .dialog({
-                component: IncidenceUploadSuccessDialog,
+                component: ValuationUploadSuccessDialog,
                 parent: this,
                 persistent: true,
                 componentProps: {
-                  fileName: this.selected_file.name,
+                  healthEffectGroupName: this.healthEffectGroupName,
                   parentDialog: this.$refs.dialog,
                 },
               })
@@ -269,12 +269,12 @@ export default {
 
           self.$q.loading.hide();
 
-          var oldValue =  this.$store.state.incidence.incidenceForceReloadValue
+          var oldValue =  this.$store.state.valuation.valuationForceReloadValue
           console.log("oldValue: " + oldValue);
           var newValue = oldValue + 1;
           console.log("newValue: " + newValue);
           layerName = this.name;
-          this.$store.commit("incidence/updateIncidenceForceReloadValue", newValue)
+          this.$store.commit("valuation/updateValuationForceReloadValue", newValue)
 
           //self.hide();
           //self.$emit("ok");
@@ -357,13 +357,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.upload-hif {
+.upload-valuation {
   .q-field {
     padding-left: 10px;
     padding-right: 10px;
   }
 
-  .hif-name {
+  .valuation-name {
     padding-left: 15px;
   }
   .upload-card {

@@ -29,7 +29,7 @@
               round
               flat
               color="grey"
-              @click.stop="deleteRow(props)"
+              @click.stop="archiveRow(props)"
               icon="mdi-archive"
             ></q-btn>
           </template>
@@ -97,29 +97,29 @@ export default defineComponent({
     },
   },
   methods: {
-    deleteRow(props) {
-      // Prompt user to confirm hif dataset deletion
-      if(confirm("Are you sure you wish to archive " + props.row.author_year + "?")){
-        // Delete AQ layer, reload the hif dataset list if successful, alert the user if unsuccessful       
+    archiveRow(props) {
+      // Prompt user to confirm vf archive
+      if(confirm("Are you sure you wish to archive valuation function " + props.row.id + "?")){
+        // Archive the valuation function  
         axios
-          .delete(process.env.API_SERVER + "/api/health-impact-function/" + props.row.id, 
+          .post(process.env.API_SERVER + "/api/valuation-function/" + props.row.id, 
             {validateStatus: function (status) {
               return status < 500;
             }}
           )
           .then((response) => {
-            if(response.status === 204) {
+            if(response.status === 200) {
               trackCurrentPage = this.pagination.page;
-              console.log("Successfully deleted health impact function: " + props.row.name);
+              console.log("Successfully archived valuation function: " + props.row.author_year);
 
               // Reload list
-              var oldValue =  this.$store.state.incidence.incidenceForceReloadValue
+              var oldValue =  this.$store.state.valuation.valuationForceReloadValue;
               console.log("oldValue: " + oldValue);
               var newValue = oldValue - 1;
               console.log("newValue: " + newValue);
-              this.$store.commit("incidence/updateIncidenceForceReloadValue", newValue)
+              this.$store.commit("valuation/updateValuationForceReloadValue", newValue)
             } else if(response.status === 403){
-              console.log("Forbidden action on incidence dataset: " + props.row.name);
+              console.log("Forbidden action on VF: " + props.row.author_year);
               this.$q.notify({
                 group: false, // required to be updateable
                 type: 'negative',
@@ -147,12 +147,6 @@ export default defineComponent({
     },
 
    
-    
-    rowClicked(props) {
-      this.selected = [];
-      this.selected.push(props.row);
-      this.$store.commit("incidence/updateIncidenceDatasetId", props.row.id);
-    },
   },
 
   data() {
@@ -170,7 +164,7 @@ export default defineComponent({
     const filter = ref("");
     const loading = ref(false);
     const pagination = ref({
-      sortBy: "name",
+      sortBy: "endpoint_group_name",
       descending: false,
       page: 1,
       rowsPerPage: 25,
@@ -207,6 +201,25 @@ export default defineComponent({
          });
     })
 
+    watch(
+      () => store.state.valuation.valuationForceReloadValue,
+      (newValue, oldValue) => {
+        if(newValue > oldValue) {
+          console.log("--- added VF");
+        } else if(newValue < oldValue) {
+          console.log("--- archived VF");
+        }
+        filter.value = "";
+        pagination.value.sortBy = "endpoint_name";
+        pagination.value.descending = pagination.value.descending;
+        pagination.value.rowsNumber = 0;
+        onRequest({
+            pagination: pagination.value,
+            filter: undefined,
+         });
+      })
+
+
    
     watch(
       () => showAll.value,
@@ -214,11 +227,9 @@ export default defineComponent({
         console.log("Show all functions: " + showAll.value);
         if(showAll.value && !visibleColumns.value.includes("user")) {
           visibleColumns.value.push("user");
-          //visibleColumns.value.push("edit");
         }
         if(!showAll.value && visibleColumns.value.includes("user")) {
           visibleColumns.value.pop("user");
-          //visibleColumns.value.pop("edit");
         }
         onRequest({
           filter: "",
@@ -275,8 +286,6 @@ export default defineComponent({
 
             console.log("----- return -----");
             console.log(records);
-
-            store.commit("incidence/updateIncidenceDatasetId", 0);
 
 
             // // don't forget to update local pagination object
@@ -355,7 +364,7 @@ const columns = [
   {
     name: "endpoint_group_name",
     align: "left",
-    label: "Health Effect Group",
+    label: "Health Effect Category",
     field: "endpoint_group_name",
     sortable: true,
   },
@@ -369,7 +378,7 @@ const columns = [
   {
     name: "qualifier",
     align: "left",
-    label: "Qualifier",
+    label: "Risk Model Details",
     field: "qualifier",
     sortable: true,
   },
@@ -397,7 +406,7 @@ const columns = [
   {
     name: "p1a",
     align: "left",
-    label: "Parameter 1 A",
+    label: "Standard Error",
     field: "p1a",
     sortable: true,
   },
@@ -469,6 +478,13 @@ const columns = [
     align: "left",
     label: "EPA Standard",
     field: "epa_standard",
+    sortable: true,
+  },
+  {
+    name: "user",
+    align: "left",
+    label: "User",
+    field: "",
     sortable: true,
   },
   { 
