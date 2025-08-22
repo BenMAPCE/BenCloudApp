@@ -40,7 +40,7 @@ export default defineComponent({
       })
         .onOk(() => {
           console.log("Upload Valuation OK");
-          store.commit("hif/updateHifAddedDate", new Date());
+          store.commit("valuation/updateHealthEffectGroupAddedDate", new Date());
         })
         .onCancel(() => {
           // console.log('Cancel')

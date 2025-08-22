@@ -37,10 +37,7 @@ export default defineComponent({
         component: HifUploadForm,
         parent: this,
         persistent: true,
-        componentProps: {
-          pollutantFriendlyName: props.pollutantFriendlyName,
-          pollutantId: props.pollutantId,
-        },
+        componentProps: {},
       })
         .onOk(() => {
           console.log("Upload HIF OK");

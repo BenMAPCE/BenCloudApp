@@ -35,7 +35,7 @@
 
           <div class="row">
             <div class="col-12 hif-name">
-              Add {{ pollutantFriendlyName }} HIF Group
+              Add HIF Group
             </div>
           </div>
 
@@ -67,21 +67,6 @@
             </div>
           </div>
 
-          <!-- <div class="row">
-            <div class="col-12">
-              <q-input
-                filled
-                dense
-                label="*Pollutant"
-                :value="pollutantFriendlyName"
-                disable
-                :rules="[(val) => (val && val.length > 0) || 'Please enter a pollutant name']"
-              />
-            </div>
-          </div> -->
-
-          <input type="hidden" name="pollutantId" :value="pollutantId" />
-
           <div class="row justify-center">
             <q-card-actions>
               <q-btn color="primary" label="Upload" @click="onSubmit" />
@@ -101,9 +86,6 @@
 <script>
 import HifUploadErrorsDialog from "./HifUploadErrorsDialog.vue";
 import HifUploadSuccessDialog from "./HifUploadSuccessDialog.vue";
-
-import { useQuasar } from "quasar";
-import { useStore } from "vuex";
 
 export var layerName = null;
 
@@ -125,16 +107,7 @@ export default {
   components: {
   },
 
-  props: {
-    pollutantId: {
-      type: Number,
-      default: 0,
-    },
-    pollutantFriendlyName: {
-      type: String,
-      default: "None",
-    },
-  },
+  props: {},
 
 
   emits: [
@@ -206,12 +179,6 @@ export default {
         hasErrors = true;
       }
 
-      if (this.pollutantId === 0) {
-        this.errorMessage =
-          this.errorMessage + (hasErrors ? ", " : "") + "Pollutant is required";
-        hasErrors = true;
-      }
-
       if (this.selected_file === "") {
         this.errorMessage =
           this.errorMessage + (hasErrors ? ", " : "") + "File is required";
@@ -232,9 +199,7 @@ export default {
       fileData.append("file", this.selected_file);
       fileData.append("hifGroupName", this.hifGroupName);
       fileData.append("description", this.description);
-      fileData.append("pollutantId", this.pollutantId);
       fileData.append("filename", this.selected_file.name);
-      console.log(fileData);
       fileData.append("uploadDate",localISOTime)
       var self = this;
 
@@ -252,10 +217,6 @@ export default {
           },
         })
         .then((response) => {
-          console.log(response.status);
-          console.log(response.statusText);
-          console.log(response.data.success);
-          console.log(response.data.messages);
 
           if (response.data.success === false) {
             console.log("BAD NEWS");
