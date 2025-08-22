@@ -200,7 +200,7 @@ const columns = [
   },
   {
     name: "qualifier",
-    label: "Qualifier",
+    label: "Risk Model Details",
     field: (row) => row.qualifier,
     align: "left",
     style:
