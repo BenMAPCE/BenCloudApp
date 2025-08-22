@@ -14,3 +14,7 @@ export function healthEffectGroupAddedDate (state) {
 export function valuationForceReloadValue (state) {
   return state.valuationForceReloadValue
 }
+
+export function healthEffectForceReloadValue (state) {
+  return state.healthEffectForceReloadValue
+}

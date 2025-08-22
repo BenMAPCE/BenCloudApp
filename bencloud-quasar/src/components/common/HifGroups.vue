@@ -56,6 +56,19 @@ export default defineComponent({
       }
     );
 
+    //update group dropdown when a new group is added
+    watch(
+      () => store.state.hif.hifGroupForceReloadValue,
+      (groupValue, prevGroupValue) => {
+        if (groupValue != prevGroupValue) {
+          (async () => {
+            const response = await loadHifGroups().fetch();
+            options.value = JSON.parse(JSON.stringify(response.data.value));
+          })();
+        }
+      }
+    );
+
     function changeGroupValue(value) {
       store.commit("hif/updateHifGroupId", value.id);
       store.commit("hif/updateHifGroupName", value.name);

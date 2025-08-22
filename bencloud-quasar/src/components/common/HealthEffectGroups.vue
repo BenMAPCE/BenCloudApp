@@ -56,6 +56,19 @@ export default defineComponent({
       }
     );
 
+    //update group dropdown when a new group is added
+    watch(
+      () => store.state.valuation.healthEffectForceReloadValue,
+      (groupValue, prevGroupValue) => {
+        if (groupValue != prevGroupValue) {
+          (async () => {
+            const response = await loadHealthEffectGroups().fetch();
+            options.value = JSON.parse(JSON.stringify(response.data.value));
+          })();
+        }
+      }
+    );
+
     function changeGroupValue(value) {
       store.commit("valuation/updateHealthEffectGroupId", value.id);
       store.commit("valuation/updateHealthEffectGroupName", value.name);

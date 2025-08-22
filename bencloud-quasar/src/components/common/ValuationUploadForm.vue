@@ -276,6 +276,13 @@ export default {
           layerName = this.name;
           this.$store.commit("valuation/updateValuationForceReloadValue", newValue)
 
+          var oldValue =  this.$store.state.valuation.healthEffectForceReloadValue
+          console.log("oldValue: " + oldValue);
+          var newValue = oldValue + 1;
+          console.log("newValue: " + newValue);
+          layerName = this.name;
+          this.$store.commit("valuation/updateHealthEffectForceReloadValue", newValue)
+
           //self.hide();
           //self.$emit("ok");
 

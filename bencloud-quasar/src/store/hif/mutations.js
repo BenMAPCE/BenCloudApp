@@ -23,3 +23,6 @@ export function updateHifForceReloadValue (state, newValue) {
     state.hifForceReloadValue = newValue;
 }
 
+export function updateHifGroupForceReloadValue (state, newValue) {
+    state.hifGroupForceReloadValue = newValue;
+}
