@@ -271,6 +271,13 @@ export default {
           layerName = this.name;
           this.$store.commit("hif/updateHifForceReloadValue", newValue)
 
+          var oldValue =  this.$store.state.hif.hifGroupForceReloadValue
+          console.log("oldValue: " + oldValue);
+          var newValue = oldValue + 1;
+          console.log("newValue: " + newValue);
+          layerName = this.name;
+          this.$store.commit("hif/updateHifGroupForceReloadValue", newValue)
+
           //self.hide();
           //self.$emit("ok");
 

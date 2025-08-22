@@ -22,3 +22,7 @@ export function hifLayerAddedDate (state) {
 export function hifForceReloadValue (state) {
   return state.hifForceReloadValue
 }
+
+export function hifGroupForceReloadValue (state) {
+  return state.hifGroupForceReloadValue
+}

@@ -5,6 +5,7 @@ export default function () {
     hifGroupId: 0,
     hifGroupName: "",
     hifLayerAddedDate : null,
-    hifForceReloadValue: 1
+    hifForceReloadValue: 1,
+    hifGroupForceReloadValue: 1
   }
 }
