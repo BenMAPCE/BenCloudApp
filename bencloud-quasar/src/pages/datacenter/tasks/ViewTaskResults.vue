@@ -15,6 +15,10 @@
       <p class="label">Pre-policy: </p>
       <p>{{ task_pre_policy }}</p>  
     </div>
+    <div class="info aq_grid_definition_name">
+      <p class="label">Geography: </p>
+      <p>{{ aq_grid_definition_name }}</p>  
+    </div>
     <div v-if="task_uuid_with_type.substring(0,1) === 'E'" class="info task-metric">
       <p class="label"> Metric: </p>
       <p>{{ task_metric }}</p>  
@@ -25,7 +29,7 @@
     </div>
 
     <div class="info selection"> 
-      <p class="label">Viewing results for:</p>
+      <p class="label label-viewsum">Viewing summary results for:</p>
       <div class="aq-post-policy-selection q-pl-md q-pt-sm q-pb-sm q-pr-md">
         <q-select
           square
@@ -84,6 +88,7 @@ export default defineComponent({
     const batch_task_id = route.params.batch_task_id;
     const pollutant_name = ref("");
     const task_pre_policy = ref("");
+    const aq_grid_definition_name = ref("");
     const task_metric = ref("");
     const batch_task_name = ref("NO TASK NAME")
     const task_name = ref("");
@@ -202,6 +207,7 @@ export default defineComponent({
             .get(process.env.API_SERVER + "/api/batch-tasks/" + batch_task_id + "/scenarios")
             .then((response) => {
               task_pre_policy.value = response.data.aq_baseline_name
+              aq_grid_definition_name.value = response.data.aq_grid_definition_name
               task_metric.value = response.data.task_metric_name
               pollutant_name.value = response.data.pollutant_name
               batch_info.value = response.data
@@ -239,6 +245,7 @@ export default defineComponent({
       batch_task_name,
       pollutant_name,
       task_pre_policy,
+      aq_grid_definition_name,
       task_metric,
       scenario_names,
       scenario_years,
@@ -273,6 +280,9 @@ export default defineComponent({
   }
   .selection>.label {
     width: 200px;
+  }
+  .selection>.label-viewsum{
+    width:250px;
   }
   .aq-post-policy-selection {
     min-width: 180px;
