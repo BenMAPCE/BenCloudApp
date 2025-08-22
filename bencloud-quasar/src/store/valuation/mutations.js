@@ -14,3 +14,7 @@ export function updateHealthEffectGroupAddedDate (state, newDate) {
 export function updateValuationForceReloadValue (state, newValue) {
     state.valuationForceReloadValue = newValue;
 }
+
+export function updateHealthEffectForceReloadValue (state, newValue) {
+    state.healthEffectForceReloadValue = newValue;
+}

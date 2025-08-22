@@ -3,6 +3,7 @@ export default function () {
     healthEffectGroupId: 0,
     healthEffectGroupName: "",
     healthEffectGroupAddedDate : null,
-    valuationForceReloadValue: 1
+    valuationForceReloadValue: 1,
+    healthEffectForceReloadValue: 1
   }
 }
