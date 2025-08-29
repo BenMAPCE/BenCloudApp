@@ -10,7 +10,7 @@
     class="hif-group-options"
     emit
     map-options
-    label="Group"
+    label="Health Impact Function Group"
   />
 </template>
 

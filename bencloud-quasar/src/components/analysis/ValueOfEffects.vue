@@ -427,7 +427,7 @@ const visibleColumns = ref([
       {
         name: "endpoint_group_id",
         align: "left",
-        label: "Health Effect Group Id",
+        label: "Health Effect Category Id",
         field: "endpoint_group_id",
         sortable: false,
       },

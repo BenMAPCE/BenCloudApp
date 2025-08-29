@@ -10,7 +10,7 @@
     class="health-effect-group-options"
     emit
     map-options
-    label="Group"
+    label="Health Effect Category"
   />
 </template>
 

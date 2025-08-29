@@ -176,7 +176,7 @@ export default defineComponent({
     watch(
       () => store.state.valuation.healthEffectGroupId,
       (healthEffectGroupId, prevHealthEffectGroupId) => {
-        console.log("--- changed health effect Group")
+        console.log("--- changed health effect category")
         healthEffectGroupId = healthEffectGroupId;
         filter.value = "";
         pagination.value.sortBy = "endpoint_name";
