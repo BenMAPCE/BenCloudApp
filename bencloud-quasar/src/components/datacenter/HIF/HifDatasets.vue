@@ -430,6 +430,20 @@ const columns = [
     sortable: true,
   },
   {
+    name: "start_day",
+    align: "left",
+    label: "Start Day",
+    field: "start_day",
+    sortable: true,
+  },
+  {
+    name: "end_day",
+    align: "left",
+    label: "End Day",
+    field: "end_day",
+    sortable: true,
+  },
+  {
     name: "race_ethnicity_gender",
     align: "left",
     label: "Race / Ethnicity / Gender",
@@ -448,6 +462,20 @@ const columns = [
     align: "left",
     label: "Location",
     field: "location",
+    sortable: true,
+  },
+  {
+    name: "geographic_area",
+    align: "left",
+    label: "Geographic Area",
+    field: "geographic_area",
+    sortable: true,
+  },
+  {
+    name: "geographic_area_feature",
+    align: "left",
+    label: "Geographic Area Feature",
+    field: "geographic_area_feature",
     sortable: true,
   },
   {
