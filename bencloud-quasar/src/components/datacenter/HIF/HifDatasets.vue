@@ -423,6 +423,13 @@ const columns = [
     sortable: false,
   },
   {
+    name: "timing",
+    align: "left",
+    label: "Timing",
+    field: "timing",
+    sortable: true,
+  },
+  {
     name: "race_ethnicity_gender",
     align: "left",
     label: "Race / Ethnicity / Gender",
