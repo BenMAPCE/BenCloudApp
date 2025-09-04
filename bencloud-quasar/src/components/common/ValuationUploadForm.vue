@@ -45,7 +45,7 @@
                 filled
                 dense
                 v-model="healthEffectGroupName"
-                label="*Health Effect Group Name"
+                label="*Health Effect Category Name"
                 hint=""
                 lazy-rules
                 :rules="[(val) => (val && val.length > 0) || 'Please enter a name']"
@@ -169,7 +169,7 @@ export default {
 
       if (this.healthEffectGroupName === "") {
         this.errorMessage =
-          this.errorMessage + (hasErrors ? ", " : "") + "Health effect group name is required";
+          this.errorMessage + (hasErrors ? ", " : "") + "Health effect category name is required";
         hasErrors = true;
       }
 
