@@ -17,11 +17,8 @@
     <template v-slot:body="props">
       <q-tr class="cursor-pointer" :props="props" @click.exact="rowClicked(props)">
         <q-td v-for="col in props.cols" :key="col.name" :props="props">
-          <template v-if="col.name === 'hero_id'">
-            <a :href="props.row.epa_hero_url" target="_blank">{{ props.row.hero_id }}</a>
-          </template>
-          <template v-if="col.name === 'author'">
-            <a :href="props.row.access_url" target="_blank">{{ props.row.author_year }}</a>
+          <template v-if="col.name === 'reference'">
+            <a :href="props.row.access_url" target="_blank">{{ props.row.reference }}</a>
           </template>
           <template v-if="col.name === 'actions' && props.row.share_scope != 1">
             <q-btn
@@ -386,7 +383,7 @@ const columns = [
     name: "reference",
     align: "left",
     label: "Reference",
-    field: "reference",
+    field: "",
     sortable: true,
   },
   {
