@@ -245,7 +245,7 @@ const columns = [
   {
     name: "beta",
     label: "Beta",
-    field: (row) => row.beta.toLocaleString("en-US", { maximumFractionDigits: 2 }),
+    field: (row) => row.beta.toLocaleString("en-US", { maximumFractionDigits: 3 }),
     sort: (a, b, rowA, rowB) => parseFloat(rowA.beta) - parseFloat(rowB.beta),
     sortable: true,
   },
