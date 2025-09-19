@@ -18,13 +18,29 @@
 
   <q-tab-panels v-model="tab" animated>
     <q-tab-panel name="defaults">
-
       <div class="q-py-xs">
         <q-option-group
-          v-model="selectedItem"
-          :options="options"
+          v-model="limitToGridYN"
+          :options="optionsLimitYN"
           color="primary"
         ></q-option-group>
+      </div>
+      
+      <div class="q-py-xs q-ml-md inline-block" v-if="limitToGridYN === '1'">
+        <div class="text-caption text-grey q-mb-xs">
+          Choose a grid that defines the boundaries of that area
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <GridDefinitions 
+            v-model= "limitToGridId"
+            @changeGridValue="val=> limitToGridId = val"
+            ></GridDefinitions>
+          </div>
+        </div>
+        <div class="text-caption text-grey q-mb-xs">
+          Not seeing your grid in the list? <router-link to="/datacenter/review-grids">Upload it now</router-link> and return here after it is processed.
+        </div>
       </div>
 
     </q-tab-panel>
@@ -36,54 +52,65 @@
 </template>
 <script>
 import { defineComponent } from "vue";
-import { ref, watch, onMounted } from "vue";
+import { ref, watch, onMounted} from "vue";
 import { useStore } from "vuex";
+import GridDefinitions from "./GridDefinitions.vue";
 
 export default defineComponent({
   model: ref(null),
   name: "Location",
-
+  components: {
+    GridDefinitions,
+  },
 
   setup(props, context) {
     const rows = ref([]);
-    const selectedItem = ref('1');
+    const limitToGridId = ref(null);
     const store = useStore();
+    const limitToGridYN = ref('0');
 
     watch(
-      () => selectedItem.value,
-      (currentSelectedItem, prevSelectedItem) => {
-        console.log("watch: " + currentSelectedItem + " |" + prevSelectedItem)
-        if (currentSelectedItem != prevSelectedItem) {
-          console.log("selectedItem: " + currentSelectedItem)
-          //console.log("options: " + options)
-
-          //var name = options.find((opt) => opt.value === currentSelectedItem).label;
-
+      [
+        () => limitToGridId.value, 
+        () => limitToGridYN.value
+      ],      
+      (
+        [currentlimitToGridId, currentlimitToGridYN], 
+        [prevlimitToGridId, prevlimitToGridYN]
+      ) => {
+        console.log("watch: current | previous limitToGridId" + currentlimitToGridId + " |" + prevlimitToGridId);
+        if (currentlimitToGridId != prevlimitToGridId || currentlimitToGridYN != prevlimitToGridYN) {
+          console.log("limitToGridId: " + currentlimitToGridId + "|" + currentlimitToGridYN)
+          if(currentlimitToGridYN=="0"){
+            limitToGridId.value=null;
+          }
           store.commit("analysis/updateLocation",
           {
-            locationId: currentSelectedItem,
-            plocationName: ""
+            limitToGridId: currentlimitToGridId,
+            locationName: ""
           });
+
         }
       });
 
    onMounted(() => {
-      console.log("... " + store.state.analysis.locationId);
-      if (store.state.analysis.locationId != null) {
-        selectedItem.value = store.state.analysis.locationId;
-        console.log("- selectedItem: " + selectedItem.value);
+    console.log("limitToGridId value in state: " + store.state.analysis.limitToGridId);
+    //console.log("... " + store.state.analysis.limitToGridId + "|" + store.state.analysis.limitToGridId);
+      if (store.state.analysis.limitToGridId != null) {
+        limitToGridId.value = Number(store.state.analysis.limitToGridId);
+        limitToGridYN.value = "1";
+        console.log('Dropdown initialized with limitToGridId:', limitToGridId.value)
       }
     })();
 
     return {
       tab: ref("defaults"),
-      options: [
-        { label: 'U.S. National', value: '1' },
-        { label: 'Eastern U.S.', value: '2', disable: true },
-        { label: 'Western U.S.', value: '3', disable: true  },
-        { label: 'Global (everywhere)', value: '4', disable: true }
+      optionsLimitYN: [
+        { label: 'Everywhere I have air quality data', value: '0' },
+        { label: 'Limit my analysis to a pre-defined area', value: '1'}
       ],
-      selectedItem,
+      limitToGridId,
+      limitToGridYN,
       rows
     };
   },

@@ -127,6 +127,7 @@ export default defineComponent({
     const options = ref([]);
 
     const pollutantId = store.state.analysis.pollutantId;
+    const limitToGridId = store.state.analysis.limitToGridId;
     const pollutantFriendlyName = store.state.analysis.pollutantFriendlyName;
     const prePolicyAirQualityName = store.state.analysis.prePolicyAirQualityName;
     const postPolicyAirQualityName = store.state.analysis.postPolicyAirQualityName;
@@ -233,6 +234,7 @@ export default defineComponent({
 
       var batchTaskJSON = JSON.parse(JSON.stringify(store.state.analysis.batchTaskObject));
       batchTaskJSON['name'] = taskName.value;
+      batchTaskJSON['limitToGridId'] = store.state.analysis.limitToGridId;
       batchTaskJSON['gridDefinitionId'] = store.state.analysis.aggregationScale;
       store.commit("analysis/updateBatchTaskObject", batchTaskJSON);
       console.log("----- Batch task configuration -----")
@@ -298,6 +300,7 @@ export default defineComponent({
 
     return {
       pollutantId,
+      limitToGridId,
       pollutantFriendlyName,
       prePolicyAirQualityName,
       postPolicyAirQualityName,
