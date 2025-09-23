@@ -31,6 +31,10 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    getAll: {
+      type: Boolean,
+      default: false,
+    },
   },
 
     // setup (props, context) {
@@ -50,7 +54,8 @@ export default defineComponent({
     watch(
       () => groupValue.value,
       (groupValue, prevGroupValue) => {
-        if (groupValue != prevGroupValue) {
+        console.log(props);
+        if (groupValue != prevGroupValue && !props.getAll) {
           changeGroupValue(groupValue);
         }
       }
@@ -62,7 +67,7 @@ export default defineComponent({
       (groupValue, prevGroupValue) => {
         if (groupValue != prevGroupValue) {
           (async () => {
-            const response = await loadHealthEffectGroups().fetch();
+            const response = await loadHealthEffectGroups(props.getAll).fetch();
             options.value = JSON.parse(JSON.stringify(response.data.value));
           })();
         }
@@ -76,10 +81,11 @@ export default defineComponent({
     }
 
     onBeforeMount(() => {
+      if(!props.getAll)
         store.commit("valuation/updateHealthEffectGroupId", 0);
 
       (async () => {
-        const response = await loadHealthEffectGroups().fetch();
+        const response = await loadHealthEffectGroups(props.getAll).fetch();
         console.log(response);
         options.value = JSON.parse(JSON.stringify(response.data.value));
       })();
