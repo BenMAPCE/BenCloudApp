@@ -6,6 +6,8 @@ export function updateStepNumber(state, stepNumber ) {
 export function updateLocation(state, location) {
     state.locationId = location.locationId;
     state.locationName = location.locationName;
+    //exposure doesn't have limitToGridId right now
+    // state.limitToGridId = location.limitToGridId;
 }
 
 export function updatePollutantId (state, pollutantId ) {

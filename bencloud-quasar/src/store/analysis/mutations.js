@@ -3,7 +3,7 @@ export function updateStepNumber(state, stepNumber ) {
     state.stepNumber = stepNumber;
 }
 export function updateLocation(state, location) {
-    state.locationId = location.locationId;
+    state.limitToGridId = location.limitToGridId;
     state.locationName = location.locationName;
 }
 

@@ -125,6 +125,7 @@ export const createHifTemplate = (taskName, store) => {
   const valuationsForHealthImpactFunctionGroups =
     store.state.analysis.valuationsForHealthImpactFunctionGroups;
   const batchTaskObject = store.state.analysis.batchTaskObject;
+  const limitToGridId = store.state.analysis.limitToGridId;
 
   var template = {};
 
@@ -133,6 +134,7 @@ export const createHifTemplate = (taskName, store) => {
   console.log("-------------------------------");
 
   template["name"] = taskName;
+  template["limitToGridId"]= limitToGridId;
   template["type"] = "HIF";
 
   var pollutant = {};
@@ -363,6 +365,12 @@ export const loadHifTemplate = (model, store) => {
     "analysis/updatePollutantFriendlyName",
     pollutant.pollutantFriendlyName
   );
+
+  store.commit("analysis/updateLocation",
+          {
+            limitToGridId: parameters.limitToGridId,
+            locationName: ""
+          });
 
   var air_quality_data = parameters.air_quality_data;
   if (air_quality_data[0].type === "baseline") {
