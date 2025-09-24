@@ -21,7 +21,7 @@
         />
       </div>
 
-      <div class="col" v-if="currentHealthEffectGroupId">
+      <div class="col">
           <ValuationAdd></ValuationAdd>
         </div>
     </div>

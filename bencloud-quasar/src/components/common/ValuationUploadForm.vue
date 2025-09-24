@@ -2,7 +2,7 @@
   <div class="upload-valuation">
     <q-dialog class="upload-valuation-dialog" ref="dialog" @hide="onDialogHide" persistent>
       <q-card class="upload-card">
-        <q-form @submit="onSubmit" class="q-gutter-md">
+        <q-form @submit="onSubmit()" class="q-gutter-md">
           <div class="row">
             <div class="col-12">
               <q-uploader
@@ -39,31 +39,53 @@
             </div>
           </div>
 
-          <div class="row">
-            <div class="col-12">
-              <q-input
-                filled
-                dense
-                v-model="healthEffectGroupName"
-                label="*Health Effect Category Name"
-                hint=""
-                lazy-rules
-                :rules="[(val) => (val && val.length > 0) || 'Please enter a name']"
-              />
-            </div>
-          </div>
+          <q-select
+            square
+            dense
+            outlined
+            v-model="typeValue"
+            :options="typeOptions"
+            class="upload-type-options"
+            emit
+            map-options
+            label="Upload Type"
+          />
 
-          <div class="row">
-            <div class="col-12">
-              <q-input
-                filled
-                dense
-                v-model="description"
-                label="*Description"
-                hint=""
-                lazy-rules
-                :rules="[(val) => (val && val.length > 0) || 'Please enter a description']"
-              />
+          <div v-if="typeValue != null">
+            
+            <div v-if="typeValue == 'Append to an existing health effect category'" class="col-12">
+              <Suspense>
+                <HealthEffectGroups v-model="healthEffectGroupName" updateState getAll></HealthEffectGroups>
+              </Suspense>
+            </div>
+            
+
+            <div v-if="typeValue == 'Add a new health effect category'" class="row">
+              <div class="col-12">
+                <q-input
+                  filled
+                  dense
+                  v-model="healthEffectGroupName"
+                  label="*Health Effect Category Name"
+                  hint=""
+                  lazy-rules
+                  :rules="[(val) => (val && val.length > 0) || 'Please enter a name']"
+                />
+              </div>
+            </div>
+
+            <div v-if="typeValue == 'Add a new health effect category'" class="row">
+              <div class="col-12">
+                <q-input
+                  filled
+                  dense
+                  v-model="description"
+                  label="*Description"
+                  hint=""
+                  lazy-rules
+                  :rules="[(val) => (val && val.length > 0) || 'Please enter a description']"
+                />
+              </div>
             </div>
           </div>
 
@@ -75,8 +97,8 @@
           </div>
         </q-form>
 
-        <q-card-section class="error-card" v-if="this.errorMessage != ''">
-          {{ this.errorMessage }}
+        <q-card-section class="error-card" v-if="errorMessage != ''">
+          {{ errorMessage }}
         </q-card-section>
       </q-card>
     </q-dialog>
@@ -86,27 +108,16 @@
 <script>
 import ValuationUploadErrorsDialog from "./ValuationUploadErrorsDialog.vue";
 import ValuationUploadSuccessDialog from "./ValuationUploadSuccessDialog.vue";
+import HealthEffectGroups from "./HealthEffectGroups.vue";
 
-import { useQuasar } from "quasar";
+import { Notify, Loading, Dialog } from "quasar";
+import { ref, watch } from "vue";
 import { useStore } from "vuex";
-
-export var layerName = null;
+import axios from "axios";
 
 export default {
-  data: () => ({
-    selected_file: "",
-    check_if_document_upload: false,
-    gridValue: 0,
-    errorMessage: "",
-    name: "",
-    filename:"",
-    healthEffectGroupName: "",
-    description: "",
-    uploadDate: "",
-    dashData: [],
-  }),
-  
   components: {
+    HealthEffectGroups
   },
 
 
@@ -115,73 +126,135 @@ export default {
     "ok",
     "hide",
   ],
+  setup(props, { emit }) {
+    const store = useStore();
+    const typeValue = ref(null);
+    const typeOptions = ref(["Add a new health effect category", "Append to an existing health effect category"]);
+    const healthEffectGroupName = ref("");
+    const dialog = ref(null);
 
-  methods: {
-    // following method is REQUIRED
-    // (don't change its name --> "show")
-    show() {
-      this.$refs.dialog.show();
-    },
+    var selected_file = "";
+    var check_if_document_upload = false;
+    const errorMessage = ref("");
+    const description = ref("");
+
+
+    watch(
+      () => typeValue.value,
+      (typeValue, prevTypeValue) => {
+        if (typeValue != prevTypeValue) {
+          healthEffectGroupName.value = "";
+          description.value = "";
+          errorMessage.value = "";
+        }
+      }
+    );
+
+    const show = () => {
+      dialog.value.show();
+    }
 
     // following method is REQUIRED
     // (don't change its name --> "hide")
-    hide() {
-      this.$refs.dialog.hide();
-    },
+    const hide = () => {
+      dialog.value.hide();
+    }
 
-    onDialogHide() {
+    const onDialogHide = () => {
       // required to be emitted
       // when QDialog emits "hide" event
-      this.$emit("hide");
-    },
+      emit("hide");
+    }
 
-    onUploadClick() {
+    const onUploadClick = () => {
       console.log("onUploadClick");
-      console.log(this.healthEffectGroupName);
-      console.log(this.description);
 
       // on OK, it is REQUIRED to
       // emit "ok" event (with optional payload)
       // before hiding the QDialog
-      this.$emit("ok");
-      // or with payload: this.$emit('ok', { ... })
+      emit("ok");
+      // or with payload: emit('ok', { ... })
 
       // then hiding dialog
-      this.hide();
-    },
+      dialog.value.hide();
+    }
 
-    onOKClick() {
+    const onOKClick = () => {
       // on OK, it is REQUIRED to
       // emit "ok" event (with optional payload)
       // before hiding the QDialog
-      this.$emit("ok");
-      // or with payload: this.$emit('ok', { ... })
+      emit("ok");
+      // or with payload: emit('ok', { ... })
 
       // then hiding dialog
-      this.hide();
-    },
+      dialog.value.hide();
+    }
 
-    onSubmit() {
+    const file_selected = (file) => {
+      selected_file = file[0];
+      check_if_document_upload = true;
+    }
+
+    const file_removed = (file) => {
+      selected_file = "";
+      check_if_document_upload = false;
+    }
+
+    const file_rejected = (rejectedFiles) =>{
+      rejectedFiles.forEach(rejection=>{
+          if(rejection.failedPropValidation === 'max-file-size'){
+            Notify.create({
+              type: 'negative',
+              position:'top',
+              message:'File size exceeds 1G limit!'
+            });
+            errorMessage.value = "File " + rejection.file.name + " exceeds 1G limit!";
+            //console.log('size limit reach.');
+          }
+          else{
+            Notify.create({
+              type: 'negative',
+              position:'top',
+              message:'Invalid file format.'
+            });
+            errorMessage.value = "Invalid file format. Please check your csv file.";
+            //console.log('Invalid file format.');
+          }
+        })
+    }
+
+    const onCancelClick = () => {
+      // we just need to hide the dialog
+      dialog.value.hide();
+    }
+
+    const onSubmit = () => {
       var hasErrors = false;
-      this.errorMessage = "";
+      var newCategory = false;
+      errorMessage.value = "";
 
-      console.log(this.selected_file);
-
-      if (this.healthEffectGroupName === "") {
-        this.errorMessage =
-          this.errorMessage + (hasErrors ? ", " : "") + "Health effect category name is required";
+      if (healthEffectGroupName.value === "") {
+        errorMessage.value =
+          errorMessage.value + (hasErrors ? ", " : "") + "Health effect category name is required";
         hasErrors = true;
       }
-
-      if (this.description === "") {
-        this.errorMessage =
-          this.errorMessage + (hasErrors ? ", " : "") + "Description is required";
-        hasErrors = true;
+      
+      if(typeValue.value == 'Append to an existing health effect category') {
+        healthEffectGroupName.value = healthEffectGroupName.value.name;
       }
 
-      if (this.selected_file === "") {
-        this.errorMessage =
-          this.errorMessage + (hasErrors ? ", " : "") + "File is required";
+      if (typeValue.value == 'Add a new health effect category') {
+        newCategory = true;
+        if(description.value === "") {
+          errorMessage.value =
+            errorMessage.value + (hasErrors ? ", " : "") + "Description is required";
+          hasErrors = true;
+        }
+      }
+
+      if (selected_file === "") {
+        errorMessage.value =
+          errorMessage.value + (hasErrors ? ", " : "") + "File is required";
         hasErrors = true;
       }
 
@@ -196,22 +269,23 @@ export default {
 
       const url = process.env.API_SERVER + "/api/valuation-function-data";
       const fileData = new FormData();
-      fileData.append("file", this.selected_file);
-      fileData.append("healthEffectGroupName", this.healthEffectGroupName);
-      fileData.append("description", this.description);
-      fileData.append("filename", this.selected_file.name);
+      fileData.append("file", selected_file);
+      fileData.append("healthEffectGroupName", healthEffectGroupName.value);
+      fileData.append("description", description.value);
+      fileData.append("filename", selected_file.name);
+      fileData.append("newCategory", newCategory);
       console.log(fileData);
       fileData.append("uploadDate",localISOTime)
       var self = this;
 
-      this.$q.loading.show({
+      Loading.show({
         message: "Uploading valuation function data. Please wait...",
         boxClass: "bg-grey-2 text-grey-9",
         spinnerColor: "primary",
       });
 
       var self = this;
-      this.$axios
+      axios
         .post(url, fileData, {
           headers: {
             "Content-Type": "multipart/form-data",
@@ -228,19 +302,18 @@ export default {
             if (response.data.messages.length > 0) {
               console.log("Show Errors");
 
-              this.$q
-                .dialog({
+              Dialog.create({
                   component: ValuationUploadErrorsDialog,
                   parent: this,
                   persistent: true,
                   componentProps: {
                     errorList: response.data.messages,
-                    fileName: this.selected_file.name,
+                    fileName: selected_file.name,
                   },
                 })
                 .onOk(() => {
                   console.log("OK");
-                  this.$refs.dialog.hide()
+                  dialog.value.hide()
                 })
                 .onCancel(() => {
                 })
@@ -248,14 +321,13 @@ export default {
                });
             }
           } else {
-            this.$q
-              .dialog({
+            Dialog.create({
                 component: ValuationUploadSuccessDialog,
                 parent: this,
                 persistent: true,
                 componentProps: {
-                  healthEffectGroupName: this.healthEffectGroupName,
-                  parentDialog: this.$refs.dialog,
+                  healthEffectGroupName: healthEffectGroupName.value,
+                  parentDialog: dialog.value,
                 },
               })
               .onOk(() => {
@@ -267,21 +339,19 @@ export default {
               });
           }
 
-          self.$q.loading.hide();
+          Loading.hide();
 
-          var oldValue =  this.$store.state.valuation.valuationForceReloadValue
+          var oldValue =  store.state.valuation.valuationForceReloadValue
           console.log("oldValue: " + oldValue);
           var newValue = oldValue + 1;
           console.log("newValue: " + newValue);
-          layerName = this.name;
-          this.$store.commit("valuation/updateValuationForceReloadValue", newValue)
+          store.commit("valuation/updateValuationForceReloadValue", newValue)
 
-          var oldValue =  this.$store.state.valuation.healthEffectForceReloadValue
+          var oldValue =  store.state.valuation.healthEffectForceReloadValue
           console.log("oldValue: " + oldValue);
           var newValue = oldValue + 1;
           console.log("newValue: " + newValue);
-          layerName = this.name;
-          this.$store.commit("valuation/updateHealthEffectForceReloadValue", newValue)
+          store.commit("valuation/updateHealthEffectForceReloadValue", newValue)
 
           //self.hide();
           //self.$emit("ok");
@@ -293,7 +363,7 @@ export default {
             // The request was made and the server responded with a status code
             // that falls out of the range of 2xx
             console.log(error.response.data);
-            self.errorMessage = error.response.data;
+            self.errorMessage.value = error.response.data;
             console.log(error.response.status);
             console.log(error.response.headers);
           } else if (error.request) {
@@ -306,60 +376,30 @@ export default {
             console.log("Error", error.message);
           }
           console.log("FAILURE!!");
-          self.$q.loading.hide();
-        })
-        .finally(function () 
-          { 
-            layerName = null;
-          }
-        );
-    },
-
-    file_selected: function (file) {
-      this.selected_file = file[0];
-      this.check_if_document_upload = true;
-    },
-
-    file_removed: function (file) {
-      this.selected_file = "";
-      this.check_if_document_upload = false;
-    },
-
-    file_rejected:function(rejectedFiles){
-      rejectedFiles.forEach(rejection=>{
-          if(rejection.failedPropValidation === 'max-file-size'){
-            this.$q.notify({
-              type: 'negative',
-              position:'top',
-              message:'File size exceeds 1G limit!'
-            });
-            this.errorMessage = "File " + rejection.file.name + " exceeds 1G limit!";
-            //console.log('size limit reach.');
-          }
-          else{
-            this.$q.notify({
-              type: 'negative',
-              position:'top',
-              message:'Invalid file format.'
-            });
-            this.errorMessage = "Invalid file format. Please check your csv file.";
-            //console.log('Invalid file format.');
-          }
-        })
-    },
-
-    onCancelClick() {
-      // we just need to hide the dialog
-      this.hide();
-    },
-
-    onRejected(rejectedEntries) {
-    },
-
-    onChangeGridValue(value) {
-      this.gridValue = value;
+          Loading.hide();
+        });
     }
+
+    return {
+      typeOptions,
+      typeValue,
+      healthEffectGroupName,
+      dialog,
+      errorMessage,
+      description,
+      show,
+      hide,
+      onDialogHide,
+      onUploadClick,
+      onCancelClick,
+      file_removed,
+      file_rejected,
+      file_selected,
+      onOKClick,
+      onSubmit,
+    };
   },
+
 };
 </script>
 
