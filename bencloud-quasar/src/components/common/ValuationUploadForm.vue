@@ -173,7 +173,6 @@ export default {
       // emit "ok" event (with optional payload)
       // before hiding the QDialog
       emit("ok");
-      // or with payload: emit('ok', { ... })
 
       // then hiding dialog
       dialog.value.hide();
@@ -257,7 +256,6 @@ export default {
           errorMessage.value + (hasErrors ? ", " : "") + "File is required";
         hasErrors = true;
       }
-
    
       if (hasErrors) {
         return;
@@ -274,7 +272,6 @@ export default {
       fileData.append("description", description.value);
       fileData.append("filename", selected_file.name);
       fileData.append("newCategory", newCategory);
-      console.log(fileData);
       fileData.append("uploadDate",localISOTime)
       var self = this;
 
@@ -292,10 +289,6 @@ export default {
           },
         })
         .then((response) => {
-          console.log(response.status);
-          console.log(response.statusText);
-          console.log(response.data.success);
-          console.log(response.data.messages);
 
           if (response.data.success === false) {
             console.log("BAD NEWS");
@@ -353,9 +346,6 @@ export default {
           console.log("newValue: " + newValue);
           store.commit("valuation/updateHealthEffectForceReloadValue", newValue)
 
-          //self.hide();
-          //self.$emit("ok");
-
           return response.status;
         })
         .catch(function (error) {
@@ -399,7 +389,6 @@ export default {
       onSubmit,
     };
   },
-
 };
 </script>
 
