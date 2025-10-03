@@ -28,7 +28,7 @@
         />
       </div>
 
-      <div class="col" v-if="currentPollutantId">
+      <div class="col">
           <HifAdd
             :pollutantId=selectedPollutantId 
             :pollutantFriendlyName=selectedPollutantFriendlyName
