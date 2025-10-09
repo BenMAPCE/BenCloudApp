@@ -2,7 +2,7 @@
   <div class="upload-hif">
     <q-dialog class="upload-hif-dialog" ref="dialog" @hide="onDialogHide" persistent>
       <q-card class="upload-card">
-        <q-form @submit="onSubmit" class="q-gutter-md">
+        <q-form @submit="onSubmit()" class="q-gutter-md">
           <div class="row">
             <div class="col-12">
               <q-uploader
@@ -35,48 +35,70 @@
 
           <div class="row">
             <div class="col-12 hif-name">
-              Add HIF Group
+              Add Health Impact Functions
             </div>
           </div>
 
-          <div class="row">
-            <div class="col-12">
-              <q-input
-                filled
-                dense
-                v-model="hifGroupName"
-                label="*Group Name"
-                hint=""
-                lazy-rules
-                :rules="[(val) => (val && val.length > 0) || 'Please enter a name']"
-              />
-            </div>
-          </div>
+          <q-select
+            square
+            dense
+            outlined
+            v-model="typeValue"
+            :options="typeOptions"
+            class="upload-type-options"
+            emit
+            map-options
+            label="Upload Type"
+          />
 
-          <div class="row">
-            <div class="col-12">
-              <q-input
-                filled
-                dense
-                v-model="description"
-                label="*Description"
-                hint=""
-                lazy-rules
-                :rules="[(val) => (val && val.length > 0) || 'Please enter a description']"
-              />
+          <div v-if="typeValue != null">
+            
+            <div v-if="typeValue == 'Append to an existing health impact function group'" class="col-12">
+              <Suspense>
+                <HifGroups v-model="hifGroupName" updateState fromUploadForm></HifGroups>
+              </Suspense>
+            </div>
+            
+
+            <div v-if="typeValue == 'Add a new health impact function group'" class="row">
+              <div class="col-12">
+                <q-input
+                  filled
+                  dense
+                  v-model="hifGroupName"
+                  label="*Health Impact Function Group Name"
+                  hint=""
+                  lazy-rules
+                  :rules="[(val) => (val && val.length > 0) || 'Please enter a name']"
+                />
+              </div>
+            </div>
+
+            <div v-if="typeValue == 'Add a new health impact function group'" class="row">
+              <div class="col-12">
+                <q-input
+                  filled
+                  dense
+                  v-model="description"
+                  label="*Description"
+                  hint=""
+                  lazy-rules
+                  :rules="[(val) => (val && val.length > 0) || 'Please enter a description']"
+                />
+              </div>
             </div>
           </div>
 
           <div class="row justify-center">
             <q-card-actions>
-              <q-btn color="primary" label="Upload" @click="onSubmit" />
+              <q-btn color="primary" label="Upload" @click="onSubmit()" />
               <q-btn color="primary" label="Cancel" @click="onCancelClick" />
             </q-card-actions>
           </div>
         </q-form>
 
-        <q-card-section class="error-card" v-if="this.errorMessage != ''">
-          {{ this.errorMessage }}
+        <q-card-section class="error-card" v-if="errorMessage != ''">
+          {{ errorMessage }}
         </q-card-section>
       </q-card>
     </q-dialog>
@@ -86,29 +108,17 @@
 <script>
 import HifUploadErrorsDialog from "./HifUploadErrorsDialog.vue";
 import HifUploadSuccessDialog from "./HifUploadSuccessDialog.vue";
+import HifGroups from "./HifGroups.vue";
 
-export var layerName = null;
+import { Notify, Loading, Dialog } from "quasar";
+import { ref, watch } from "vue";
+import { useStore } from "vuex";
+import axios from "axios";
 
 export default {
-  data: () => ({
-    selected_file: "",
-    check_if_document_upload: false,
-    pollutantValue: 0,
-    gridValue: 0,
-    errorMessage: "",
-    name: "",
-    filename:"",
-    hifGroupName: "",
-    description: "",
-    uploadDate: "",
-    dashData: [],
-  }),
-  
   components: {
+    HifGroups
   },
-
-  props: {},
-
 
   emits: [
     // REQUIRED
@@ -116,75 +126,136 @@ export default {
     "hide",
   ],
 
-  methods: {
-    // following method is REQUIRED
-    // (don't change its name --> "show")
-    show() {
-      this.$refs.dialog.show();
-    },
+  setup(props, { emit }) {
+    const store = useStore();
+    const typeValue = ref(null);
+    const typeOptions = ref(["Add a new health impact function group", "Append to an existing health impact function group"]);
+    const hifGroupName = ref("");
+    const dialog = ref(null);
+
+    var selected_file = "";
+    var check_if_document_upload = false;
+    const errorMessage = ref("");
+    const description = ref("");
+
+
+    watch(
+      () => typeValue.value,
+      (typeValue, prevTypeValue) => {
+        if (typeValue != prevTypeValue) {
+          hifGroupName.value = "";
+          description.value = "";
+          errorMessage.value = "";
+        }
+      }
+    );
+
+    const show = () => {
+      dialog.value.show();
+    }
 
     // following method is REQUIRED
     // (don't change its name --> "hide")
-    hide() {
-      this.$refs.dialog.hide();
-    },
+    const hide = () => {
+      dialog.value.hide();
+    }
 
-    onDialogHide() {
+    const onDialogHide = () => {
       // required to be emitted
       // when QDialog emits "hide" event
-      this.$emit("hide");
-    },
+      emit("hide");
+    }
 
-    onUploadClick() {
+    const onUploadClick = () => {
       console.log("onUploadClick");
-      console.log(this.hifGroupName);
-      console.log(this.description);
 
       // on OK, it is REQUIRED to
       // emit "ok" event (with optional payload)
       // before hiding the QDialog
-      this.$emit("ok");
-      // or with payload: this.$emit('ok', { ... })
+      emit("ok");
 
       // then hiding dialog
-      this.hide();
-    },
+      dialog.value.hide();
+    }
 
-    onOKClick() {
+    const onOKClick = () => {
       // on OK, it is REQUIRED to
       // emit "ok" event (with optional payload)
       // before hiding the QDialog
-      this.$emit("ok");
-      // or with payload: this.$emit('ok', { ... })
+      emit("ok");
+      // or with payload: emit('ok', { ... })
 
       // then hiding dialog
-      this.hide();
-    },
+      dialog.value.hide();
+    }
 
-    onSubmit() {
+    const file_selected = (file) => {
+      selected_file = file[0];
+      check_if_document_upload = true;
+    }
+
+    const file_removed = (file) => {
+      selected_file = "";
+      check_if_document_upload = false;
+    }
+
+    const file_rejected = (rejectedFiles) =>{
+      rejectedFiles.forEach(rejection=>{
+          if(rejection.failedPropValidation === 'max-file-size'){
+            Notify.create({
+              type: 'negative',
+              position:'top',
+              message:'File size exceeds 1G limit!'
+            });
+            errorMessage.value = "File " + rejection.file.name + " exceeds 1G limit!";
+            //console.log('size limit reach.');
+          }
+          else{
+            Notify.create({
+              type: 'negative',
+              position:'top',
+              message:'Invalid file format.'
+            });
+            errorMessage.value = "Invalid file format. Please check your csv file.";
+            //console.log('Invalid file format.');
+          }
+        })
+    }
+
+    const onCancelClick = () => {
+      // we just need to hide the dialog
+      dialog.value.hide();
+    }
+
+    const onSubmit = () => {
       var hasErrors = false;
-      this.errorMessage = "";
+      var newGroup = false;
+      errorMessage.value = "";
 
-      console.log(this.selected_file);
-
-      if (this.hifGroupName === "") {
-        this.errorMessage =
-          this.errorMessage + (hasErrors ? ", " : "") + "Health impact function group name is required";
+      if (hifGroupName.value === "") {
+        errorMessage.value =
+          errorMessage.value + (hasErrors ? ", " : "") + "Health impact function group name is required";
         hasErrors = true;
       }
 
-      if (this.description === "") {
-        this.errorMessage =
-          this.errorMessage + (hasErrors ? ", " : "") + "Description is required";
-        hasErrors = true;
+      if(typeValue.value == 'Append to an existing health impact function group') {
+        hifGroupName.value = hifGroupName.value.name;
       }
 
-      if (this.selected_file === "") {
-        this.errorMessage =
-          this.errorMessage + (hasErrors ? ", " : "") + "File is required";
-        hasErrors = true;
+      if (typeValue.value == 'Add a new health impact function group') {
+        newGroup = true;
+        if(description.value === "") {
+          errorMessage.value =
+            errorMessage.value + (hasErrors ? ", " : "") + "Description is required";
+          hasErrors = true;
+        }
       }
 
+      if (selected_file === "") {
+        errorMessage.value =
+          errorMessage.value + (hasErrors ? ", " : "") + "File is required";
+        hasErrors = true;
+      }
    
       if (hasErrors) {
         return;
@@ -196,21 +267,22 @@ export default {
 
       const url = process.env.API_SERVER + "/api/health-impact-function-data";
       const fileData = new FormData();
-      fileData.append("file", this.selected_file);
-      fileData.append("hifGroupName", this.hifGroupName);
-      fileData.append("description", this.description);
-      fileData.append("filename", this.selected_file.name);
+      fileData.append("file", selected_file);
+      fileData.append("hifGroupName", hifGroupName.value);
+      fileData.append("description",description.value);
+      fileData.append("filename", selected_file.name);
+      fileData.append("newGroup", newGroup);
       fileData.append("uploadDate",localISOTime)
       var self = this;
 
-      this.$q.loading.show({
+      Loading.show({
         message: "Uploading health impact function data. Please wait...",
         boxClass: "bg-grey-2 text-grey-9",
         spinnerColor: "primary",
       });
 
       var self = this;
-      this.$axios
+      axios
         .post(url, fileData, {
           headers: {
             "Content-Type": "multipart/form-data",
@@ -223,19 +295,18 @@ export default {
             if (response.data.messages.length > 0) {
               console.log("Show Errors");
 
-              this.$q
-                .dialog({
+              Dialog.create({
                   component: HifUploadErrorsDialog,
                   parent: this,
                   persistent: true,
                   componentProps: {
                     errorList: response.data.messages,
-                    fileName: this.selected_file.name,
+                    fileName: selected_file.name,
                   },
                 })
                 .onOk(() => {
                   console.log("OK");
-                  this.$refs.dialog.hide()
+                  Dialog.hide()
                 })
                 .onCancel(() => {
                 })
@@ -243,14 +314,13 @@ export default {
                });
             }
           } else {
-            this.$q
-              .dialog({
+            Dialog.create({
                 component: HifUploadSuccessDialog,
                 parent: this,
                 persistent: true,
                 componentProps: {
-                  hifGroupName: this.hifGroupName,
-                  parentDialog: this.$refs.dialog,
+                  hifGroupName: hifGroupName.value,
+                  parentDialog: dialog.value,
                 },
               })
               .onOk(() => {
@@ -262,24 +332,19 @@ export default {
               });
           }
 
-          self.$q.loading.hide();
+          Loading.hide();
 
-          var oldValue =  this.$store.state.hif.hifForceReloadValue
+          var oldValue =  store.state.hif.hifForceReloadValue
           console.log("oldValue: " + oldValue);
           var newValue = oldValue + 1;
           console.log("newValue: " + newValue);
-          layerName = this.name;
-          this.$store.commit("hif/updateHifForceReloadValue", newValue)
+          store.commit("hif/updateHifForceReloadValue", newValue)
 
-          var oldValue =  this.$store.state.hif.hifGroupForceReloadValue
+          var oldValue =  store.state.hif.hifGroupForceReloadValue
           console.log("oldValue: " + oldValue);
           var newValue = oldValue + 1;
           console.log("newValue: " + newValue);
-          layerName = this.name;
-          this.$store.commit("hif/updateHifGroupForceReloadValue", newValue)
-
-          //self.hide();
-          //self.$emit("ok");
+          store.commit("hif/updateHifGroupForceReloadValue", newValue)
 
           return response.status;
         })
@@ -288,7 +353,7 @@ export default {
             // The request was made and the server responded with a status code
             // that falls out of the range of 2xx
             console.log(error.response.data);
-            self.errorMessage = error.response.data;
+            self.errorMessage.value = error.response.data;
             console.log(error.response.status);
             console.log(error.response.headers);
           } else if (error.request) {
@@ -301,59 +366,28 @@ export default {
             console.log("Error", error.message);
           }
           console.log("FAILURE!!");
-          self.$q.loading.hide();
-        })
-        .finally(function () 
-          { 
-            layerName = null;
-          }
-        );
-    },
-
-    file_selected: function (file) {
-      this.selected_file = file[0];
-      this.check_if_document_upload = true;
-    },
-
-    file_removed: function (file) {
-      this.selected_file = "";
-      this.check_if_document_upload = false;
-    },
-
-    file_rejected:function(rejectedFiles){
-      rejectedFiles.forEach(rejection=>{
-          if(rejection.failedPropValidation === 'max-file-size'){
-            this.$q.notify({
-              type: 'negative',
-              position:'top',
-              message:'File size exceeds 1G limit!'
-            });
-            this.errorMessage = "File " + rejection.file.name + " exceeds 1G limit!";
-            //console.log('size limit reach.');
-          }
-          else{
-            this.$q.notify({
-              type: 'negative',
-              position:'top',
-              message:'Invalid file format.'
-            });
-            this.errorMessage = "Invalid file format. Please check your csv file.";
-            //console.log('Invalid file format.');
-          }
-        })
-    },
-
-    onCancelClick() {
-      // we just need to hide the dialog
-      this.hide();
-    },
-
-    onRejected(rejectedEntries) {
-    },
-
-    onChangeGridValue(value) {
-      this.gridValue = value;
+          Loading.hide();
+        });
     }
+
+    return {
+      typeOptions,
+      typeValue,
+      hifGroupName,
+      dialog,
+      errorMessage,
+      description,
+      show,
+      hide,
+      onDialogHide,
+      onUploadClick,
+      onCancelClick,
+      file_removed,
+      file_rejected,
+      file_selected,
+      onOKClick,
+      onSubmit,
+    };
   },
 };
 </script>

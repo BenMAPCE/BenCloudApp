@@ -31,6 +31,10 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    fromUploadForm: {
+      type: Boolean,
+      default: false,
+    },
   },
 
     // setup (props, context) {
@@ -50,7 +54,7 @@ export default defineComponent({
     watch(
       () => groupValue.value,
       (groupValue, prevGroupValue) => {
-        if (groupValue != prevGroupValue) {
+        if (groupValue != prevGroupValue && !props.fromUploadForm) {
           changeGroupValue(groupValue);
         }
       }
@@ -76,6 +80,7 @@ export default defineComponent({
     }
 
     onBeforeMount(() => {
+      if(!props.fromUploadForm)
         store.commit("hif/updateHifGroupId", 0);
 
       (async () => {
