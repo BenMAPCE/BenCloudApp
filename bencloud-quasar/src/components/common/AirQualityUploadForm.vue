@@ -45,7 +45,7 @@
               <q-input
                 filled
                 dense
-                v-model="group"
+                v-model="groupName"
                 label="Group Name"
                 hint=""
                 lazy-rules
@@ -170,7 +170,7 @@ export default {
     pollutantValue: 0,
     gridValue: 0,
     errorMessage: "",
-    group: "",
+    groupName: "",
     name: "",
     aqYear:"",
     source:"",
@@ -344,7 +344,7 @@ export default {
       for (var i=0; i < this.selected_files.length; i++) {
         fileData.append("file" + i, this.selected_files[i]);
       }
-      fileData.append("group",this.group);
+      fileData.append("groupName",this.groupName);
       if (!this.isBatchUpload) {
         fileData.append("userLayerName", this.name);
       }
