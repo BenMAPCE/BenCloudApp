@@ -11,11 +11,12 @@
                 :max-file-size="20000000"
                 square
                 flat
-                @added="file_selected"
-                @removed="file_removed"
+                @added="files_selected"
+                @removed="files_removed"
                 @rejected="file_rejected"
                 bordered
                 hide-upload-btn
+                multiple
               >
                 <template v-slot:header="scope">
                   <div class="row no-wrap items-center q-pa-sm q-gutter-xs">
@@ -42,6 +43,23 @@
           <div class="row">
             <div class="col-12">
               <q-input
+                filled
+                dense
+                v-model="groupName"
+                label="Group Name"
+                hint=""
+                lazy-rules
+              />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-12">
+              <div v-if="isBatchUpload" class="batch-name">
+                Layer name of each surface will match the file name of each uploaded CSV.
+              </div>
+              <q-input
+                v-else
                 filled
                 dense
                 v-model="name"
@@ -121,7 +139,7 @@
 
           <div class="row justify-center">
             <q-card-actions>
-              <q-btn color="primary" label="Upload" @click="onSubmit" />
+              <q-btn color="primary" :label="`Upload ${selected_files.length>0?selected_files.length:''} Surface${isBatchUpload?`s`:''}`" @click="onSubmit" />
               <q-btn color="primary" label="Cancel" @click="onCancelClick" />
             </q-card-actions>
           </div>
@@ -147,21 +165,28 @@ export var layerName = null;
 
 export default {
   data: () => ({
-    selected_file: "",
+    selected_files: [],
     check_if_document_upload: false,
     pollutantValue: 0,
     gridValue: 0,
     errorMessage: "",
+    groupName: "",
     name: "",
     aqYear:"",
     source:"",
     dataType:"",
     description:"",
-    filename:"",
+    filenames:[],
     uploadDate: "",
     dashData: [],
     descriptionHint:"",
   }),
+
+  computed: {
+    isBatchUpload() {
+      return this.selected_files.length > 1;
+    }
+  },
   
   components: {
     GridDefinitions,
@@ -247,11 +272,11 @@ export default {
       var hasErrors = false;
       this.errorMessage = "";
 
-      console.log(this.selected_file);
-      console.log(this.selected_file.name);
+      console.log(this.selected_files);
+      console.log(this.filenames);
 
 
-      if (this.name === "") {
+      if (this.name === "" && !this.isBatchUpload) {
         this.errorMessage =
           this.errorMessage + (hasErrors ? ", " : "") + "Name is required";
         hasErrors = true;
@@ -268,9 +293,9 @@ export default {
         hasErrors = true;
       }
 
-      if (this.selected_file === "") {
+      if (this.selected_files.length < 1) {
         this.errorMessage =
-          this.errorMessage + (hasErrors ? ", " : "") + "File is required";
+          this.errorMessage + (hasErrors ? ", " : "") + "At least 1 file is required";
         hasErrors = true;
       }
 
@@ -316,15 +341,19 @@ export default {
 
       const url = process.env.API_SERVER + "/api/air-quality-data";
       const fileData = new FormData();
-      fileData.append("file", this.selected_file);
-      fileData.append("name", this.name);
+      for (var i=0; i < this.selected_files.length; i++) {
+        fileData.append("file" + i, this.selected_files[i]);
+      }
+      fileData.append("groupName",this.groupName);
+      if (!this.isBatchUpload) {
+        fileData.append("userLayerName", this.name);
+      }
       fileData.append("pollutantId", this.pollutantId);
       fileData.append("gridId", this.gridValue);
       fileData.append("aqYear", this.aqYear);
       fileData.append("source", this.source);
       fileData.append("dataType", this.dataType);
       fileData.append("description", this.description);
-      fileData.append("filename", this.selected_file.name);
       fileData.append("uploadDate",localISOTime)
       var self = this;
 
@@ -361,7 +390,7 @@ export default {
                   persistent: true,
                   componentProps: {
                     errorList: response.data.messages,
-                    fileName: this.selected_file.name,
+                    fileName: this.filenames.join(", "),
                   },
                 })
                 .onOk(() => {
@@ -380,7 +409,7 @@ export default {
                 parent: this,
                 persistent: true,
                 componentProps: {
-                  fileName: this.selected_file.name,
+                  fileName: this.filenames.join(", "),
                   parentDialog: this.$refs.dialog,
                 },
               })
@@ -405,7 +434,7 @@ export default {
                   persistent: true,
                   componentProps: {
                     errorList: response.data.messages,
-                    fileName: this.selected_file.name,
+                    fileName: this.filenames.join(", "),
                   },
                 })
                 .onOk(() => {
@@ -460,33 +489,40 @@ export default {
         );
     },
 
-    file_selected: function (file) {
-      this.selected_file = file[0];
+    files_selected: function (files) {
+      this.selected_files.push(...files);
+      console.log(this.selected_files)
+      this.filenames = this.selected_files.map(f => f.name);
       this.check_if_document_upload = true;
     },
 
-    file_removed: function (file) {
-      this.selected_file = "";
-      this.check_if_document_upload = false;
+    files_removed: function (files) {
+      const removedFilenames = new Set(files.map(f => f.name));
+      this.selected_files = this.selected_files.filter(f => !removedFilenames.has(f.name));
+      console.log(this.selected_files)
+      this.filenames = this.selected_files.map(f => f.name);
+      this.check_if_document_upload = this.selected_files.length > 0;
     },
 
     file_rejected: function(rejections){
       rejections.forEach(rejection=>{
-        if(rejection.failedPropValidation === 'max-file-size'){
-          this.$q.notify({
+        console.log(rejection.failedPropValidation);
+        var message;
+        switch (rejection.failedPropValidation) {
+          case 'max-file-size':
+            message = 'File ' + rejection.file.name + ' exceeds 20MB limit!';
+            break;
+          case 'duplicate':
+            message = 'File named ' + rejection.file.name + ' already selected.';
+            break;
+          default:
+            message = 'File ' + rejection.file.name + ' is rejected.';
+        }
+        this.$q.notify({
             type: 'negative',
             position: 'top',
-            message: 'File ' + rejection.file.name + ' exceeds 20MB limit!'
+            message: message
           });
-          //console.log('Size limit reach.');
-        }
-        else{
-          this.$q.notify({
-            type: 'negative',
-            position: 'top',
-            message: 'File ' + rejection.file.name + ' is rejected.'
-          });
-        }
       });    
     },
 
@@ -525,6 +561,11 @@ export default {
   .air-quality-name {
     padding-left: 15px;
   }
+
+  .batch-name {
+    padding-left: 15px;
+  }
+
   .upload-card {
     width: 500px;
   }
