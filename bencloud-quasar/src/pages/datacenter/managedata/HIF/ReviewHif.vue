@@ -36,6 +36,10 @@
             ></HifAdd
           >
         </div>
+      <div class="col" v-if="currentPollutantId && currentHifGroupId && currentHifGroupId > 6">
+          <q-btn no-caps push color="primary" ref="btn" @click="deleteHifGroup(selectedHifGroupName)">
+          DELETE HEALTH IMPACT FUNCTION GROUP</q-btn>
+      </div>
     </div>
 
     <div class="q-pa-md">
@@ -51,6 +55,7 @@
 import { defineComponent } from "vue";
 import { ref, reactive } from "vue";
 import { watch, onBeforeMount } from "vue";
+import axios from "axios";
 
 import Pollutants from "../../../../components/common/Pollutants.vue";
 import HifGroups from "../../../../components/common/HifGroups.vue";
@@ -112,6 +117,53 @@ setup(props, context) {
       console.log("!!!!!!!!!!!!!!!!!!");
     }
 
+    function deleteHifGroup(groupName) {
+      // Prompt user to confirm HIF Group deletion
+      if(confirm("Are you sure you wish to permanently delete the HIF Group: " + groupName + "?")){
+        // Delete HIF Group, reload if successful, alert the user if unsuccessful       
+        axios
+          .delete(process.env.API_SERVER + "/api/health-impact-function-groups/" + selectedHifGroupId.value, 
+            {validateStatus: function (status) {
+              return status < 500;
+            }}
+          )
+          .then((response) => {
+            if(response.status === 204) {
+              console.log("Successfully deleted HIF Group: " + groupName);
+              var oldValue =  store.state.hif.hifGroupForceReloadValue
+              var newValue = oldValue + 1;
+              store.commit("hif/updateHifGroupId", 0);
+              store.commit("hif/updateHifGroupName", "");
+              store.commit("hif/updateHifGroupForceReloadValue", newValue)
+
+            } else if(response.status === 403){
+              console.log("Forbidden action on HIF Group: " + groupName);
+              this.$q.notify({
+                group: false, // required to be updateable
+                type: 'negative',
+                timeout: 6000, 
+                color: "red",
+                spinner: false, // we reset the spinner setting so the icon can be displayed
+                position: "top",
+                message: response.data.message,
+              });
+              this.$emit('ok')
+            } else {
+              this.$q.notify({
+                group: false, // required to be updateable
+                type: 'negative',
+                timeout: 6000, 
+                color: "red",
+                spinner: false, // we reset the spinner setting so the icon can be displayed
+                position: "top",
+                message: "Unknown error: " + response.status,
+              });
+              this.$emit('ok')
+            }
+          })
+      }
+    }
+
   onBeforeMount(() => {
     store.commit("hif/updatePollutantId", 0);
     store.commit("hif/updatePollutantFriendlyName", "");
@@ -126,6 +178,7 @@ setup(props, context) {
     selectedHifGroupName,
     showAll,
     onChangePollutantValue,
+    deleteHifGroup,
     isAdmin
   };
 },
