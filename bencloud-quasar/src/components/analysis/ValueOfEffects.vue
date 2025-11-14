@@ -86,7 +86,7 @@ import { useQuasar } from "quasar";
 
 import { loadHealthImpactFunctionGroups, buildHealthImpactFunctionGroups } from "../../composables/analysis/health-impact-function-groups";
 import {
-  getValuationFunctionsForEndpointGroupId,
+  getValuationFunctionsForEndpointId,
   loadValuationFunctions,
 } from "../../composables/analysis/valuation-functions";
 import ValueOfEffectsEditForm from "./ValueOfEffectsEditForm.vue";
@@ -188,13 +188,13 @@ export default defineComponent({
     }
 
     function editValueOfEffects(row) {
-      var valuationFunctionsForEndpointGroupId = getValuationFunctionsForEndpointGroupId(
+      var valuationFunctionsForEndpointId = getValuationFunctionsForEndpointId(
         valuationFunctions.value,
-        row.endpoint_group_id
+        row.endpoint_id
       );
 
       console.log("------------------");
-      console.log(valuationFunctionsForEndpointGroupId);
+      console.log(valuationFunctionsForEndpointId);
       console.log("------------------");
 
       console.log("*****");
@@ -214,7 +214,7 @@ export default defineComponent({
         persistent: true,
         componentProps: {
           row: row,
-          valuationFunctionsForEndpointGroupId: valuationFunctionsForEndpointGroupId,
+          valuationFunctionsForEndpointId: valuationFunctionsForEndpointId,
           valuationsSelected: valuationsForHealthFunction,
         },
       })

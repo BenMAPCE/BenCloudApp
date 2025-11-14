@@ -60,7 +60,7 @@
         <q-select
           filled
           v-model="valuationFunctionsSelected"
-          :options="valuationFunctionsForEndpointGroupId"
+          :options="valuationFunctionsForEndpointId"
           option-value="id"
           option-label="label"
           use-chips
@@ -101,7 +101,7 @@ export default {
       type: Object,
       default: null,
     },
-    valuationFunctionsForEndpointGroupId: {
+    valuationFunctionsForEndpointId: {
       type: Object,
       default: null,
     },
@@ -126,12 +126,12 @@ export default {
       var selectedValidations = [];
 
       if (this.valuationsSelected != undefined && this.valuationsSelected.valuation_ids != undefined) {
-        for (var vf = 0; vf < this.valuationFunctionsForEndpointGroupId.length; vf++) {
+        for (var vf = 0; vf < this.valuationFunctionsForEndpointId.length; vf++) {
           for (var vs = 0; vs < this.valuationsSelected.valuation_ids.length; vs++) {
             if (
-              this.valuationFunctionsForEndpointGroupId[vf].id == this.valuationsSelected.valuation_ids[vs]
+              this.valuationFunctionsForEndpointId[vf].id == this.valuationsSelected.valuation_ids[vs]
             ) {
-              selectedValidations.push(this.valuationFunctionsForEndpointGroupId[vf]);
+              selectedValidations.push(this.valuationFunctionsForEndpointId[vf]);
             }
           }
         }
