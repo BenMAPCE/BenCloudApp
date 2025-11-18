@@ -2,7 +2,7 @@ import { useStore, mapGetters } from "vuex";
 import axios from "axios";
 import { ref } from "vue";
 import { healthEffects } from "src/store/analysis/getters";
-import { getValuationFunctionsForEndpointGroupId, updateValuationFunctions } from "./valuation-functions";
+import { getValuationFunctionsForEndpointId, updateValuationFunctions } from "./valuation-functions";
 
 export const loadHealthImpactFunctionGroups = (store) => {
   const data = ref(null);
@@ -193,11 +193,15 @@ export const buildHealthImpactFunctionGroups = (
   
       // load valuations
       //console.log("--- 001")
-      var valuationsForEndpointGroupId =
-        getValuationFunctionsForEndpointGroupId(
+      console.log("\n\n\nhere\n\n\n")
+      console.log(valuationFunctions.value);
+      console.log(functions[f].hifRecord);
+      var valuationsForEndpointId =
+        getValuationFunctionsForEndpointId(
           valuationFunctions.value,
-          functions[f].hifRecord.endpoint_group_id
+          functions[f].hifRecord.endpoint_id
         );
+      console.log(valuationsForEndpointId);
       let valuationsSelected = store.getters[
         "analysis/getValuationsForHealthFunctionId"
       ](functions[f].hifId);
@@ -206,13 +210,13 @@ export const buildHealthImpactFunctionGroups = (
 
       if(!!valuationsSelected.valuation_ids) {
         for(var j = 0; j < valuationsSelected.valuation_ids.length; j++) {
-          for(var k = 0; k < valuationsForEndpointGroupId.length; k++) {
-            if(valuationsForEndpointGroupId[k].id === valuationsSelected.valuation_ids[j]) {
+          for(var k = 0; k < valuationsForEndpointId.length; k++) {
+            if(valuationsForEndpointId[k].id === valuationsSelected.valuation_ids[j]) {
               valuationsArray.push( {
                 hifId: valuationsSelected.health_function_id,
                 hifInstanceId: null,
-                vfId: valuationsForEndpointGroupId[k].id,
-                vfRecord: valuationsForEndpointGroupId[k]
+                vfId: valuationsForEndpointId[k].id,
+                vfRecord: valuationsForEndpointId[k]
               })
             }
           }
