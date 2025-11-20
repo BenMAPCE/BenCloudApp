@@ -2,25 +2,34 @@
   <q-dialog ref="dialog" persistent @hide="onDialogHide">
     <q-card id="error-list-card" class="error-list-card">
       <q-card-section>
-        <div class="text-h6">Your upload of {{ this.fileName }} has failed</div>
-        <div v-if="this.errorList.length > 1" class="text-h6">Your file has the following errors</div>
-        <div v-if="this.errorList.length == 1" class="text-h6">Your file has the following error</div>
+        <div class="text-h6">Your upload of {{ fileNames.join(", ") }} has failed</div>
+        <div class="text-h6">
+          Your {{ fileNames.length === 1 ? 'file' : 'files' }} 
+          {{ fileNames.length === 1 ? 'has' : 'have' }} the following 
+          {{ processedErrorList.filter(item => item.isError).length === 1 ? 'error' : 'errors' }}
+        </div>
       </q-card-section>
 
       <q-separator />
 
       <q-card-section style="max-height: 50vh" class="scroll">
-        <li v-for="item in errorList" :key="item.message" class="error-list-item">
-          <q-item>
-            <q-item-section class="icon-column">
+        <li v-for="(item, index) in processedErrorList" :key="index" class="error-list-item">
+          <q-item :clickable="item.needsExpansion" @click="item.needsExpansion ? toggleExpand(index) : null">
+            <q-item-section class="icon-column" v-if="item.isError">
               <q-icon class="error-icon" name="mdi-alert-circle" />
             </q-item-section>
             <q-item-section class="type-column">
               {{ item.type }}
             </q-item-section>
-
             <q-item-section class="message-column">
-              {{ item.message }}
+              <div>
+                <div :class="{ 'message-truncated': !item.expanded }">
+                  {{ item.message }}
+                </div>
+                <div class="text-caption text-primary q-mt-xs view-more-text" v-if="item.needsExpansion">
+                  {{ item.expanded ? '(view less)' : '(view more)' }}
+                </div>
+              </div>
             </q-item-section>
           </q-item>
         </li>
@@ -48,6 +57,7 @@ import print from "print-js";
 export default {
   data: () => ({
     errorMessage: "",
+    processedErrorList: [],
   }),
 
   props: {
@@ -55,9 +65,9 @@ export default {
       type: Object,
       default: null,
     },
-    fileName: {
-      type: String,
-      default: "",
+    fileNames: {
+      type: Array,
+      default: () => [],
     },
   },
   components: {},
@@ -69,12 +79,44 @@ export default {
     "dismiss",
   ],
 
+  watch: {
+    errorList: {
+      handler(newVal) {
+        this.processErrorList(newVal);
+      },
+      immediate: true,
+      deep: true
+    }
+  },
+
   methods: {
+    processErrorList(errors) {
+      this.processedErrorList = errors.map(error => ({
+        ...error,
+        expanded: false,
+        needsExpansion: this.checkIfNeedsExpansion(error.message),
+        isError: error.type.toLowerCase() === 'error'
+      }));
+    },
+
+    checkIfNeedsExpansion(message) {
+      const lines = message.split('\n');
+      return lines.length > 3 || message.length > 150;
+    },
+
+    toggleExpand(index) {
+      if (this.processedErrorList[index].needsExpansion) {
+        this.processedErrorList[index].expanded = !this.processedErrorList[index].expanded;
+      }
+    },
+
     // following method is REQUIRED
     // (don't change its name --> "show")
     show() {
       console.log("^^^^^^^^^^^^^^");
       console.log(this.errorList);
+      console.log(this.fileNames);
+      this.processErrorList(this.errorList);
       this.$refs.dialog.show();
     },
 
@@ -131,8 +173,25 @@ export default {
       printJS({
         printable: "error-list-card",
         type: "html",
-        style: "li.error-list-item { list-style: none; } .type-column { text-transform: capitalize; }",
+        style: `
+          li.error-list-item { 
+            list-style: none;
+          } 
+          .type-column { 
+            text-transform: capitalize; 
+          }
+          .message-truncated {
+            overflow: hidden;
+          }
+          .view-more-text {
+            display: none !important;
+          }
+          .q-focus-helper {
+            display: none !important;
+          }
+        `,
       });
+      
       document.getElementById("print-button").style.display = "flex";
       document.getElementById("ok-button").style.display = "flex";
     },
@@ -144,8 +203,9 @@ export default {
 
 .ok-button {
   background-color: var(--q-primary) !important;
-    color: white !important;
+  color: white !important;
 }
+
 .error-list-card {
   max-width: fit-content;
 }
@@ -153,6 +213,7 @@ export default {
 li.error-list-item {
   list-style: none;
 }
+
 .error-icon {
   color: red;
 }
@@ -169,5 +230,19 @@ li.error-list-item {
 
 .message-column {
   max-width: 600px;
+}
+
+.message-truncated {
+  display: -webkit-box;
+  line-clamp: 3;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  white-space: pre-wrap;
+}
+
+.view-more-text {
+  cursor: pointer;
+  user-select: none;
 }
 </style>
