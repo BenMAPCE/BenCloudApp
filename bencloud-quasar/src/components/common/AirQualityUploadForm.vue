@@ -384,13 +384,14 @@ export default {
             if(response.data.success === false){
               if (response.data.messages.length > 0){
                 console.log("Show Errors");
+                console.log(this.filenames);
                 this.$q
                 .dialog({component: AirQualityUploadErrorsDialog,
                   parent: this,
                   persistent: true,
                   componentProps: {
                     errorList: response.data.messages,
-                    fileName: this.filenames.join(", "),
+                    fileNames: this.filenames,
                   },
                 })
                 .onOk(() => {
@@ -434,7 +435,7 @@ export default {
                   persistent: true,
                   componentProps: {
                     errorList: response.data.messages,
-                    fileName: this.filenames.join(", "),
+                    fileNames: this.filenames,
                   },
                 })
                 .onOk(() => {
