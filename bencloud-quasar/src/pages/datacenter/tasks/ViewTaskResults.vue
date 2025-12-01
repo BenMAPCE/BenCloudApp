@@ -16,8 +16,12 @@
       <p>{{ task_pre_policy }}</p>  
     </div>
     <div class="info aq_grid_definition_name">
-      <p class="label">Geography: </p>
+      <p class="label">AQ Geography:</p>
       <p>{{ aq_grid_definition_name }}</p>  
+    </div>
+    <div class="info limit_to_grid_name" v-if="limit_to_grid_name">
+      <p class="label">Analysis Limited To: </p>
+      <p> {{ limit_to_grid_name }}</p>
     </div>
     <div v-if="task_uuid_with_type.substring(0,1) === 'E'" class="info task-metric">
       <p class="label"> Metric: </p>
@@ -103,6 +107,7 @@ export default defineComponent({
     const componentKey = ref(0);
     const valuation_grid_id = ref(0);
     const valuation_grid_name = ref("");
+    const limit_to_grid_name = ref("");
 
 
     const rows = ref([]);
@@ -213,6 +218,7 @@ export default defineComponent({
               batch_info.value = response.data
               valuation_grid_id.value = response.data.valuation_grid_id
               valuation_grid_name.value = response.data.valuation_grid_name
+              limit_to_grid_name.value = response.data.limit_to_grid_name
               var scenariosList = response.data.scenarios
               for(var i = 0; i < scenariosList.length; i++) {
                 scenario_names.value.push(scenariosList[i].scenario_name)
@@ -253,7 +259,8 @@ export default defineComponent({
       selected_scenario_year,
       componentKey,
       valuation_grid_id,
-      valuation_grid_name
+      valuation_grid_name,
+      limit_to_grid_name,
     };
   },
 });
@@ -269,7 +276,7 @@ export default defineComponent({
     height: 30px;
   }
   .label {
-    width: 125px;
+    width: 170px;
     font-weight: bold;
   }
   .selection {
