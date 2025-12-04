@@ -155,8 +155,7 @@
 
 <script>
 import GridDefinitions from "../datacenter/airquality/GridDefinitions.vue";
-import AirQualityUploadErrorsDialog from "./AirQualityUploadErrorsDialog.vue";
-import AirQualityUploadSuccessDialog from "./AirQualityUploadSuccessDialog.vue";
+import AirQualityUploadResponseDialog from "./AirQualityUploadResponseDialog.vue";
 
 import { useQuasar } from "quasar";
 import { useStore } from "vuex";
@@ -380,74 +379,25 @@ export default {
           console.log(response.data.success);
           console.log(response.data.messages);
           
-          if(response.status === 200) {
-            if(response.data.success === false){
-              if (response.data.messages.length > 0){
-                console.log("Show Errors");
-                console.log(this.filenames);
-                this.$q
-                .dialog({component: AirQualityUploadErrorsDialog,
-                  parent: this,
-                  persistent: true,
-                  componentProps: {
-                    errorList: response.data.messages,
-                    fileNames: this.filenames,
-                  },
-                })
-                .onOk(() => {
-                  console.log("OK");
-                })
-                .onCancel(() => {
-                })
-                .onDismiss(() => {
-                });
-              }
-            }
-            else{
-              this.$q
-              .dialog({
-                component: AirQualityUploadSuccessDialog,
-                parent: this,
-                persistent: true,
-                componentProps: {
-                  fileName: this.filenames.join(", "),
-                  parentDialog: this.$refs.dialog,
-                },
-              })
-              .onOk(() => {
-                console.log("OK");
-              })
-              .onCancel(() => {
-              })
-              .onDismiss(() => {
-              });
-            }
-            
-          } else {
-            console.log("BAD NEWS");
-            if (response.data.messages.length > 0) {
-              console.log("Show Errors");
-
-              this.$q
-                .dialog({
-                  component: AirQualityUploadErrorsDialog,
-                  parent: this,
-                  persistent: true,
-                  componentProps: {
-                    errorList: response.data.messages,
-                    fileNames: this.filenames,
-                  },
-                })
-                .onOk(() => {
-                  console.log("OK");
-                  this.$refs.dialog.hide()
-                })
-                .onCancel(() => {
-                })
-                .onDismiss(() => {
-               });
-            }
-          }
+          this.$q
+          .dialog({component: AirQualityUploadResponseDialog,
+            parent: this,
+            persistent: true,
+            componentProps: {
+              success: response.status === 200 && response.data.success,
+              messageList: response.data.messages,
+              fileNames: this.filenames,
+              parentDialog: this.$refs.dialog,
+            },
+          })
+          .onOk(() => {
+            console.log("OK");
+          })
+          .onCancel(() => {
+          })
+          .onDismiss(() => {
+          });
+              
 
           self.$q.loading.hide();
 

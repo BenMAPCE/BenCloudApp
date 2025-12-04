@@ -1,20 +1,31 @@
 <template>
   <q-dialog ref="dialog" persistent @hide="onDialogHide">
-    <q-card id="error-list-card" class="error-list-card">
+    <q-card id="message-list-card" class="message-list-card">
       <q-card-section>
-        <div class="text-h6">Your upload of {{ fileNames.join(", ") }} has failed</div>
-        <div class="text-h6">
-          Your {{ fileNames.length === 1 ? 'file' : 'files' }} 
-          {{ fileNames.length === 1 ? 'has' : 'have' }} the following 
-          {{ processedErrorList.filter(item => item.isError).length === 1 ? 'error' : 'errors' }}
+        <div>
+          <div class="text-h6">
+            Your upload {{ success ? 'was successful' : 'has failed' }} for the following {{ fileNames.length === 1 ? 'file' : 'files' }}:
+          </div>
+          <ul>
+            <li class="text-h6" v-for="(name, index) in fileNames" :key="index">{{ name }}</li>
+          </ul>
+        </div>
+        <div class="text-h6" v-if="processedMessageList.length > 0">
+          Your {{ fileNames.length === 1 ? 'file has' : 'files have' }} the following 
+          {{ warningCount > 0 ? (warningCount === 1 ? 'warning' : 'warnings') : '' }}
+          {{ warningCount > 0 && errorCount > 0 ? 'and' : '' }} 
+          {{ errorCount > 0 ? (errorCount === 1 ? 'error' : 'errors') : '' }}
         </div>
       </q-card-section>
 
       <q-separator />
 
-      <q-card-section style="max-height: 50vh" class="scroll">
-        <li v-for="(item, index) in processedErrorList" :key="index" class="error-list-item">
+      <q-card-section style="max-height: 50vh" class="scroll" v-if="processedMessageList.length > 0">
+        <li v-for="(item, index) in processedMessageList" :key="index" class="message-list-item">
           <q-item :clickable="item.needsExpansion" @click="item.needsExpansion ? toggleExpand(index) : null">
+            <q-item-section class="icon-column" v-if="item.isWarning">
+              <q-icon class="warning-icon" name="mdi-alert-circle" />
+            </q-item-section>
             <q-item-section class="icon-column" v-if="item.isError">
               <q-icon class="error-icon" name="mdi-alert-circle" />
             </q-item-section>
@@ -40,28 +51,36 @@
       <q-card-actions align="right">
         <q-btn
           color="black"
-          @click="printErrorList()"
+          @click="printMessageList()"
           label="Print"
           id="print-button"
           class="q-ml-sm back-button"
         />
-        <q-btn flat label="OK" id="ok-button" class="ok-button" color="primary" v-close-popup />
+        <q-btn
+          flat
+          label="OK"
+          id="ok-button"
+          class="ok-button"
+          color="primary"
+          @click="onOKClick"
+        />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
 <script>
-import print from "print-js";
-
 export default {
   data: () => ({
-    errorMessage: "",
-    processedErrorList: [],
+    processedMessageList: [],
   }),
 
   props: {
-    errorList: {
+    success: {
+      type: Boolean,
+      default: false,
+    },
+    messageList: {
       type: Object,
       default: null,
     },
@@ -69,7 +88,12 @@ export default {
       type: Array,
       default: () => [],
     },
+    parentDialog: {
+      type: Object,
+      default: null,
+    },
   },
+
   components: {},
 
   emits: [
@@ -80,22 +104,32 @@ export default {
   ],
 
   watch: {
-    errorList: {
+    messageList: {
       handler(newVal) {
-        this.processErrorList(newVal);
+        this.processMessageList(newVal);
       },
       immediate: true,
       deep: true
     }
   },
 
+  computed: {
+    warningCount() {
+      return this.processedMessageList.filter(item => item.isWarning).length;
+    },
+    errorCount() {
+      return this.processedMessageList.filter(item => item.isError).length;
+    },
+  },
+
   methods: {
-    processErrorList(errors) {
-      this.processedErrorList = errors.map(error => ({
+    processMessageList(errors) {
+      this.processedMessageList = errors.map(error => ({
         ...error,
         expanded: false,
         needsExpansion: this.checkIfNeedsExpansion(error.message),
-        isError: error.type.toLowerCase() === 'error'
+        isError: error.type.toLowerCase() === 'error',
+        isWarning: error.type.toLowerCase() === 'warning',
       }));
     },
 
@@ -105,18 +139,15 @@ export default {
     },
 
     toggleExpand(index) {
-      if (this.processedErrorList[index].needsExpansion) {
-        this.processedErrorList[index].expanded = !this.processedErrorList[index].expanded;
+      if (this.processedMessageList[index].needsExpansion) {
+        this.processedMessageList[index].expanded = !this.processedMessageList[index].expanded;
       }
     },
 
     // following method is REQUIRED
     // (don't change its name --> "show")
     show() {
-      console.log("^^^^^^^^^^^^^^");
-      console.log(this.errorList);
-      console.log(this.fileNames);
-      this.processErrorList(this.errorList);
+      this.processMessageList(this.messageList);
       this.$refs.dialog.show();
     },
 
@@ -134,6 +165,11 @@ export default {
 
     onOKClick() {
       console.log("clicked OK");
+      console.log(this.parentDialog);
+      if (this.success && this.parentDialog) {
+        this.parentDialog.hide();
+      }
+
       // on OK, it is REQUIRED to
       // emit "ok" event (with optional payload)
       // before hiding the QDialog
@@ -145,7 +181,6 @@ export default {
     },
 
     onDismissClick() {
-      console.log("clicked View Tasks");
       // required to be emitted
       // when QDialog emits "hide" event
       this.$emit("dismiss");
@@ -158,6 +193,9 @@ export default {
     },
 
     onRejected(rejectedEntries) {
+      if (this.success) {
+        return;
+      }
       // Notify plugin needs to be installed
       // https://quasar.dev/quasar-plugins/notify#Installation
       $q.notify({
@@ -166,15 +204,15 @@ export default {
       });
     },
 
-    printErrorList() {
+    printMessageList() {
       console.log("printing...");
       document.getElementById("print-button").style.display = "none";
       document.getElementById("ok-button").style.display = "none";
       printJS({
-        printable: "error-list-card",
+        printable: "message-list-card",
         type: "html",
         style: `
-          li.error-list-item { 
+          li.message-list-item { 
             list-style: none;
           } 
           .type-column { 
@@ -206,12 +244,16 @@ export default {
   color: white !important;
 }
 
-.error-list-card {
+.message-list-card {
   max-width: fit-content;
 }
 
-li.error-list-item {
+li.message-list-item {
   list-style: none;
+}
+
+.warning-icon {
+  color: orange;
 }
 
 .error-icon {
@@ -223,7 +265,7 @@ li.error-list-item {
 }
 
 .type-column {
-  max-width: 40px;
+  max-width: 60px;
   text-transform: capitalize;
   font-weight: 600;
 }
