@@ -100,6 +100,17 @@
                   </q-item-section>
                 </q-item>
                 <q-item
+                  v-else-if="props.row.batch_task_name.startsWith('Air Quality import:')"
+                  dense
+                  clickable
+                  v-close-popup
+                  @click="viewAirQualitySurfaces()"
+                >
+                  <q-item-section>
+                    <q-item-label>View Air Quality Surfaces</q-item-label>
+                  </q-item-section>
+                </q-item>
+                <q-item
                   v-else-if="props.row.batch_task_name.startsWith('Result export:')"
                   dense
                   clickable
@@ -500,6 +511,10 @@ setup(props, context) {
     this.$router.push({ path: '/datacenter/review-grids' });
   }
 
+  function viewAirQualitySurfaces() {
+    this.$router.push({ path: '/datacenter/review-air-quality' });
+  }
+
   onBeforeMount(() => {
     (async () => {
       try {
@@ -548,7 +563,8 @@ setup(props, context) {
     completedTasksRefreshTimeout,
     convertToUserTimezone,
     downloadExportedResults,
-    viewGridDefinitions
+    viewGridDefinitions,
+    viewAirQualitySurfaces,
   };
 },
 
