@@ -30,6 +30,11 @@ export const getTemplates = () => {
       error.value = ex;
     } finally {
       loading.value = false;
+      //reset post AQ group name filters because it can be changed after the template is created.
+      store.commit("analysis/updatePrePolicyAirQualityGroupName", null);
+      store.commit("exposure/updatePrePolicyAirQualityGroupName", null);
+      store.commit("analysis/updatePostPolicyAirQualityGroupName", null);
+      store.commit("exposure/updatePostPolicyAirQualityGroupName", null);
 
       return { response, error, data, loading };
     }
