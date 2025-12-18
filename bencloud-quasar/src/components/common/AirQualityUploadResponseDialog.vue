@@ -210,7 +210,7 @@ export default {
       console.log("printing...");
       document.getElementById("print-button").style.display = "none";
       document.getElementById("ok-button").style.display = "none";
-      printJS({
+      print({
         printable: "message-list-card",
         type: "html",
         style: `
