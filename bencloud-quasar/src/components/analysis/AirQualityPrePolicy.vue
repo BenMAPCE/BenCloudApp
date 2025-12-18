@@ -136,7 +136,7 @@ export default defineComponent({
           groupOptions.value = [];
           return;
         }
-        const uniqueGroupNames = [...new Set(rows.value.map(item => item.groupName))];
+        const uniqueGroupNames = [null, ...new Set(rows.value.map(item => item.groupName).filter(v=> v != null && v != ""))];
         groupOptions.value = uniqueGroupNames.map(g => ({ label: g, value: g }));
         console.log("groupOptions: ", groupOptions.value);
 
