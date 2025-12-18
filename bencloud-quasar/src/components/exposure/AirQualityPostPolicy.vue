@@ -1,13 +1,16 @@
 <template>
 
-  <q-scroll-area class="aq-post-policy-scroll-area" visible: true>
-      <q-option-group
-        v-model="selectedItems"
-        :options="rows"
-        color="primary"
-        type="checkbox"
-      ></q-option-group>
-  </q-scroll-area>
+  <div class="q-pt-sm q-pb-sm aq-post-policy-selection">
+    <q-select square dense outlined v-model="selectedGroup" :options="groupOptions" emit-value
+      label="Filter to Group (optional)">
+    </q-select>
+  </div>
+  <div>
+    <q-scroll-area class="aq-post-policy-scroll-area" visible: true>
+      <q-option-group v-model="selectedItems" :options="rowsFiltered" color="primary" type="checkbox"
+        emit></q-option-group>
+    </q-scroll-area>
+  </div>
 
 </template>
 
@@ -21,86 +24,174 @@ export default defineComponent({
   model: ref(null),
   name: "AirQualityPostPolicy",
 
-async setup(props, context) {
+  async setup(props, context) {
     const store = useStore();
     const rows = ref([]);
+    const rowsFiltered = ref([]);
     const selectedItems = ref([]);
+
+    const groupOptions = ref([]);
+    const selectedGroup = ref(null);
 
     watch(
       () => selectedItems.value,
       (currentSelectedItems, prevSelectedItems) => {
         console.log("watch: " + currentSelectedItems + " |" + prevSelectedItems)
         if (currentSelectedItems != prevSelectedItems) {
-          var names = [];
-          var gridIds = [];
-          var gridNames = [];
-          rows.value.forEach(element => {
-            if(currentSelectedItems.includes(element.value)) {
-              var scenario = null;
-              if(!!store.state.exposure.postPolicyAirQualityName) {
-                scenario = store.state.exposure.postPolicyAirQualityName.find(e => e.name === element.label)
-              }
-              //if this element is already stored, there may be corresponding years stored
-              if(!!scenario) {
-                names.push(scenario);
-                //if the element is not stored, the years value is empty for now
-              } else {
-                var scenario = { name: element.label, years:[], popYears: []};
-                names.push(scenario);
-              }
-              gridIds.push(element.gridId);
-              gridNames.push(element.gridName);
-            }
-          })
-          store.commit("exposure/updatePostPolicyAirQuality",
-          {
-            postPolicyAirQualityId: currentSelectedItems,
-            postPolicyAirQualityName: names,
-            postPolicyGridDefinitionId: gridIds,
-            postPolicyGridDefinitionName: gridNames
-          });
+          updateSelectedItems(currentSelectedItems, false);
         }
       });
 
-  // The airQualityLayers property is set when the AirQualityPrePolicy.vue component pulls a new list of layers
-  // We monitor the change so we don't have to make a duplicate api call.  Instead we pull the data fro the store.
-  watch(
-    () => store.state.exposure.airQualityLayers,
-    (newData, oldData) => {
-      rows.value = convertAirQualityLayers(newData);
-      if (store.state.exposure.postPolicyAirQualityId != null) {
-        selectedItems.value = store.state.exposure.postPolicyAirQualityId;
-      }
-    }
-  );
+    watch(
+      () => selectedGroup.value,
+      (currentSelectedItem, prevSelectedItem) => {
+        console.log("watch: " + currentSelectedItem + " | " + prevSelectedItem)
+        if (currentSelectedItem != prevSelectedItem) {
+          console.log("currentSelectedItem: " + currentSelectedItem)
 
-  onBeforeMount(() => {
-        // (async () => {
-        //   const response = await loadAirQualityLayers().fetch();
-        //   rows.value = convertAirQualityLayers(response.data.value);
-        //
-        // if (store.state.exposure.postPolicyAirQualityId != null) {
-        //   selectedItems.value = store.state.exposure.postPolicyAirQualityId;
-        // }
-        //
-        // })()
+          store.commit("exposure/updatePostPolicyAirQualityGroupName", currentSelectedItem);
+          //filter to selected group if any
+          try {
+            if (selectedGroup.value) {
+              rowsFiltered.value = rows.value.filter(r => r.groupName === selectedGroup.value);
+              //de-select aq layer if it is not in the filtered list
+              updateSelectedItems(selectedItems.value, true);
+            }
+            else {
+              rowsFiltered.value = rows.value;
+            }
+          } catch (e) {
+            rowsFiltered = rows.value;
+            console.log("Error applying filter. No group filter applied");
+          }
+        }
+      }
+
+    );
+
+    // The airQualityLayers property is set when the AirQualityPrePolicy.vue component pulls a new list of layers
+    // We monitor the change so we don't have to make a duplicate api call.  Instead we pull the data fro the store.
+    watch(
+      () => store.state.exposure.airQualityLayers,
+      (newData, oldData) => {
+        rows.value = convertAirQualityLayers(newData);
+        if (store.state.exposure.postPolicyAirQualityId != null) {
+          selectedItems.value = store.state.exposure.postPolicyAirQualityId;
+        }
+        //get unique group names for the dropdown
+        if (!rows.value || rows.value.length == 0) {
+          groupOptions.value = [];
+          return;
+        }
+        const uniqueGroupNames = [...new Set(rows.value.map(item => item.groupName))];
+        groupOptions.value = uniqueGroupNames.map(g => ({ label: g, value: g }));
+        console.log("groupOptions: ", groupOptions.value);
+
+        //filter to selected group if any
+        try {
+          if (selectedGroup.value) {
+            rowsFiltered.value = rows.value.filter(r => r.groupName === selectedGroup.value);
+          }
+          else {
+            rowsFiltered.value = rows.value;
+          }
+        } catch (e) {
+          rowsFiltered = rows.value;
+          console.log("Error applying filter. No group filter applied");
+        }
+      }
+    );
+
+    onBeforeMount(() => {
+      // (async () => {
+      //   const response = await loadAirQualityLayers().fetch();
+      //   rows.value = convertAirQualityLayers(response.data.value);
+      //
+      // if (store.state.exposure.postPolicyAirQualityId != null) {
+      //   selectedItems.value = store.state.exposure.postPolicyAirQualityId;
+      // }
+      //
+      // })()
     })
+    function updateSelectedItems(currentSelectedItems, updateSelectedItems) {
+      //if updateSelectedItems is true, we want to check selected items agains the filtered list and update it
+      //Only update selectedItems when group filter changes to avoid watch feedback loop
+      var names = [];
+      var ids = [];
+      var gridIds = [];
+      var gridNames = [];
+      if (currentSelectedItems.length > 0) {
+        //only add selected items that are in the filtered list
+        var newSelectedItems = [];
+        rowsFiltered.value.forEach(element => {
+          if (currentSelectedItems.includes(element.value)) {
+            newSelectedItems.push(element.value);
+            var scenario = null;
+            if (!!store.state.exposure.postPolicyAirQualityName) {
+              scenario = store.state.exposure.postPolicyAirQualityName.find(e => e.name === element.label)
+            }
+            if (!!store.state.exposure.postPolicyAirQualityGroupName) {
+              selectedGroup.value = store.state.exposure.postPolicyAirQualityGroupName;
+            }
+            //if this element is already stored, there may be corresponding years stored
+            if (!!scenario) {
+              names.push(scenario);
+              ids.push(element.value);
+              //if the element is not stored, the years value is empty for now
+            } else {
+              var scenario = { name: element.label, years: [], popYears: [] };
+              names.push(scenario);
+              ids.push(element.value);
+            }
+            gridIds.push(element.gridId);
+            gridNames.push(element.gridName);
+          }
+        })
+        if(updateSelectedItems){
+          selectedItems.value = newSelectedItems;
+        }
+        store.commit("exposure/updatePostPolicyAirQuality",
+        {
+          //postPolicyAirQualityId: currentSelectedItems,
+          postPolicyAirQualityId: ids,
+          postPolicyAirQualityName: names,
+          postPolicyGridDefinitionId: gridIds,
+          postPolicyGridDefinitionName: gridNames
+        });
+      }
+      else {
+        //if nothing is selected, clear the store values
+        selectedItems.value = [];
+        store.commit("analysis/updatePostPolicyAirQuality",
+          {
+            postPolicyAirQualityId: [],
+            postPolicyAirQualityName: [],
+            postPolicyGridDefinitionId: [],
+            postPolicyGridDefinitionName: []
+          });
+      }      
+    }
 
     return {
       rows,
+      rowsFiltered,
       selectedItems,
+      groupOptions,
+      selectedGroup,
     };
-}
+  }
 });
 
 </script>
 
 <style lang="scss" scoped>
-
 .aq-post-policy-scroll-area {
   border: 1px solid black;
   height: 200px;
   max-width: 90%;
 }
 
+.aq-post-policy-selection {
+  max-width: 90%;
+}
 </style>

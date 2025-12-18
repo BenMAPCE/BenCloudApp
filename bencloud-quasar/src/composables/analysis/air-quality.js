@@ -18,7 +18,8 @@ export const loadAirQualityLayers = (store) => {
             params: {
                 page: 1,
                 rowsPerPage: 9999999,
-                pollutantId: store.state.analysis.pollutantId
+                pollutantId: store.state.analysis.pollutantId,
+                // groupName: store.state.analysis.prePolicyAirQualityGroupName,
                 },
             })
             .then((response) => {
@@ -49,6 +50,7 @@ export const convertAirQualityLayers = (data) => {
           option.label = records[i].name;
           option.gridId = records[i].grid_definition_id
           option.gridName = records[i].grid_definition_name
+          option.groupName = records[i].group_name
           console.log(option)
           options.push(option);
       }

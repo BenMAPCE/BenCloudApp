@@ -46,7 +46,7 @@
                 filled
                 dense
                 v-model="groupName"
-                label="Group Name"
+                :label="groupNameLabel"
                 hint=""
                 lazy-rules
               />
@@ -179,11 +179,15 @@ export default {
     uploadDate: "",
     dashData: [],
     descriptionHint:"",
+    //groupNameLabel: "Group Name",
   }),
 
   computed: {
     isBatchUpload() {
       return this.selected_files.length > 1;
+    },
+    groupNameLabel(){
+      return this.isBatchUpload ? "Group Name *" : "Group Name";
     }
   },
   
@@ -278,6 +282,11 @@ export default {
       if (this.name === "" && !this.isBatchUpload) {
         this.errorMessage =
           this.errorMessage + (hasErrors ? ", " : "") + "Name is required";
+        hasErrors = true;
+      }
+      if (this.groupName === "" && this.isBatchUpload) {
+        this.errorMessage =
+          this.errorMessage + (hasErrors ? ", " : "") + "Group Name is required for batch upload";
         hasErrors = true;
       }
       if (this.pollutantId === 0) {

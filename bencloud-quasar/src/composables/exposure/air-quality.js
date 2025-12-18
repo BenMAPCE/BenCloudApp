@@ -19,6 +19,8 @@ export const loadAirQualityLayers = (store) => {
                 page: 1,
                 rowsPerPage: 9999999,
                 pollutantId: store.state.exposure.pollutantId
+                // groupName is a parameter for this API but since post and pre policy aq may have different group name filters selected we can't filter from server side.
+                // groupName: store.state.analysis.prePolicyAirQualityGroupName,
                 },
             })
             .then((response) => {
@@ -49,6 +51,7 @@ export const convertAirQualityLayers = (data) => {
           option.label = records[i].name;
           option.gridId = records[i].grid_definition_id
           option.gridName = records[i].grid_definition_name
+          option.groupName = records[i].group_name
           console.log(option)
           options.push(option);
       }
