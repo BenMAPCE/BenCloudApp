@@ -37,7 +37,7 @@ export default defineComponent({
       () => selectedItems.value,
       (currentSelectedItems, prevSelectedItems) => {
         console.log("watch: " + currentSelectedItems + " |" + prevSelectedItems)
-        if (currentSelectedItems != prevSelectedItems) {
+        if ((currentSelectedItems != prevSelectedItems) && (currentSelectedItems.length + prevSelectedItems.length > 0)) {
           updateSelectedItems(currentSelectedItems, false);
         }
       });
