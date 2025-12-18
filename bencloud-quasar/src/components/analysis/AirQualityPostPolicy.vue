@@ -36,7 +36,7 @@ export default defineComponent({
       () => selectedItems.value,
       (currentSelectedItems, prevSelectedItems) => {
         console.log("watch: " + currentSelectedItems + " |" + prevSelectedItems)
-        if (currentSelectedItems != prevSelectedItems) {
+        if ((currentSelectedItems != prevSelectedItems) && (currentSelectedItems.length + prevSelectedItems.length > 0)) {
 
           updateSelectedItems(currentSelectedItems, false);
         }
@@ -114,8 +114,8 @@ export default defineComponent({
       // })()
     })
 
-    function updateSelectedItems(currentSelectedItems, updateSelectedItems) {
-      //if updateSelectedItems is true, we want to check selected items agains the filtered list and update it
+    function updateSelectedItems(currentSelectedItems, updateSelItems) {
+      //if updateSelItems is true, we want to check selected items agains the filtered list and update it
       //Only update selectedItems when group filter changes to avoid watch feedback loop
       var names = [];
       var ids = [];
@@ -148,7 +148,7 @@ export default defineComponent({
             gridNames.push(element.gridName);
           }
         })
-        if(updateSelectedItems){
+        if(updateSelItems){
           selectedItems.value = newSelectedItems;
         }
         store.commit("analysis/updatePostPolicyAirQuality",
