@@ -86,7 +86,7 @@ import { useQuasar } from "quasar";
 
 import { loadHealthImpactFunctionGroups, buildHealthImpactFunctionGroups } from "../../composables/analysis/health-impact-function-groups";
 import {
-  getValuationFunctionsForEndpointGroupId,
+  getValuationFunctionsForEndpointId,
   loadValuationFunctions,
 } from "../../composables/analysis/valuation-functions";
 import ValueOfEffectsEditForm from "./ValueOfEffectsEditForm.vue";
@@ -188,13 +188,13 @@ export default defineComponent({
     }
 
     function editValueOfEffects(row) {
-      var valuationFunctionsForEndpointGroupId = getValuationFunctionsForEndpointGroupId(
+      var valuationFunctionsForEndpointId = getValuationFunctionsForEndpointId(
         valuationFunctions.value,
-        row.endpoint_group_id
+        row.endpoint_id
       );
 
       console.log("------------------");
-      console.log(valuationFunctionsForEndpointGroupId);
+      console.log(valuationFunctionsForEndpointId);
       console.log("------------------");
 
       console.log("*****");
@@ -214,7 +214,7 @@ export default defineComponent({
         persistent: true,
         componentProps: {
           row: row,
-          valuationFunctionsForEndpointGroupId: valuationFunctionsForEndpointGroupId,
+          valuationFunctionsForEndpointId: valuationFunctionsForEndpointId,
           valuationsSelected: valuationsForHealthFunction,
         },
       })
@@ -427,7 +427,7 @@ const visibleColumns = ref([
       {
         name: "endpoint_group_id",
         align: "left",
-        label: "Health Effect Group Id",
+        label: "Health Effect Category Id",
         field: "endpoint_group_id",
         sortable: false,
       },
@@ -480,18 +480,25 @@ const visibleColumns = ref([
         field: "metric_name",
         sortable: true,
       },
+      // {
+      //   name: "seasonal_metric_name",
+      //   align: "left",
+      //   label: "Seasonal Metric",
+      //   field: "seasonal_metric_name",
+      //   sortable: true,
+      // },
+      // {
+      //   name: "metric_statistic_name",
+      //   align: "left",
+      //   label: "Metric Statistic",
+      //   field: "metric_statistic_name",
+      //   sortable: true,
+      // },
       {
-        name: "seasonal_metric_name",
+        name: "timing_name",
         align: "left",
-        label: "Seasonal Metric",
-        field: "seasonal_metric_name",
-        sortable: true,
-      },
-      {
-        name: "metric_statistic_name",
-        align: "left",
-        label: "Metric Statistic",
-        field: "metric_statistic_name",
+        label: "Timing",
+        field: "timing_name",
         sortable: true,
       },
       {

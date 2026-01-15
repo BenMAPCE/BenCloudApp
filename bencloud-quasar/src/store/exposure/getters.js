@@ -1,9 +1,9 @@
 export function stepNumber (state) {
   return state.stepNumber
 }
-export function locationId (state) {
-  return state.locationId
-}
+// export function locationId (state) {
+//   return state.locationId
+// }
 
 export function pollutantId (state) {
     return state.pollutantId

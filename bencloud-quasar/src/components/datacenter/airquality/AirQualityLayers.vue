@@ -383,6 +383,7 @@ const rows = [];
 
 const visibleColumns = ref([
   "name",
+  "group_name",
   "grid_definition_name",
   "aq_year",
   "source",
@@ -410,6 +411,15 @@ const columns = [
     label: "Name",
     align: "left",
     field: (row) => row.name,
+    format: (val) => `${val}`,
+    sortable: true,
+  },
+  {
+    name: "group_name",
+    required: true,
+    label: "Group Name",
+    align: "left",
+    field: (row) => row.group_name,
     format: (val) => `${val}`,
     sortable: true,
   },

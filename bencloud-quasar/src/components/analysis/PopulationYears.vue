@@ -16,6 +16,8 @@
         emit-value
         map-options
         label="Year(s)"
+        ref="selects"
+        @popup-show="() => scrollToYear(scenario)"
         />
       </div>
       <div v-if="scenario.index === 0 && scenarios.length > 1" class="checkbox">
@@ -27,7 +29,7 @@
 
 <script>
 import { defineComponent } from "vue";
-import { ref, watch, onMounted, onUpdated, onBeforeMount } from "vue";
+import { ref, watch, onMounted, onUpdated, onBeforeMount, nextTick } from "vue";
 import { useStore } from "vuex";
 
 export default defineComponent({
@@ -39,6 +41,32 @@ export default defineComponent({
     const rows = ref([]);
     const scenarios = ref([]);
     const applyAll = ref();
+    const selects = ref([]);
+
+    const DEFAULT_SELECT_YEAR = 2020;
+
+    const scrollToYear = async (scenario) => {
+
+      // Do not scroll if any years selected
+      if (scenario.years.length > 0) {
+        return; 
+      }
+
+      await nextTick(); // Ensure DOM is updated
+
+      const yearIndex = rows.value.findIndex(item => item.value === DEFAULT_SELECT_YEAR); 
+      if (yearIndex <= 0) {
+        console.warn(`Default select year ${DEFAULT_SELECT_YEAR} not found in years list.`);
+        return;
+      }
+
+      const select = selects.value[scenario.index];
+      if (!select) {
+        console.warn(`Select component not found for scenario ${scenario.name}.`);
+      }
+
+      select.scrollTo(yearIndex,'start');
+    };
 
     watch(
       () => store.state.analysis.populationYears,
@@ -98,7 +126,9 @@ export default defineComponent({
     return {
       rows,
       scenarios,
-      applyAll
+      applyAll,
+      selects,
+      scrollToYear
     };
   },
 

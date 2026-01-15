@@ -30,6 +30,11 @@ export const getTemplates = () => {
       error.value = ex;
     } finally {
       loading.value = false;
+      //reset post AQ group name filters because it can be changed after the template is created.
+      store.commit("analysis/updatePrePolicyAirQualityGroupName", null);
+      store.commit("exposure/updatePrePolicyAirQualityGroupName", null);
+      store.commit("analysis/updatePostPolicyAirQualityGroupName", null);
+      store.commit("exposure/updatePostPolicyAirQualityGroupName", null);
 
       return { response, error, data, loading };
     }
@@ -125,6 +130,7 @@ export const createHifTemplate = (taskName, store) => {
   const valuationsForHealthImpactFunctionGroups =
     store.state.analysis.valuationsForHealthImpactFunctionGroups;
   const batchTaskObject = store.state.analysis.batchTaskObject;
+  const limitToGridId = store.state.analysis.limitToGridId;
 
   var template = {};
 
@@ -133,6 +139,7 @@ export const createHifTemplate = (taskName, store) => {
   console.log("-------------------------------");
 
   template["name"] = taskName;
+  template["limitToGridId"]= limitToGridId;
   template["type"] = "HIF";
 
   var pollutant = {};
@@ -363,6 +370,12 @@ export const loadHifTemplate = (model, store) => {
     "analysis/updatePollutantFriendlyName",
     pollutant.pollutantFriendlyName
   );
+
+  store.commit("analysis/updateLocation",
+          {
+            limitToGridId: parameters.limitToGridId,
+            locationName: ""
+          });
 
   var air_quality_data = parameters.air_quality_data;
   if (air_quality_data[0].type === "baseline") {

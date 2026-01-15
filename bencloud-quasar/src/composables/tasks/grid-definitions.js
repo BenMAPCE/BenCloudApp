@@ -45,6 +45,9 @@ export const buildGridDefinitionOptions = (data, populationDatasetId) => {
         gridsExcluded.push(70);
     }
 
+    //do not show the non-clipped CMAQ 12km in export options
+    gridsExcluded.push(28);
+
     var records = JSON.parse(JSON.stringify(data));
     var options = [];
     var option = {};

@@ -200,7 +200,7 @@ const columns = [
   },
   {
     name: "qualifier",
-    label: "Qualifier",
+    label: "Risk Model Details",
     field: (row) => row.qualifier,
     align: "left",
     style:
@@ -259,16 +259,22 @@ const columns = [
     field: "gender",
     sortable: true,
   },
-  {
-    name: "seasonal_metric",
-    label: "Seasonal Metric",
-    field: "seasonal_metric",
-    sortable: true,
-  },
+  // {
+  //   name: "seasonal_metric",
+  //   label: "Seasonal Metric",
+  //   field: "seasonal_metric",
+  //   sortable: true,
+  // },
   {
     name: "metric_statistic",
     label: "Annual Statistic",
     field: "metric_statistic",
+    sortable: true,
+  },
+  {
+    name: "timing",
+    label: "Timing",
+    field: "timing",
     sortable: true,
   },
   {

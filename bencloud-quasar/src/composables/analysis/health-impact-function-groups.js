@@ -2,7 +2,7 @@ import { useStore, mapGetters } from "vuex";
 import axios from "axios";
 import { ref } from "vue";
 import { healthEffects } from "src/store/analysis/getters";
-import { getValuationFunctionsForEndpointGroupId, updateValuationFunctions } from "./valuation-functions";
+import { getValuationFunctionsForEndpointId, updateValuationFunctions } from "./valuation-functions";
 
 export const loadHealthImpactFunctionGroups = (store) => {
   const data = ref(null);
@@ -171,6 +171,7 @@ export const buildHealthImpactFunctionGroups = (
       option.metric_name = functions[f].hifRecord.metric_name;
       option.seasonal_metric_name = functions[f].hifRecord.seasonal_metric_name;
       option.metric_statistic_name = functions[f].hifRecord.metric_statistic_name;
+      option.timing_name = functions[f].hifRecord.timing_name;
       option.race_ethnicity_gender =
         functions[f].hifRecord.race_name +
         " / " +
@@ -186,14 +187,21 @@ export const buildHealthImpactFunctionGroups = (
       else {
         option.incidence_prevalence = "";
       }
+      option.hero_id = functions[f].hifRecord.hero_id;
+      option.epa_hero_url = functions[f].hifRecord.epa_hero_url;
+      option.access_url = functions[f].hifRecord.access_url;
   
       // load valuations
       //console.log("--- 001")
-      var valuationsForEndpointGroupId =
-        getValuationFunctionsForEndpointGroupId(
+      console.log("\n\n\nhere\n\n\n")
+      console.log(valuationFunctions.value);
+      console.log(functions[f].hifRecord);
+      var valuationsForEndpointId =
+        getValuationFunctionsForEndpointId(
           valuationFunctions.value,
-          functions[f].hifRecord.endpoint_group_id
+          functions[f].hifRecord.endpoint_id
         );
+      console.log(valuationsForEndpointId);
       let valuationsSelected = store.getters[
         "analysis/getValuationsForHealthFunctionId"
       ](functions[f].hifId);
@@ -202,13 +210,13 @@ export const buildHealthImpactFunctionGroups = (
 
       if(!!valuationsSelected.valuation_ids) {
         for(var j = 0; j < valuationsSelected.valuation_ids.length; j++) {
-          for(var k = 0; k < valuationsForEndpointGroupId.length; k++) {
-            if(valuationsForEndpointGroupId[k].id === valuationsSelected.valuation_ids[j]) {
+          for(var k = 0; k < valuationsForEndpointId.length; k++) {
+            if(valuationsForEndpointId[k].id === valuationsSelected.valuation_ids[j]) {
               valuationsArray.push( {
                 hifId: valuationsSelected.health_function_id,
                 hifInstanceId: null,
-                vfId: valuationsForEndpointGroupId[k].id,
-                vfRecord: valuationsForEndpointGroupId[k]
+                vfId: valuationsForEndpointId[k].id,
+                vfRecord: valuationsForEndpointId[k]
               })
             }
           }

@@ -3,7 +3,7 @@ export function updateStepNumber(state, stepNumber ) {
     state.stepNumber = stepNumber;
 }
 export function updateLocation(state, location) {
-    state.locationId = location.locationId;
+    state.limitToGridId = location.limitToGridId;
     state.locationName = location.locationName;
 }
 
@@ -64,6 +64,9 @@ export function updatePrePolicyAirQualityName(state, prePolicyAirQualityName) {
 export function updatePrePolicyAirQualityMetricId(state, metricId) {
     state.prePolicyAirQualityMetricId = metricId;
 }
+export function updatePrePolicyAirQualityGroupName(state, groupName) {
+    state.prePolicyAirQualityGroupName = groupName;
+}
 
 export function updatePostPolicyAirQuality(state, postPolicyAirQuality) {
     state.postPolicyAirQualityId = postPolicyAirQuality.postPolicyAirQualityId;
@@ -98,6 +101,10 @@ export function updatePostPolicyAirQualitySelection(state, postPolicyAirQualityS
 
 export function updatePostPolicyAirQualityMetricId(state, metricId) {
     state.postPolicyAirQualityMetricId = metricId;
+}
+
+export function updatePostPolicyAirQualityGroupName(state, groupName) {
+    state.postPolicyAirQualityGroupName = groupName;
 }
 
 export function setValuationsForHealthImpactFunctionGroups(state, payload) {

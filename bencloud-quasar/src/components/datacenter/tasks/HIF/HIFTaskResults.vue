@@ -235,7 +235,7 @@ const columns = [
   },
   {
     name: "qualifier",
-    label: "Qualifier",
+    label: "Risk Model Details",
     field: (row) => row.qualifier,
     align: "left",
     style:
@@ -245,7 +245,7 @@ const columns = [
   {
     name: "beta",
     label: "Beta",
-    field: (row) => row.beta.toLocaleString("en-US", { maximumFractionDigits: 2 }),
+    field: (row) => row.beta.toLocaleString("en-US", { maximumFractionDigits: 3 }),
     sort: (a, b, rowA, rowB) => parseFloat(rowA.beta) - parseFloat(rowB.beta),
     sortable: true,
   },
@@ -280,16 +280,22 @@ const columns = [
     field: "metric",
     sortable: true,
   },
-  {
-    name: "seasonal_metric",
-    label: "Seasonal Metric",
-    field: "seasonal_metric",
-    sortable: true,
-  },
+  // {
+  //   name: "seasonal_metric",
+  //   label: "Seasonal Metric",
+  //   field: "seasonal_metric",
+  //   sortable: true,
+  // },
   {
     name: "metric_statistic",
     label: "Annual Statistic",
     field: "metric_statistic",
+    sortable: true,
+  },
+  {
+    name: "timing",
+    label: "Timing",
+    field: "timing",
     sortable: true,
   },
   {
@@ -321,13 +327,21 @@ const columns = [
     sortable: true,
   },
   {
-    name: "mean",
-    label: "Mean",
+    name: "point_estimate",
+    label: "Change in Incidence (Cases)",
     field: (row) =>
-      row.mean.toLocaleString("en-US", { maximumFractionDigits: 2 }),
-    sort: (a, b, rowA, rowB) => parseFloat(rowA.mean) - parseFloat(rowB.mean),
+      row.point_estimate.toLocaleString("en-US", { maximumFractionDigits: 2 }),
+    sort: (a, b, rowA, rowB) => parseFloat(rowA.point_estimate) - parseFloat(rowB.point_estimate),
     sortable: true,
   },
+  // {
+  //   name: "mean",
+  //   label: "Mean",
+  //   field: (row) =>
+  //     row.mean.toLocaleString("en-US", { maximumFractionDigits: 2 }),
+  //   sort: (a, b, rowA, rowB) => parseFloat(rowA.mean) - parseFloat(rowB.mean),
+  //   sortable: true,
+  // },
   {
     name: "standard_deviation",
     label: "Standard Deviation",
@@ -358,14 +372,6 @@ const columns = [
     field: (row) =>
       row.pct_97_5.toLocaleString("en-US", { maximumFractionDigits: 2 }),
     sort: (a, b, rowA, rowB) => parseFloat(rowA.pct_97_5) - parseFloat(rowB.pct_97_5),
-    sortable: true,
-  },
-  {
-    name: "point_estimate",
-    label: "Change in Incidence (Cases)",
-    field: (row) =>
-      row.point_estimate.toLocaleString("en-US", { maximumFractionDigits: 2 }),
-    sort: (a, b, rowA, rowB) => parseFloat(rowA.point_estimate) - parseFloat(rowB.point_estimate),
     sortable: true,
   },
   {

@@ -223,7 +223,7 @@ const columns = [
   },
   { name: "endpoint group", 
     align: "left", 
-    label: "Health Effect Group", 
+    label: "Health Effect Category", 
     field: "Health Effect Group",
     sortable: true,
   },
