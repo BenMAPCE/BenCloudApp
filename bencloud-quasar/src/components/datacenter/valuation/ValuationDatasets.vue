@@ -20,7 +20,7 @@
           <template v-if="col.name === 'reference'">
             <a :href="props.row.access_url" target="_blank">{{ props.row.reference }}</a>
           </template>
-          <template v-if="col.name === 'actions' && props.row.share_scope != 1">
+          <template v-if="col.name === 'actions' && (props.row.share_scope != 1 || isAdmin)">
             <q-btn
               dense
               round
@@ -74,6 +74,7 @@ import axios from "axios";
 import { useStore } from "vuex";
 import { showAll } from '../../../pages/datacenter/managedata/valuation/ReviewValuation.vue';
 import { date } from 'quasar'
+import { isAdmin } from '../../../boot/auth.js';
 
 var trackCurrentPage = null;
 var numLayers = null;
@@ -96,7 +97,8 @@ export default defineComponent({
   methods: {
     archiveRow(props) {
       // Prompt user to confirm vf archive
-      if(confirm("Are you sure you wish to archive valuation function " + props.row.id + "?")){
+      var sharedWarning = props.row.share_scope == 1 ? "This valuation function is shared with all users. " : "";
+      if(confirm(sharedWarning + "Are you sure you wish to archive valuation function " + props.row.id + "?")){
         // Archive the valuation function  
         axios
           .post(process.env.API_SERVER + "/api/valuation-function/" + props.row.id, 
@@ -325,6 +327,7 @@ export default defineComponent({
       visibleColumns,
       selected: ref([]),
       onRequest,
+      isAdmin,
     };
   },
 });
