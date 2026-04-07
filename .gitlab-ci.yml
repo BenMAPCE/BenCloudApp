@@ -28,7 +28,7 @@ build_stage_app:
  stage: code_build
  only: 
   - tags
- image: node:16
+ image: node:20
  tags:
   - benmapstagegitlab
  script:
