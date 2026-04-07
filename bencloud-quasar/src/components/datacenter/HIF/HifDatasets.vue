@@ -23,7 +23,7 @@
           <template v-if="col.name === 'author'">
             <a :href="props.row.access_url" target="_blank">{{ props.row.author_year }}</a>
           </template>
-          <template v-if="col.name === 'actions' && props.row.share_scope != 1">
+          <template v-if="col.name === 'actions' && (props.row.share_scope != 1 || isAdmin)">
             <q-btn
               dense
               round
@@ -77,6 +77,7 @@ import axios from "axios";
 import { useStore } from "vuex";
 import { showAll } from '../../../pages/datacenter/managedata/HIF/ReviewHif.vue';
 import { date } from 'quasar'
+import { isAdmin } from "../../../boot/auth.js";
 
 var trackCurrentPage = null;
 var numLayers = null;
@@ -102,7 +103,8 @@ export default defineComponent({
   methods: {
     archiveRow(props) {
       // Prompt user to confirm hif archive
-      if(confirm("Are you sure you wish to archive " + props.row.author_year + "?")){
+      var sharedWarning = props.row.share_scope == 1 ? "This health impact function is shared with all users. " : "";
+      if(confirm(sharedWarning + "Are you sure you wish to archive " + props.row.author_year + "?")){
         // Archive the health impact function  
         axios
           .post(process.env.API_SERVER + "/api/health-impact-function/" + props.row.id, 
@@ -353,6 +355,7 @@ export default defineComponent({
       visibleColumns,
       selected: ref([]),
       onRequest,
+      isAdmin,
     };
   },
 });

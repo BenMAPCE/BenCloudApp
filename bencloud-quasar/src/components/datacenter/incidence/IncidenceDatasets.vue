@@ -26,6 +26,16 @@
               icon="mdi-delete"
             ></q-btn>
           </template>
+          <template v-if="col.name === 'actions' && props.row.share_scope == 1 && isAdmin">
+            <q-btn
+              dense
+              round
+              flat
+              color="grey"
+              @click.stop="archiveRow(props)"
+              icon="mdi-archive"
+            ></q-btn>
+          </template>
           <template v-else>
             {{col.value}}
           </template>
@@ -64,6 +74,7 @@ import { useStore } from "vuex";
 import { layerName } from '../../common/AirQualityUploadForm.vue';
 import { showAll } from '../../../pages/datacenter/managedata/incidence/ReviewIncidence.vue';
 import { date } from 'quasar'
+import { isAdmin } from "src/boot/auth.js";
 
 var trackCurrentPage = null;
 var numLayers = null;
@@ -128,7 +139,54 @@ export default defineComponent({
       }
     },
 
-   
+   archiveRow(props) {
+      // Prompt user to confirm incidence dataset archiving
+      if(confirm("This incidence dataset is shared with all users. Are you sure you wish to archive " + props.row.name + "?")){
+        // Archive the incidence dataset, reload the list if successful, alert the user if unsuccessful       
+        axios
+          .post(process.env.API_SERVER + "/api/incidence/" + props.row.id, 
+            {validateStatus: function (status) {
+              return status < 500;
+            }}
+          )
+          .then((response) => {
+            if(response.status === 200) {
+              trackCurrentPage = this.pagination.page;
+              console.log("Successfully archived incidence dataset: " + props.row.name);
+
+              // Reload list
+              var oldValue =  this.$store.state.incidence.incidenceForceReloadValue
+              console.log("oldValue: " + oldValue);
+              var newValue = oldValue - 1;
+              console.log("newValue: " + newValue);
+              this.$store.commit("incidence/updateIncidenceForceReloadValue", newValue)
+            } else if(response.status === 403){
+              console.log("Forbidden action on incidence dataset: " + props.row.name);
+              this.$q.notify({
+                group: false, // required to be updateable
+                type: 'negative',
+                timeout: 6000, 
+                color: "red",
+                spinner: false, // we reset the spinner setting so the icon can be displayed
+                position: "top",
+                message: response.data.message,
+              });
+              this.$emit('ok')
+            } else {
+              this.$q.notify({
+                group: false, // required to be updateable
+                type: 'negative',
+                timeout: 6000, 
+                color: "red",
+                spinner: false, // we reset the spinner setting so the icon can be displayed
+                position: "top",
+                message: "Unknown error: " + response.status,
+              });
+              this.$emit('ok')
+            }
+          });
+      }
+    },
     
     rowClicked(props) {
       this.selected = [];
@@ -305,6 +363,7 @@ export default defineComponent({
       visibleColumns,
       selected: ref([]),
       onRequest,
+      isAdmin,
     };
   },
 });
