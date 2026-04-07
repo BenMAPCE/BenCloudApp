@@ -137,6 +137,15 @@
 
           <input type="hidden" name="pollutantId" :value="pollutantId" />
 
+          <div v-if="isAdmin" class="q-px-md q-pb-sm">
+            <q-toggle
+              v-model="shareScope"
+              :true-value="1"
+              :false-value="0"
+              label="Share with all users"
+            />
+          </div>
+
           <div class="row justify-center">
             <q-card-actions>
               <q-btn color="primary" :label="`Upload ${selected_files.length>0?selected_files.length:''} Surface${isBatchUpload?`s`:''}`" @click="onSubmit" />
@@ -159,6 +168,7 @@ import AirQualityUploadResponseDialog from "./AirQualityUploadResponseDialog.vue
 
 import { useQuasar } from "quasar";
 import { useStore } from "vuex";
+import { isAdmin } from "src/boot/auth.js";
 
 export var layerName = null;
 
@@ -179,8 +189,13 @@ export default {
     uploadDate: "",
     dashData: [],
     descriptionHint:"",
+    shareScope: 0,
     //groupNameLabel: "Group Name",
   }),
+
+  setup() {
+    return { isAdmin };
+  },
 
   computed: {
     isBatchUpload() {
@@ -363,6 +378,7 @@ export default {
       fileData.append("dataType", this.dataType);
       fileData.append("description", this.description);
       fileData.append("uploadDate",localISOTime)
+      fileData.append("shareScope", this.shareScope);
       var self = this;
 
       this.$q.loading.show({
@@ -487,7 +503,7 @@ export default {
     },
 
     onCancelClick() {
-      // we just need to hide the dialog
+      this.shareScope = 0;
       this.hide();
     },
 

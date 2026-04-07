@@ -89,6 +89,15 @@
             </div>
           </div>
 
+          <div v-if="isAdmin" class="q-px-md q-pb-sm">
+            <q-toggle
+              v-model="shareScope"
+              :true-value="1"
+              :false-value="0"
+              label="Share with all users"
+            />
+          </div>
+
           <div class="row justify-center">
             <q-card-actions>
               <q-btn color="primary" label="Upload" @click="onSubmit" />
@@ -114,6 +123,7 @@ import { Notify, Loading, Dialog } from "quasar";
 import { ref, watch } from "vue";
 import { useStore } from "vuex";
 import axios from "axios";
+import { isAdmin } from "src/boot/auth.js";
 
 export default {
   components: {
@@ -132,6 +142,7 @@ export default {
     const typeOptions = ref(["Add a new health effect category", "Append to an existing health effect category"]);
     const healthEffectGroupName = ref("");
     const dialog = ref(null);
+    const shareScope = ref(0);
 
     var selected_file = "";
     var check_if_document_upload = false;
@@ -223,7 +234,7 @@ export default {
     }
 
     const onCancelClick = () => {
-      // we just need to hide the dialog
+      shareScope.value = 0;
       dialog.value.hide();
     }
 
@@ -273,6 +284,7 @@ export default {
       fileData.append("filename", selected_file.name);
       fileData.append("newCategory", newCategory);
       fileData.append("uploadDate",localISOTime)
+      fileData.append("shareScope", shareScope.value);
       var self = this;
 
       Loading.show({
@@ -377,6 +389,8 @@ export default {
       dialog,
       errorMessage,
       description,
+      shareScope,
+      isAdmin,
       show,
       hide,
       onDialogHide,
