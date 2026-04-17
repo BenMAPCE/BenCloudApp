@@ -57,7 +57,7 @@ export default defineComponent({
         rows.value.push(epaDefaults);
 
         response.data.value.forEach(function(row) {
-          if(row.share_scope == 0) {
+          if(!row.epa_standard) {
             rows.value.push(row);
           }
         })
