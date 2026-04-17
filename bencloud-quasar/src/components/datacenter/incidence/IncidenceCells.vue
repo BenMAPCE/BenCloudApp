@@ -272,7 +272,7 @@ const columns = [
     field: "Type",
     sortable: true,
   },
-  {
+  /*{
     name: "timeframe",
     align: "left",
     label: "Timeframe",
@@ -285,7 +285,7 @@ const columns = [
     label: "Units",
     field: "Units",
     sortable: true,
-  },
+  },*/
   {
     name: "value",
     align: "left",
@@ -293,7 +293,7 @@ const columns = [
     field: "Value",
     sortable: true,
   },
-  {
+  /*{
     name: "distribution",
     align: "left",
     label: "Distribution",
@@ -306,7 +306,7 @@ const columns = [
     label: "Standard Error",
     field: "Standard Error",
     sortable: true,
-  },
+  },*/
   
 ];
 
