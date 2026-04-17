@@ -26,7 +26,7 @@
               icon="mdi-delete"
             ></q-btn>
           </template>
-          <template v-if="col.name === 'actions' && props.row.share_scope == 1 && isAdmin">
+          <template v-if="col.name === 'actions' && props.row.share_scope == 1 && props.row.epa_standard == false && isAdmin">
             <q-btn
               dense
               round
