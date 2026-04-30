@@ -10,6 +10,7 @@
   >
     <div class="tabs q-pl-sm" v-if="task_type != 'E'">
       <q-tab name="results" class="hif-results" label="Health Results" @click="changeTabs('results')" />
+      <q-tab name="results-map" class="hif-results-map" label="Health Results Map" @click="changeTabs('results-map')" />
       <q-tab name="valuation-results" class="valuation-results" label="Valuation Results" @click="changeTabs('valuation-results')" />
     </div>
     <div class="q-pl-sm" v-if="task_type == 'E'">
@@ -22,6 +23,12 @@
       <div v-if="task_type === 'H'">
         <HIFTaskResults  v-bind:task_uuid="task_uuid" v-bind:task_name="task_name" v-bind:task_type="task_type" 
         v-bind:batch_task_id="batch_task_id" v-bind:valuation_grid_id = "valuation_grid_id" v-bind:valuation_grid_name = "valuation_grid_name" v-bind:task_pop_id = "task_pop_id" :key="componentKey"></HIFTaskResults>
+      </div>
+    </q-tab-panel>
+
+    <q-tab-panel name="results-map">
+      <div v-if="task_type === 'H'">
+        <HIFResultsMap :task_uuid="task_uuid" :task_pop_id="task_pop_id" :key="componentKey" />
       </div>
     </q-tab-panel>
 
@@ -52,6 +59,7 @@ import { defineComponent } from "vue";
 import { useStore } from "vuex";
 
 import HIFTaskResults from "./HIF/HIFTaskResults.vue";
+import HIFResultsMap from "./HIF/HIFResultsMap.vue";
 import ValuationTaskResults from "./Valuation/ValuationTaskResults.vue";
 import ExposureTaskResults from "./Exposure/ExposureTaskResults.vue";
 
@@ -62,6 +70,7 @@ export default defineComponent({
 
   components: {
     HIFTaskResults,
+    HIFResultsMap,
     ValuationTaskResults,
     ExposureTaskResults
   },
