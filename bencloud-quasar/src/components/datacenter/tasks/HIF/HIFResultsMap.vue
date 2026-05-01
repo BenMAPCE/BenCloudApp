@@ -178,7 +178,7 @@ import GeoJSON from 'ol/format/GeoJSON';
 import { Style, Stroke, Fill } from 'ol/style';
 import { defaults as defaultControls } from 'ol/control';
 
-import { defineComponent, ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue';
+import { defineComponent, ref, shallowRef, computed, watch, onMounted, onUnmounted, nextTick } from 'vue';
 import axios from 'axios';
 
 const METRIC_OPTIONS = [
@@ -229,10 +229,10 @@ export default defineComponent({
 
   setup(props) {
     const mapContainer  = ref(null);
-    const map           = ref(null);
-    const resultsLayer  = ref(null);
-    const stateLayer    = ref(null);
-    const countyLayer   = ref(null);
+    const map           = shallowRef(null);
+    const resultsLayer  = shallowRef(null);
+    const stateLayer    = shallowRef(null);
+    const countyLayer   = shallowRef(null);
 
     const loadingResults  = ref(false);
     const renderingMap    = ref(false);
