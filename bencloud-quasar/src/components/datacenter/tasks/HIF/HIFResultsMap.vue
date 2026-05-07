@@ -417,17 +417,20 @@ export default defineComponent({
         '| sample key =', Object.keys(cellMap)[0]);
 
       // Load grid cell geometries from GeoServer and style by metric value.
-      // Each grid's WFS layer name matches its table_name in grid_definition.
+      // table_name from the API is schema-qualified (e.g. "grids.us_state").
+      // GeoServer publishes layers without the schema prefix, so strip it.
       const geoServerBaseUrl  = process.env.GEOSERVER_BASE_URL;
       const workspaceName     = process.env.GEOSERVER_WORKSPACE_NAME;
       const scheme            = selectedColorScheme.value;
-      const layerName         = selectedGridTableName.value;
+      const rawTableName      = selectedGridTableName.value;
+      // Strip PostgreSQL schema prefix: "grids.us_cmaq_12km" → "us_cmaq_12km"
+      const layerName         = rawTableName.includes('.') ? rawTableName.split('.').pop() : rawTableName;
       const wfsUrl = `${geoServerBaseUrl}/${workspaceName}/ows?service=WFS&version=1.0.0` +
                      `&request=GetFeature&typeName=${workspaceName}:${layerName}` +
                      `&maxFeatures=1000000&outputFormat=application/json&srsName=EPSG:4326`;
 
       console.log('[HIFResultsMap] rebuildResultsLayer: gridId =', selectedGridId.value,
-        '| layerName =', layerName, '| wfsUrl =', wfsUrl);
+        '| rawTableName =', rawTableName, '| layerName (GeoServer) =', layerName, '| wfsUrl =', wfsUrl);
 
       if (!layerName) {
         console.error('[HIFResultsMap] rebuildResultsLayer: layerName is empty — cannot load WFS features');
@@ -441,15 +444,23 @@ export default defineComponent({
       });
 
       source.on('featuresloadstart', () => console.log('[HIFResultsMap] WFS load started'));
-      source.on('featuresloadend', (evt) => {
-        console.log('[HIFResultsMap] WFS load complete: features =', evt.features?.length ?? source.getFeatures().length);
-        if (!featuresLogged && source.getFeatures().length > 0) {
+      source.on('featuresloadend', () => {
+        const features = source.getFeatures();
+        console.log('[HIFResultsMap] WFS load complete: features =', features.length);
+        if (!featuresLogged && features.length > 0) {
           featuresLogged = true;
-          const f = source.getFeatures()[0];
-          console.log('[HIFResultsMap] first WFS feature properties =', f.getProperties());
-          const sampleKey = `${f.get('col')}_${f.get('row')}`;
-          console.log('[HIFResultsMap] sample feature lookup key =', sampleKey,
-            '| hit in cellMap =', sampleKey in cellMap);
+          const f = features[0];
+          const props = f.getProperties();
+          console.log('[HIFResultsMap] first WFS feature property keys =', Object.keys(props).filter(k => k !== 'geometry'));
+          const colVal = f.get('col');
+          const rowVal = f.get('row');
+          const sampleKey = `${colVal}_${rowVal}`;
+          console.log('[HIFResultsMap] feature col =', colVal, '| row =', rowVal,
+            '| lookup key =', sampleKey, '| hit in cellMap =', sampleKey in cellMap);
+          if (!(sampleKey in cellMap)) {
+            console.warn('[HIFResultsMap] col/row mismatch — cellMap sample keys:',
+              Object.keys(cellMap).slice(0, 5));
+          }
         }
       });
       source.on('featuresloaderror', (err) => console.error('[HIFResultsMap] WFS load error:', err));
