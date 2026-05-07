@@ -192,49 +192,51 @@ export default defineComponent({
     archiveRow(props) {
       // Prompt user to confirm grid definition archiving
       if(confirm("This grid definition is shared with all users. Are you sure you wish to archive " + props.row.name + "?")){
-        // Archive grid, reload the grid list if successful, alert the user if unsuccessful       
-        axios
-          .post(process.env.API_SERVER + "/api/grid-definitions/" + props.row.id, 
-            {validateStatus: function (status) {
-              return status < 500;
-            }}
-          )
-          .then((response) => {
-            if(response.status === 200) {
-              trackCurrentPage = this.pagination.page;
-              console.log("Successfully archived grid-definition: " + props.row.name);
+        if(confirm("This grid definition is shared with all users. Are you sure?")){
+          // Archive grid, reload the grid list if successful, alert the user if unsuccessful       
+          axios
+            .post(process.env.API_SERVER + "/api/grid-definitions/" + props.row.id, 
+              {validateStatus: function (status) {
+                return status < 500;
+              }}
+            )
+            .then((response) => {
+              if(response.status === 200) {
+                trackCurrentPage = this.pagination.page;
+                console.log("Successfully archived grid-definition: " + props.row.name);
 
-              // Reload list
-              var oldValue =  this.$store.state.grids.gridForceReloadValue
-              console.log("oldValue: " + oldValue);
-              var newValue = oldValue - 1;
-              console.log("newValue: " + newValue);
-              this.$store.commit("grids/updateGridForceReloadValue", newValue)
-            } else if(response.status === 403){
-              console.log("Forbidden action on grid definition: " + props.row.name);
-              this.$q.notify({
-                group: false, // required to be updateable
-                type: 'negative',
-                timeout: 6000, 
-                color: "red",
-                spinner: false, // we reset the spinner setting so the icon can be displayed
-                position: "top",
-                message: response.data.message,
-              });
-              this.$emit('ok')
-            } else {
-              this.$q.notify({
-                group: false, // required to be updateable
-                type: 'negative',
-                timeout: 6000, 
-                color: "red",
-                spinner: false, // we reset the spinner setting so the icon can be displayed
-                position: "top",
-                message: "Unknown error: " + response.status,
-              });
-              this.$emit('ok')
-            }
-          });
+                // Reload list
+                var oldValue =  this.$store.state.grids.gridForceReloadValue
+                console.log("oldValue: " + oldValue);
+                var newValue = oldValue - 1;
+                console.log("newValue: " + newValue);
+                this.$store.commit("grids/updateGridForceReloadValue", newValue)
+              } else if(response.status === 403){
+                console.log("Forbidden action on grid definition: " + props.row.name);
+                this.$q.notify({
+                  group: false, // required to be updateable
+                  type: 'negative',
+                  timeout: 6000, 
+                  color: "red",
+                  spinner: false, // we reset the spinner setting so the icon can be displayed
+                  position: "top",
+                  message: response.data.message,
+                });
+                this.$emit('ok')
+              } else {
+                this.$q.notify({
+                  group: false, // required to be updateable
+                  type: 'negative',
+                  timeout: 6000, 
+                  color: "red",
+                  spinner: false, // we reset the spinner setting so the icon can be displayed
+                  position: "top",
+                  message: "Unknown error: " + response.status,
+                });
+                this.$emit('ok')
+              }
+            });
+        }
       }
     },
 

@@ -103,8 +103,10 @@ export default defineComponent({
   methods: {
     archiveRow(props) {
       // Prompt user to confirm hif archive
-      var sharedWarning = props.row.share_scope == 1 ? "This health impact function is shared with all users. " : "";
-      if(confirm(sharedWarning + "Are you sure you wish to archive " + props.row.author_year + "?")){
+      if(props.row.share_scope == 1 && !confirm("This health impact function is shared with all users. Are you sure you wish to archive " + props.row.author_year + "?")){
+        return;
+      }
+      if(confirm((props.row.share_scope == 1 ? "This health impact function is shared with all users. Are you sure?" : "Are you sure you wish to archive " + props.row.author_year + "?"))){
         // Archive the health impact function  
         axios
           .post(process.env.API_SERVER + "/api/health-impact-function/" + props.row.id, 
