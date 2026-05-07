@@ -360,11 +360,6 @@ export default defineComponent({
       renderingMap.value = true;
       try {
         const cellData = await loadGridCellResults();
-        console.log('[HIFResultsMap] applySelection: cellData rows =', cellData.length);
-        if (cellData.length) {
-          console.log('[HIFResultsMap] applySelection: sample row keys =', Object.keys(cellData[0]));
-          console.log('[HIFResultsMap] applySelection: sample row =', cellData[0]);
-        }
         rebuildResultsLayer(cellData);
       } finally {
         renderingMap.value = false;
@@ -375,14 +370,12 @@ export default defineComponent({
     function rebuildResultsLayer(cellData) {
       if (!map.value) return;
 
-      // Remove old results layer
       if (resultsLayer.value) {
         map.value.removeLayer(resultsLayer.value);
         resultsLayer.value = null;
       }
 
       if (!cellData.length) {
-        console.warn('[HIFResultsMap] rebuildResultsLayer: no cell data — layer not added');
         statsReady.value = false;
         legendStops.value = [];
         return;
@@ -400,70 +393,31 @@ export default defineComponent({
       legendStops.value = [min, max];
       statsReady.value  = true;
 
-      // Build a lookup by grid col/row for the style function.
-      // API field names are inspected at runtime; fall back to common aliases.
+      // API returns column field as "col" or "column" depending on grid type.
       const firstRow = cellData[0];
-      const colField = 'col' in firstRow ? 'col' : 'column' in firstRow ? 'column' : null;
-      const rowField = 'row' in firstRow ? 'row' : null;
-      console.log('[HIFResultsMap] rebuildResultsLayer: colField =', colField, '| rowField =', rowField);
+      const colField = 'col' in firstRow ? 'col' : 'column';
 
       const cellMap = {};
       for (const r of cellData) {
-        const c = colField ? r[colField] : undefined;
-        const rr = rowField ? r[rowField] : undefined;
-        cellMap[`${c}_${rr}`] = r;
+        cellMap[`${r[colField]}_${r.row}`] = r;
       }
-      console.log('[HIFResultsMap] rebuildResultsLayer: cellMap size =', Object.keys(cellMap).length,
-        '| sample key =', Object.keys(cellMap)[0]);
 
-      // Load grid cell geometries from GeoServer and style by metric value.
-      // table_name from the API is schema-qualified (e.g. "grids.us_state").
+      // table_name from the API is schema-qualified ("grids.us_cmaq_12km").
       // GeoServer publishes layers without the schema prefix, so strip it.
-      const geoServerBaseUrl  = process.env.GEOSERVER_BASE_URL;
-      const workspaceName     = process.env.GEOSERVER_WORKSPACE_NAME;
-      const scheme            = selectedColorScheme.value;
-      const rawTableName      = selectedGridTableName.value;
-      // Strip PostgreSQL schema prefix: "grids.us_cmaq_12km" → "us_cmaq_12km"
-      const layerName         = rawTableName.includes('.') ? rawTableName.split('.').pop() : rawTableName;
-      const wfsUrl = `${geoServerBaseUrl}/${workspaceName}/ows?service=WFS&version=1.0.0` +
-                     `&request=GetFeature&typeName=${workspaceName}:${layerName}` +
-                     `&maxFeatures=1000000&outputFormat=application/json&srsName=EPSG:4326`;
+      const geoServerBaseUrl = process.env.GEOSERVER_BASE_URL;
+      const workspaceName    = process.env.GEOSERVER_WORKSPACE_NAME;
+      const scheme           = selectedColorScheme.value;
+      const rawTableName     = selectedGridTableName.value;
+      const layerName        = rawTableName.includes('.') ? rawTableName.split('.').pop() : rawTableName;
 
-      console.log('[HIFResultsMap] rebuildResultsLayer: gridId =', selectedGridId.value,
-        '| rawTableName =', rawTableName, '| layerName (GeoServer) =', layerName, '| wfsUrl =', wfsUrl);
+      if (!layerName) return;
 
-      if (!layerName) {
-        console.error('[HIFResultsMap] rebuildResultsLayer: layerName is empty — cannot load WFS features');
-        return;
-      }
-
-      let featuresLogged = false;
       const source = new VectorSource({
-        url: wfsUrl,
+        url: `${geoServerBaseUrl}/${workspaceName}/ows?service=WFS&version=1.0.0` +
+             `&request=GetFeature&typeName=${workspaceName}:${layerName}` +
+             `&maxFeatures=1000000&outputFormat=application/json&srsName=EPSG:4326`,
         format: new GeoJSON({ featureProjection: 'EPSG:3857' }),
       });
-
-      source.on('featuresloadstart', () => console.log('[HIFResultsMap] WFS load started'));
-      source.on('featuresloadend', () => {
-        const features = source.getFeatures();
-        console.log('[HIFResultsMap] WFS load complete: features =', features.length);
-        if (!featuresLogged && features.length > 0) {
-          featuresLogged = true;
-          const f = features[0];
-          const props = f.getProperties();
-          console.log('[HIFResultsMap] first WFS feature property keys =', Object.keys(props).filter(k => k !== 'geometry'));
-          const colVal = f.get('col');
-          const rowVal = f.get('row');
-          const sampleKey = `${colVal}_${rowVal}`;
-          console.log('[HIFResultsMap] feature col =', colVal, '| row =', rowVal,
-            '| lookup key =', sampleKey, '| hit in cellMap =', sampleKey in cellMap);
-          if (!(sampleKey in cellMap)) {
-            console.warn('[HIFResultsMap] col/row mismatch — cellMap sample keys:',
-              Object.keys(cellMap).slice(0, 5));
-          }
-        }
-      });
-      source.on('featuresloaderror', (err) => console.error('[HIFResultsMap] WFS load error:', err));
 
       resultsLayer.value = new VectorLayer({
         source,
@@ -479,20 +433,14 @@ export default defineComponent({
         },
       });
 
-      console.log('[HIFResultsMap] rebuildResultsLayer: adding resultsLayer to map');
-
       // Insert below boundary overlays
       const layers = map.value.getLayers().getArray();
       const insertIndex = layers.findIndex(l => l === stateLayer.value || l === countyLayer.value);
-      console.log('[HIFResultsMap] rebuildResultsLayer: total layers =', layers.length,
-        '| insertIndex =', insertIndex);
       if (insertIndex >= 0) {
         map.value.getLayers().insertAt(insertIndex, resultsLayer.value);
       } else {
         map.value.addLayer(resultsLayer.value);
       }
-      console.log('[HIFResultsMap] rebuildResultsLayer: layer count after add =',
-        map.value.getLayers().getLength());
 
       // Pointer move → tooltip
       map.value.on('pointermove', (evt) => {
