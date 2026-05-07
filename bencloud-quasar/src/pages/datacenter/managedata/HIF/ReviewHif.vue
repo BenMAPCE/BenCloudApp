@@ -119,7 +119,10 @@ setup(props, context) {
 
     function deleteHifGroup(groupName) {
       // Prompt user to confirm HIF Group deletion
-      if(confirm("Are you sure you wish to permanently delete the HIF Group: " + groupName + "?")){
+      if(currentHifGroupShareScope.value == 1 && !confirm("This HIF Group is shared with all users. Are you sure you wish to permanently delete the HIF Group: " + groupName + "?")){
+        return;
+      }
+      if(confirm((currentHifGroupShareScope.value == 1 ? "This HIF Group is shared with all users. Are you sure?" : "Are you sure you wish to permanently delete the HIF Group: " + groupName + "?"))){
         // Delete HIF Group, reload if successful, alert the user if unsuccessful       
         axios
           .delete(process.env.API_SERVER + "/api/health-impact-function-groups/" + selectedHifGroupId.value, 
