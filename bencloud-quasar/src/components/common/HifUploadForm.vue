@@ -326,6 +326,9 @@ export default {
                });
             }
           } else {
+            if (newGroup) {
+              store.commit("hif/updateHifNewGroupName", hifGroupName.value);
+            }
             Dialog.create({
                 component: HifUploadSuccessDialog,
                 parent: this,

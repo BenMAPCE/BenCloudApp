@@ -23,6 +23,10 @@ export function updateHifGroupEpaStandard (state, hifGroupEpaStandard) {
     state.hifGroupEpaStandard = hifGroupEpaStandard;
 }
 
+export function updateHifNewGroupName (state, hifNewGroupName) {
+    state.hifNewGroupName = hifNewGroupName;
+}
+
 export function updateHifLayerAddedDate (state, newDate) {
     state.hifLayerAddedDate = newDate;
 }

@@ -6,6 +6,7 @@ export default function () {
     hifGroupName: "",
     hifGroupShareScope: 0,
     hifGroupEpaStandard: 0,
+    hifNewGroupName: "",
     hifLayerAddedDate : null,
     hifForceReloadValue: 1,
     hifGroupForceReloadValue: 1

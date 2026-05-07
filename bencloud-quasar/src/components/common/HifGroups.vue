@@ -54,20 +54,29 @@ export default defineComponent({
     watch(
       () => groupValue.value,
       (groupValue, prevGroupValue) => {
-        if (groupValue != prevGroupValue && !props.fromUploadForm) {
+        if (groupValue != prevGroupValue && groupValue != null && !props.fromUploadForm) {
           changeGroupValue(groupValue);
         }
       }
     );
 
-    //update group dropdown when a new group is added
+    //update group dropdown when a group is added or deleted
     watch(
       () => store.state.hif.hifGroupForceReloadValue,
-      (groupValue, prevGroupValue) => {
-        if (groupValue != prevGroupValue) {
+      (newValue, prevValue) => {
+        if (newValue != prevValue) {
           (async () => {
             const response = await loadHifGroups().fetch();
             options.value = JSON.parse(JSON.stringify(response.data.value));
+
+            const newGroupName = store.state.hif.hifNewGroupName;
+            if (newGroupName) {
+              groupValue.value = options.value.find(o => o.name === newGroupName) || null;
+              store.commit("hif/updateHifNewGroupName", "");
+            } else {
+              const currentId = store.state.hif.hifGroupId;
+              groupValue.value = options.value.find(o => o.id === currentId) || null;
+            }
           })();
         }
       }
