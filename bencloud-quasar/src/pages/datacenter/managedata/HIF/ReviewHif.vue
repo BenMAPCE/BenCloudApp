@@ -36,7 +36,7 @@
             ></HifAdd
           >
         </div>
-      <div class="col" v-if="currentPollutantId && currentHifGroupId && currentHifGroupId > 6">
+      <div class="col" v-if="currentPollutantId && currentHifGroupId && !currentHifGroupEpaStandard && (currentHifGroupShareScope != 1 || isAdmin)">
           <q-btn no-caps push color="primary" ref="btn" @click="deleteHifGroup(selectedHifGroupName)">
           DELETE HEALTH IMPACT FUNCTION GROUP</q-btn>
       </div>
@@ -85,6 +85,8 @@ setup(props, context) {
     const currentHifGroupId = ref(0);
     const selectedHifGroupId = reactive(ref(0));
     const selectedHifGroupName = ref("OOPS");
+    const currentHifGroupShareScope = ref(0);
+    const currentHifGroupEpaStandard = ref(0);
 
 
     watch(
@@ -107,6 +109,8 @@ setup(props, context) {
         console.log("------- currentHifGroupId: " + currentHifGroupId.value);
         selectedHifGroupId.value = store.state.hif.hifGroupId
         selectedHifGroupName.value = store.state.hif.hifGroupName
+        currentHifGroupShareScope.value = store.state.hif.hifGroupShareScope
+        currentHifGroupEpaStandard.value = store.state.hif.hifGroupEpaStandard
         console.log("------- hifGroupId: " + store.state.hif.hifGroupId);
         console.log("------- hifGroupId: " + hifGroupId);
         console.log("------- hifGroupFriendlyName: " + store.state.hif.hifGroupName);
@@ -179,6 +183,8 @@ setup(props, context) {
     currentHifGroupId,
     selectedHifGroupId,
     selectedHifGroupName,
+    currentHifGroupShareScope,
+    currentHifGroupEpaStandard,
     showAll,
     onChangePollutantValue,
     deleteHifGroup,

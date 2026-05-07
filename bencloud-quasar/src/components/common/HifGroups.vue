@@ -76,6 +76,8 @@ export default defineComponent({
     function changeGroupValue(value) {
       store.commit("hif/updateHifGroupId", value.id);
       store.commit("hif/updateHifGroupName", value.name);
+      store.commit("hif/updateHifGroupShareScope", value.share_scope);
+      store.commit("hif/updateHifGroupEpaStandard", value.epa_standard);
       emit("changeGroupValue", value);
     }
 
