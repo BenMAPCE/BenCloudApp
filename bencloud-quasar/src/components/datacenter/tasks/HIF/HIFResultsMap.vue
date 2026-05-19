@@ -81,10 +81,8 @@
 
       <div class="col-grow" />
 
-      <div class="col-auto">
+      <div class="col-auto row q-gutter-md">
         <q-toggle v-model="showStateOverlay" label="State boundaries" dense />
-      </div>
-      <div class="col-auto">
         <q-toggle v-model="showCountyOverlay" label="County boundaries" dense />
       </div>
     </div>
