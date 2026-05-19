@@ -517,11 +517,6 @@ export default defineComponent({
     watch(showStateOverlay,  v => stateLayer.value?.setVisible(v));
     watch(showCountyOverlay, v => countyLayer.value?.setVisible(v));
 
-    // Re-apply color when scheme or metric changes without re-fetching data
-    watch(selectedColorScheme, () => {
-      if (resultsLayer.value) applySelection();
-    });
-
     // ── Lifecycle ─────────────────────────────────────────────────────────────
     onMounted(async () => {
       await loadResults();
