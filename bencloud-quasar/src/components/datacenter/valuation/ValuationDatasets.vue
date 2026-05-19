@@ -97,8 +97,10 @@ export default defineComponent({
   methods: {
     archiveRow(props) {
       // Prompt user to confirm vf archive
-      var sharedWarning = props.row.share_scope == 1 ? "This valuation function is shared with all users. " : "";
-      if(confirm(sharedWarning + "Are you sure you wish to archive valuation function " + props.row.id + "?")){
+      if(props.row.share_scope == 1 && !confirm("This valuation function is shared with all users. Are you sure you wish to archive valuation function " + props.row.id + "?")){
+        return;
+      }
+      if(confirm((props.row.share_scope == 1 ? "This valuation function is shared with all users. Are you sure?" : "Are you sure you wish to archive valuation function " + props.row.id + "?"))){
         // Archive the valuation function  
         axios
           .post(process.env.API_SERVER + "/api/valuation-function/" + props.row.id, 

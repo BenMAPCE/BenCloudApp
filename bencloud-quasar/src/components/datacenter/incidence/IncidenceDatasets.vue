@@ -142,6 +142,7 @@ export default defineComponent({
    archiveRow(props) {
       // Prompt user to confirm incidence dataset archiving
       if(confirm("This incidence dataset is shared with all users. Are you sure you wish to archive " + props.row.name + "?")){
+        if(confirm("This incidence dataset is shared with all users. Are you sure?")){
         // Archive the incidence dataset, reload the list if successful, alert the user if unsuccessful       
         axios
           .post(process.env.API_SERVER + "/api/incidence/" + props.row.id, 
@@ -185,6 +186,7 @@ export default defineComponent({
               this.$emit('ok')
             }
           });
+        }
       }
     },
     

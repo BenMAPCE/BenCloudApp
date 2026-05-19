@@ -54,9 +54,6 @@
                     @click="exportData"
                     :label="card.label"
                   />
-                  <q-tooltip anchor="top middle" self="bottom middle">
-                    In Development
-                  </q-tooltip>
                   </div>
                 </q-card-actions>
                 <q-card-section class="q-px-none">
