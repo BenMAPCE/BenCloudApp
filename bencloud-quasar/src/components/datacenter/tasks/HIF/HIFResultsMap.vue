@@ -251,9 +251,11 @@ export default defineComponent({
     const allResults        = ref([]);  // flat array from API
     const endpointOptions   = ref([]);
     const selectedEndpoint  = ref(null);
-    const cachedCellData    = ref([]);   // last-fetched grid-cell rows
-    const cachedEndpoint    = ref(null); // endpoint key when cachedCellData was fetched
-    const cachedGridId      = ref(null); // grid id when cachedCellData was fetched
+    const cachedCellData    = ref([]);        // last-fetched grid-cell rows
+    const cachedEndpoint    = ref(null);      // endpoint key when cachedCellData was fetched
+    const cachedGridId      = ref(null);      // grid id when cachedCellData was fetched
+    const cachedSource      = shallowRef(null); // WFS VectorSource reused across re-renders
+    const cachedSourceGridId = ref(null);     // grid id the cached source was built for
     const selectedMetric    = ref('point_estimate');
     const selectedColorScheme = ref('blue-red');
     const metricOptions     = METRIC_OPTIONS;
@@ -364,18 +366,16 @@ export default defineComponent({
     // ── Apply selection: refetch only when endpoint or grid changed ──────────
     async function applySelection() {
       renderingMap.value = true;
-      loadingStatus.value = 'Loading health data…';
       try {
         const needsFetch = selectedEndpoint.value !== cachedEndpoint.value ||
                            selectedGridId.value    !== cachedGridId.value;
         if (needsFetch) {
-          cachedCellData.value  = await loadGridCellResults();
-          cachedEndpoint.value  = selectedEndpoint.value;
-          cachedGridId.value    = selectedGridId.value;
+          loadingStatus.value  = 'Loading health data…';
+          cachedCellData.value = await loadGridCellResults();
+          cachedEndpoint.value = selectedEndpoint.value;
+          cachedGridId.value   = selectedGridId.value;
         }
-        loadingStatus.value = 'Loading map features…';
-        // rebuildResultsLayer takes ownership of renderingMap and clears it
-        // after the WFS features load and the map finishes rendering.
+        // rebuildResultsLayer sets loadingStatus and takes ownership of renderingMap.
         const released = rebuildResultsLayer(cachedCellData.value);
         if (!released) renderingMap.value = false;
       } catch {
@@ -431,22 +431,48 @@ export default defineComponent({
 
       if (!layerName) return false;
 
-      const source = new VectorSource({
-        url: `${geoServerBaseUrl}/${workspaceName}/ows?service=WFS&version=1.0.0` +
-             `&request=GetFeature&typeName=${workspaceName}:${layerName}` +
-             `&maxFeatures=1000000&outputFormat=application/json&srsName=EPSG:4326`,
-        format: new GeoJSON({ featureProjection: 'EPSG:3857' }),
-      });
+      // Reuse the cached VectorSource when the grid hasn't changed — avoids
+      // a repeat WFS download for metric/color/endpoint-only changes.
+      const sourceIsCached = cachedSource.value !== null &&
+                             cachedSourceGridId.value === selectedGridId.value;
 
-      // Keep the progress bar up through the full pipeline:
-      // WFS download → OL parse → style calls → canvas paint → done.
-      source.once('featuresloadend', () => {
-        loadingStatus.value = 'Rendering…';
-        map.value?.once('rendercomplete', () => {
-          renderingMap.value = false;
+      let source;
+      if (sourceIsCached) {
+        source = cachedSource.value;
+      } else {
+        // propertyName limits the response to only what we need.
+        // "geom" is the PostGIS geometry column name — adjust if your grid
+        // tables use a different column name (e.g. "the_geom", "shape").
+        source = new VectorSource({
+          url: `${geoServerBaseUrl}/${workspaceName}/ows?service=WFS&version=1.0.0` +
+               `&request=GetFeature&typeName=${workspaceName}:${layerName}` +
+               `&maxFeatures=1000000&outputFormat=application/json&srsName=EPSG:4326` +
+               `&propertyName=col,row,geom`,
+          format: new GeoJSON({ featureProjection: 'EPSG:3857' }),
         });
-      });
-      source.once('featuresloaderror', () => { renderingMap.value = false; });
+        cachedSource.value       = source;
+        cachedSourceGridId.value = selectedGridId.value;
+      }
+
+      // Keep the progress bar up through the full pipeline.
+      // If the source already has features (cached + ready), skip straight to render.
+      const waitForRender = () => {
+        loadingStatus.value = 'Rendering…';
+        map.value?.once('rendercomplete', () => { renderingMap.value = false; });
+      };
+
+      if (!sourceIsCached) {
+        loadingStatus.value = 'Loading map features…';
+        source.once('featuresloadend',   waitForRender);
+        source.once('featuresloaderror', () => { renderingMap.value = false; });
+      } else if (source.getState() === 'ready') {
+        waitForRender();
+      } else {
+        // Cached but still in-flight (e.g. grid changed mid-load)
+        loadingStatus.value = 'Loading map features…';
+        source.once('featuresloadend',   waitForRender);
+        source.once('featuresloaderror', () => { renderingMap.value = false; });
+      }
 
       resultsLayer.value = new VectorLayer({
         source,
