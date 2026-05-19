@@ -369,15 +369,20 @@ export default defineComponent({
           cachedEndpoint.value  = selectedEndpoint.value;
           cachedGridId.value    = selectedGridId.value;
         }
-        rebuildResultsLayer(cachedCellData.value);
-      } finally {
+        // rebuildResultsLayer takes ownership of renderingMap and clears it
+        // after the WFS features load and the map finishes rendering.
+        const released = rebuildResultsLayer(cachedCellData.value);
+        if (!released) renderingMap.value = false;
+      } catch {
         renderingMap.value = false;
       }
     }
 
     // ── Build / replace the choropleth VectorLayer ────────────────────────────
+    // Returns true when it takes ownership of renderingMap (async WFS path),
+    // false when it returns early so the caller can clear the flag.
     function rebuildResultsLayer(cellData) {
-      if (!map.value) return;
+      if (!map.value) return false;
 
       if (resultsLayer.value) {
         map.value.removeLayer(resultsLayer.value);
@@ -387,7 +392,7 @@ export default defineComponent({
       if (!cellData.length) {
         statsReady.value = false;
         legendStops.value = [];
-        return;
+        return false;
       }
 
       const metric = selectedMetric.value;
@@ -419,7 +424,7 @@ export default defineComponent({
       const rawTableName     = selectedGridTableName.value;
       const layerName        = rawTableName.includes('.') ? rawTableName.split('.').pop() : rawTableName;
 
-      if (!layerName) return;
+      if (!layerName) return false;
 
       const source = new VectorSource({
         url: `${geoServerBaseUrl}/${workspaceName}/ows?service=WFS&version=1.0.0` +
@@ -427,6 +432,15 @@ export default defineComponent({
              `&maxFeatures=1000000&outputFormat=application/json&srsName=EPSG:4326`,
         format: new GeoJSON({ featureProjection: 'EPSG:3857' }),
       });
+
+      // Keep the spinner up until features have loaded AND the map has
+      // finished its render pass — this covers both the network wait and
+      // the main-thread freeze while OL styles and paints the features.
+      const releaseSpinner = () => map.value?.once('rendercomplete', () => {
+        renderingMap.value = false;
+      });
+      source.once('featuresloadend',   releaseSpinner);
+      source.once('featuresloaderror', () => { renderingMap.value = false; });
 
       resultsLayer.value = new VectorLayer({
         source,
@@ -473,6 +487,8 @@ export default defineComponent({
           hoveredCell.value = null;
         }
       });
+
+      return true; // spinner ownership transferred to featuresloadend/rendercomplete
     }
 
     // ── Map initialisation ────────────────────────────────────────────────────
