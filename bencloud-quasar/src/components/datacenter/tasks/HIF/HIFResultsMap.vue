@@ -104,7 +104,10 @@
 
       <!-- Map -->
       <div class="col map-wrapper">
-        <q-spinner v-if="renderingMap || loadingResults" size="50px" color="primary" class="map-spinner" />
+        <div v-if="renderingMap || loadingResults" class="map-loading-overlay">
+          <q-linear-progress indeterminate color="primary" class="map-progress-bar" />
+          <div class="map-loading-label">{{ loadingStatus }}</div>
+        </div>
         <div ref="mapContainer" class="map-container"></div>
 
         <!-- Hover tooltip -->
@@ -236,6 +239,7 @@ export default defineComponent({
 
     const loadingResults  = ref(false);
     const renderingMap    = ref(false);
+    const loadingStatus   = ref('');
     const loadError       = ref('');
 
     const gridOptions     = ref([]);   // [{ id, name, table_name }] from /api/grid-definitions
@@ -284,6 +288,7 @@ export default defineComponent({
     async function loadResults() {
       if (!props.task_uuid) return;
       loadingResults.value = true;
+      loadingStatus.value  = 'Loading health data…';
       loadError.value = '';
       try {
         const [resultsRes, gridInfoRes, gridDefsRes] = await Promise.all([
@@ -361,6 +366,7 @@ export default defineComponent({
     // ── Apply selection: refetch only when endpoint or grid changed ──────────
     async function applySelection() {
       renderingMap.value = true;
+      loadingStatus.value = 'Loading health data…';
       try {
         const needsFetch = selectedEndpoint.value !== cachedEndpoint.value ||
                            selectedGridId.value    !== cachedGridId.value;
@@ -369,6 +375,7 @@ export default defineComponent({
           cachedEndpoint.value  = selectedEndpoint.value;
           cachedGridId.value    = selectedGridId.value;
         }
+        loadingStatus.value = 'Loading map features…';
         // rebuildResultsLayer takes ownership of renderingMap and clears it
         // after the WFS features load and the map finishes rendering.
         const released = rebuildResultsLayer(cachedCellData.value);
@@ -433,13 +440,14 @@ export default defineComponent({
         format: new GeoJSON({ featureProjection: 'EPSG:3857' }),
       });
 
-      // Keep the spinner up until features have loaded AND the map has
-      // finished its render pass — this covers both the network wait and
-      // the main-thread freeze while OL styles and paints the features.
-      const releaseSpinner = () => map.value?.once('rendercomplete', () => {
-        renderingMap.value = false;
+      // Keep the progress bar up through the full pipeline:
+      // WFS download → OL parse → style calls → canvas paint → done.
+      source.once('featuresloadend', () => {
+        loadingStatus.value = 'Rendering…';
+        map.value?.once('rendercomplete', () => {
+          renderingMap.value = false;
+        });
       });
-      source.once('featuresloadend',   releaseSpinner);
       source.once('featuresloaderror', () => { renderingMap.value = false; });
 
       resultsLayer.value = new VectorLayer({
@@ -569,7 +577,7 @@ export default defineComponent({
 
     return {
       mapContainer,
-      loadingResults, renderingMap, loadError,
+      loadingResults, renderingMap, loadingStatus, loadError,
       gridOptions, selectedGridId,
       endpointOptions, selectedEndpoint,
       selectedMetric, metricOptions,
@@ -607,12 +615,26 @@ export default defineComponent({
   border: 1px solid #ccc;
 }
 
-.map-spinner {
+.map-loading-overlay {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  top: 0;
+  left: 0;
+  right: 0;
   z-index: 2000;
+  pointer-events: none;
+}
+
+.map-progress-bar {
+  height: 4px;
+}
+
+.map-loading-label {
+  font-size: 11px;
+  color: #555;
+  padding: 3px 6px;
+  background: rgba(255, 255, 255, 0.85);
+  display: inline-block;
+  border-radius: 0 0 4px 0;
 }
 
 .map-tooltip {
