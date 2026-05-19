@@ -249,6 +249,9 @@ export default defineComponent({
     const allResults        = ref([]);  // flat array from API
     const endpointOptions   = ref([]);
     const selectedEndpoint  = ref(null);
+    const cachedCellData    = ref([]);   // last-fetched grid-cell rows
+    const cachedEndpoint    = ref(null); // endpoint key when cachedCellData was fetched
+    const cachedGridId      = ref(null); // grid id when cachedCellData was fetched
     const selectedMetric    = ref('point_estimate');
     const selectedColorScheme = ref('blue-red');
     const metricOptions     = METRIC_OPTIONS;
@@ -355,12 +358,18 @@ export default defineComponent({
       }
     }
 
-    // ── Apply selection: fetch per-cell data → rebuild results layer ─────────
+    // ── Apply selection: refetch only when endpoint or grid changed ──────────
     async function applySelection() {
       renderingMap.value = true;
       try {
-        const cellData = await loadGridCellResults();
-        rebuildResultsLayer(cellData);
+        const needsFetch = selectedEndpoint.value !== cachedEndpoint.value ||
+                           selectedGridId.value    !== cachedGridId.value;
+        if (needsFetch) {
+          cachedCellData.value  = await loadGridCellResults();
+          cachedEndpoint.value  = selectedEndpoint.value;
+          cachedGridId.value    = selectedGridId.value;
+        }
+        rebuildResultsLayer(cachedCellData.value);
       } finally {
         renderingMap.value = false;
       }
