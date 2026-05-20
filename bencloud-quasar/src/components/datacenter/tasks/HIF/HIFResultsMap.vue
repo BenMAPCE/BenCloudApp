@@ -195,6 +195,8 @@ const COLOR_SCHEMES = [
   { label: 'Yellow → Red',  value: 'yellow-red' },
 ];
 
+const BATCH_SIZE = 5000; // features per WFS page request
+
 // Simple linear interpolation between two hex colors
 function lerpColor(hexA, hexB, t) {
   const parse = h => [parseInt(h.slice(1,3),16), parseInt(h.slice(3,5),16), parseInt(h.slice(5,7),16)];
@@ -440,24 +442,6 @@ export default defineComponent({
       const sourceIsCached = cachedSource.value !== null &&
                              cachedSourceGridId.value === selectedGridId.value;
 
-      let source;
-      if (sourceIsCached) {
-        source = cachedSource.value;
-      } else {
-        // propertyName limits the response to only what we need.
-        // "geom" is the PostGIS geometry column name — adjust if your grid
-        // tables use a different column name (e.g. "the_geom", "shape").
-        source = new VectorSource({
-          url: `${geoServerBaseUrl}/${workspaceName}/ows?service=WFS&version=1.0.0` +
-               `&request=GetFeature&typeName=${workspaceName}:${layerName}` +
-               `&maxFeatures=1000000&outputFormat=application/json&srsName=EPSG:4326` +
-               `&propertyName=col,row,geom`,
-          format: new GeoJSON({ featureProjection: 'EPSG:3857' }),
-        });
-        cachedSource.value       = source;
-        cachedSourceGridId.value = selectedGridId.value;
-      }
-
       // Keep the progress bar up through the full pipeline.
       // If the source already has features (cached + ready), skip straight to render.
       const waitForRender = () => {
@@ -465,17 +449,80 @@ export default defineComponent({
         map.value?.once('rendercomplete', () => { renderingMap.value = false; });
       };
 
-      if (!sourceIsCached) {
-        loadingStatus.value = 'Loading map features…';
-        source.once('featuresloadend',   waitForRender);
-        source.once('featuresloaderror', () => { renderingMap.value = false; });
-      } else if (source.getState() === 'ready') {
-        waitForRender();
+      let source;
+      if (sourceIsCached) {
+        source = cachedSource.value;
+        if (source.getState() === 'ready') {
+          waitForRender();
+        } else {
+          // Cached but still in-flight (grid changed mid-load)
+          loadingStatus.value = 'Loading map features…';
+          source.once('featuresloadend',   waitForRender);
+          source.once('featuresloaderror', () => { renderingMap.value = false; });
+        }
       } else {
-        // Cached but still in-flight (e.g. grid changed mid-load)
-        loadingStatus.value = 'Loading map features…';
+        // propertyName limits the WFS response to only the fields we need.
+        // "geom" is the PostGIS geometry column — adjust if tables use a
+        // different name (e.g. "the_geom", "shape").
+        const wfsBase = `${geoServerBaseUrl}/${workspaceName}/ows?service=WFS&version=1.0.0` +
+                        `&request=GetFeature&typeName=${workspaceName}:${layerName}` +
+                        `&outputFormat=application/json&srsName=EPSG:4326` +
+                        `&propertyName=col,row,geom`;
+
+        const geoJsonFmt = new GeoJSON({ featureProjection: 'EPSG:3857' });
+
+        source = new VectorSource({
+          loader(extent, resolution, projection, success, failure) {
+            let startIndex  = 0;
+            let totalLoaded = 0;
+            let totalFeatures = null;
+
+            // Fire a hits request in parallel so we can show "X / Y" progress.
+            // Non-critical — if it fails we fall back to showing just the running count.
+            const hitsUrl = `${geoServerBaseUrl}/${workspaceName}/ows?service=WFS&version=1.1.0` +
+                            `&request=GetFeature&typeName=${workspaceName}:${layerName}` +
+                            `&resultType=hits&outputFormat=application/json`;
+            fetch(hitsUrl)
+              .then(r => r.json())
+              .then(d => { totalFeatures = d.totalFeatures ?? d.numberMatched ?? null; })
+              .catch(() => {});
+
+            function updateStatus() {
+              const loaded = totalLoaded.toLocaleString();
+              loadingStatus.value = totalFeatures
+                ? `Loading map features… ${loaded} / ${Number(totalFeatures).toLocaleString()}`
+                : `Loading map features… ${loaded}`;
+            }
+
+            function loadBatch() {
+              fetch(`${wfsBase}&maxFeatures=${BATCH_SIZE}&startIndex=${startIndex}`)
+                .then(r => r.json())
+                .then(data => {
+                  const features = geoJsonFmt.readFeatures(data);
+                  if (features.length > 0) {
+                    source.addFeatures(features);
+                    totalLoaded += features.length;
+                    startIndex  += features.length;
+                    updateStatus();
+                  }
+                  if (features.length < BATCH_SIZE) {
+                    success(source.getFeatures());
+                  } else {
+                    loadBatch();
+                  }
+                })
+                .catch(failure);
+            }
+
+            updateStatus();
+            loadBatch();
+          },
+        });
+
         source.once('featuresloadend',   waitForRender);
         source.once('featuresloaderror', () => { renderingMap.value = false; });
+        cachedSource.value       = source;
+        cachedSourceGridId.value = selectedGridId.value;
       }
 
       resultsLayer.value = new VectorLayer({
