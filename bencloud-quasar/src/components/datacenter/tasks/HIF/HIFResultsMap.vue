@@ -461,6 +461,8 @@ export default defineComponent({
           source.once('featuresloaderror', () => { renderingMap.value = false; });
         }
       } else {
+        loadingStatus.value = 'Loading map features…';
+
         // propertyName limits the WFS response to only the fields we need.
         // "geom" is the PostGIS geometry column — adjust if tables use a
         // different name (e.g. "the_geom", "shape").
