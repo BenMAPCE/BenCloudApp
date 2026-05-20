@@ -256,10 +256,12 @@ export default defineComponent({
     const cachedGridId      = ref(null);      // grid id when cachedCellData was fetched
     const cachedSource      = shallowRef(null); // WFS VectorSource reused across re-renders
     const cachedSourceGridId = ref(null);     // grid id the cached source was built for
-    const selectedMetric    = ref('point_estimate');
+    const selectedMetric      = ref('point_estimate');
     const selectedColorScheme = ref('blue-red');
-    const metricOptions     = METRIC_OPTIONS;
-    const colorSchemeOptions = COLOR_SCHEMES;
+    const appliedMetric       = ref('point_estimate'); // updated only on Apply
+    const appliedColorScheme  = ref('blue-red');       // updated only on Apply
+    const metricOptions       = METRIC_OPTIONS;
+    const colorSchemeOptions  = COLOR_SCHEMES;
 
     const showStateOverlay  = ref(true);
     const showCountyOverlay = ref(false);
@@ -276,11 +278,11 @@ export default defineComponent({
     const statsReady  = ref(false);
 
     const currentMetricLabel = computed(() =>
-      METRIC_OPTIONS.find(o => o.value === selectedMetric.value)?.label ?? ''
+      METRIC_OPTIONS.find(o => o.value === appliedMetric.value)?.label ?? ''
     );
 
     const legendGradientStyle = computed(() => {
-      const [lo, mid, hi] = SCHEME_STOPS[selectedColorScheme.value] || SCHEME_STOPS['blue-red'];
+      const [lo, mid, hi] = SCHEME_STOPS[appliedColorScheme.value] || SCHEME_STOPS['blue-red'];
       return { background: `linear-gradient(to bottom, ${hi}, ${mid}, ${lo})` };
     });
 
@@ -405,12 +407,14 @@ export default defineComponent({
       const min = Math.min(...values);
       const max = Math.max(...values);
 
-      legendMin.value   = min;
-      legendMax.value   = max;
-      legendTotal.value = values.reduce((a, b) => a + b, 0);
-      legendCount.value = values.length;
-      legendStops.value = [min, max];
-      statsReady.value  = true;
+      legendMin.value      = min;
+      legendMax.value      = max;
+      legendTotal.value    = values.reduce((a, b) => a + b, 0);
+      legendCount.value    = values.length;
+      legendStops.value    = [min, max];
+      statsReady.value     = true;
+      appliedMetric.value      = selectedMetric.value;
+      appliedColorScheme.value = selectedColorScheme.value;
 
       // API returns column field as "col" or "column" depending on grid type.
       const firstRow = cellData[0];
