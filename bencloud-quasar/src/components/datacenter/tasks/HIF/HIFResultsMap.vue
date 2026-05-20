@@ -471,24 +471,27 @@ export default defineComponent({
 
         const geoJsonFmt = new GeoJSON({ featureProjection: 'EPSG:3857' });
 
-        const totalFeatures = cellData.length;
-
         source = new VectorSource({
           loader(extent, resolution, projection, success, failure) {
-            let startIndex  = 0;
-            let totalLoaded = 0;
+            let startIndex   = 0;
+            let totalLoaded  = 0;
+            let totalFeatures = null; // read from first GeoServer response
 
             function loadBatch() {
               fetch(`${wfsBase}&maxFeatures=${BATCH_SIZE}&startIndex=${startIndex}`)
                 .then(r => r.json())
                 .then(data => {
+                  if (totalFeatures === null) {
+                    totalFeatures = data.totalFeatures ?? data.numberMatched ?? null;
+                  }
                   const features = geoJsonFmt.readFeatures(data);
                   if (features.length > 0) {
                     source.addFeatures(features);
                     totalLoaded += features.length;
                     startIndex  += features.length;
-                    loadingStatus.value =
-                      `Loading map features… ${totalLoaded.toLocaleString()} / ${totalFeatures.toLocaleString()}`;
+                    loadingStatus.value = totalFeatures
+                      ? `Loading map features… ${totalLoaded.toLocaleString()} / ${Number(totalFeatures).toLocaleString()}`
+                      : `Loading map features… ${totalLoaded.toLocaleString()}`;
                   }
                   if (features.length < BATCH_SIZE) {
                     success(source.getFeatures());
