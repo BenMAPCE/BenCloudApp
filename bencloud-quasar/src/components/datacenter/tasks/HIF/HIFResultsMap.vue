@@ -471,28 +471,12 @@ export default defineComponent({
 
         const geoJsonFmt = new GeoJSON({ featureProjection: 'EPSG:3857' });
 
+        const totalFeatures = cellData.length;
+
         source = new VectorSource({
           loader(extent, resolution, projection, success, failure) {
             let startIndex  = 0;
             let totalLoaded = 0;
-            let totalFeatures = null;
-
-            // Fire a hits request in parallel so we can show "X / Y" progress.
-            // Non-critical — if it fails we fall back to showing just the running count.
-            const hitsUrl = `${geoServerBaseUrl}/${workspaceName}/ows?service=WFS&version=1.1.0` +
-                            `&request=GetFeature&typeName=${workspaceName}:${layerName}` +
-                            `&resultType=hits&outputFormat=application/json`;
-            fetch(hitsUrl)
-              .then(r => r.json())
-              .then(d => { totalFeatures = d.totalFeatures ?? d.numberMatched ?? null; })
-              .catch(() => {});
-
-            function updateStatus() {
-              const loaded = totalLoaded.toLocaleString();
-              loadingStatus.value = totalFeatures
-                ? `Loading map features… ${loaded} / ${Number(totalFeatures).toLocaleString()}`
-                : `Loading map features… ${loaded}`;
-            }
 
             function loadBatch() {
               fetch(`${wfsBase}&maxFeatures=${BATCH_SIZE}&startIndex=${startIndex}`)
@@ -503,7 +487,8 @@ export default defineComponent({
                     source.addFeatures(features);
                     totalLoaded += features.length;
                     startIndex  += features.length;
-                    updateStatus();
+                    loadingStatus.value =
+                      `Loading map features… ${totalLoaded.toLocaleString()} / ${totalFeatures.toLocaleString()}`;
                   }
                   if (features.length < BATCH_SIZE) {
                     success(source.getFeatures());
@@ -514,7 +499,6 @@ export default defineComponent({
                 .catch(failure);
             }
 
-            updateStatus();
             loadBatch();
           },
         });
