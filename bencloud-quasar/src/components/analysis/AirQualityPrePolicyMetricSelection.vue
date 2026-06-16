@@ -219,7 +219,7 @@ export default defineComponent({
 
               row = {};
 
-              row.input_file_characteristic = "filename";
+              row.input_file_characteristic = "File name";
               row.value = airQualityLayers[i].filename;
               rows.value.push(row);
 
@@ -241,6 +241,11 @@ export default defineComponent({
                 Math.round(metric_statistics[m].pct_2_5 * 100) / 100 +
                 " - " +
                 Math.round(metric_statistics[m].pct_97_5 * 100) / 100;
+              rows.value.push(row);
+
+              row = {};
+              row.input_file_characteristic = "Grid definition";
+              row.value = airQualityLayers[i].grid_definition_name;
               rows.value.push(row);
             }
           }
