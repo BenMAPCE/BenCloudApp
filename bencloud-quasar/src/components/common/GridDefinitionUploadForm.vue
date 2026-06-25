@@ -61,6 +61,15 @@
               </div>
             </div>
 
+            <div v-if="isAdmin" class="q-px-md q-pb-sm">
+              <q-toggle
+                v-model="shareScope"
+                :true-value="1"
+                :false-value="0"
+                label="Share with all users"
+              />
+            </div>
+
             <div class="row justify-center">
               <q-card-actions>
                 <q-btn color="primary" label="Upload" @click="onSubmit" />
@@ -82,6 +91,7 @@
   import GridDefinitionUploadSuccessDialog from "./GridDefinitionUploadSuccessDialog.vue";
   import { useQuasar } from "quasar";
   import { useStore } from "vuex";
+  import { isAdmin } from "src/boot/auth.js";
   
   export var layerName = null;
   
@@ -94,10 +104,13 @@
       filename:"",
       uploadDate: "",
       dashData: [],
+      shareScope: 0,
     }),
-    
- 
-  
+
+    setup() {
+      return { isAdmin };
+    },
+
     emits: [
       // REQUIRED
       "ok",
@@ -185,8 +198,9 @@
         fileData.append("filename", this.selected_file.name);
         console.log(fileData);
         fileData.append("uploadDate",localISOTime)
+        fileData.append("shareScope", this.shareScope);
         var self = this;
-  
+
         this.$q.loading.show({
           message: "Uploading Grid Definition. Please wait...",
           boxClass: "bg-grey-2 text-grey-9",
@@ -329,7 +343,7 @@
       },
   
       onCancelClick() {
-        // we just need to hide the dialog
+        this.shareScope = 0;
         this.hide();
       },
     },

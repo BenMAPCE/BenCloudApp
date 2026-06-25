@@ -59,6 +59,24 @@
             </div>
           </div>
 
+          <div v-if="isAdmin" class="q-px-md q-pb-sm">
+            <q-toggle
+              v-model="shareScope"
+              :true-value="1"
+              :false-value="0"
+              label="Share with all users"
+            />
+          </div>
+
+          <div v-if="isAdmin && shareScope" class="q-px-md q-pb-sm">
+            <q-toggle
+              v-model="epaStandard"
+              :true-value="1"
+              :false-value="0"
+              label="Share as EPA standard dataset"
+            />
+          </div>
+
           <div class="row justify-center">
             <q-card-actions>
               <q-btn color="primary" label="Upload" @click="onSubmit" />
@@ -82,6 +100,7 @@ import IncidenceUploadSuccessDialog from "./IncidenceUploadSuccessDialog.vue";
 
 import { useQuasar } from "quasar";
 import { useStore } from "vuex";
+import { isAdmin } from "src/boot/auth.js";
 
 export var layerName = null;
 
@@ -96,12 +115,17 @@ export default {
     filename:"",
     uploadDate: "",
     dashData: [],
+    shareScope: 0,
+    epaStandard: 0,
   }),
-  
+
+  setup() {
+    return { isAdmin };
+  },
+
   components: {
     GridDefinitions,
   },
-
 
   emits: [
     // REQUIRED
@@ -196,6 +220,8 @@ export default {
       fileData.append("filename", this.selected_file.name);
       console.log(fileData);
       fileData.append("uploadDate",localISOTime)
+      fileData.append("shareScope", this.shareScope);
+      fileData.append("epaStandard", this.epaStandard == 1 ? "true" : "false");
       var self = this;
 
       this.$q.loading.show({
@@ -336,7 +362,8 @@ export default {
     },
 
     onCancelClick() {
-      // we just need to hide the dialog
+      this.shareScope = 0;
+      this.epaStandard = 0;
       this.hide();
     },
 

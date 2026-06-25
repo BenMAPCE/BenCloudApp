@@ -10,7 +10,7 @@ build_dev_app:
  stage: code_build
  only: 
   - develop
- image: node:16
+ image: node:20
  tags:
     - benmapdevgitlab
 #    - devsecops-instance
@@ -28,7 +28,7 @@ build_stage_app:
  stage: code_build
  only: 
   - tags
- image: node:16
+ image: node:20
  tags:
   - benmapstagegitlab
  script:
